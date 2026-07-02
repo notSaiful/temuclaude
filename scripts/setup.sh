@@ -25,7 +25,7 @@ fi
 # Install dependencies
 echo ""
 echo "=== Installing dependencies ==="
-$PIP install litellm "litellm[proxy]" openai pyyaml aiohttp 2>&1 | tail -5
+$PIP install -r requirements.txt 2>&1 | tail -5
 
 # Set environment variables
 echo ""
@@ -58,5 +58,5 @@ $PYTHON tests/test_orchestrator.py
 echo ""
 echo "=== Setup complete ==="
 echo "To start the LiteLLM proxy:"
-echo "  export TIMUCLAUDE_MASTER_KEY=your-key"
-echo "  $PYTHON -m litellm --config config/litellm-minimal.yaml --port 4000"
+echo "  source .env"
+echo "  $PYTHON -m litellm --config config/litellm.yaml --port 4000"

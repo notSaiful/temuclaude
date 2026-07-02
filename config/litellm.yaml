@@ -1,18 +1,13 @@
-# Timuclaude — LiteLLM Proxy Configuration
-# This configures the LiteLLM proxy that serves as our production API
-# All Ollama Cloud models are exposed through one OpenAI-compatible endpoint
+# Timuclaude — LiteLLM Proxy Configuration (minimal, no database)
+# Used for Phase 1 testing. Database (Postgres) added in Phase 3.
 
 model_list:
-  # === USER-FACING MODEL ===
-  # This is what users call: model="timuclaude"
-  # It routes to GLM-5.2 as default (the orchestrator's primary model)
   - model_name: timuclaude
     litellm_params:
       model: ollama_chat/glm-5.2:cloud
       api_base: http://localhost:11434
       keep_alive: "30m"
-      
-  # === INDIVIDUAL MODELS (for internal orchestration) ===
+
   - model_name: glm-5.2
     litellm_params:
       model: ollama_chat/glm-5.2:cloud
@@ -31,12 +26,6 @@ model_list:
       api_base: http://localhost:11434
       keep_alive: "30m"
 
-  - model_name: kimi-k2.7-code
-    litellm_params:
-      model: ollama_chat/kimi-k2.7-code:cloud
-      api_base: http://localhost:11434
-      keep_alive: "30m"
-
   - model_name: minimax-m3
     litellm_params:
       model: ollama_chat/minimax-m3:cloud
@@ -49,31 +38,20 @@ model_list:
       api_base: http://localhost:11434
       keep_alive: "30m"
 
-  # === CHEAP ROUTE (for trivial queries) ===
   - model_name: gpt-oss-120b
     litellm_params:
       model: ollama_chat/gpt-oss:120b-cloud
       api_base: http://localhost:11434
       keep_alive: "30m"
 
-# === ROUTING ===
 router_settings:
   routing_strategy: simple-shuffle
   num_retries: 2
   timeout: 120
-  allowed_fails: 3
 
-# === FALLBACKS ===
-# If a model fails, try the next one
-fallbacks:
-  - timuclaude: ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
-
-# === LITELLM SETTINGS ===
 litellm_settings:
   drop_params: true
   set_verbose: false
 
-# === GENERAL SETTINGS ===
 general_settings:
   master_key: "os.environ/TIMUCLAUDE_MASTER_KEY"
-  database_url: "sqlite:///timuclaude.db"  # For cost tracking + adaptive router
