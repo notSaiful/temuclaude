@@ -99,22 +99,36 @@ class Timuclaude:
 
     def determine_tier(self, query: str, task_type: str) -> str:
         """Determine routing tier: trivial, medium, or hard."""
-        # Simple heuristic for now (Phase 2 will improve this)
         word_count = len(query.split())
+        char_count = len(query)
 
-        if word_count < 15 and task_type in ("knowledge", "simple"):
+        # Trivial: very short AND simple task type
+        # Only knowledge and simple tasks qualify as trivial
+        # Math (even short) requires computation = medium minimum
+        # Coding (even short) requires generation = medium minimum
+        if word_count <= 8 and char_count <= 50 and task_type in ("knowledge", "simple"):
             return "trivial"
-        if task_type in ("math", "reasoning") and word_count > 50:
+
+        # Hard: long, complex queries
+        if word_count > 100:
             return "hard"
-        if "code" in query.lower() and "fix" in query.lower():
+        if char_count > 500:
             return "hard"
-        if word_count > 200:
+        if task_type in ("math", "reasoning") and word_count > 30:
+            return "hard"
+        if task_type == "coding" and word_count > 25:
+            return "hard"
+        if "fix" in query.lower() and ("code" in query.lower() or "error" in query.lower() or "bug" in query.lower()):
             return "hard"
 
         return "medium"
 
     async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192) -> str:
-        """Call a single Ollama Cloud model."""
+        """Call a single Ollama Cloud model. Minimum max_tokens=200 for thinking models."""
+        # Thinking models use internal tokens for reasoning — don't cap too low
+        if max_tokens < 200:
+            max_tokens = 200
+
         ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
         try:
             response = await self.client.chat.completions.create(
@@ -127,9 +141,9 @@ class Timuclaude:
         except Exception as e:
             return f"[ERROR: {model} failed: {e}]"
 
-    async def direct_response(self, model: str, messages: list) -> str:
+    async def direct_response(self, model: str, messages: list, max_tokens: int = 8192) -> str:
         """Get a direct response from a single model."""
-        return await self.call_model(model, messages)
+        return await self.call_model(model, messages, max_tokens=max_tokens)
 
     async def complete(self, query: str, system_prompt: str = None) -> str:
         """
@@ -150,7 +164,7 @@ class Timuclaude:
                 {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant."},
                 {"role": "user", "content": query},
             ]
-            answer = await self.direct_response(model, messages)
+            answer = await self.direct_response(model, messages, max_tokens=500)
             models_used = [model]
             strategy = "direct_cheap"
         elif tier == "medium":
@@ -160,7 +174,7 @@ class Timuclaude:
                 {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers."},
                 {"role": "user", "content": query},
             ]
-            answer = await self.direct_response(model, messages)
+            answer = await self.direct_response(model, messages, max_tokens=8192)
             models_used = [model]
             strategy = "direct_specialist"
         else:
