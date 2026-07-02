@@ -24,7 +24,8 @@ logs/*.jsonl
 # OS
 .DS_Store
 
-# Secrets
+# .env file with secrets
+.env
 config/secrets.*
 *secret*
 *key*
