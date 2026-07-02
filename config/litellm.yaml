@@ -75,5 +75,5 @@ litellm_settings:
 
 # === GENERAL SETTINGS ===
 general_settings:
-  master_key: "sk-timuclaude-master-key-change-me"
+  master_key: "os.environ/TIMUCLAUDE_MASTER_KEY"
   database_url: "sqlite:///timuclaude.db"  # For cost tracking + adaptive router

@@ -34,21 +34,66 @@ class Timuclaude:
 
     async def classify_task(self, query: str) -> str:
         """Classify the query into a task type for routing."""
-        # Simple keyword-based classification (Phase 2 will use a model for this)
+        # Keyword-based classification (Phase 2 will use a model for this)
+        # Order matters: check more specific categories first
         query_lower = query.lower()
+        import re
 
-        if any(kw in query_lower for kw in ["calculate", "solve", "equation", "prove", "integral", "derivative", "matrix", "theorem", "algebra", "geometry", "probability", "statistics"]):
+        # Math: arithmetic expressions like "2+2" or "15*12"
+        if re.search(r'\d+\s*[+\-*/^]\s*\d+', query):
             return "math"
-        if any(kw in query_lower for kw in ["code", "function", "debug", "python", "javascript", "java", "react", "api", "sql", "algorithm", "compile", "error", "bug"]):
-            return "coding"
-        if any(kw in query_lower for kw in ["analyze", "compare", "evaluate", "reason", "why", "how does", "explain the mechanism", "implication"]):
-            return "reasoning"
-        if any(kw in query_lower for kw in ["write", "create", "generate", "compose", "story", "poem", "essay", "article", "blog"]):
+        # Math: math terms
+        if any(kw in query_lower for kw in [
+            "calculate", "solve", "equation", "prove", "integral", "derivative",
+            "matrix", "theorem", "algebra", "geometry", "probability", "statistics",
+            "sum", "product", "factor", "prime", " polynomial", "function of x",
+            "limit", "series", "differential", "vector", "tensor", "topology"
+        ]):
+            return "math"
+
+        # Creative: writing/generation tasks (check early, before coding)
+        if any(kw in query_lower for kw in [
+            "write a poem", "write a story", "write a short story",
+            "write an essay", "write a blog", "write a script",
+            "compose", "screenplay", "generate a", "create a story",
+            "write a song", "write a letter",
+        ]):
             return "creative"
-        if any(kw in query_lower for kw in ["what is", "who is", "when did", "where is", "history", "define", "definition"]):
+
+        # Knowledge: factual questions (check before coding to avoid false positives)
+        if any(kw in query_lower for kw in [
+            "what is the capital", "what is the capital of", "who is", "when did",
+            "where is", "history of", "define ", "definition of", "meaning of",
+            "what is the largest", "what is the smallest", "what is the tallest",
+        ]):
             return "knowledge"
-        if any(kw in query_lower for kw in ["deploy", "setup", "install", "configure", "run", "execute", "build"]):
+        # Generic "what is" that's NOT about code/math
+        if query_lower.startswith("what is ") and not any(kw in query_lower for kw in ["api", "function", "code", "algorithm"]):
+            return "knowledge"
+
+        # Reasoning: analytical questions
+        if any(kw in query_lower for kw in [
+            "compare", "analyze", "evaluate", "why does", "why is",
+            "how does", "explain the mechanism", "trade-off", "tradeoff",
+            "consequence", "implication", "difference between",
+        ]):
+            return "reasoning"
+
+        # Agentic: deployment/setup tasks (check before coding — "deploy react" is agentic not coding)
+        if any(kw in query_lower for kw in [
+            "deploy", "setup", "install ", "configure", "run ", "execute",
+            "build a", "automate", "pipeline", "workflow",
+        ]):
             return "agentic"
+
+        # Coding: programming tasks
+        if any(kw in query_lower for kw in [
+            "code", "function", "debug", "python", "javascript", "java ",
+            "react", "typescript", "rust", "golang", "sql", "algorithm",
+            "compile", "error:", "bug", "docker", "kubernetes",
+            "api endpoint", "rest api", "graphql api",
+        ]):
+            return "coding"
 
         return "knowledge"  # default
 
