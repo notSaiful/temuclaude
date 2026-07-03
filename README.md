@@ -170,6 +170,16 @@ timuclaude/
 - GEPA prompt evolution: generates improved prompts for weak task types (manual trigger)
 - 8 test suites pass (14 non-live + 2 live tests)
 
+**Phase 4 (Benchmark Testing):** Complete
+- Universal benchmark framework: runs on any Q&A dataset
+- Dataset loaders: HLE (HF gated), MRCR v2, custom JSON, sample dataset
+- LLM-as-judge scoring: extracts answer, compares to ground truth (HLE-style)
+- Exact-match scoring: for simple numeric/text answers
+- Benchmark runner: per-question scoring, category breakdown, latency tracking
+- Results reporter: human-readable report + comparison (baseline vs Timuclaude)
+- CLI scripts: run_baseline.py, run_timuclaude.py
+- 5 test suites pass (13 non-live + 1 live test, 100% accuracy on sample)
+
 ## License
 
 MIT
