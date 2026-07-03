@@ -51,6 +51,9 @@ module.exports = {
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.25, 1, 0.5, 1)',
+        material: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        quad: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        cubic: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
