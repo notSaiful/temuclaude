@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/Navbar';
 import { OrchestrationDiagram } from '@/components/OrchestrationDiagram';
+import { ScrollReveal, StaggerReveal, StaggerItem, AnimatedCounter } from '@/components/Animations';
 
 export default function HomePage() {
   return (
@@ -61,12 +62,14 @@ export default function HomePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: '5', label: 'AI Models' },
-                { value: '28x', label: 'Cheaper' },
+                { value: '28', suffix: 'x', label: 'Cheaper' },
                 { value: '9', label: 'Benchmarks' },
                 { value: 'MIT', label: 'Licensed' },
               ].map((stat, i) => (
                 <div key={i}>
-                  <div className="text-3xl font-bold text-accent-primary">{stat.value}</div>
+                  <div className="text-3xl font-bold text-accent-primary">
+                    <AnimatedCounter value={stat.value} suffix={stat.suffix || ''} />
+                  </div>
                   <div className="text-sm text-text-secondary mt-1">{stat.label}</div>
                 </div>
               ))}
@@ -102,7 +105,7 @@ export default function HomePage() {
               Three steps from your question to a superior answer
             </p>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <StaggerReveal className="grid md:grid-cols-3 gap-6">
               {[
                 {
                   num: '01',
@@ -120,13 +123,15 @@ export default function HomePage() {
                   desc: 'Code execution verifies math. A self-QA gate scores the answer 0-10. If below 8, it retries with feedback.',
                 },
               ].map((feature, i) => (
-                <div key={i} className="card">
-                  <div className="text-2xl font-bold text-accent-primary mb-3">{feature.num}</div>
-                  <h3 className="text-lg font-semibold text-text-primary mb-2">{feature.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed">{feature.desc}</p>
-                </div>
+                <StaggerItem key={i}>
+                  <div className="card h-full">
+                    <div className="text-2xl font-bold text-accent-primary mb-3">{feature.num}</div>
+                    <h3 className="text-lg font-semibold text-text-primary mb-2">{feature.title}</h3>
+                    <p className="text-sm text-text-secondary leading-relaxed">{feature.desc}</p>
+                  </div>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerReveal>
           </div>
         </section>
 
@@ -203,7 +208,7 @@ export default function HomePage() {
               Free to try in the playground. Pay only when you need more.
             </p>
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <StaggerReveal className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
                 {
                   name: 'Self-Hosted',
@@ -233,10 +238,10 @@ export default function HomePage() {
                   featured: false,
                 },
               ].map((tier, i) => (
-                <div
-                  key={i}
-                  className={`card ${tier.featured ? 'border-accent-primary border-2' : ''}`}
-                >
+                <StaggerItem key={i}>
+                  <div
+                    className={`card h-full ${tier.featured ? 'border-accent-primary border-2' : ''}`}
+                  >
                   {tier.featured && (
                     <div className="badge-accent mb-4 w-fit">Most Popular</div>
                   )}
@@ -260,9 +265,10 @@ export default function HomePage() {
                   >
                     {tier.cta}
                   </a>
-                </div>
+                  </div>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerReveal>
           </div>
         </section>
 

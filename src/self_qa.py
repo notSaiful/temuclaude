@@ -3,17 +3,30 @@ Timuclaude Self-QA Gate
 After generating a response, a verifier model scores it 0-10.
 If below threshold (8), retry with feedback. Max 3 retries.
 
-Based on: GDPval-RealWorks repo (hyeonsangjeon/gdpval-realworks)
-- Self-QA scores each output on a 0-10 scale using rubric-based self-evaluation
-- If score < threshold: enters reflection loop, retries
-- Checks: Are all requirements met? Is output correct? Is it professional?
+Based on:
+- GDPval-RealWorks repo (hyeonsangjeon/gdpval-realworks)
+  Self-QA scores each output on a 0-10 scale using rubric-based self-evaluation
+- ATTS (2025): USVA 4-rubric verification — LC (Logical Coherence), FC (Factual
+  Correctness), CM (Completeness), GA (Goal Alignment). More granular than
+  single 0-10 score. 28% token savings with 2% accuracy cost.
+- Reflexion (arXiv:2303.11366): Verbal self-reflection on failures stored in
+  memory for retry. 91% HumanEval (vs GPT-4's 80%). +10-20% on hard problems.
 """
 import asyncio
-from typing import Callable, Awaitable
+import re
+from typing import Callable, Awaitable, Optional
 
 
 DEFAULT_THRESHOLD = 8
 DEFAULT_MAX_RETRIES = 3
+
+# USVA 4-rubric scoring (from ATTS framework)
+USVA_RUBRICS = {
+    "LC": "Logical Coherence — Is the reasoning internally consistent and logical?",
+    "FC": "Factual Correctness — Are the facts and claims accurate?",
+    "CM": "Completeness — Does the answer address all parts of the question?",
+    "GA": "Goal Alignment — Does the answer meet the user's actual goal?",
+}
 
 
 def build_qa_prompt(question: str, answer: str) -> list:
@@ -44,6 +57,111 @@ def build_qa_prompt(question: str, answer: str) -> list:
     return [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
+    ]
+
+
+def build_usva_prompt(question: str, answer: str) -> list:
+    """Build the USVA 4-rubric evaluation prompt (ATTS pattern).
+    
+    Instead of a single 0-10 score, the verifier scores on 4 rubrics:
+    - LC (Logical Coherence): 0.0-1.0
+    - FC (Factual Correctness): 0.0-1.0
+    - CM (Completeness): 0.0-1.0
+    - GA (Goal Alignment): 0.0-1.0
+    
+    Overall score = average of 4 rubrics × 10. More granular than single score.
+    """
+    system_prompt = (
+        "You are a quality evaluator using the USVA 4-rubric framework. "
+        "Score the answer on 4 dimensions, each from 0.0 to 1.0:\n\n"
+        f"LC (Logical Coherence): {USVA_RUBRICS['LC']}\n"
+        f"FC (Factual Correctness): {USVA_RUBRICS['FC']}\n"
+        f"CM (Completeness): {USVA_RUBRICS['CM']}\n"
+        f"GA (Goal Alignment): {USVA_RUBRICS['GA']}\n\n"
+        "Respond in EXACTLY this format:\n"
+        "LC: X.X\n"
+        "FC: X.X\n"
+        "CM: X.X\n"
+        "GA: X.X\n"
+        "Reason: Brief explanation of the weakest area\n"
+    )
+    
+    user_prompt = (
+        f"Question: {question}\n\n"
+        f"Answer: {answer}\n\n"
+        f"Score on all 4 rubrics:"
+    )
+    
+    return [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
+
+def extract_usva_score(response: str) -> tuple:
+    """Extract USVA 4-rubric scores from verifier response.
+    
+    Returns (overall_score: float 0-10, weakest_area: str, reasoning: str).
+    """
+    scores = {}
+    for rubric in ["LC", "FC", "CM", "GA"]:
+        match = re.search(rf'{rubric}:\s*(\d+\.?\d*)', response)
+        if match:
+            scores[rubric] = float(match.group(1))
+    
+    if not scores:
+        # Fallback to single score
+        score, reasoning = extract_score(response)
+        return (score, "unknown", reasoning)
+    
+    # Overall = average × 10
+    overall = (sum(scores.values()) / len(scores)) * 10
+    
+    # Find weakest area
+    weakest = min(scores, key=lambda k: scores[k])
+    
+    # Extract reasoning
+    reason_match = re.search(r'[Rr]eason:\s*(.+?)(?:\n|$)', response, re.DOTALL)
+    reasoning = reason_match.group(1).strip() if reason_match else f"Weakest: {weakest}"
+    
+    return (overall, weakest, reasoning)
+
+
+def build_reflexion_prompt(question: str, failed_answer: str, score: float, reasoning: str, reflections: list) -> list:
+    """Build a reflexion prompt (Reflexion pattern, arXiv:2303.11366).
+    
+    When self-QA fails, generate a verbal reflection on what went wrong,
+    then retry with the reflection as additional context.
+    
+    Args:
+        question: Original question
+        failed_answer: The answer that failed QA
+        score: The score it received
+        reasoning: Why it failed
+        reflections: List of previous reflections (from earlier failed attempts)
+    
+    Returns:
+        Messages list for the model to generate an improved answer with reflection context.
+    """
+    reflection_context = ""
+    if reflections:
+        reflection_context = "\n\nPrevious reflections:\n"
+        for i, r in enumerate(reflections, 1):
+            reflection_context += f"{i}. {r}\n"
+    
+    system_prompt = (
+        "You are Timuclaude. Your previous answer was not good enough. "
+        "Reflect on what went wrong and provide an improved answer.\n\n"
+        f"The previous answer scored {score:.1f}/10.\n"
+        f"Reason: {reasoning}\n"
+        f"{reflection_context}\n"
+        "Think about: What was wrong? Why did it fail? What should you do differently?\n"
+        "Then provide a corrected, complete answer."
+    )
+    
+    return [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"Original question: {question}\n\nFailed answer: {failed_answer[:2000]}\n\nProvide a corrected answer:"},
     ]
 
 
@@ -86,9 +204,15 @@ async def self_qa_gate(
     threshold: int = DEFAULT_THRESHOLD,
     max_retries: int = DEFAULT_MAX_RETRIES,
     max_tokens: int = 4096,
+    use_usva: bool = True,
+    use_reflexion: bool = True,
 ) -> dict:
     """
     Run the Self-QA gate: score the answer, retry if below threshold.
+    
+    Enhanced with:
+    - USVA 4-rubric scoring (ATTS pattern): More granular than single 0-10
+    - Reflexion memory (arXiv:2303.11366): Verbal reflection on failures, retry with context
     
     Args:
         question: The original user question
@@ -98,6 +222,8 @@ async def self_qa_gate(
         threshold: Minimum acceptable score (default 8)
         max_retries: Max retry attempts before accepting (default 3)
         max_tokens: Max tokens for QA evaluation
+        use_usva: If True, use 4-rubric scoring instead of single 0-10
+        use_reflexion: If True, use reflexion memory on retries
     
     Returns:
         Dict with:
@@ -107,21 +233,31 @@ async def self_qa_gate(
         - 'reasoning': Verifier's reasoning
         - 'attempts': Number of attempts made
         - 'all_scores': List of all scores from each attempt
+        - 'reflections': List of reflections generated (if use_reflexion=True)
     """
     all_scores = []
     all_reasonings = []
     current_answer = answer
     attempts = 0
     last_reasoning = ""
+    reflections = []  # Reflexion memory (arXiv:2303.11366)
     
     for attempt in range(max_retries + 1):
         attempts += 1
         
-        # Score the current answer
-        qa_messages = build_qa_prompt(question, current_answer)
-        qa_response = await call_model_func(verifier_model, qa_messages, max_tokens=max_tokens)
+        # Score the current answer using USVA or standard
+        if use_usva:
+            qa_messages = build_usva_prompt(question, current_answer)
+            qa_response = await call_model_func(verifier_model, qa_messages, max_tokens=max_tokens)
+            score, weakest_area, reasoning = extract_usva_score(qa_response)
+            # Include weakest area in reasoning for better feedback
+            if weakest_area != "unknown":
+                reasoning = f"Weakest area: {weakest_area}. {reasoning}"
+        else:
+            qa_messages = build_qa_prompt(question, current_answer)
+            qa_response = await call_model_func(verifier_model, qa_messages, max_tokens=max_tokens)
+            score, reasoning = extract_score(qa_response)
         
-        score, reasoning = extract_score(qa_response)
         all_scores.append(score)
         all_reasonings.append(reasoning)
         last_reasoning = reasoning
@@ -135,26 +271,38 @@ async def self_qa_gate(
                 "reasoning": reasoning,
                 "attempts": attempts,
                 "all_scores": all_scores,
+                "reflections": reflections,
             }
         
-        # Score too low — retry with feedback (if we have retries left)
+        # Score too low — retry with feedback
         if attempt < max_retries:
-            feedback = (
-                f"Your previous answer was scored {score}/10 by a quality evaluator.\n"
-                f"Reason: {reasoning}\n\n"
-                f"Please improve your answer to the original question. "
-                f"Address the issues mentioned above.\n\n"
-                f"Original question: {question}\n"
-                f"Previous answer: {current_answer}\n"
-            )
-            
-            retry_messages = [
-                {"role": "system", "content": "You are Timuclaude. Improve your previous answer based on feedback."},
-                {"role": "user", "content": feedback},
-            ]
-            
-            # Use the verifier model to generate an improved answer
-            current_answer = await call_model_func(verifier_model, retry_messages, max_tokens=max_tokens)
+            if use_reflexion:
+                # Reflexion pattern: generate verbal reflection, store in memory, retry with context
+                reflection = f"Attempt {attempt + 1} scored {score:.1f}/10. Issue: {reasoning}"
+                reflections.append(reflection)
+                
+                retry_messages = build_reflexion_prompt(
+                    question, current_answer, score, reasoning, reflections
+                )
+                # Use the verifier model to generate improved answer with reflection context
+                current_answer = await call_model_func(verifier_model, retry_messages, max_tokens=max_tokens)
+            else:
+                # Standard retry with feedback (original behavior)
+                feedback = (
+                    f"Your previous answer was scored {score}/10 by a quality evaluator.\n"
+                    f"Reason: {reasoning}\n\n"
+                    f"Please improve your answer to the original question. "
+                    f"Address the issues mentioned above.\n\n"
+                    f"Original question: {question}\n"
+                    f"Previous answer: {current_answer}\n"
+                )
+                
+                retry_messages = [
+                    {"role": "system", "content": "You are Timuclaude. Improve your previous answer based on feedback."},
+                    {"role": "user", "content": feedback},
+                ]
+                
+                current_answer = await call_model_func(verifier_model, retry_messages, max_tokens=max_tokens)
     
     # Max retries reached — accept the best attempt
     best_score = max(all_scores) if all_scores else 0
@@ -165,4 +313,5 @@ async def self_qa_gate(
         "reasoning": last_reasoning,
         "attempts": attempts,
         "all_scores": all_scores,
+        "reflections": reflections,
     }
