@@ -12,7 +12,7 @@ Based on published research:
 import asyncio
 import re
 from collections import Counter
-from typing import Optional
+from typing import Optional, Callable, Awaitable
 
 
 DEFAULT_N_SAMPLES = 20
@@ -78,7 +78,7 @@ def majority_vote(answers: list) -> Optional[str]:
 async def self_consistency(
     question: str,
     model: str,
-    call_model_func,
+    call_model_func: Callable[..., Awaitable[str]],
     n_samples: int = DEFAULT_N_SAMPLES,
     temperature: float = DEFAULT_TEMPERATURE,
     max_tokens: int = 8192,

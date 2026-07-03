@@ -12,7 +12,7 @@ Based on:
 - MGH hypothesis (better management of existing model capabilities)
 """
 import asyncio
-from typing import Optional
+from typing import Optional, Callable, Awaitable
 
 from .models import (
     MODEL_POOL,
@@ -106,7 +106,7 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> l
 async def fuse(
     question: str,
     task_type: str,
-    call_model_func,
+    call_model_func: Callable[..., Awaitable[str]],
     panel_size: int = DEFAULT_PANEL_SIZE,
     max_tokens: int = 8192,
 ) -> dict:

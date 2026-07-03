@@ -13,7 +13,7 @@ from pathlib import Path
 class QueryLogger:
     """Logs every query to JSONL file for analysis and self-improvement."""
 
-    def __init__(self, log_dir: str = None):
+    def __init__(self, log_dir: str = None) -> None:
         if log_dir is None:
             log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
         self.log_dir = Path(log_dir)
@@ -36,7 +36,7 @@ class QueryLogger:
         cost_estimate: float = None,
         success: bool = True,
         error: str = None,
-    ):
+    ) -> str:
         """Log a query to the JSONL file."""
         entry = {
             "query_id": str(uuid.uuid4()),
@@ -60,7 +60,7 @@ class QueryLogger:
                 f.write(json.dumps(entry) + "\n")
         return entry["query_id"]
 
-    def get_recent(self, n: int = 100):
+    def get_recent(self, n: int = 100) -> list:
         """Get the N most recent queries."""
         if not self.log_file.exists():
             return []
