@@ -460,3 +460,142 @@ NEXT_PUBLIC_GITHUB_REPO=notSaiful/timuclaude-research
 - Plausible: custom events, privacy-friendly
 - Sentry (optional): error tracking for production
 - Uptime monitoring: Vercel built-in status page
+---
+
+## MINOR GAP FILLS (5 items)
+
+---
+
+## GAP 11: COMPONENT SPECS (Modal, Stepper, Tooltip, Accordion, Breadcrumb)
+
+### Modal/Dialog Component
+- Overlay: fixed inset-0, bg rgba(26,24,22,0.4), backdrop-filter blur(4px)
+- Container: centered, max-width 500px, bg #FFFFFF, radius 12px, shadow-lg, padding 24px
+- Close: X button top-right (24px, #8E8B85, hover #1A1816)
+- Animation: backdrop fades in (200ms), content scales from 0.96 + fades (250ms, ease-spring)
+- Accessibility: role="dialog", aria-modal="true", aria-labelledby="modal-title", focus trap inside modal, Escape to close, return focus to trigger on close
+
+### Stepper Component (for orchestration visualization)
+- Horizontal layout: steps connected by thin lines
+- Each step: circle (24px) + label below
+- States: pending (#E8E4DC), active (#D97757, pulsing), completed (#788C5D with checkmark), error (#C46686 with X)
+- Line between steps: #E8E4DC (pending), #D97757 (active), #788C5D (completed)
+- Labels: Inter 400, 0.75rem, #5E5B56
+- Active step: scale 1.1, subtle pulse animation
+- Fades in steps as they complete (staggered 200ms)
+
+### Tooltip Component
+- Trigger: hover or focus (keyboard accessible)
+- Content: small popover, bg #1A1816, text #FAF8F5, font 0.75rem, padding 6px 10px, radius 6px
+- Arrow: 6px triangle pointing to trigger
+- Animation: fade in + 4px slide (150ms, ease-spring)
+- Position: auto-detected (top/bottom/left/right based on viewport)
+- Delay: 500ms show, 0ms hide
+- Accessibility: role="tooltip", aria-describedby on trigger
+
+### Accordion Component (for FAQ and docs sidebar)
+- Item: clickable header + collapsible content
+- Header: Inter 500, 0.9375rem, #1A1816, padding 16px 0, cursor pointer
+- Icon: chevron-right (collapsed) → chevron-down (expanded), 16px, #8E8B85, rotate 90deg (200ms)
+- Content: Inter 400, 0.9375rem, #5E5B56, padding 0 0 16px 0
+- Border: 1px solid rgba(26,24,22,0.08) between items
+- Animation: max-height transition (250ms, ease-spring)
+- Accessibility: role="button", aria-expanded, aria-controls, keyboard Enter/Space to toggle
+
+### Breadcrumb Component (for docs)
+- Container: flex row, Inter 400, 0.8125rem, #8E8B85
+- Items: Home > Docs > [Section] > [Page]
+- Separator: "/" in #8E8B85 (with spaces)
+- Current page: #1A1816 (not clickable)
+- Links: hover #D97757, underline on hover
+- Accessibility: nav aria-label="Breadcrumb", ol with li items
+
+---
+
+## GAP 12: ENTERPRISE PAGE DESIGN
+
+### Layout
+1. Hero: "Enterprise-grade AI orchestration" + "Security, compliance, and scale for your team" + [Contact Sales]
+2. Trust bar: "Trusted by [company logos]" (placeholder until we have customers)
+3. Features grid (6 cards):
+   - SSO/SAML — "Single sign-on with your existing identity provider"
+   - SOC2 Compliance — "Audit-ready logs and data controls"
+   - Self-Hosted — "Deploy on your own infrastructure. Your data never leaves."
+   - SLA — "99.9% uptime guarantee with dedicated support"
+   - Custom Models — "Add your own fine-tuned models to the pool"
+   - Team Management — "Role-based access control, audit logs, usage limits"
+4. Pricing callout: "Custom pricing. Contact our team for a quote." + [Contact Sales]
+5. Contact form: name, email, company, message + [Send]
+6. FAQ (enterprise-specific):
+   - "Can we self-host?" → "Yes. Full self-hosted deployment with Docker or Kubernetes."
+   - "Do you offer custom models?" → "Yes. Add your own fine-tuned models to the orchestration pool."
+   - "What compliance certifications do you have?" → "We're working toward SOC2 Type II. Audit logs and data controls are available now."
+   - "What's the SLA?" → "99.9% uptime with 4-hour response time for critical issues."
+
+---
+
+## GAP 13: PASSWORD RESET PAGE (detailed)
+
+### /forgot-password
+- Same centered card as login (max-width 400px)
+- Logo at top
+- "Reset your password" heading (Inter 600, 1.25rem)
+- "Enter your email and we'll send you a reset link." subtext
+- Email input field
+- [Send Reset Link] button (primary, full width)
+- "Remember your password? [Log in]" link
+- On submit: "Check your email for a reset link." success message, button becomes [Back to Login]
+
+### /reset-password
+- Same card layout
+- "Set a new password" heading
+- New password input (with show/hide toggle)
+- Confirm password input
+- Password strength indicator (weak/fair/good/strong — colored bar)
+- [Reset Password] button (primary, full width)
+- On success: redirect to /login with "Password reset successfully" toast
+
+---
+
+## GAP 14: OG IMAGE DESIGN
+
+### Design
+- Size: 1200×630px
+- Background: #FAF8F5 (warm ivory)
+- Left side: Logo mark (orchestration nodes) + "Timuclaude" wordmark
+- Center: "One question. Many minds. One superior answer." in Inter 600, 48px, #1A1816
+- Below: "Open-source LLM orchestration · 28x cheaper than frontier models" in Inter 400, 20px, #5E5B56
+- Bottom: "5 models · 3 backends · MIT licensed" in Inter 500, 16px, #D97757
+- Right side: subtle SVG orchestration diagram (low opacity, decorative)
+
+### Implementation
+- Create as HTML/CSS page, serve locally, screenshot with browser_vision
+- Or generate with image_generate tool
+- Save as /public/og-image.png
+- Reference in meta tags
+
+---
+
+## GAP 15: MODELS PAGE DESIGN
+
+### Layout
+1. Heading: "Model Pool" + "5 models, 3 backends, zero lock-in"
+2. Filter bar: search input + filter chips (by capability: Reasoning, Coding, Vision, Long Context, Cheap)
+3. Model cards grid (responsive: 1 col mobile, 2 col tablet, 3 col desktop)
+
+### Model Card
+- Provider logo/name (top)
+- Model name (Inter 600, 1.125rem)
+- Tags: chips showing capabilities (Reasoning, Coding, Vision, Tools, Thinking)
+- Stats: Context length, Parameters, Pricing ($/M tokens)
+- Backend availability: "Ollama ✓ | OpenRouter ✓ | ai/ml ✓"
+- [Try in Playground] button (links to playground with model pre-selected)
+- [View on OpenRouter] external link
+
+### Models to list
+1. GLM-5.2 — Orchestrator, 1M context, tools, thinking
+2. DeepSeek V4 Pro — Reasoning, coding, 1.6T params, 3 thinking modes
+3. Kimi K2.6 — Vision, tools, thinking, 262K context
+4. MiniMax M3 — Generation, vision, tools, 1M context
+5. Nemotron 3 Ultra — Verification, agentic evaluation, 1M context
+6. GPT-OSS 120B — Cheap routing, 131K context
