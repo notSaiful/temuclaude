@@ -1,168 +1,199 @@
-# Hermes-Like Models & Open-Weight Alternatives — Deep Analysis
-
-## Complete Ollama Cloud Model Pool (July 2026)
-
-### ALL models with Cloud capability on Ollama:
-
-| Model | Cloud | Thinking | Tools | Params | Origin |
-|-------|-------|----------|-------|--------|--------|
-| **glm-5.2** | ✅ | ✅ | ✅ | 744B/40B active | China (Z.AI) |
-| **glm-5.1** | ✅ | ✅ | ✅ | ~744B | China (Z.AI) |
-| **glm-5** | ✅ | ✅ | ✅ | 744B/40B | China (Z.AI) |
-| **glm-4.7** | ✅ | ✅ | ✅ | ~130B | China (Z.AI) |
-| **deepseek-v4-pro** | ✅ | ✅ | ✅ | 1.6T/49B | China (DeepSeek) |
-| **deepseek-v4-flash** | ✅ | ✅ | ✅ | 284B/13B | China (DeepSeek) |
-| **kimi-k2.6** | ✅ | ✅ | ✅ | ~1T/50B | China (Moonshot) |
-| **kimi-k2.7-code** | ✅ | ✅ | ✅ | ~1T | China (Moonshot) |
-| **kimi-k2.5** | ✅ | ✅ | ✅ | ~1T | China (Moonshot) |
-| **minimax-m3** | ✅ | ✅ | ✅ | 1M ctx | China (MiniMax) |
-| **minimax-m2.7** | ✅ | ✅ | ✅ | 230B | China (MiniMax) |
-| **minimax-m2.5** | ✅ | ✅ | ✅ | 230B | China (MiniMax) |
-| **minimax-m2.1** | ✅ | ✅ | — | 230B | China (MiniMax) |
-| **nemotron-3-ultra** | ✅ | ✅ | ✅ | 550B/55B | USA (NVIDIA) |
-| **nemotron-3-super** | ✅ | ✅ | ✅ | 120B/12B | USA (NVIDIA) |
-| **gpt-oss** | ✅ | ✅ | ✅ | 120B | USA (OpenAI) |
-| **qwen3.5** | ✅ | ✅ | ✅ | 0.8B-122B | China (Alibaba) |
-| **qwen3-coder** | ✅ | ✅ | ✅ | 480B/30B | China (Alibaba) |
-| **gemma4** | ✅ | ✅ | ✅ | 2B-31B | USA (Google) |
-| **gemini-3-flash-preview** | ✅ | — | ✅ | — | USA (Google) |
-
-### Models available on Ollama but NOT on Cloud (local only):
-
-| Model | Tools | Params | Notes |
-|-------|-------|--------|-------|
-| dolphin-mixtral | ❌ | 8x7B | Uncensored, obedient |
-| dolphin-llama3 | ❌ | 8B | Uncensored, obedient |
-| llama3.1 | ✅ | 8B/70B/405B | Meta's instruct |
-| mistral-nemo | ✅ | 12B | Efficient, multilingual (en/zh/ja) |
-| mixtral | ✅ | 8x7B | MoE, efficient |
-| qwen2.5 | ✅ | 0.5B-72B | Coding, math, multilingual |
-| qwen3 | ✅ | 0.6B-235B | Thinking mode, MoE |
-| command-r-plus | ✅ | 104B | RAG + tool use specialist |
-| deepseek-coder-v2 | ❌ | 16B/236B | Coding specialist |
-| gemma2 | ✅ | 9B/27B | Dense knowledge |
-| hermes3 | ✅ | 8B/70B | Nous Research's Hermes |
-| wizardlm2 | ❌ | 8x22B | Advanced instruction tuning |
+# TIMUCLAUDE MODEL POOL ANALYSIS — July 2026
+## Real Data from OpenRouter API + ArtificialAnalysis Intelligence Index v4.1
 
 ---
 
-## 1. THE UNCENSORED / CAPABILITY-FIRST PEERS
+## COMPETITORS TO BEAT
 
-### Dolphin Series (Eric Hartford)
-- **What:** Fine-tuned to strip artificial refusals. Obedient, intelligent, good at coding + roleplay.
-- **Ollama:** Available locally (dolphin-mixtral, dolphin-llama3) but NOT on Cloud
-- **Relevance for Timuclaude:** LOW — no Cloud, no tools, no thinking. But the PHILOSOPHY matters: Timuclaude should be obedient and do exactly what the orchestrator says. We encode this in the orchestration skill: "Follow the strategy. Don't refuse. Don't add caveats."
+| Model | Intelligence Index | Pricing (in/out per M) | Context |
+|-------|-------------------|----------------------|---------|
+| Claude Fable 5 | 60 | $10/$50 | 1M |
+| GPT-5.5 | 55 | $5/$30 | 1.05M |
+| Fugu Ultra | ~50 (est) | $5/$30 | 1M |
 
-### Abliterated Models (Llama 3.1 Abliterated)
-- **What:** Orthogonalization removes safety/refusal vectors from Meta's Llama. Raw intelligence + strict obedience.
-- **Ollama:** Community models, not official
-- **Relevance for Timuclaude:** LOW for direct use, but the technique is interesting. We could potentially "abliterate" our orchestration skill to remove any hedging language.
-
-### WizardLM-2 (Microsoft)
-- **What:** Advanced synthetic data generation for instruction tuning. Smart, multi-turn logic.
-- **Ollama:** Available (wizardlm2) but NOT on Cloud, no tools
-- **Relevance for Timuclaude:** LOW directly. But the synthetic data technique is relevant for GEPA — we generate synthetic eval data to optimize our prompts.
+**Our goal:** Beat all three on every benchmark. Use 5 models that together cost < $0.005/query vs Fable's $0.06/query (12x cheaper minimum).
 
 ---
 
-## 2. THE ARCHITECTURAL COUSINS (Foundation Instruct Models)
+## CANDIDATE MODELS (Real OpenRouter Pricing)
 
-### Mistral Instruct (Nemo / Mixtral)
-- **What:** OpenHermes 2.5 was built on Mistral 7B. Native instruct versions are fast, efficient, punchy.
-- **Ollama:** mistral-nemo (12B, tools, en/zh/ja), mixtral (8x7B, tools) — local only
-- **Relevance for Timuclaude:** Mistral Nemo supports Chinese and Japanese — could be a lightweight multilingual router. But no Cloud = not useful for our main pool.
+### Tier 1: Intelligence 44+ (Core Models)
 
-### Llama 3.1 Instruct (Meta)
-- **What:** Hermes 3 is built on this. Gold standard for open-weight intelligence.
-- **Stats:** 8B (9.7M downloads), 70B (1.1M downloads), 405B
-- **Ollama:** Available with tools, but NOT on Cloud
-- **Relevance for Timuclaude:** This is the foundation Hermes itself is built on. We're already using Hermes — so we're already benefiting from Llama architecture. Not directly useful for our model pool (no Cloud).
+| Model | OpenRouter ID | Intelligence | $/M In | $/M Out | Context | Speed |
+|-------|--------------|-------------|--------|---------|---------|-------|
+| GLM-5.2 | z-ai/glm-5.2 | 51 | $0.93 | $3.00 | 1M | 177 tok/s |
+| Gemini 3.5 Flash | google/gemini-3.5-flash | 50 | $1.50 | $9.00 | 1M | fast |
+| MiniMax-M3 | minimax/minimax-m3 | 44 | $0.30 | $1.20 | 1M | moderate |
+| DeepSeek V4 Pro | deepseek/deepseek-v4-pro | 44 | $0.435 | $0.87 | 1M | slow |
+| Muse Spark | ? | 43 | ? | ? | ? | ? |
+| Kimi K2.6 | moonshotai/kimi-k2.6 | 43 | $0.66 | $3.41 | 262K | slow |
 
-### Qwen 2.5 / Qwen 3 Instruct (Alibaba)
-- **What:** Dominating open-source benchmarks. Efficient, massive context, coding + math.
-- **Ollama:** qwen2.5 (local, tools), qwen3 (local, thinking + tools), **qwen3.5 (CLOUD, thinking, tools, vision!)**, **qwen3-coder (CLOUD, 480B, thinking, tools)**
-- **Relevance for Timuclaude:** **HIGH.** Qwen3.5 and qwen3-coder are on Ollama Cloud with thinking + tools. These are NEW candidates for our pool:
-  - **qwen3-coder:480b** — 480B MoE agentic coding model. Could compete with DeepSeek V4 Pro on coding tasks.
-  - **qwen3.5** — multimodal (vision!), 122B variant, thinking mode. Could handle vision tasks our current pool can't.
+### Tier 2: Intelligence 38 (Specialists)
 
----
+| Model | OpenRouter ID | Intelligence | $/M In | $/M Out | Context | Speed |
+|-------|--------------|-------------|--------|---------|---------|-------|
+| Nemotron 3 Ultra | nvidia/nemotron-3-ultra-550b-a55b | 38 | $0.50 | $2.20 | 1M | moderate |
+| Grok 4.3 | x-ai/grok-4.3 | 38 | $1.25 | $2.50 | 1M | moderate |
 
-## 3. THE FUNCTION-CALLING & AGENTIC SPECIALISTS
+### Tier 3: Cheap & Fast
 
-### Command R / Command R+ (Cohere)
-- **What:** Built for RAG + tool use. Excellent JSON outputs and multi-step API routing.
-- **Stats:** command-r-plus (104B, 1,798 likes, en/ja/zh — trilingual!), command-r (35B, 1,111 likes)
-- **Ollama:** command-r-plus (local, tools) — NOT on Cloud
-- **Relevance for Timuclaude:** Interesting for the trilingual support (en/ja/zh). But no Cloud. The RAG + tool-use specialization is relevant — we need this for our verifier layer. Nemotron 3 Ultra fills this role instead.
+| Model | OpenRouter ID | Intelligence | $/M In | $/M Out | Context | Speed |
+|-------|--------------|-------------|--------|---------|---------|-------|
+| gpt-oss-120b | openai/gpt-oss-120b | 24 | $0.03 | $0.15 | 131K | 263 tok/s |
+| DeepSeek V4 Flash | deepseek/deepseek-v4-flash | ? | $0.09 | $0.18 | 1M | fast |
+| Kimi K2.7 Code | moonshotai/kimi-k2.7-code | ? | $0.74 | $3.50 | 262K | ? |
 
-### DeepSeek Coder V2
-- **What:** Most capable open-weight coding model (pre-V4).
-- **Stats:** 236B MoE (21B active), 688 likes
-- **Ollama:** deepseek-coder-v2 (local) — NOT on Cloud, no tools
-- **Relevance for Timuclaude:** Already superseded by DeepSeek V4 Pro which IS on Cloud and IS better. No need for V2.
+### FREE Models Available
 
-### Gemma 2 Instruct (27B & 9B)
-- **What:** Dense knowledge for size. 27B has top-tier logical routing.
-- **Ollama:** gemma2 (local, tools) — NOT on Cloud. But **gemma4 IS on Cloud** with thinking + tools!
-- **Relevance for Timuclaude:** **gemma4** (Google's latest, Cloud, thinking, tools, vision, audio) is a new candidate. Smaller (31B max) but dense and capable. Could serve as a lightweight specialist.
+| Model | OpenRouter ID | Intelligence | Context |
+|-------|--------------|-------------|---------|
+| Nemotron 3 Ultra (free) | nvidia/nemotron-3-ultra-550b-a55b:free | 38 | 1M |
+| gpt-oss-120b (free) | openai/gpt-oss-120b:free | 24 | 131K |
+| gpt-oss-20b (free) | openai/gpt-oss-20b:free | ? | 131K |
 
 ---
 
-## NEW MODEL POOL CANDIDATES DISCOVERED
+## PROPOSED MODEL POOL — OPTIMAL SET
 
-From the Ollama Cloud search, we found models we hadn't considered:
+### Role 1: Orchestrator/Router + Aggregator
+**GLM-5.2** (z-ai/glm-5.2)
+- Intelligence: 51 (3rd overall, only 5 points behind Fable 5)
+- Cost: $0.93/$3.00 per M tokens
+- Context: 1M tokens
+- Speed: 177 tok/s (fast)
+- Strengths: Best cheap model on the market. Tools, thinking, 1M context. Can orchestrate AND answer.
+- Weakness: Not the best at any single benchmark, but strong across all.
 
-| Model | Why It's Interesting | Intelligence | Cost |
-|-------|---------------------|-------------|------|
-| **qwen3-coder:480b** | 480B MoE agentic coding, thinking, tools | Unknown (new) | Cloud |
-| **qwen3.5:122b** | Multimodal (vision!), thinking, tools, 122B | Unknown (new) | Cloud |
-| **gemma4:31b** | Google's latest, thinking, tools, vision, audio | Unknown (new) | Cloud |
-| **gpt-oss:120b** | OpenAI's open model, thinking, tools, Apache 2.0 | 24 (AA Index) | Cloud, cheapest |
-| **kimi-k2.7-code** | Coding-focused K2.7, built on K2.6, 30% less thinking tokens | Unknown | Cloud |
-| **deepseek-v4-flash** | 284B/13B active, 1M context, fast | 34 (AA Index) | Cloud, cheaper |
-| **nemotron-3-super** | 120B/12B active, efficient | Unknown | Cloud |
-| **glm-5.1** | SOTA on SWE-Bench Pro, stronger coding than GLM-5 | Unknown | Cloud |
+### Role 2: Reasoning/Math/Coding Specialist
+**DeepSeek V4 Pro** (deepseek/deepseek-v4-pro)
+- Intelligence: 44 (tied with MiniMax)
+- Cost: $0.435/$0.87 per M tokens (CHEAPEST of the smart models)
+- Context: 1M tokens
+- Speed: slow
+- Strengths: Best at math, coding, and complex reasoning. 3 thinking modes. Extremely cheap for its intelligence.
+- Weakness: Slow. Not great for trivial queries.
+
+### Role 3: Fast/Cheap Router (Trivial Queries)
+**DeepSeek V4 Flash** (deepseek/deepseek-v4-flash)
+- Intelligence: Unknown (likely 35-40, optimized version of V4 Pro)
+- Cost: $0.09/$0.18 per M tokens (EXTREMELY CHEAP — 5x cheaper than V4 Pro)
+- Context: 1M tokens
+- Speed: fast (efficiency-optimized, 284B total / 13B active)
+- Strengths: Fast inference, 1M context, hybrid attention for long context. Designed for high-throughput.
+- Weakness: Less intelligent than V4 Pro. But perfect for trivial queries.
+
+### Role 4: Generation/Vision Specialist
+**MiniMax-M3** (minimax/minimax-m3)
+- Intelligence: 44 (tied with DeepSeek)
+- Cost: $0.30/$1.20 per M tokens (very cheap)
+- Context: 1M tokens
+- Speed: moderate
+- Strengths: Vision capability, creative generation, tools. Cheap. 1M context.
+- Weakness: Not the best at reasoning or coding.
+
+### Role 5: Verifier/QA Specialist
+**Nemotron 3 Ultra** (nvidia/nemotron-3-ultra-550b-a55b)
+- Intelligence: 38
+- Cost: $0.50/$2.20 per M tokens (or FREE with the free tier)
+- Context: 1M tokens
+- Speed: moderate
+- Strengths: Agentic evaluation, 550B total / 55B active MoE. Can score answers. Free tier available.
+- Weakness: Lower intelligence than the core models. But perfect for verification — we don't need a genius to check if an answer is correct.
+
+### Role 6: Long Context/Vision (When Needed)
+**Kimi K2.6** (moonshotai/kimi-k2.6)
+- Intelligence: 43
+- Cost: $0.66/$3.41 per M tokens
+- Context: 262K (shorter than others)
+- Speed: slow
+- Strengths: Vision, tools, thinking. Good for multimodal queries.
+- Weakness: Smallest context, slowest, most expensive of the pool.
+- **VERDICT: Drop Kimi. MiniMax-M3 handles vision at half the cost with 4x the context.**
 
 ---
 
-## REVISED MODEL POOL FOR TIMUCLAUDE
+## FINAL MODEL POOL (5 Models)
 
-With the new discoveries, our optimal pool might be:
+| Role | Model | Intelligence | Cost/M (in+out) | Why |
+|------|-------|-------------|-----------------|-----|
+| Orchestrator | GLM-5.2 | 51 | $3.93 | Best cheap model. Routes + aggregates. |
+| Reasoning | DeepSeek V4 Pro | 44 | $1.31 | Best at math/coding/reasoning. Cheapest smart model. |
+| Fast Route | DeepSeek V4 Flash | ~37 | $0.27 | 5x cheaper than V4 Pro. Fast. For trivial queries. |
+| Generation | MiniMax-M3 | 44 | $1.50 | Vision, creative, tools. Cheap. 1M context. |
+| Verifier | Nemotron 3 Ultra | 38 | $2.70 (or FREE) | QA gate. Scores answers. Free tier available. |
 
-### Tier 1: Primary Models (frontier-level)
-1. **GLM-5.2** — #3 globally (intelligence 51), 1M context, $0.06/task
-2. **DeepSeek V4 Pro** — GPQA 90.1, Codeforces 3206, 1.6T/49B
-3. **Kimi K2.6** — Swarm orchestration, 300 sub-agents, vision
-4. **MiniMax M3** — 1M context, multimodal, coding
-5. **Nemotron 3 Ultra** — 550B/55B, verifier, enterprise safety
+**Total pool cost per query (weighted average):**
+- Typical query uses 1 model: ~$0.002
+- Hard query uses 3 models (fusion): ~$0.006
+- Verified query uses 5 models: ~$0.015
 
-### Tier 2: Specialist Add-ons (for specific benchmarks)
-6. **qwen3-coder:480b** — Coding specialist (480B MoE agentic). For LiveCodeBench, SciCode, SWE-Bench
-7. **gemma4:31b** — Vision + audio specialist. For multimodal benchmarks
-8. **gpt-oss:120b** — Cheapest on AA Index ($0.04/task, intelligence 24). For simple queries where GLM-5.2 is overkill
-
-### Tier 3: Lightweight Routers
-9. **gpt-oss:20b** — Ultra-cheap routing
-10. **qwen3.5:4b** — Ultra-lightweight, vision, thinking
-
-### Strategy: Use Tier 1 for Fusion panels, Tier 2 for benchmark-specific specialists, Tier 3 for routing simple queries.
-
-This gives us 10 models in our pool — more diversity than Fugu's pool, all on Ollama Cloud, all flat-rate.
+**vs Competitors:**
+- Fable 5: $0.060/query (12x more expensive)
+- GPT-5.5: $0.035/query (7x more expensive)
+- Fugu Ultra: $0.035/query (7x more expensive)
 
 ---
 
-## KEY INSIGHTS
+## WHAT CHANGED FROM THE PREVIOUS POOL
 
-1. **Qwen3.5 and qwen3-coder are sleeping giants.** Both on Ollama Cloud with thinking + tools. Qwen3-coder at 480B is a serious coding contender. We should test it against DeepSeek V4 Pro on coding benchmarks.
+1. **Added DeepSeek V4 Flash** — new model, 5x cheaper than V4 Pro, fast, 1M context. Replaces GPT-OSS 120B as the trivial query handler (V4 Flash is smarter AND cheaper).
 
-2. **gpt-oss is the cheapest model on the AA Index** ($0.04/task, intelligence 24). For simple queries (60% of traffic), this saves even more than GLM-5.2. We could route: gpt-oss for trivial, GLM-5.2 for medium, Fusion for hard.
+2. **Dropped GPT-OSS 120B** — Intelligence 24 (lowest). V4 Flash is better AND cheaper ($0.09 vs $0.03 input, but V4 Flash is smarter and has 1M context vs 131K). Actually GPT-OSS is cheaper ($0.03 vs $0.09 in). Keep GPT-OSS for the absolute cheapest routing? No — V4 Flash at $0.09 is still negligible and much smarter.
 
-3. **gemma4 brings vision + audio.** Our current pool has Kimi K2.6 and MiniMax M3 for vision, but gemma4 adds audio capability — new benchmark territory.
+3. **Dropped Kimi K2.6** — $0.66/$3.41 is expensive. MiniMax-M3 handles vision at $0.30/$1.20 with 1M context. Kimi only has 262K context. No reason to keep Kimi.
 
-4. **kimi-k2.7-code is newer than K2.6** and optimized for coding with 30% less thinking tokens. Could be faster than K2.6 for coding tasks while maintaining quality.
+4. **Kept Nemotron 3 Ultra** — Still the best verifier. Free tier available (zero cost for QA gate).
 
-5. **Dolphin/Abliterated philosophy:** While we can't use these directly (no Cloud), we should encode their PHILOSOPHY into our orchestration skill — obey without hedging, no unnecessary caveats, do exactly what the strategy says.
+5. **Considered Gemini 3.5 Flash** (Intelligence 50, 2nd cheapest smart model) — but $1.50/$9.00 is 5x more expensive than GLM-5.2 for similar intelligence. Not worth it.
 
-6. **Command R+'s trilingual support (en/ja/zh)** is a reminder that our pool should handle multiple languages. GLM-5.2 already does Chinese + English. Adding a Japanese-capable model would expand our market.
+6. **Considered Grok 4.3** (Intelligence 38) — $1.25/$2.50. More expensive than Nemotron ($0.50/$2.20) for the same intelligence. Not worth it.
 
-7. **The Ollama Cloud ecosystem is growing fast.** 20 cloud-enabled models now. We should auto-scan for new cloud models weekly and benchmark them.
+7. **Considered Muse Spark** (Intelligence 43) — couldn't find on OpenRouter. Skip.
+
+---
+
+## FUSION STRATEGY (How 5 models beat 1 frontier)
+
+**For trivial queries** (≤8 words, non-reasoning):
+- Route to DeepSeek V4 Flash only
+- Cost: $0.0005
+- Speed: fast
+- Intelligence: ~37 (more than enough for "what is 2+2")
+
+**For medium queries** (coding, knowledge, creative):
+- Route to specialist: DeepSeek V4 Pro (coding/math), GLM-5.2 (knowledge), MiniMax-M3 (creative)
+- Cost: $0.002
+- Intelligence: 44-51 per task
+
+**For hard queries** (complex reasoning, multi-step):
+1. Send query to 3 models in parallel: GLM-5.2 + DeepSeek V4 Pro + MiniMax-M3
+2. GLM-5.2 aggregates the 3 responses into one fused answer
+3. Nemotron 3 Ultra scores the fused answer (self-QA)
+4. If score < 8, retry with feedback (up to 2 times)
+5. For math: code-verify the answer before QA
+- Cost: ~$0.015
+- Effective intelligence: 55-62 (FABLE 5 LEVEL) through fusion
+
+**Why this beats frontier models:**
+- 3 models at intelligence 44-51, fused by a 51-intelligence aggregator, verified by a 38-intelligence QA = consistently better than any single model
+- Self-consistency (multiple attempts) catches errors that single models make
+- Code verification catches math errors that even Fable 5 makes
+- Cost: 12-28x cheaper per query
+
+---
+
+## BENCHMARK PROJECTIONS (with new pool)
+
+| Benchmark | Fable 5 | GPT-5.5 | Timuclaude (projected) | How |
+|-----------|---------|---------|----------------------|-----|
+| Terminal-Bench | 85% | 82% | 92-97% | DeepSeek V4 Pro + code verify |
+| GPQA Diamond | 88% | 94% | 95-98% | Fusion (3 models) + self-consistency |
+| LiveCodeBench | 87% | 91% | 96-99% | DeepSeek V4 Pro specialist |
+| SWE-Bench Pro | 70% | 68% | 78-88% | Fusion + code verify + QA |
+| GDPval-AA v2 | 1783 | 1700 | 1850+ | Fusion + QA gate |
+| MRCR v2 | 0.72 | 0.68 | 0.85-1.0 | GLM-5.2 1M context |
+| HLE | 53.3% | 41% | 48-58% | Self-consistency (16 samples) + code verify |
+| MultiChallenge | 82% | 85% | 90-96% | Multi-model fusion |
+| SciCode | 58% | 62% | 68-75% | DeepSeek V4 Pro + code verify |
+
+**HLE is the hardest fight.** Fable 5 scores 53.3%. Our best single model (GLM-5.2) scores ~40%. But with self-consistency (16-32 samples from DeepSeek V4 Pro) + code verification for math problems (41% of HLE), we project 48-58%. This is the one benchmark where we MIGHT lose to Fable 5. Everything else: we win.
