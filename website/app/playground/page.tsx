@@ -21,8 +21,6 @@ type OrchestrationData = {
   cost: string;
 };
 
-type Mode = 'quick' | 'fusion' | 'verify';
-
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -30,38 +28,14 @@ const EXAMPLE_PROMPTS = [
   'What is the derivative of x³ + 2x² - 5x + 1?',
 ];
 
-const MODELS = [
-  { id: 'glm-5.2', name: 'GLM-5.2', role: 'Orchestrator', context: '1M', capabilities: ['Tools', 'Thinking'] },
-  { id: 'deepseek-v4-pro', name: 'DeepSeek V4 Pro', role: 'Reasoning', context: '1.6T', capabilities: ['Coding', 'Math', 'Reasoning'] },
-  { id: 'kimi-k2.6', name: 'Kimi K2.6', role: 'Long Context', context: '262K', capabilities: ['Vision', 'Tools'] },
-  { id: 'minimax-m3', name: 'MiniMax M3', role: 'Generation', context: '1M', capabilities: ['Vision', 'Creative'] },
-  { id: 'nemotron-3-ultra', name: 'Nemotron 3 Ultra', role: 'Verifier', context: '1M', capabilities: ['Evaluation'] },
-  { id: 'gpt-oss-120b', name: 'GPT-OSS 120B', role: 'Cheap Route', context: '131K', capabilities: ['Fast', 'Low cost'] },
-];
-
-const FREE_QUERY_LIMIT = 3;
-
 export default function PlaygroundPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [mode, setMode] = useState<Mode>('quick');
-  const [selectedModels, setSelectedModels] = useState<string[]>(['glm-5.2', 'deepseek-v4-pro', 'kimi-k2.6']);
-  const [temperature, setTemperature] = useState(0.7);
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
-  const [freeQueriesUsed, setFreeQueriesUsed] = useState(0);
-  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Load free query count from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem('timuclaude_free_queries');
-    if (stored) setFreeQueriesUsed(parseInt(stored, 10));
-  }, []);
-
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -69,43 +43,23 @@ export default function PlaygroundPage() {
   const handleSend = useCallback(async () => {
     if (!input.trim() || status === 'submitted' || status === 'streaming') return;
 
-    // Check free query limit
-    if (freeQueriesUsed >= FREE_QUERY_LIMIT) {
-      setShowSignupPrompt(true);
-      return;
-    }
-
     const userMessage: Message = { role: 'user', content: input.trim() };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setStatus('submitted');
 
-    // Increment free query counter
-    const newCount = freeQueriesUsed + 1;
-    setFreeQueriesUsed(newCount);
-    localStorage.setItem('timuclaude_free_queries', newCount.toString());
-
     try {
-      // Call the Timuclaude API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-          mode,
-          models: selectedModels,
-          temperature,
-        }),
+        body: JSON.stringify({ messages: [...messages, userMessage] }),
         signal: abortControllerRef.current?.signal,
       });
 
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`API returned ${response.status}`);
 
       setStatus('streaming');
 
-      // Read SSE stream
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let assistantContent = '';
@@ -139,15 +93,12 @@ export default function PlaygroundPage() {
                 if (data.orchestration) {
                   orchestrationData = data.orchestration;
                 }
-              } catch {
-                // Ignore parse errors for partial chunks
-              }
+              } catch {}
             }
           }
         }
       }
 
-      // Add orchestration data to the last message
       if (orchestrationData) {
         setMessages((prev) => {
           const updated = [...prev];
@@ -165,174 +116,23 @@ export default function PlaygroundPage() {
         setStatus('ready');
       } else {
         setStatus('error');
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: 'Something went wrong. Please try again.',
-          },
-        ]);
+        setMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
       }
     }
-  }, [input, status, messages, mode, selectedModels, temperature, freeQueriesUsed]);
+  }, [input, status, messages]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
     setStatus('ready');
   };
 
-  const toggleModel = (modelId: string) => {
-    setSelectedModels((prev) =>
-      prev.includes(modelId) ? prev.filter((m) => m !== modelId) : [...prev, modelId]
-    );
-  };
-
-  const remainingFreeQueries = FREE_QUERY_LIMIT - freeQueriesUsed;
-
   return (
     <>
       <Navbar />
       <div className="flex h-screen pt-16">
         <h1 className="sr-only">Timuclaude Playground</h1>
-        {/* Sidebar */}
-        <aside
-          className={`${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } md:translate-x-0 fixed md:sticky top-16 left-0 z-30 w-72 h-[calc(100vh-4rem)] bg-bg-secondary border-r border-border-subtle overflow-y-auto transition-transform duration-250 ease-spring`}
-          aria-label="Playground settings"
-        >
-          <div className="p-4 space-y-6">
-            {/* New Chat */}
-            <button
-              className="btn-primary w-full"
-              onClick={() => {
-                setMessages([]);
-                setShowOrchestration(null);
-              }}
-            >
-              New Chat
-            </button>
 
-            {/* Free Query Counter */}
-            <div className="text-center">
-              <div
-                className={`badge ${remainingFreeQueries > 1 ? 'badge-olive' : remainingFreeQueries === 1 ? 'bg-accent-amber/12 text-accent-amber' : 'bg-accent-fig/12 text-accent-fig'}`}
-              >
-                {remainingFreeQueries} of {FREE_QUERY_LIMIT} free queries left
-              </div>
-            </div>
-
-            {/* Mode Selector */}
-            <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">Mode</h3>
-              <div className="space-y-1">
-                {[
-                  { id: 'quick' as Mode, label: 'Quick', desc: 'Single model, fast' },
-                  { id: 'fusion' as Mode, label: 'Fusion', desc: '3-5 models in parallel' },
-                  { id: 'verify' as Mode, label: 'Verify', desc: 'Fusion + code check + QA' },
-                ].map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => setMode(m.id)}
-                    className={`w-full text-left p-2.5 rounded-sm transition-colors ${
-                      mode === m.id
-                        ? 'bg-accent-primary/10 text-text-primary border border-accent-primary/30'
-                        : 'text-text-secondary hover:bg-bg-tertiary border border-transparent'
-                    }`}
-                  >
-                    <div className="text-sm font-medium">{m.label}</div>
-                    <div className="text-xs text-text-muted">{m.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Model Selector */}
-            <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
-                Models {mode === 'quick' ? '(select one)' : '(select 3-5)'}
-              </h3>
-              <div className="space-y-1">
-                {MODELS.map((model) => (
-                  <label
-                    key={model.id}
-                    className={`flex items-center gap-2 p-2 rounded-sm cursor-pointer transition-colors ${
-                      selectedModels.includes(model.id) ? 'bg-bg-tertiary' : 'hover:bg-bg-tertiary'
-                    }`}
-                  >
-                    <input
-                      type={mode === 'quick' ? 'radio' : 'checkbox'}
-                      checked={selectedModels.includes(model.id)}
-                      onChange={() => {
-                        if (mode === 'quick') {
-                          setSelectedModels([model.id]);
-                        } else {
-                          toggleModel(model.id);
-                        }
-                      }}
-                      className="accent-accent-primary"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-text-primary truncate">{model.name}</div>
-                      <div className="text-xs text-text-muted truncate">{model.role}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Advanced */}
-            <div>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">Advanced</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="flex items-center justify-between text-sm text-text-secondary mb-1">
-                    <span>Temperature</span>
-                    <span className="font-mono text-text-primary">{temperature.toFixed(1)}</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="2"
-                    step="0.1"
-                    value={temperature}
-                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="w-full accent-accent-primary"
-                    aria-label="Temperature"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* Sidebar backdrop (mobile) */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 z-20 bg-black/30 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
-        {/* Main Chat Area */}
-        <main
-          className="flex-1 flex flex-col h-[calc(100vh-4rem)]"
-          aria-label="Timuclaude Playground"
-          id="main-content"
-        >
-          {/* Mobile sidebar toggle */}
-          <button
-            className="md:hidden absolute top-20 left-4 z-10 p-2 bg-bg-secondary rounded-sm border border-border-subtle"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-label="Toggle settings"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1816" strokeWidth="2">
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-
+        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="Timuclaude Playground" id="main-content">
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
             <div className="max-w-3xl mx-auto space-y-6">
@@ -343,7 +143,7 @@ export default function PlaygroundPage() {
                     Ask Timuclaude anything
                   </h2>
                   <p className="text-text-secondary mb-8">
-                    5 AI models are ready to collaborate on your question.
+                    One model. Five minds behind the scenes. One superior answer.
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {EXAMPLE_PROMPTS.map((prompt, i) => (
@@ -361,10 +161,7 @@ export default function PlaygroundPage() {
 
               {/* Messages */}
               {messages.map((message, i) => (
-                <div
-                  key={i}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
+                <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
                     className={`max-w-[85%] ${
                       message.role === 'user'
@@ -421,18 +218,6 @@ export default function PlaygroundPage() {
                 </div>
               )}
 
-              {/* Error state */}
-              {status === 'error' && (
-                <div className="flex justify-center">
-                  <div className="bg-accent-fig/8 border border-accent-fig/20 rounded-md p-4 text-sm text-text-secondary text-center">
-                    Something went wrong.{' '}
-                    <button onClick={handleSend} className="text-accent-primary hover:underline">
-                      Try again
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <div ref={messagesEndRef} />
             </div>
           </div>
@@ -443,35 +228,6 @@ export default function PlaygroundPage() {
               data={messages[parseInt(showOrchestration)].orchestration!}
               onClose={() => setShowOrchestration(null)}
             />
-          )}
-
-          {/* Signup Prompt */}
-          {showSignupPrompt && (
-            <div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onClick={() => setShowSignupPrompt(false)}
-            >
-              <div className="absolute inset-0 bg-black/30" />
-              <div
-                className="relative bg-bg-primary rounded-md p-6 max-w-sm w-full text-center"
-                onClick={(e) => e.stopPropagation()}
-                role="alertdialog"
-                aria-modal="true"
-                aria-labelledby="signup-title"
-                aria-describedby="signup-desc"
-              >
-                <h2 id="signup-title" className="text-lg font-semibold text-text-primary mb-2">
-                  You've used all {FREE_QUERY_LIMIT} free queries!
-                </h2>
-                <p id="signup-desc" className="text-sm text-text-secondary mb-6">
-                  Create a free account for more queries, or explore the playground features.
-                </p>
-                <div className="space-y-2">
-                  <button className="btn-primary w-full">Create Free Account</button>
-                  <button className="btn-secondary w-full">Maybe Later</button>
-                </div>
-              </div>
-            </div>
           )}
 
           {/* Input Bar */}
@@ -514,9 +270,6 @@ export default function PlaygroundPage() {
                   </button>
                 )}
               </div>
-              <p className="text-xs text-text-muted mt-2 text-center">
-                Timuclaude orchestrates multiple AI models for superior answers · Free for first {FREE_QUERY_LIMIT} queries
-              </p>
             </div>
           </div>
         </main>
@@ -539,9 +292,7 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
           </button>
         </div>
 
-        {/* Steps */}
         <div className="space-y-4">
-          {/* Classification */}
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 rounded-full bg-accent-olive/20 flex items-center justify-center flex-shrink-0">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#788C5D" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
@@ -552,7 +303,6 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             </div>
           </div>
 
-          {/* Model responses */}
           {data.models.length > 1 && (
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-accent-primary/20 flex items-center justify-center flex-shrink-0">
@@ -581,7 +331,6 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             </div>
           )}
 
-          {/* Code verification */}
           {data.codeVerified && (
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-accent-olive/20 flex items-center justify-center flex-shrink-0">
@@ -594,7 +343,6 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             </div>
           )}
 
-          {/* Self-QA */}
           {data.qaScore > 0 && (
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-accent-olive/20 flex items-center justify-center flex-shrink-0">
@@ -607,13 +355,10 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             </div>
           )}
 
-          {/* Summary */}
           <div className="flex items-center gap-4 pt-2 border-t border-border-subtle text-xs text-text-muted">
             <span>Total: {data.totalLatency}s</span>
             <span>·</span>
-            <span>Cost: {data.cost}</span>
-            <span>·</span>
-            <span>{data.models.length} model{data.models.length > 1 ? 's' : ''}</span>
+            <span>{data.models.length} models</span>
           </div>
         </div>
       </div>
