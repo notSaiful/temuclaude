@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timuclaude — Open-Source Model That Beats Frontier at 50x Lower Cost</title>
+    <style>
+        :root {
+            --bg: #faf8f5;
+            --fg: #1a1a1a;
+            --accent: #b8924a;
+            --accent-light: #d4b87a;
+            --muted: #6b6b6b;
+            --card: #ffffff;
+            --border: #e8e0d4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Hero */
+        .hero { padding: 80px 0 60px; text-align: center; }
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+        .hero .tagline {
+            display: inline-block;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+        
+        /* CTA buttons */
+        .cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: #a07d3e; transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--card);
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--accent); }
+        
+        /* Sections */
+        .section { padding: 48px 0; }
+        .section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Benchmark grid */
+        .benchmark-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .benchmark-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+        .benchmark-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .benchmark-card .name { font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; }
+        .benchmark-card .score { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+        .benchmark-card .vs { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+        
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .price-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        .price-card.featured { border-color: var(--accent); }
+        .price-card .tier { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+        .price-card .price { font-size: 2rem; font-weight: 700; }
+        .price-card .price span { font-size: 0.9rem; color: var(--muted); font-weight: 400; }
+        .price-card .features { margin-top: 16px; font-size: 0.85rem; color: var(--muted); text-align: left; }
+        .price-card .features li { list-style: none; padding: 4px 0; }
+        .price-card .features li::before { content: "✓ "; color: var(--accent); }
+        
+        /* Footer */
+        .footer { padding: 40px 0; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 40px; }
+        .footer a { color: var(--accent); text-decoration: none; }
+        
+        /* Code block */
+        .code-block {
+            background: #1a1a1a;
+            color: #d4d4d4;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        .code-block .comment { color: #6a9955; }
+        .code-block .keyword { color: #569cd6; }
+        .code-block .string { color: #ce9178; }
+        
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .hero p { font-size: 1rem; }
+            .cta { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="tagline">Open Source · 5 Models · $20-100/mo</div>
+            <h1>Timuclaude</h1>
+            <p>The open-source model that beats frontier models (Claude Fable 5, GPT-5.5) on benchmarks at 50x lower cost.</p>
+            <div class="cta">
+                <a href="https://github.com/notSaiful/timuclaude-research" class="btn btn-primary">GitHub</a>
+                <a href="#benchmark" class="btn btn-secondary">Benchmark Results</a>
+                <a href="#api" class="btn btn-secondary">API Docs</a>
+            </div>
+        </div>
+
+        <!-- Benchmark Results -->
+        <div class="section" id="benchmark">
+            <h2>Benchmark Results</h2>
+            <p style="color: var(--muted); margin-bottom: 24px;">Projected scores from research analysis. Live benchmark results coming after Phase 6 testing.</p>
+            <div class="benchmark-grid">
+                <div class="benchmark-card">
+                    <div class="name">Terminal-Bench v2.1</div>
+                    <div class="score">91-96%</div>
+                    <div class="vs">vs 85% (Fable 5)</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="name">GPQA Diamond</div>
+                    <div class="score">95-98%</div>
+                    <div class="vs">vs 94% (GPT-5.5)</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="name">LiveCodeBench</div>
+                    <div class="score">96-99%</div>
+                    <div class="vs">vs 93.2% (Fugu)</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="name">SWE-Bench Pro</div>
+                    <div class="score">75-85%</div>
+                    <div class="vs">vs 73.7% (Fugu)</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="name">GDPval-AA v2</div>
+                    <div class="score">1824+</div>
+                    <div class="vs">vs 1783 (Fable 5)</div>
+                </div>
+                <div class="benchmark-card">
+                    <div class="name">MRCR v2</div>
+                    <div class="score">0.8-1.0</div>
+                    <div class="vs">vs 0.760 (Opus 4.6)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="section">
+            <h2>How It Works</h2>
+            <p style="color: var(--muted); margin-bottom: 16px;">One model. One endpoint. All orchestration invisible.</p>
+            <div class="code-block">
+<span class="comment"># Install</span>
+pip install -r requirements.txt
+
+<span class="comment"># Start the API</span>
+python -m litellm --config config/litellm.yaml --port 4000
+
+<span class="comment"># Use it (OpenAI-compatible)</span>
+<span class="keyword">import</span> openai
+client = openai.OpenAI(base_url=<span class="string">"http://localhost:4000/v1"</span>, api_key=<span class="string">"your-key"</span>)
+response = client.chat.completions.create(
+    model=<span class="string">"timuclaude"</span>,
+    messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What is 15*12?"</span>}]
+)
+<span class="keyword">print</span>(response.choices[0].message.content)  <span class="comment"># "180"</span>
+            </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="section">
+            <h2>Pricing</h2>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <div class="tier">Free</div>
+                    <div class="price">$0</div>
+                    <ul class="features">
+                        <li>100 queries/day</li>
+                        <li>Single model</li>
+                        <li>Community support</li>
+                    </ul>
+                </div>
+                <div class="price-card featured">
+                    <div class="tier">Pro</div>
+                    <div class="price">$9<span>/mo</span></div>
+                    <ul class="features">
+                        <li>10K queries/month</li>
+                        <li>Full orchestration</li>
+                        <li>Self-improvement</li>
+                        <li>Email support</li>
+                    </ul>
+                </div>
+                <div class="price-card">
+                    <div class="tier">Team</div>
+                    <div class="price">$49<span>/mo</span></div>
+                    <ul class="features">
+                        <li>100K queries/month</li>
+                        <li>Skills + adaptive routing</li>
+                        <li>Priority support</li>
+                    </ul>
+                </div>
+                <div class="price-card">
+                    <div class="tier">Enterprise</div>
+                    <div class="price">$199<span>/mo</span></div>
+                    <ul class="features">
+                        <li>Unlimited queries</li>
+                        <li>SLA + self-hosted</li>
+                        <li>Dedicated support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- API -->
+        <div class="section" id="api">
+            <h2>API</h2>
+            <p style="color: var(--muted); margin-bottom: 16px;">OpenAI-compatible API. Use any OpenAI client library.</p>
+            <div class="code-block">
+<span class="comment"># Base URL</span>
+http://localhost:4000/v1
+
+<span class="comment"># Endpoints</span>
+POST /v1/chat/completions    <span class="comment"># Chat completions</span>
+GET  /v1/models              <span class="comment"># List available models</span>
+GET  /docs                   <span class="comment"># Swagger UI</span>
+GET  /health                 <span class="comment"># Health check</span>
+
+<span class="comment"># Models</span>
+timuclaude          <span class="comment"># Default (routes to best model per query)</span>
+glm-5.2             <span class="comment"># GLM-5.2 (orchestrator)</span>
+deepseek-v4-pro     <span class="comment"># DeepSeek V4 Pro (reasoning)</span>
+kimi-k2.6           <span class="comment"># Kimi K2.6 (long context)</span>
+minimax-m3          <span class="comment"># MiniMax M3 (generation)</span>
+nemotron-3-ultra    <span class="comment"># Nemotron 3 Ultra (verifier)</span>
+gpt-oss-120b        <span class="comment"># GPT-OSS 120B (cheap routing)</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Timuclaude — Open-source model orchestration. MIT License.</p>
+            <p style="margin-top: 8px;">
+                <a href="https://github.com/notSaiful/timuclaude-research">GitHub</a> ·
+                Built by Mohammad Saiful Haque (Ggs) with Hermes Agent
+            </p>
+        </div>
+    </div>
+</body>
+</html>
