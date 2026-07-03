@@ -1,0 +1,3435 @@
+{
+  "distilled_at": "20260703T072148",
+  "total_raw_files": 8,
+  "total_findings": 119,
+  "new_findings": 119,
+  "already_distilled": 0,
+  "by_type": {
+    "github_repo": 74,
+    "hf_model": 40,
+    "hf_paper": 5
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1272003010",
+      "name": "Lyasuk/llm-debate-swarm",
+      "url": "https://github.com/Lyasuk/llm-debate-swarm",
+      "description": "Multi-LLM debate & arbitration engine: weighted multi-provider consensus + an N-agent debiasing debate swarm, aggregated into a calibrated probability.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-17T18:23:17Z",
+      "relevance_score": 60,
+      "matched_keywords": [
+        "orchestration",
+        "judge",
+        "ensemble",
+        "multi-agent",
+        "debate",
+        "consensus",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1272003010"
+    },
+    {
+      "type": "github_repo",
+      "id": "1112553124",
+      "name": "irfanalidv/AgentEnsemble",
+      "url": "https://github.com/irfanalidv/AgentEnsemble",
+      "description": "AgentEnsemble is a Production-ready multi-agent orchestration for Python. ReAct, Swarm, Pipeline, Debate, Router, Planner, WorkflowGraph. Observability, cost tracking, human-in-loop. Structured outputs via Pydantic + LangChain.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-03-28T22:11:05Z",
+      "relevance_score": 55,
+      "matched_keywords": [
+        "orchestration",
+        "ensemble",
+        "multi-agent",
+        "debate",
+        "swarm",
+        "react",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:1112553124"
+    },
+    {
+      "type": "github_repo",
+      "id": "1269083006",
+      "name": "raydocs/fusion-deck",
+      "url": "https://github.com/raydocs/fusion-deck",
+      "description": "\ud83c\udccf Three models gang up and out-argue the lone star. A Claude Code skill: a panel of Opus 4.8 + GPT-5.5 + Gemini 3.1 Pro judged into one answer \u2014 plus plan, context, orchestrate & handoff workflows. Runs on the subscriptions already on your machine.",
+      "stars": 1,
+      "language": "Shell",
+      "updated_at": "2026-06-23T11:07:19Z",
+      "relevance_score": 53,
+      "matched_keywords": [
+        "fusion",
+        "panel",
+        "judge",
+        "ensemble",
+        "multi-model",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1269083006"
+    },
+    {
+      "type": "github_repo",
+      "id": "1101935600",
+      "name": "he-yufeng/gsm8k-prompt-engineering",
+      "url": "https://github.com/he-yufeng/gsm8k-prompt-engineering",
+      "description": "Prompt-engineering study on LLM math reasoning (GSM8K) and code generation (HumanEval): zero/few-shot, self-consistency, self-verification, and experiments on prompt quality, complexity, demonstrations, and diversity.",
+      "stars": 5,
+      "language": "Python",
+      "updated_at": "2026-06-27T19:09:44Z",
+      "relevance_score": 43,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "verification",
+        "reasoning",
+        "humaneval",
+        "code generation"
+      ],
+      "dedup_key": "github_repo:1101935600"
+    },
+    {
+      "type": "github_repo",
+      "id": "1252198630",
+      "name": "Hritikd/hermes",
+      "url": "https://github.com/Hritikd/hermes",
+      "description": "Test-time compute scaling engine with Process Reward Models, MCTS, and beam search \u2014 o1-style reasoning infrastructure",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-14T17:29:58Z",
+      "relevance_score": 40,
+      "matched_keywords": [
+        "mcts",
+        "process reward",
+        "test-time compute",
+        "reasoning",
+        "hermes"
+      ],
+      "dedup_key": "github_repo:1252198630"
+    },
+    {
+      "type": "github_repo",
+      "id": "1267261457",
+      "name": "Trusty-Squire/castellan",
+      "url": "https://github.com/Trusty-Squire/castellan",
+      "description": "Castellan \u2014 verified coding agent. You bring the inspiration; your castellan handles the rest, and proves it. Specs compile to gated loops: git is the memory, tests are the judge. Frontier results at 1/20th frontier cost.",
+      "stars": 0,
+      "language": "TypeScript",
+      "updated_at": "2026-06-23T19:25:17Z",
+      "relevance_score": 39,
+      "matched_keywords": [
+        "judge",
+        "verification",
+        "benchmark",
+        "frontier",
+        "coding agent",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1267261457"
+    },
+    {
+      "type": "github_repo",
+      "id": "1206707311",
+      "name": "CallmeTruong/llm-reasoning-scaffolding",
+      "url": "https://github.com/CallmeTruong/llm-reasoning-scaffolding",
+      "description": "A performance-driven comparison of LLM reasoning protocols, featuring a custom Monte Carlo Tree Search (MCTS) implementation. This benchmark evaluates how search-based scaffolding forces structured logic and error correction on the GSM8K dataset, contrasting the precision of MCTS-guided inference against traditional CoT and Best-of-N methods.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-04-22T20:18:32Z",
+      "relevance_score": 37,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "best-of-n",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1206707311"
+    },
+    {
+      "type": "github_repo",
+      "id": "1220066979",
+      "name": "capitansuat/swarm-debate",
+      "url": "https://github.com/capitansuat/swarm-debate",
+      "description": "Multi-LLM debate engine with a shared expert validator that fact-checks each round",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-05-16T22:29:31Z",
+      "relevance_score": 36,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm",
+        "ollama",
+        "llama"
+      ],
+      "dedup_key": "github_repo:1220066979"
+    },
+    {
+      "type": "github_repo",
+      "id": "1269999936",
+      "name": "acebot712/agent-from-scratch",
+      "url": "https://github.com/acebot712/agent-from-scratch",
+      "description": "Build your own ~600-800 line AI agent framework in pure Python \u2014 tool use, memory, planning, multi-agent, evals. Understand every agent framework by building one. Course repo, tagged per module.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-17T09:11:57Z",
+      "relevance_score": 36,
+      "matched_keywords": [
+        "multi-agent",
+        "react",
+        "tool-use",
+        "agentic",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1269999936"
+    },
+    {
+      "type": "github_repo",
+      "id": "1219504513",
+      "name": "sohanur083/prompt-optimizer",
+      "url": "https://github.com/sohanur083/prompt-optimizer",
+      "description": "Automatic prompt optimization for LLMs. Meta-prompting + evolutionary search + A/B evaluation. DSPy/APE/OPRO alternative with a one-line API.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-27T15:19:17Z",
+      "relevance_score": 35,
+      "matched_keywords": [
+        "opro",
+        "prompt optim",
+        "meta-prompt",
+        "dspy"
+      ],
+      "dedup_key": "github_repo:1219504513"
+    },
+    {
+      "type": "github_repo",
+      "id": "1247353549",
+      "name": "yxrdhzm/promptOptimizationEngine",
+      "url": "https://github.com/yxrdhzm/promptOptimizationEngine",
+      "description": "LLM\u63d0\u793a\u8bcd\u4f18\u5316\u5f15\u64ce - \u901a\u8fc7\u6d4b\u8bd5\u96c6\u9a71\u52a8+LLM\u81ea\u6211\u8fed\u4ee3\uff0c\u81ea\u52a8\u4ea7\u51fa\u6bd4\u4eba\u5de5\u7f16\u5199\u66f4\u4f18\u7684\u7cfb\u7edf\u63d0\u793a\u8bcd\u3002\u652f\u6301 OpenAI/Anthropic/DashScope/DeepSeek/Ollama\uff0c\u5185\u7f6e Streamlit Web UI\u3002Automatically optimize system prompts via OPRO self-iteration with LLM-as-Judge evaluation.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-23T08:06:51Z",
+      "relevance_score": 34,
+      "matched_keywords": [
+        "judge",
+        "opro",
+        "ollama",
+        "llama",
+        "deepseek"
+      ],
+      "dedup_key": "github_repo:1247353549"
+    },
+    {
+      "type": "github_repo",
+      "id": "1166889617",
+      "name": "DHIWAHAR-K/Beyond-English-Multilingual-Self-Consistency-for-Robust-LLM-Reasoning",
+      "url": "https://github.com/DHIWAHAR-K/Beyond-English-Multilingual-Self-Consistency-for-Robust-LLM-Reasoning",
+      "description": "Research: Does multilingual self-consistency improve LLM reasoning beyond math? Empirical study across 6 benchmarks (commonsense, ethics, NLI, knowledge) and 10 languages using Qwen2.5-32B and Aya Expanse 32B on Apple Silicon (MLX). Chain-of-thought + cross-lingual prompting.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-06-25T04:21:55Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "benchmark",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1166889617"
+    },
+    {
+      "type": "github_repo",
+      "id": "1148472168",
+      "name": "JianChengXingYun/Em-Mcts",
+      "url": "https://github.com/JianChengXingYun/Em-Mcts",
+      "description": "Empirical-MCTS: A dual-loop inference-time scaling framework that transforms stateless Monte Carlo Tree Search into continuous empirical learning. By unifying real-time meta-prompt evolution (PE-EMP) with global memory optimization, it enables LLMs to accumulate and reuse reasoning wisdom across problems\u2014significantly boosting performance on comple",
+      "stars": 7,
+      "language": "Python",
+      "updated_at": "2026-05-06T05:21:59Z",
+      "relevance_score": 32,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning",
+        "meta-prompt"
+      ],
+      "dedup_key": "github_repo:1148472168"
+    },
+    {
+      "type": "github_repo",
+      "id": "974178189",
+      "name": "LIN0304/llm-reasoning-architecture-advances-2023-2025",
+      "url": "https://github.com/LIN0304/llm-reasoning-architecture-advances-2023-2025",
+      "description": "A comprehensive analysis of advanced reasoning structures and transformer architecture innovations from 2023-2025, including Tree of Thoughts, Graph of Thoughts, Mamba, and other breakthrough approaches.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2025-04-28T11:26:10Z",
+      "relevance_score": 32,
+      "matched_keywords": [
+        "reasoning",
+        "tree of thoughts",
+        "graph of thoughts",
+        "breakthrough"
+      ],
+      "dedup_key": "github_repo:974178189"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287751462",
+      "name": "chaturvediaksh1304-sudo/news-to-trade-agent",
+      "url": "https://github.com/chaturvediaksh1304-sudo/news-to-trade-agent",
+      "description": "Multi-agent S&P 500 news-to-trade pipeline: numeric screener, LLM debate swarm, Alpaca paper trading, public reasoning log + Next.js dashboard",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T01:23:44Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1287751462"
+    },
+    {
+      "type": "github_repo",
+      "id": "1265575129",
+      "name": "Rudra303/NovaScientist",
+      "url": "https://github.com/Rudra303/NovaScientist",
+      "description": "NovaScientist is an enterprise-grade, multi-agent AI framework for automated scientific discovery. Using a swarm of specialized LLM agents, it autonomously generates, debates, and refines novel scientific hypotheses. Features highly-parallelized asynchronous execution, real-time ELO tournament evaluation, and a robust FastAPI-driven backend.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-11T18:32:54Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm",
+        "novel"
+      ],
+      "dedup_key": "github_repo:1265575129"
+    },
+    {
+      "type": "github_repo",
+      "id": "1238766550",
+      "name": "qorexdevs/deterministic-horizon",
+      "url": "https://github.com/qorexdevs/deterministic-horizon",
+      "description": "Frontier LLMs collapse past ~22 reasoning steps on state-space search, but tool delegation stays near-perfect. Benchmark, theory and code behind the Deterministic Horizon (ICML 2026).",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T01:43:31Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "benchmark",
+        "frontier",
+        "tool-use"
+      ],
+      "dedup_key": "github_repo:1238766550"
+    },
+    {
+      "type": "github_repo",
+      "id": "1270623746",
+      "name": "pookNast/HiveMindFusion",
+      "url": "https://github.com/pookNast/HiveMindFusion",
+      "description": "Multi-model AI gateway with fusion orchestration \u2014 routes across local and cloud LLMs through a single OpenAI-compatible API",
+      "stars": 0,
+      "language": "Go",
+      "updated_at": "2026-07-02T23:54:57Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "orchestration",
+        "fusion",
+        "multi-model"
+      ],
+      "dedup_key": "github_repo:1270623746"
+    },
+    {
+      "type": "github_repo",
+      "id": "1160498426",
+      "name": "xinzhel/lits-llm",
+      "url": "https://github.com/xinzhel/lits-llm",
+      "description": "A modular Python framework for building LLM agents with tree search (e.g., MCTS, BFS) and chain reasoning (e.g., ReAct) --- CiT [ACL2026 Findings], LiTS [ACL 2026 Demo], LiTS-Mem [Under Review]",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-24T00:14:07Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning",
+        "react"
+      ],
+      "dedup_key": "github_repo:1160498426"
+    },
+    {
+      "type": "github_repo",
+      "id": "1160423134",
+      "name": "aayambansal/ConsistPRM",
+      "url": "https://github.com/aayambansal/ConsistPRM",
+      "description": "We introduce ConsistBench, a Z3-verified benchmark revealing that LLMs achieve 100% accuracy yet near-0% on negation probes, and show that Z3-verified labels are critical for training consistency-aware process reward models.",
+      "stars": 0,
+      "language": "TeX",
+      "updated_at": "2026-02-18T00:05:25Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "process reward",
+        "prm",
+        "benchmark",
+        "z3"
+      ],
+      "dedup_key": "github_repo:1160423134"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287538971",
+      "name": "MajidGhosian/Agentic-AI-Learning-Lab",
+      "url": "https://github.com/MajidGhosian/Agentic-AI-Learning-Lab",
+      "description": "A hands-on repository for learning Agentic AI through small, practical projects. It covers key concepts like ReAct agents, tool use, memory, planning, reflection, multi-agent systems, RAG, and automation. Each module builds real-world AI skills by implementing autonomous, goal-driven systems using modern LLM frameworks and tools.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-02T19:38:39Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "reflection",
+        "multi-agent",
+        "react",
+        "agentic"
+      ],
+      "dedup_key": "github_repo:1287538971"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279581518",
+      "name": "amori27/agentic-ai-framework",
+      "url": "https://github.com/amori27/agentic-ai-framework",
+      "description": "Autonomous AI agent frameworks with tool use, planning, and multi-agent coordination",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-07-02T04:40:43Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "multi-agent",
+        "tool-use",
+        "agentic",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1279581518"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221695486",
+      "name": "dinho-afsn/agentic-harness-patterns-skill",
+      "url": "https://github.com/dinho-afsn/agentic-harness-patterns-skill",
+      "description": "Build production patterns for AI coding agents from Claude Code source analysis and harness engineering practice.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-03T05:51:04Z",
+      "relevance_score": 29,
+      "matched_keywords": [
+        "agentic",
+        "claude code",
+        "codex",
+        "coding agent"
+      ],
+      "dedup_key": "github_repo:1221695486"
+    },
+    {
+      "type": "github_repo",
+      "id": "1276348145",
+      "name": "darrshangovender/thinking-loop",
+      "url": "https://github.com/darrshangovender/thinking-loop",
+      "description": "Test-time reasoning compute. Five published strategies (CoT, Self-Consistency, Decomposition, ToT-Lite, Direct) behind one interface, adjudicated by a critic LLM, with calibrated confidence and hard budget guards. Reproducible benchmark included.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-21T21:40:05Z",
+      "relevance_score": 28,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1276348145"
+    },
+    {
+      "type": "github_repo",
+      "id": "1258956684",
+      "name": "Yash-814800/ARGUS",
+      "url": "https://github.com/Yash-814800/ARGUS",
+      "description": "An autonomous multi-agent swarm for zero-touch microservice incident detection, AI-powered root cause analysis, and closed-loop remediation \u2014 driven by LLM debate, vector memory, and surgical safety guardrails.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-06-04T20:28:09Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1258956684"
+    },
+    {
+      "type": "github_repo",
+      "id": "1246001919",
+      "name": "mdayan8/hive",
+      "url": "https://github.com/mdayan8/hive",
+      "description": "Swarm Intelligence That Predicts Anything. HIVE deploys autonomous AI agents to research, debate, and forecast any scenario \u2014 delivering intelligence briefs with probability scores, risk analysis, and actionable strategy.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-22T05:12:46Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1246001919"
+    },
+    {
+      "type": "github_repo",
+      "id": "1152711216",
+      "name": "alfredojrc/gemini-mcp",
+      "url": "https://github.com/alfredojrc/gemini-mcp",
+      "description": "MCP server wrapping Google Gemini AI with multi-agent swarm and AI-to-AI debate capabilities",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-02-08T18:14:44Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1152711216"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287666398",
+      "name": "LaxRaj/comp-evals",
+      "url": "https://github.com/LaxRaj/comp-evals",
+      "description": "Open-source eval: frontier models on synthetic compensation-reasoning scenarios, judged by two independent LLMs.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T03:23:03Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "judge",
+        "reasoning",
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1287666398"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279719600",
+      "name": "adu3110/tot-mcts",
+      "url": "https://github.com/adu3110/tot-mcts",
+      "description": "Tree-of-Thought + Monte Carlo Tree Search over real LLM completions \u2014 pure Python + TypeScript, no frameworks",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-25T14:38:06Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1279719600"
+    },
+    {
+      "type": "github_repo",
+      "id": "1048835024",
+      "name": "queelius/mcts-reasoning",
+      "url": "https://github.com/queelius/mcts-reasoning",
+      "description": "Monte Carlo Tree Search for LLM-based reasoning with fluent API and advanced sampling strategies",
+      "stars": 5,
+      "language": "Python",
+      "updated_at": "2026-06-17T11:44:58Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1048835024"
+    },
+    {
+      "type": "github_repo",
+      "id": "1188002911",
+      "name": "gsavla6-hue/ai-game-playing-agent",
+      "url": "https://github.com/gsavla6-hue/ai-game-playing-agent",
+      "description": "Intelligent game-playing agent using Monte Carlo Tree Search + LLM reasoning to play chess, checkers and custom text-based strategy games",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-03-21T13:41:23Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1188002911"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279042427",
+      "name": "Evgeniy-Mikhailove/prompt-techniques-library",
+      "url": "https://github.com/Evgeniy-Mikhailove/prompt-techniques-library",
+      "description": "Decision matrix for choosing the right prompting technique. 6 production patterns: CoT, ReAct, Chaining, ToT, RAG, Self-Consistency.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-01T10:39:08Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "react"
+      ],
+      "dedup_key": "github_repo:1279042427"
+    },
+    {
+      "type": "github_repo",
+      "id": "891039887",
+      "name": "NathanMayPro/Basic-Mixture-Of-Agents-langchain-implementation",
+      "url": "https://github.com/NathanMayPro/Basic-Mixture-Of-Agents-langchain-implementation",
+      "description": "A Python implementation of Mixture of Agents (MoA) using LangChain. This framework enables dynamic interaction between multiple AI models through layered approaches. Features include multi-provider LLM support (Mistral, OpenAI, Anthropic, Groq), configurable layers and roles, response aggregation, and comprehensive logging.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2024-12-01T10:15:22Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "mixture of agents",
+        "moa",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:891039887"
+    },
+    {
+      "type": "github_repo",
+      "id": "1049849988",
+      "name": "MackCesar/cot-vs-tot",
+      "url": "https://github.com/MackCesar/cot-vs-tot",
+      "description": "Experiments comparing Chain-of-Thought, Self-Consistency, Tree-of-Thoughts, and Graph-of-Thoughts reasoning strategies on LLMs.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-04-22T00:07:12Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1049849988"
+    },
+    {
+      "type": "github_repo",
+      "id": "1285101606",
+      "name": "1223had123/Post-train-for-LLMs-simple-implementation-",
+      "url": "https://github.com/1223had123/Post-train-for-LLMs-simple-implementation-",
+      "description": "\u4e00\u4e2a\u672a\u5b8c\u6210\u7248\u7684 post-training \u5b66\u4e60\u6837\u4f8b\u9879\u76ee\uff0c\u57fa\u4e8e\u672c\u5730 Qwen \u6a21\u578b\u5b9e\u73b0\u82e5\u5e72\u63a8\u7406\u8bc4\u6d4b\u6d41\u7a0b\u3002\u5f53\u524d\u4ed3\u5e93\u91cd\u70b9\u653e\u5728 prompt engineering\u3001Chain-of-Thought\u3001self-consistency \u548c\u591a\u6570\u636e\u96c6\u8bc4\u6d4b\u811a\u624b\u67b6\u4e0a\uff1bSFT\u3001PPO\u3001DPO \u7b49\u771f\u6b63\u7684\u8bad\u7ec3\u9636\u6bb5\u8fd8\u5728\u5f85\u5b9e\u73b0\u5217\u8868\u4e2d\u3002",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-01T10:30:42Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1285101606"
+    },
+    {
+      "type": "github_repo",
+      "id": "1282748112",
+      "name": "VinayakMokashi/prompt-engineering-techniques",
+      "url": "https://github.com/VinayakMokashi/prompt-engineering-techniques",
+      "description": "Hands-on prompt-engineering techniques (few-shot & in-context learning, chain-of-thought, self-consistency, and embedding-based prompt evaluation) demonstrated with LangChain and Groq-hosted LLaMA models.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-29T16:46:41Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "llama"
+      ],
+      "dedup_key": "github_repo:1282748112"
+    },
+    {
+      "type": "github_repo",
+      "id": "1245188455",
+      "name": "xiaweiyi713/agentic-os-core",
+      "url": "https://github.com/xiaweiyi713/agentic-os-core",
+      "description": "A hardcore memory & planning engine for AI Agents \u2014 graph-based knowledge storage, MCTS tree-of-thoughts reasoning, and hierarchical goal planning. Zero dependencies.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-21T07:25:46Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "mcts",
+        "reasoning",
+        "agentic"
+      ],
+      "dedup_key": "github_repo:1245188455"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask_oritoken",
+      "downloads": 4,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask_oritoken"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask",
+      "downloads": 3,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_with_general_qa_withlo_reasoning_v2_t1977_labelmask_rightformat",
+      "downloads": 2,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_with_general_qa_withlo_reasoning_v2_t1977_labelmask_rightformat"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_with_reasoning_pipeline_t2126",
+      "downloads": 2,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_with_reasoning_pipeline_t2126"
+    },
+    {
+      "type": "github_repo",
+      "id": "1213958711",
+      "name": "Saksham4796/momentum-guided-test-time-search",
+      "url": "https://github.com/Saksham4796/momentum-guided-test-time-search",
+      "description": "Momentum-guided test-time search for LLM reasoning on GSM8K. Implements vanilla decoding, Tree-of-Thoughts, MCTS, and a momentum-based search strategy with lookahead entropy scoring, dynamic branching/backtracking, MLX KV-cache acceleration, and CSV benchmarking for accuracy, latency, tokens, and memory.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-18T00:30:44Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "mcts",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1213958711"
+    },
+    {
+      "type": "github_repo",
+      "id": "1146966514",
+      "name": "murtazabaig/automatically-optimize-ai-prompts-with-openai-using-opro-dspy-methodology",
+      "url": "https://github.com/murtazabaig/automatically-optimize-ai-prompts-with-openai-using-opro-dspy-methodology",
+      "description": "Advanced n8n automation for Automatically Optimize AI Prompts with OpenAI Using OPRO & DSPy Methodology.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-02-01T02:06:08Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "opro",
+        "dspy"
+      ],
+      "dedup_key": "github_repo:1146966514"
+    },
+    {
+      "type": "github_repo",
+      "id": "951260128",
+      "name": "bhorev/automatic-prompt-optimization",
+      "url": "https://github.com/bhorev/automatic-prompt-optimization",
+      "description": "Automatic Prompt Optimization OPRO implementation with Amazon Bedrock",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2025-03-19T12:15:24Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "opro",
+        "prompt optim"
+      ],
+      "dedup_key": "github_repo:951260128"
+    },
+    {
+      "type": "github_repo",
+      "id": "1166643929",
+      "name": "theamitmehra/got-benchmark",
+      "url": "https://github.com/theamitmehra/got-benchmark",
+      "description": " A framework for implementing and benchmarking **Graph-of-Thoughts (GoT)** reasoning against Chain-of-Thought (CoT) and Tree-of-Thought (ToT) baselines across multiple LLM backends.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-02-25T13:02:47Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1166643929"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF",
+      "downloads": 223173,
+      "likes": 674,
+      "tags": [
+        "gguf",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "Dense",
+        "image-text-to-text",
+        "en",
+        "zh",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "base_model:Qwen/Qwen3.5-27B",
+        "base_model:quantized:Qwen/Qwen3.5-27B",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "image-text-to-text",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled-GGUF",
+      "downloads": 186413,
+      "likes": 332,
+      "tags": [
+        "gguf",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "lora",
+        "image-text-to-image",
+        "en",
+        "zh",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "base_model:Qwen/Qwen3.5-9B",
+        "base_model:adapter:Qwen/Qwen3.5-9B",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "image-text-to-image",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled",
+      "downloads": 156998,
+      "likes": 2893,
+      "tags": [
+        "safetensors",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "Dense",
+        "image-text-to-text",
+        "conversational",
+        "en",
+        "zh",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "base_model:Qwen/Qwen3.5-27B",
+        "base_model:finetune:Qwen/Qwen3.5-27B",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "pipeline_tag": "image-text-to-text",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled"
+    },
+    {
+      "type": "github_repo",
+      "id": "1276500960",
+      "name": "somsomy499/prompt-engineering",
+      "url": "https://github.com/somsomy499/prompt-engineering",
+      "description": "Systematic prompt engineering toolkit: chain-of-thought, few-shot, self-consistency, and A/B testing",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-22T05:20:40Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought"
+      ],
+      "dedup_key": "github_repo:1276500960"
+    },
+    {
+      "type": "github_repo",
+      "id": "1274961599",
+      "name": "tariqnasheed/Multi-LLM-comparator",
+      "url": "https://github.com/tariqnasheed/Multi-LLM-comparator",
+      "description": "Compare any 3 LLMs side\u2011by\u2011side \u2013 latency, token usage, cost \u2013 with built\u2011in reasoning techniques (few\u2011shot, chain\u2011of\u2011thought, self\u2011consistency, self\u2011critique). Supports Mistral, DeepSeek, OpenAI, and any OpenAI\u2011compatible API. Zero\u2011dependency pain with uv sync.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-20T04:52:31Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "reasoning",
+        "deepseek",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:1274961599"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1272003010",
+      "name": "Lyasuk/llm-debate-swarm",
+      "url": "https://github.com/Lyasuk/llm-debate-swarm",
+      "description": "Multi-LLM debate & arbitration engine: weighted multi-provider consensus + an N-agent debiasing debate swarm, aggregated into a calibrated probability.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-17T18:23:17Z",
+      "relevance_score": 60,
+      "matched_keywords": [
+        "orchestration",
+        "judge",
+        "ensemble",
+        "multi-agent",
+        "debate",
+        "consensus",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1272003010"
+    },
+    {
+      "type": "github_repo",
+      "id": "1112553124",
+      "name": "irfanalidv/AgentEnsemble",
+      "url": "https://github.com/irfanalidv/AgentEnsemble",
+      "description": "AgentEnsemble is a Production-ready multi-agent orchestration for Python. ReAct, Swarm, Pipeline, Debate, Router, Planner, WorkflowGraph. Observability, cost tracking, human-in-loop. Structured outputs via Pydantic + LangChain.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-03-28T22:11:05Z",
+      "relevance_score": 55,
+      "matched_keywords": [
+        "orchestration",
+        "ensemble",
+        "multi-agent",
+        "debate",
+        "swarm",
+        "react",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:1112553124"
+    },
+    {
+      "type": "github_repo",
+      "id": "1269083006",
+      "name": "raydocs/fusion-deck",
+      "url": "https://github.com/raydocs/fusion-deck",
+      "description": "\ud83c\udccf Three models gang up and out-argue the lone star. A Claude Code skill: a panel of Opus 4.8 + GPT-5.5 + Gemini 3.1 Pro judged into one answer \u2014 plus plan, context, orchestrate & handoff workflows. Runs on the subscriptions already on your machine.",
+      "stars": 1,
+      "language": "Shell",
+      "updated_at": "2026-06-23T11:07:19Z",
+      "relevance_score": 53,
+      "matched_keywords": [
+        "fusion",
+        "panel",
+        "judge",
+        "ensemble",
+        "multi-model",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1269083006"
+    },
+    {
+      "type": "github_repo",
+      "id": "1101935600",
+      "name": "he-yufeng/gsm8k-prompt-engineering",
+      "url": "https://github.com/he-yufeng/gsm8k-prompt-engineering",
+      "description": "Prompt-engineering study on LLM math reasoning (GSM8K) and code generation (HumanEval): zero/few-shot, self-consistency, self-verification, and experiments on prompt quality, complexity, demonstrations, and diversity.",
+      "stars": 5,
+      "language": "Python",
+      "updated_at": "2026-06-27T19:09:44Z",
+      "relevance_score": 43,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "verification",
+        "reasoning",
+        "humaneval",
+        "code generation"
+      ],
+      "dedup_key": "github_repo:1101935600"
+    },
+    {
+      "type": "github_repo",
+      "id": "1252198630",
+      "name": "Hritikd/hermes",
+      "url": "https://github.com/Hritikd/hermes",
+      "description": "Test-time compute scaling engine with Process Reward Models, MCTS, and beam search \u2014 o1-style reasoning infrastructure",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-14T17:29:58Z",
+      "relevance_score": 40,
+      "matched_keywords": [
+        "mcts",
+        "process reward",
+        "test-time compute",
+        "reasoning",
+        "hermes"
+      ],
+      "dedup_key": "github_repo:1252198630"
+    },
+    {
+      "type": "github_repo",
+      "id": "1267261457",
+      "name": "Trusty-Squire/castellan",
+      "url": "https://github.com/Trusty-Squire/castellan",
+      "description": "Castellan \u2014 verified coding agent. You bring the inspiration; your castellan handles the rest, and proves it. Specs compile to gated loops: git is the memory, tests are the judge. Frontier results at 1/20th frontier cost.",
+      "stars": 0,
+      "language": "TypeScript",
+      "updated_at": "2026-06-23T19:25:17Z",
+      "relevance_score": 39,
+      "matched_keywords": [
+        "judge",
+        "verification",
+        "benchmark",
+        "frontier",
+        "coding agent",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1267261457"
+    },
+    {
+      "type": "github_repo",
+      "id": "1206707311",
+      "name": "CallmeTruong/llm-reasoning-scaffolding",
+      "url": "https://github.com/CallmeTruong/llm-reasoning-scaffolding",
+      "description": "A performance-driven comparison of LLM reasoning protocols, featuring a custom Monte Carlo Tree Search (MCTS) implementation. This benchmark evaluates how search-based scaffolding forces structured logic and error correction on the GSM8K dataset, contrasting the precision of MCTS-guided inference against traditional CoT and Best-of-N methods.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-04-22T20:18:32Z",
+      "relevance_score": 37,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "best-of-n",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1206707311"
+    },
+    {
+      "type": "github_repo",
+      "id": "1220066979",
+      "name": "capitansuat/swarm-debate",
+      "url": "https://github.com/capitansuat/swarm-debate",
+      "description": "Multi-LLM debate engine with a shared expert validator that fact-checks each round",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-05-16T22:29:31Z",
+      "relevance_score": 36,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm",
+        "ollama",
+        "llama"
+      ],
+      "dedup_key": "github_repo:1220066979"
+    },
+    {
+      "type": "github_repo",
+      "id": "1269999936",
+      "name": "acebot712/agent-from-scratch",
+      "url": "https://github.com/acebot712/agent-from-scratch",
+      "description": "Build your own ~600-800 line AI agent framework in pure Python \u2014 tool use, memory, planning, multi-agent, evals. Understand every agent framework by building one. Course repo, tagged per module.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-17T09:11:57Z",
+      "relevance_score": 36,
+      "matched_keywords": [
+        "multi-agent",
+        "react",
+        "tool-use",
+        "agentic",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1269999936"
+    },
+    {
+      "type": "github_repo",
+      "id": "1219504513",
+      "name": "sohanur083/prompt-optimizer",
+      "url": "https://github.com/sohanur083/prompt-optimizer",
+      "description": "Automatic prompt optimization for LLMs. Meta-prompting + evolutionary search + A/B evaluation. DSPy/APE/OPRO alternative with a one-line API.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-27T15:19:17Z",
+      "relevance_score": 35,
+      "matched_keywords": [
+        "opro",
+        "prompt optim",
+        "meta-prompt",
+        "dspy"
+      ],
+      "dedup_key": "github_repo:1219504513"
+    },
+    {
+      "type": "github_repo",
+      "id": "1247353549",
+      "name": "yxrdhzm/promptOptimizationEngine",
+      "url": "https://github.com/yxrdhzm/promptOptimizationEngine",
+      "description": "LLM\u63d0\u793a\u8bcd\u4f18\u5316\u5f15\u64ce - \u901a\u8fc7\u6d4b\u8bd5\u96c6\u9a71\u52a8+LLM\u81ea\u6211\u8fed\u4ee3\uff0c\u81ea\u52a8\u4ea7\u51fa\u6bd4\u4eba\u5de5\u7f16\u5199\u66f4\u4f18\u7684\u7cfb\u7edf\u63d0\u793a\u8bcd\u3002\u652f\u6301 OpenAI/Anthropic/DashScope/DeepSeek/Ollama\uff0c\u5185\u7f6e Streamlit Web UI\u3002Automatically optimize system prompts via OPRO self-iteration with LLM-as-Judge evaluation.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-23T08:06:51Z",
+      "relevance_score": 34,
+      "matched_keywords": [
+        "judge",
+        "opro",
+        "ollama",
+        "llama",
+        "deepseek"
+      ],
+      "dedup_key": "github_repo:1247353549"
+    },
+    {
+      "type": "github_repo",
+      "id": "1166889617",
+      "name": "DHIWAHAR-K/Beyond-English-Multilingual-Self-Consistency-for-Robust-LLM-Reasoning",
+      "url": "https://github.com/DHIWAHAR-K/Beyond-English-Multilingual-Self-Consistency-for-Robust-LLM-Reasoning",
+      "description": "Research: Does multilingual self-consistency improve LLM reasoning beyond math? Empirical study across 6 benchmarks (commonsense, ethics, NLI, knowledge) and 10 languages using Qwen2.5-32B and Aya Expanse 32B on Apple Silicon (MLX). Chain-of-thought + cross-lingual prompting.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-06-25T04:21:55Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "benchmark",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1166889617"
+    },
+    {
+      "type": "github_repo",
+      "id": "1148472168",
+      "name": "JianChengXingYun/Em-Mcts",
+      "url": "https://github.com/JianChengXingYun/Em-Mcts",
+      "description": "Empirical-MCTS: A dual-loop inference-time scaling framework that transforms stateless Monte Carlo Tree Search into continuous empirical learning. By unifying real-time meta-prompt evolution (PE-EMP) with global memory optimization, it enables LLMs to accumulate and reuse reasoning wisdom across problems\u2014significantly boosting performance on comple",
+      "stars": 7,
+      "language": "Python",
+      "updated_at": "2026-05-06T05:21:59Z",
+      "relevance_score": 32,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning",
+        "meta-prompt"
+      ],
+      "dedup_key": "github_repo:1148472168"
+    },
+    {
+      "type": "github_repo",
+      "id": "974178189",
+      "name": "LIN0304/llm-reasoning-architecture-advances-2023-2025",
+      "url": "https://github.com/LIN0304/llm-reasoning-architecture-advances-2023-2025",
+      "description": "A comprehensive analysis of advanced reasoning structures and transformer architecture innovations from 2023-2025, including Tree of Thoughts, Graph of Thoughts, Mamba, and other breakthrough approaches.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2025-04-28T11:26:10Z",
+      "relevance_score": 32,
+      "matched_keywords": [
+        "reasoning",
+        "tree of thoughts",
+        "graph of thoughts",
+        "breakthrough"
+      ],
+      "dedup_key": "github_repo:974178189"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287751462",
+      "name": "chaturvediaksh1304-sudo/news-to-trade-agent",
+      "url": "https://github.com/chaturvediaksh1304-sudo/news-to-trade-agent",
+      "description": "Multi-agent S&P 500 news-to-trade pipeline: numeric screener, LLM debate swarm, Alpaca paper trading, public reasoning log + Next.js dashboard",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T01:23:44Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1287751462"
+    },
+    {
+      "type": "github_repo",
+      "id": "1265575129",
+      "name": "Rudra303/NovaScientist",
+      "url": "https://github.com/Rudra303/NovaScientist",
+      "description": "NovaScientist is an enterprise-grade, multi-agent AI framework for automated scientific discovery. Using a swarm of specialized LLM agents, it autonomously generates, debates, and refines novel scientific hypotheses. Features highly-parallelized asynchronous execution, real-time ELO tournament evaluation, and a robust FastAPI-driven backend.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-11T18:32:54Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm",
+        "novel"
+      ],
+      "dedup_key": "github_repo:1265575129"
+    },
+    {
+      "type": "github_repo",
+      "id": "1238766550",
+      "name": "qorexdevs/deterministic-horizon",
+      "url": "https://github.com/qorexdevs/deterministic-horizon",
+      "description": "Frontier LLMs collapse past ~22 reasoning steps on state-space search, but tool delegation stays near-perfect. Benchmark, theory and code behind the Deterministic Horizon (ICML 2026).",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T01:43:31Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "benchmark",
+        "frontier",
+        "tool-use"
+      ],
+      "dedup_key": "github_repo:1238766550"
+    },
+    {
+      "type": "github_repo",
+      "id": "1270623746",
+      "name": "pookNast/HiveMindFusion",
+      "url": "https://github.com/pookNast/HiveMindFusion",
+      "description": "Multi-model AI gateway with fusion orchestration \u2014 routes across local and cloud LLMs through a single OpenAI-compatible API",
+      "stars": 0,
+      "language": "Go",
+      "updated_at": "2026-07-02T23:54:57Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "orchestration",
+        "fusion",
+        "multi-model"
+      ],
+      "dedup_key": "github_repo:1270623746"
+    },
+    {
+      "type": "github_repo",
+      "id": "1160498426",
+      "name": "xinzhel/lits-llm",
+      "url": "https://github.com/xinzhel/lits-llm",
+      "description": "A modular Python framework for building LLM agents with tree search (e.g., MCTS, BFS) and chain reasoning (e.g., ReAct) --- CiT [ACL2026 Findings], LiTS [ACL 2026 Demo], LiTS-Mem [Under Review]",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-24T00:14:07Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning",
+        "react"
+      ],
+      "dedup_key": "github_repo:1160498426"
+    },
+    {
+      "type": "github_repo",
+      "id": "1160423134",
+      "name": "aayambansal/ConsistPRM",
+      "url": "https://github.com/aayambansal/ConsistPRM",
+      "description": "We introduce ConsistBench, a Z3-verified benchmark revealing that LLMs achieve 100% accuracy yet near-0% on negation probes, and show that Z3-verified labels are critical for training consistency-aware process reward models.",
+      "stars": 0,
+      "language": "TeX",
+      "updated_at": "2026-02-18T00:05:25Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "process reward",
+        "prm",
+        "benchmark",
+        "z3"
+      ],
+      "dedup_key": "github_repo:1160423134"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287538971",
+      "name": "MajidGhosian/Agentic-AI-Learning-Lab",
+      "url": "https://github.com/MajidGhosian/Agentic-AI-Learning-Lab",
+      "description": "A hands-on repository for learning Agentic AI through small, practical projects. It covers key concepts like ReAct agents, tool use, memory, planning, reflection, multi-agent systems, RAG, and automation. Each module builds real-world AI skills by implementing autonomous, goal-driven systems using modern LLM frameworks and tools.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-02T19:38:39Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "reflection",
+        "multi-agent",
+        "react",
+        "agentic"
+      ],
+      "dedup_key": "github_repo:1287538971"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279581518",
+      "name": "amori27/agentic-ai-framework",
+      "url": "https://github.com/amori27/agentic-ai-framework",
+      "description": "Autonomous AI agent frameworks with tool use, planning, and multi-agent coordination",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-07-02T04:40:43Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "multi-agent",
+        "tool-use",
+        "agentic",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1279581518"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221695486",
+      "name": "dinho-afsn/agentic-harness-patterns-skill",
+      "url": "https://github.com/dinho-afsn/agentic-harness-patterns-skill",
+      "description": "Build production patterns for AI coding agents from Claude Code source analysis and harness engineering practice.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-03T05:51:04Z",
+      "relevance_score": 29,
+      "matched_keywords": [
+        "agentic",
+        "claude code",
+        "codex",
+        "coding agent"
+      ],
+      "dedup_key": "github_repo:1221695486"
+    },
+    {
+      "type": "github_repo",
+      "id": "1276348145",
+      "name": "darrshangovender/thinking-loop",
+      "url": "https://github.com/darrshangovender/thinking-loop",
+      "description": "Test-time reasoning compute. Five published strategies (CoT, Self-Consistency, Decomposition, ToT-Lite, Direct) behind one interface, adjudicated by a critic LLM, with calibrated confidence and hard budget guards. Reproducible benchmark included.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-21T21:40:05Z",
+      "relevance_score": 28,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1276348145"
+    },
+    {
+      "type": "github_repo",
+      "id": "1258956684",
+      "name": "Yash-814800/ARGUS",
+      "url": "https://github.com/Yash-814800/ARGUS",
+      "description": "An autonomous multi-agent swarm for zero-touch microservice incident detection, AI-powered root cause analysis, and closed-loop remediation \u2014 driven by LLM debate, vector memory, and surgical safety guardrails.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-06-04T20:28:09Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1258956684"
+    },
+    {
+      "type": "github_repo",
+      "id": "1246001919",
+      "name": "mdayan8/hive",
+      "url": "https://github.com/mdayan8/hive",
+      "description": "Swarm Intelligence That Predicts Anything. HIVE deploys autonomous AI agents to research, debate, and forecast any scenario \u2014 delivering intelligence briefs with probability scores, risk analysis, and actionable strategy.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-22T05:12:46Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1246001919"
+    },
+    {
+      "type": "github_repo",
+      "id": "1152711216",
+      "name": "alfredojrc/gemini-mcp",
+      "url": "https://github.com/alfredojrc/gemini-mcp",
+      "description": "MCP server wrapping Google Gemini AI with multi-agent swarm and AI-to-AI debate capabilities",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-02-08T18:14:44Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "multi-agent",
+        "debate",
+        "swarm"
+      ],
+      "dedup_key": "github_repo:1152711216"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287666398",
+      "name": "LaxRaj/comp-evals",
+      "url": "https://github.com/LaxRaj/comp-evals",
+      "description": "Open-source eval: frontier models on synthetic compensation-reasoning scenarios, judged by two independent LLMs.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T03:23:03Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "judge",
+        "reasoning",
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1287666398"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279719600",
+      "name": "adu3110/tot-mcts",
+      "url": "https://github.com/adu3110/tot-mcts",
+      "description": "Tree-of-Thought + Monte Carlo Tree Search over real LLM completions \u2014 pure Python + TypeScript, no frameworks",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-25T14:38:06Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1279719600"
+    },
+    {
+      "type": "github_repo",
+      "id": "1048835024",
+      "name": "queelius/mcts-reasoning",
+      "url": "https://github.com/queelius/mcts-reasoning",
+      "description": "Monte Carlo Tree Search for LLM-based reasoning with fluent API and advanced sampling strategies",
+      "stars": 5,
+      "language": "Python",
+      "updated_at": "2026-06-17T11:44:58Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1048835024"
+    },
+    {
+      "type": "github_repo",
+      "id": "1188002911",
+      "name": "gsavla6-hue/ai-game-playing-agent",
+      "url": "https://github.com/gsavla6-hue/ai-game-playing-agent",
+      "description": "Intelligent game-playing agent using Monte Carlo Tree Search + LLM reasoning to play chess, checkers and custom text-based strategy games",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-03-21T13:41:23Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "mcts",
+        "tree search",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1188002911"
+    },
+    {
+      "type": "github_repo",
+      "id": "1279042427",
+      "name": "Evgeniy-Mikhailove/prompt-techniques-library",
+      "url": "https://github.com/Evgeniy-Mikhailove/prompt-techniques-library",
+      "description": "Decision matrix for choosing the right prompting technique. 6 production patterns: CoT, ReAct, Chaining, ToT, RAG, Self-Consistency.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-01T10:39:08Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "react"
+      ],
+      "dedup_key": "github_repo:1279042427"
+    },
+    {
+      "type": "github_repo",
+      "id": "891039887",
+      "name": "NathanMayPro/Basic-Mixture-Of-Agents-langchain-implementation",
+      "url": "https://github.com/NathanMayPro/Basic-Mixture-Of-Agents-langchain-implementation",
+      "description": "A Python implementation of Mixture of Agents (MoA) using LangChain. This framework enables dynamic interaction between multiple AI models through layered approaches. Features include multi-provider LLM support (Mistral, OpenAI, Anthropic, Groq), configurable layers and roles, response aggregation, and comprehensive logging.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2024-12-01T10:15:22Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "mixture of agents",
+        "moa",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:891039887"
+    },
+    {
+      "type": "github_repo",
+      "id": "1049849988",
+      "name": "MackCesar/cot-vs-tot",
+      "url": "https://github.com/MackCesar/cot-vs-tot",
+      "description": "Experiments comparing Chain-of-Thought, Self-Consistency, Tree-of-Thoughts, and Graph-of-Thoughts reasoning strategies on LLMs.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-04-22T00:07:12Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1049849988"
+    },
+    {
+      "type": "github_repo",
+      "id": "1285101606",
+      "name": "1223had123/Post-train-for-LLMs-simple-implementation-",
+      "url": "https://github.com/1223had123/Post-train-for-LLMs-simple-implementation-",
+      "description": "\u4e00\u4e2a\u672a\u5b8c\u6210\u7248\u7684 post-training \u5b66\u4e60\u6837\u4f8b\u9879\u76ee\uff0c\u57fa\u4e8e\u672c\u5730 Qwen \u6a21\u578b\u5b9e\u73b0\u82e5\u5e72\u63a8\u7406\u8bc4\u6d4b\u6d41\u7a0b\u3002\u5f53\u524d\u4ed3\u5e93\u91cd\u70b9\u653e\u5728 prompt engineering\u3001Chain-of-Thought\u3001self-consistency \u548c\u591a\u6570\u636e\u96c6\u8bc4\u6d4b\u811a\u624b\u67b6\u4e0a\uff1bSFT\u3001PPO\u3001DPO \u7b49\u771f\u6b63\u7684\u8bad\u7ec3\u9636\u6bb5\u8fd8\u5728\u5f85\u5b9e\u73b0\u5217\u8868\u4e2d\u3002",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-01T10:30:42Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "qwen"
+      ],
+      "dedup_key": "github_repo:1285101606"
+    },
+    {
+      "type": "github_repo",
+      "id": "1282748112",
+      "name": "VinayakMokashi/prompt-engineering-techniques",
+      "url": "https://github.com/VinayakMokashi/prompt-engineering-techniques",
+      "description": "Hands-on prompt-engineering techniques (few-shot & in-context learning, chain-of-thought, self-consistency, and embedding-based prompt evaluation) demonstrated with LangChain and Groq-hosted LLaMA models.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-29T16:46:41Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "llama"
+      ],
+      "dedup_key": "github_repo:1282748112"
+    },
+    {
+      "type": "github_repo",
+      "id": "1245188455",
+      "name": "xiaweiyi713/agentic-os-core",
+      "url": "https://github.com/xiaweiyi713/agentic-os-core",
+      "description": "A hardcore memory & planning engine for AI Agents \u2014 graph-based knowledge storage, MCTS tree-of-thoughts reasoning, and hierarchical goal planning. Zero dependencies.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-05-21T07:25:46Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "mcts",
+        "reasoning",
+        "agentic"
+      ],
+      "dedup_key": "github_repo:1245188455"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask_oritoken",
+      "downloads": 4,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask_oritoken"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask",
+      "downloads": 3,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_withlo_reasoning_v2_t1977_labelmask"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_with_general_qa_withlo_reasoning_v2_t1977_labelmask_rightformat",
+      "downloads": 2,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_with_general_qa_withlo_reasoning_v2_t1977_labelmask_rightformat"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_with_reasoning_pipeline_t2126",
+      "downloads": 2,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "orchestration",
+        "reasoning",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_with_reasoning_pipeline_t2126"
+    },
+    {
+      "type": "github_repo",
+      "id": "1213958711",
+      "name": "Saksham4796/momentum-guided-test-time-search",
+      "url": "https://github.com/Saksham4796/momentum-guided-test-time-search",
+      "description": "Momentum-guided test-time search for LLM reasoning on GSM8K. Implements vanilla decoding, Tree-of-Thoughts, MCTS, and a momentum-based search strategy with lookahead entropy scoring, dynamic branching/backtracking, MLX KV-cache acceleration, and CSV benchmarking for accuracy, latency, tokens, and memory.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-18T00:30:44Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "mcts",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1213958711"
+    },
+    {
+      "type": "github_repo",
+      "id": "1146966514",
+      "name": "murtazabaig/automatically-optimize-ai-prompts-with-openai-using-opro-dspy-methodology",
+      "url": "https://github.com/murtazabaig/automatically-optimize-ai-prompts-with-openai-using-opro-dspy-methodology",
+      "description": "Advanced n8n automation for Automatically Optimize AI Prompts with OpenAI Using OPRO & DSPy Methodology.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-02-01T02:06:08Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "opro",
+        "dspy"
+      ],
+      "dedup_key": "github_repo:1146966514"
+    },
+    {
+      "type": "github_repo",
+      "id": "951260128",
+      "name": "bhorev/automatic-prompt-optimization",
+      "url": "https://github.com/bhorev/automatic-prompt-optimization",
+      "description": "Automatic Prompt Optimization OPRO implementation with Amazon Bedrock",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2025-03-19T12:15:24Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "opro",
+        "prompt optim"
+      ],
+      "dedup_key": "github_repo:951260128"
+    },
+    {
+      "type": "github_repo",
+      "id": "1166643929",
+      "name": "theamitmehra/got-benchmark",
+      "url": "https://github.com/theamitmehra/got-benchmark",
+      "description": " A framework for implementing and benchmarking **Graph-of-Thoughts (GoT)** reasoning against Chain-of-Thought (CoT) and Tree-of-Thought (ToT) baselines across multiple LLM backends.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-02-25T13:02:47Z",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "benchmark"
+      ],
+      "dedup_key": "github_repo:1166643929"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF",
+      "downloads": 223173,
+      "likes": 674,
+      "tags": [
+        "gguf",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "Dense",
+        "image-text-to-text",
+        "en",
+        "zh",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "base_model:Qwen/Qwen3.5-27B",
+        "base_model:quantized:Qwen/Qwen3.5-27B",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "image-text-to-text",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled-GGUF",
+      "downloads": 186413,
+      "likes": 332,
+      "tags": [
+        "gguf",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "lora",
+        "image-text-to-image",
+        "en",
+        "zh",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "base_model:Qwen/Qwen3.5-9B",
+        "base_model:adapter:Qwen/Qwen3.5-9B",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "image-text-to-image",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-9B-Claude-4.6-Opus-Reasoning-Distilled-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled",
+      "downloads": 156998,
+      "likes": 2893,
+      "tags": [
+        "safetensors",
+        "qwen3_5",
+        "unsloth",
+        "qwen",
+        "qwen3.5",
+        "reasoning",
+        "chain-of-thought",
+        "Dense",
+        "image-text-to-text",
+        "conversational",
+        "en",
+        "zh",
+        "dataset:nohurry/Opus-4.6-Reasoning-3000x-filtered",
+        "dataset:Jackrong/Qwen3.5-reasoning-700x",
+        "base_model:Qwen/Qwen3.5-27B",
+        "base_model:finetune:Qwen/Qwen3.5-27B",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "pipeline_tag": "image-text-to-text",
+      "relevance_score": 18,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled"
+    },
+    {
+      "type": "github_repo",
+      "id": "1276500960",
+      "name": "somsomy499/prompt-engineering",
+      "url": "https://github.com/somsomy499/prompt-engineering",
+      "description": "Systematic prompt engineering toolkit: chain-of-thought, few-shot, self-consistency, and A/B testing",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-22T05:20:40Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought"
+      ],
+      "dedup_key": "github_repo:1276500960"
+    },
+    {
+      "type": "github_repo",
+      "id": "1274961599",
+      "name": "tariqnasheed/Multi-LLM-comparator",
+      "url": "https://github.com/tariqnasheed/Multi-LLM-comparator",
+      "description": "Compare any 3 LLMs side\u2011by\u2011side \u2013 latency, token usage, cost \u2013 with built\u2011in reasoning techniques (few\u2011shot, chain\u2011of\u2011thought, self\u2011consistency, self\u2011critique). Supports Mistral, DeepSeek, OpenAI, and any OpenAI\u2011compatible API. Zero\u2011dependency pain with uv sync.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-20T04:52:31Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "reasoning",
+        "deepseek",
+        "mistral"
+      ],
+      "dedup_key": "github_repo:1274961599"
+    },
+    {
+      "type": "github_repo",
+      "id": "1284794090",
+      "name": "PundarikakshNTripathi/BioEval-Onco-JAX",
+      "url": "https://github.com/PundarikakshNTripathi/BioEval-Onco-JAX",
+      "description": "A hardware-accelerated evaluation harness utilizing JAX and Tanimoto similarity to mathematically benchmark frontier LLM hallucination rates in structural oncology therapeutics.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-06-30T07:47:52Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "benchmark",
+        "frontier",
+        "hallucination"
+      ],
+      "dedup_key": "github_repo:1284794090"
+    },
+    {
+      "type": "github_repo",
+      "id": "1253294081",
+      "name": "pranjaltiwari12/LLM-Biology-Benchmark",
+      "url": "https://github.com/pranjaltiwari12/LLM-Biology-Benchmark",
+      "description": "A domain-specific benchmark for evaluating scientific reasoning in frontier LLMs across molecular biology, computational genomics and systems biology",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-25T08:55:46Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "reasoning",
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1253294081"
+    },
+    {
+      "type": "github_repo",
+      "id": "1229033505",
+      "name": "zizhao-hu/llm-alignment-compute-scaling",
+      "url": "https://github.com/zizhao-hu/llm-alignment-compute-scaling",
+      "description": "Audit how safety alignment degrades as a function of test-time compute budget \u2014 best-of-N sampling, extended CoT, and verifier-guided search.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-05-04T16:22:42Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "test-time compute",
+        "best-of-n"
+      ],
+      "dedup_key": "github_repo:1229033505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1170886237",
+      "name": "AjaySaini15/tana-ai-context-hub",
+      "url": "https://github.com/AjaySaini15/tana-ai-context-hub",
+      "description": "Three Claude Code skills (ai-memory-setup, ai-memory-sync, skill-improve) that create a self-improving AI skill system with Tana as the source of truth. Skills compound over time \u2014 every correction is captured, versioned, and propagated to all configured LLM tool paths automatically.",
+      "stars": 2,
+      "language": "Python",
+      "updated_at": "2026-06-28T18:56:18Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "self-improving",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1170886237"
+    },
+    {
+      "type": "github_repo",
+      "id": "1176118181",
+      "name": "nayyarsan/reflexloop",
+      "url": "https://github.com/nayyarsan/reflexloop",
+      "description": "Self-refining AI agents for software development \u2014 critique every session, accumulate evidence, and automatically improve their own system prompts. Works with Claude Code & GitHub Copilot.",
+      "stars": 1,
+      "language": "Shell",
+      "updated_at": "2026-03-25T05:15:14Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "self-improving",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1176118181"
+    },
+    {
+      "type": "github_repo",
+      "id": "1069654266",
+      "name": "samibs/guardloop.dev",
+      "url": "https://github.com/samibs/guardloop.dev",
+      "description": "Guardloop.dev is a self-improving AI governance system that learns from LLM mistakes, generates dynamic guardrails, and prevents repeated failures. It automatically enforces coding standards, security requirements, and compliance rules across Claude, Gemini, Codex, and other AI tools.",
+      "stars": 2,
+      "language": "Python",
+      "updated_at": "2025-11-22T18:51:32Z",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "self-improving",
+        "codex"
+      ],
+      "dedup_key": "github_repo:1069654266"
+    },
+    {
+      "type": "hf_model",
+      "id": "Harrrrychen/gptoss-20b-orchestration_v0_t1777_loss_alltag",
+      "downloads": 3,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "gpt_oss",
+        "text-generation",
+        "text-generation-inference",
+        "unsloth",
+        "conversational",
+        "en",
+        "base_model:unsloth/gpt-oss-20b-BF16",
+        "base_model:finetune:unsloth/gpt-oss-20b-BF16",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "orchestration",
+        "gpt-oss"
+      ],
+      "dedup_key": "hf_model:Harrrrychen/gptoss-20b-orchestration_v0_t1777_loss_alltag"
+    },
+    {
+      "type": "hf_model",
+      "id": "saadxsalman/Q-SS-0.5B-Reasoning-Math-GGUF",
+      "downloads": 67,
+      "likes": 0,
+      "tags": [
+        "gguf",
+        "qwen2",
+        "qwen2.5",
+        "math",
+        "reasoning",
+        "grpo",
+        "quantized",
+        "cpu-inference",
+        "llama-cpp",
+        "structured-output",
+        "text-generation",
+        "en",
+        "dataset:openai/gsm8k",
+        "dataset:open-r1/OpenR1-Math-220k",
+        "base_model:Qwen/Qwen2.5-0.5B-Instruct",
+        "base_model:quantized:Qwen/Qwen2.5-0.5B-Instruct",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "reasoning",
+        "llama",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:saadxsalman/Q-SS-0.5B-Reasoning-Math-GGUF"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.00466",
+      "title": "ELDR: Expert-Locality-Aware Decode Routing for PD-Disaggregated MoE Serving",
+      "abstract": "",
+      "upvotes": 21,
+      "url": "https://huggingface.co/papers/2607.00466",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "routing",
+        "moe"
+      ],
+      "dedup_key": "hf_paper:2607.00466"
+    },
+    {
+      "type": "github_repo",
+      "id": "933399168",
+      "name": "billyvinning/langchain-mcts",
+      "url": "https://github.com/billyvinning/langchain-mcts",
+      "description": "Improve LLM test-time reasoning with Monte Carlo Search Trees in Langchain.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-24T16:56:36Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "mcts",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:933399168"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287797520",
+      "name": "aihxp/godplans",
+      "url": "https://github.com/aihxp/godplans",
+      "description": "Plan everything before anything. Single-command AI agent skill that emits a complete, audit-proof, agent-executable master plan (PLAN.mdx) before any code is written. Claude Code, Codex, Cursor, OpenCode, and every Agent Skills client.",
+      "stars": 0,
+      "language": "Shell",
+      "updated_at": "2026-07-03T06:49:56Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "codex"
+      ],
+      "dedup_key": "github_repo:1287797520"
+    },
+    {
+      "type": "github_repo",
+      "id": "1205427866",
+      "name": "skchaudr/MyAPI",
+      "url": "https://github.com/skchaudr/MyAPI",
+      "description": "MyAPI is a context retrieval layer for AI agents and human operators. Instead of having Claude Code, Codex, or Cursor scan a project's files on every cold start, agents query MyAPI for the relevant context \u2014 decisions, prior work, architectural constraints, recent changes \u2014 and get back structured answers with reranked evidence in under 3 seconds.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T06:46:48Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "codex"
+      ],
+      "dedup_key": "github_repo:1205427866"
+    },
+    {
+      "type": "github_repo",
+      "id": "1048895505",
+      "name": "IINemo/thinkbooster",
+      "url": "https://github.com/IINemo/thinkbooster",
+      "description": "Open-source framework for test-time compute scaling of LLMs. Includes a visual debugger for inspecting reasoning traces and an endpoint that provides OpenAI-compatible API.",
+      "stars": 25,
+      "language": "Python",
+      "updated_at": "2026-07-02T21:13:44Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1048895505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1259195698",
+      "name": "pr0mila/Frontier-AI-Concepts",
+      "url": "https://github.com/pr0mila/Frontier-AI-Concepts",
+      "description": "A technical reading guide on Mechanistic Interpretability, Test-Time Compute Scaling, and Native Multimodal Pretraining. Built for ML practitioners, not beginners.",
+      "stars": 2,
+      "language": null,
+      "updated_at": "2026-06-27T15:52:37Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1259195698"
+    },
+    {
+      "type": "github_repo",
+      "id": "1225965956",
+      "name": "jrajath94/stair-tts-scaling-laws",
+      "url": "https://github.com/jrajath94/stair-tts-scaling-laws",
+      "description": "STAIR: Per-Problem Discrete Structure in Test-Time Compute Scaling for LLM Reasoning \u2014 NeurIPS 2025 submission",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-30T20:44:15Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1225965956"
+    },
+    {
+      "type": "github_repo",
+      "id": "856875371",
+      "name": "Multi-Agent-LLMs/lm-evaluation-harness",
+      "url": "https://github.com/Multi-Agent-LLMs/lm-evaluation-harness",
+      "description": "Fork from EleutherAI\u2019s lm\u2011evaluation\u2011harness with added multi\u2011agent and single\u2011agent test\u2011time inference scaling pipelines for LLM evaluation with compute-estimation for the paper \"Multi-Agent Reasoning Improves Compute Efficiency: Pareto-Optimal Scaling of Test-Time\"",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-29T10:28:00Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent"
+      ],
+      "dedup_key": "github_repo:856875371"
+    },
+    {
+      "type": "github_repo",
+      "id": "1114814160",
+      "name": "MohammedAmine0012/Continuous-Fine-Tuning-Pipeline-for-LLMs-Airflow-HuggingFace-LoRA-",
+      "url": "https://github.com/MohammedAmine0012/Continuous-Fine-Tuning-Pipeline-for-LLMs-Airflow-HuggingFace-LoRA-",
+      "description": "A production-grade Self-Improving AI System that continuously fine-tunes a Large Language Model (DeepSeek Coder) on new domain-specific data, evaluates its quality, and automatically deploys it for high-performance inference.",
+      "stars": 1,
+      "language": "Python",
+      "updated_at": "2026-01-04T15:25:06Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "self-improving",
+        "deepseek"
+      ],
+      "dedup_key": "github_repo:1114814160"
+    },
+    {
+      "type": "github_repo",
+      "id": "1278344979",
+      "name": "linmy666/madcop",
+      "url": "https://github.com/linmy666/madcop",
+      "description": "madcop \u2014 local-first AI agent framework. Middleware-driven plan-execute loop, sub-agents, crash recovery (WAL), tool-use, and a self-diagnose CLI. Built on Qian engineering cybernetics.",
+      "stars": 2,
+      "language": "TypeScript",
+      "updated_at": "2026-06-28T16:47:33Z",
+      "relevance_score": 14,
+      "matched_keywords": [
+        "tool-use",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1278344979"
+    },
+    {
+      "type": "hf_model",
+      "id": "GammaAGI/Gamma-30B-A6B-G1-349-VerificationShortRepair-LoRA",
+      "downloads": 18,
+      "likes": 0,
+      "tags": [
+        "peft",
+        "safetensors",
+        "gamma-ai",
+        "evostream",
+        "lora",
+        "nemotron",
+        "direct-answer",
+        "multilingual",
+        "adapter-chromosome",
+        "base_model:nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+        "base_model:adapter:nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+        "region:us"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 14,
+      "matched_keywords": [
+        "verification",
+        "nemotron"
+      ],
+      "dedup_key": "hf_model:GammaAGI/Gamma-30B-A6B-G1-349-VerificationShortRepair-LoRA"
+    },
+    {
+      "type": "github_repo",
+      "id": "1252546362",
+      "name": "kuttysoftmy/hrm-lens",
+      "url": "https://github.com/kuttysoftmy/hrm-lens",
+      "description": "AutoPilot generated by Angela based on HRM: An interactive visual debugger and playground designed specifically for the Hierarchical Reasoning Model. Unlike standard linear Chain-of-Thought (CoT) tracing tools, HRM-Lens visually maps the model's multi-timescale, hierarchical decision trees. It provides a real-time node-graph visualizat...",
+      "stars": 0,
+      "language": "JavaScript",
+      "updated_at": "2026-05-28T16:21:57Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1252546362"
+    },
+    {
+      "type": "github_repo",
+      "id": "1101484197",
+      "name": "JerMa88/graph_rag",
+      "url": "https://github.com/JerMa88/graph_rag",
+      "description": "An efficient graph-vector database powered by ArcadeDB for tree-of-thought and graph-of-trought knowledge representation and agentic reasoning.",
+      "stars": 0,
+      "language": "HTML",
+      "updated_at": "2025-12-13T08:17:24Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "reasoning",
+        "agentic"
+      ],
+      "dedup_key": "github_repo:1101484197"
+    },
+    {
+      "type": "github_repo",
+      "id": "926831658",
+      "name": "vale95ntino/cot2tot",
+      "url": "https://github.com/vale95ntino/cot2tot",
+      "description": "CoT2ToT: Chain-of-Thought to Tree-of-Thoughts  CoT2ToT is a Python package that processes and visualizes chain-of-thought (CoT) outputs from language models by converting them into structured graphs (trees). This tool helps you analyze and explore the reasoning steps generated by an LLM.",
+      "stars": 12,
+      "language": "Python",
+      "updated_at": "2026-01-11T10:51:08Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "chain-of-thought",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:926831658"
+    },
+    {
+      "type": "github_repo",
+      "id": "1287028277",
+      "name": "FlashVision/FlashAgent",
+      "url": "https://github.com/FlashVision/FlashAgent",
+      "description": "Lightweight AI agent framework with tool use, planning, and multi-step reasoning",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T02:31:56Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "reasoning",
+        "agent framework"
+      ],
+      "dedup_key": "github_repo:1287028277"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/Qwen2.5-7B-Latent_Verification-i1-GGUF",
+      "downloads": 129,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "gguf",
+        "chat",
+        "en",
+        "base_model:jacobpwarren/Qwen2.5-7B-Latent_Verification",
+        "base_model:quantized:jacobpwarren/Qwen2.5-7B-Latent_Verification",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "imatrix",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "verification",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:mradermacher/Qwen2.5-7B-Latent_Verification-i1-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/Qwen2.5-7B-Latent_Verification-GGUF",
+      "downloads": 52,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "gguf",
+        "chat",
+        "en",
+        "base_model:jacobpwarren/Qwen2.5-7B-Latent_Verification",
+        "base_model:quantized:jacobpwarren/Qwen2.5-7B-Latent_Verification",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "verification",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:mradermacher/Qwen2.5-7B-Latent_Verification-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "sg2023/gemma3-270m-it-sms-verification_code_extraction",
+      "downloads": 18,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "conversational",
+        "text-generation",
+        "base_model:google/gemma-3-270m-it",
+        "base_model:finetune:google/gemma-3-270m-it",
+        "license:gemma",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "verification",
+        "gemma"
+      ],
+      "dedup_key": "hf_model:sg2023/gemma3-270m-it-sms-verification_code_extraction"
+    },
+    {
+      "type": "hf_model",
+      "id": "sg2023/gemma3-270m-it-sms-verification_code_extraction-int8-tflite",
+      "downloads": 17,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "tflite",
+        "conversational",
+        "text-generation",
+        "base_model:google/gemma-3-270m-it",
+        "base_model:finetune:google/gemma-3-270m-it",
+        "license:gemma",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "verification",
+        "gemma"
+      ],
+      "dedup_key": "hf_model:sg2023/gemma3-270m-it-sms-verification_code_extraction-int8-tflite"
+    },
+    {
+      "type": "hf_model",
+      "id": "sg2023/gemma3-270m-it-sms-verification_code_extraction-fp16-tflite",
+      "downloads": 12,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "tflite",
+        "conversational",
+        "text-generation",
+        "base_model:google/gemma-3-270m-it",
+        "base_model:finetune:google/gemma-3-270m-it",
+        "license:gemma",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "verification",
+        "gemma"
+      ],
+      "dedup_key": "hf_model:sg2023/gemma3-270m-it-sms-verification_code_extraction-fp16-tflite"
+    },
+    {
+      "type": "hf_model",
+      "id": "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-NVFP4",
+      "downloads": 2047756,
+      "likes": 148,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "NemotronH_Nano_Omni_Reasoning_V3",
+        "image-feature-extraction",
+        "nvidia",
+        "pytorch",
+        "multimodal",
+        "any-to-any",
+        "custom_code",
+        "dataset:nvidia/Nemotron-Image-Training-v3",
+        "arxiv:2604.24954",
+        "base_model:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+        "base_model:quantized:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+        "license:other",
+        "8-bit",
+        "modelopt",
+        "deploy:azure",
+        "region:us"
+      ],
+      "pipeline_tag": "any-to-any",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "nemotron"
+      ],
+      "dedup_key": "hf_model:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-NVFP4"
+    },
+    {
+      "type": "hf_model",
+      "id": "nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+      "downloads": 962219,
+      "likes": 367,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "NemotronH_Nano_Omni_Reasoning_V3",
+        "image-feature-extraction",
+        "nvidia",
+        "pytorch",
+        "multimodal",
+        "any-to-any",
+        "custom_code",
+        "dataset:nvidia/Nemotron-Image-Training-v3",
+        "arxiv:2604.24954",
+        "license:other",
+        "deploy:azure",
+        "region:us"
+      ],
+      "pipeline_tag": "any-to-any",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "nemotron"
+      ],
+      "dedup_key": "hf_model:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16"
+    },
+    {
+      "type": "hf_model",
+      "id": "nvidia/Phi-4-reasoning-plus-NVFP4",
+      "downloads": 406436,
+      "likes": 11,
+      "tags": [
+        "Model Optimizer",
+        "safetensors",
+        "phi3",
+        "nvidia",
+        "ModelOpt",
+        "Phi4",
+        "quantized",
+        "FP4",
+        "fp4",
+        "base_model:microsoft/Phi-4-reasoning-plus",
+        "base_model:quantized:microsoft/Phi-4-reasoning-plus",
+        "license:mit",
+        "8-bit",
+        "modelopt",
+        "region:us"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "phi-4"
+      ],
+      "dedup_key": "hf_model:nvidia/Phi-4-reasoning-plus-NVFP4"
+    },
+    {
+      "type": "hf_model",
+      "id": "lmstudio-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-GGUF",
+      "downloads": 81676,
+      "likes": 9,
+      "tags": [
+        "gguf",
+        "nvidia",
+        "multimodal",
+        "base_model:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+        "base_model:quantized:nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+        "license:other",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "nemotron"
+      ],
+      "dedup_key": "hf_model:lmstudio-community/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/deepseek-r1-14b-cot-math-reasoning-full-i1-GGUF",
+      "downloads": 263,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "gguf",
+        "en",
+        "base_model:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "base_model:quantized:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "license:mit",
+        "endpoints_compatible",
+        "region:us",
+        "imatrix",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "deepseek"
+      ],
+      "dedup_key": "hf_model:mradermacher/deepseek-r1-14b-cot-math-reasoning-full-i1-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/deepseek-r1-14b-cot-math-reasoning-full-GGUF",
+      "downloads": 73,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "gguf",
+        "en",
+        "base_model:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "base_model:quantized:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "license:mit",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "deepseek"
+      ],
+      "dedup_key": "hf_model:mradermacher/deepseek-r1-14b-cot-math-reasoning-full-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "tensorblock/deepseek-r1-14b-cot-math-reasoning-full-GGUF",
+      "downloads": 73,
+      "likes": 2,
+      "tags": [
+        "gguf",
+        "TensorBlock",
+        "GGUF",
+        "text-generation",
+        "base_model:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "base_model:quantized:Jianyuan1/deepseek-r1-14b-cot-math-reasoning-full",
+        "license:mit",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 12,
+      "matched_keywords": [
+        "reasoning",
+        "deepseek"
+      ],
+      "dedup_key": "hf_model:tensorblock/deepseek-r1-14b-cot-math-reasoning-full-GGUF"
+    },
+    {
+      "type": "github_repo",
+      "id": "1113659366",
+      "name": "FrontierCS/Frontier-CS",
+      "url": "https://github.com/FrontierCS/Frontier-CS",
+      "description": "A benchmark for evaluating LLMs on open-ended CS problems. Exploring the Next Frontier of Computer Science.",
+      "stars": 254,
+      "language": "C++",
+      "updated_at": "2026-07-03T01:04:29Z",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1113659366"
+    },
+    {
+      "type": "github_repo",
+      "id": "939929533",
+      "name": "subhanmehmood4/subhanmehmood",
+      "url": "https://github.com/subhanmehmood4/subhanmehmood",
+      "description": "LLM Engineer & Founder @ DevAxon. Frontier AI evaluation benchmarks, production backends, and SaaS MVPs. subhanmehmood.com",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-06-23T15:16:17Z",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:939929533"
+    },
+    {
+      "type": "github_repo",
+      "id": "1274830390",
+      "name": "Msc-Company-Org/llm-finetune-eval",
+      "url": "https://github.com/Msc-Company-Org/llm-finetune-eval",
+      "description": "Benchmark a fine-tuned model against your frontier-API baseline \u2014 accuracy, cost per 1k calls, latency, format adherence. A fine-tune without a before/after eval is a vibe, not an upgrade.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-22T14:57:09Z",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1274830390"
+    },
+    {
+      "type": "github_repo",
+      "id": "1285406210",
+      "name": "David19782/frontier-llm-factcheck",
+      "url": "https://github.com/David19782/frontier-llm-factcheck",
+      "description": "Benchmark evaluating frontier LLMs on real-world fact-checking claims",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-03T06:45:05Z",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "benchmark",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1285406210"
+    },
+    {
+      "type": "hf_model",
+      "id": "QuantTrio/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-v2-AWQ",
+      "downloads": 200704,
+      "likes": 14,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "qwen3_5",
+        "image-text-to-text",
+        "vLLM",
+        "AWQ",
+        "conversational",
+        "base_model:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-v2",
+        "base_model:quantized:Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-v2",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "4-bit",
+        "awq",
+        "region:us"
+      ],
+      "pipeline_tag": "image-text-to-text",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:QuantTrio/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-v2-AWQ"
+    },
+    {
+      "type": "hf_model",
+      "id": "MaziyarPanahi/Ministral-3-3B-Reasoning-2512-GGUF",
+      "downloads": 132316,
+      "likes": 4,
+      "tags": [
+        "gguf",
+        "mistral",
+        "quantized",
+        "2-bit",
+        "3-bit",
+        "4-bit",
+        "5-bit",
+        "6-bit",
+        "8-bit",
+        "GGUF",
+        "text-generation",
+        "base_model:mistralai/Ministral-3-3B-Reasoning-2512",
+        "base_model:quantized:mistralai/Ministral-3-3B-Reasoning-2512",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "mistral"
+      ],
+      "dedup_key": "hf_model:MaziyarPanahi/Ministral-3-3B-Reasoning-2512-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "mistralai/Ministral-3-8B-Reasoning-2512",
+      "downloads": 79304,
+      "likes": 85,
+      "tags": [
+        "vllm",
+        "safetensors",
+        "mistral3",
+        "mistral-common",
+        "en",
+        "fr",
+        "es",
+        "de",
+        "it",
+        "pt",
+        "nl",
+        "zh",
+        "ja",
+        "ko",
+        "ar",
+        "arxiv:2601.08584",
+        "base_model:mistralai/Ministral-3-8B-Base-2512",
+        "base_model:finetune:mistralai/Ministral-3-8B-Base-2512",
+        "license:apache-2.0",
+        "region:us"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "mistral"
+      ],
+      "dedup_key": "hf_model:mistralai/Ministral-3-8B-Reasoning-2512"
+    },
+    {
+      "type": "hf_model",
+      "id": "ertghiu256/qwen-3-14b-code-and-math-reasoning-gguf",
+      "downloads": 264,
+      "likes": 3,
+      "tags": [
+        "gguf",
+        "unsloth",
+        "trl",
+        "sft",
+        "dataset:nvidia/OpenCodeReasoning",
+        "dataset:nvidia/OpenMathReasoning",
+        "base_model:Qwen/Qwen3-14B",
+        "base_model:quantized:Qwen/Qwen3-14B",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:ertghiu256/qwen-3-14b-code-and-math-reasoning-gguf"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-i1-GGUF",
+      "downloads": 234,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "gguf",
+        "text-generation-inference",
+        "unsloth",
+        "llama",
+        "trl",
+        "en",
+        "dataset:bespokelabs/Bespoke-Stratos-17k",
+        "dataset:AI-MO/NuminaMath-TIR",
+        "base_model:EpistemeAI/Reasoning-Llama-3.2-3B-Math-Instruct-RE1",
+        "base_model:quantized:EpistemeAI/Reasoning-Llama-3.2-3B-Math-Instruct-RE1",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "imatrix",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "llama"
+      ],
+      "dedup_key": "hf_model:mradermacher/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-i1-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "jaygala24/Qwen3-4B-GRPO-KL-math-reasoning",
+      "downloads": 106,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "qwen3",
+        "text-generation",
+        "reinforcement-learning",
+        "grpo",
+        "math-reasoning",
+        "pipelinerl",
+        "conversational",
+        "dataset:gsm8k_train",
+        "dataset:math_train",
+        "base_model:Qwen/Qwen3-4B",
+        "base_model:finetune:Qwen/Qwen3-4B",
+        "license:apache-2.0",
+        "text-generation-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:jaygala24/Qwen3-4B-GRPO-KL-math-reasoning"
+    },
+    {
+      "type": "hf_model",
+      "id": "ertghiu256/Qwen3-0.6b-math-and-code-reasoning-gguf",
+      "downloads": 91,
+      "likes": 0,
+      "tags": [
+        "gguf",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:ertghiu256/Qwen3-0.6b-math-and-code-reasoning-gguf"
+    },
+    {
+      "type": "hf_model",
+      "id": "mradermacher/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-ORPO-GGUF",
+      "downloads": 88,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "gguf",
+        "text-generation-inference",
+        "unsloth",
+        "llama",
+        "trl",
+        "en",
+        "base_model:EpistemeAI/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-ORPO",
+        "base_model:quantized:EpistemeAI/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-ORPO",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "llama"
+      ],
+      "dedup_key": "hf_model:mradermacher/Reasoning-Llama-3.2-3B-Math-Instruct-RE1-ORPO-GGUF"
+    },
+    {
+      "type": "hf_model",
+      "id": "jaygala24/Qwen2.5-0.5B-DAPO-math-reasoning",
+      "downloads": 57,
+      "likes": 0,
+      "tags": [
+        "transformers",
+        "safetensors",
+        "qwen2",
+        "text-generation",
+        "reinforcement-learning",
+        "dapo",
+        "math-reasoning",
+        "pipelinerl",
+        "conversational",
+        "dataset:gsm8k_train",
+        "dataset:math_train",
+        "base_model:Qwen/Qwen2.5-0.5B",
+        "base_model:finetune:Qwen/Qwen2.5-0.5B",
+        "license:apache-2.0",
+        "text-generation-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-generation",
+      "relevance_score": 11,
+      "matched_keywords": [
+        "reasoning",
+        "qwen"
+      ],
+      "dedup_key": "hf_model:jaygala24/Qwen2.5-0.5B-DAPO-math-reasoning"
+    },
+    {
+      "type": "hf_model",
+      "id": "LeonardoBenitez/capivara-plugin-orchestration",
+      "downloads": 6,
+      "likes": 0,
+      "tags": [
+        "gguf",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us",
+        "conversational"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "dedup_key": "hf_model:LeonardoBenitez/capivara-plugin-orchestration"
+    },
+    {
+      "type": "hf_model",
+      "id": "abolton99/orchestration",
+      "downloads": 1,
+      "likes": 0,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "mpnet",
+        "setfit",
+        "text-classification",
+        "arxiv:2209.11055",
+        "license:apache-2.0",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-classification",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "dedup_key": "hf_model:abolton99/orchestration"
+    },
+    {
+      "type": "hf_model",
+      "id": "abolton99/orchestration_one_e",
+      "downloads": 1,
+      "likes": 0,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "mpnet",
+        "setfit",
+        "text-classification",
+        "arxiv:2209.11055",
+        "license:apache-2.0",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-classification",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "dedup_key": "hf_model:abolton99/orchestration_one_e"
+    },
+    {
+      "type": "hf_model",
+      "id": "abolton99/orchestration_1e",
+      "downloads": 1,
+      "likes": 0,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "mpnet",
+        "setfit",
+        "text-classification",
+        "arxiv:2209.11055",
+        "license:apache-2.0",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-classification",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "dedup_key": "hf_model:abolton99/orchestration_1e"
+    },
+    {
+      "type": "hf_model",
+      "id": "abolton99/orchestration_4e",
+      "downloads": 1,
+      "likes": 0,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "mpnet",
+        "setfit",
+        "text-classification",
+        "arxiv:2209.11055",
+        "license:apache-2.0",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "text-classification",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "dedup_key": "hf_model:abolton99/orchestration_4e"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.02461",
+      "title": "OrbitQuant: Data-Agnostic Quantization for Image and Video Diffusion Transformers",
+      "abstract": "",
+      "upvotes": 0,
+      "url": "https://huggingface.co/papers/2607.02461",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.02461"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.01642",
+      "title": "Multi-Resolution Flow Matching: Training-Free Diffusion Acceleration via Staged Sampling",
+      "abstract": "",
+      "upvotes": 13,
+      "url": "https://huggingface.co/papers/2607.01642",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.01642"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.01436",
+      "title": "Discrete Diffusion Language Models for Interactive Radiology Report Drafting",
+      "abstract": "",
+      "upvotes": 3,
+      "url": "https://huggingface.co/papers/2607.01436",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.01436"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.00917",
+      "title": "Valdi: Value Diffusion World Models",
+      "abstract": "",
+      "upvotes": 7,
+      "url": "https://huggingface.co/papers/2607.00917",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.00917"
+    },
+    {
+      "type": "github_repo",
+      "id": "1146238980",
+      "name": "PotatoJnny/Scaling-Law-Guided-search",
+      "url": "https://github.com/PotatoJnny/Scaling-Law-Guided-search",
+      "description": "Scaling-Law Guided (SLG) Search: Optimizing LLM test-time compute via tail estimation and dynamic budget allocation.",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-27T02:33:20Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1146238980"
+    },
+    {
+      "type": "github_repo",
+      "id": "1136703179",
+      "name": "neosun100/Step-Audio-R1.1",
+      "url": "https://github.com/neosun100/Step-Audio-R1.1",
+      "description": "Step-Audio-R1.1: The First Audio Language Model with Test-Time Compute Scaling. All-in-One Docker with vLLM + Web UI + API.",
+      "stars": 4,
+      "language": "Python",
+      "updated_at": "2026-02-27T02:21:16Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1136703179"
+    },
+    {
+      "type": "github_repo",
+      "id": "1083832173",
+      "name": "Wilson0406/Self-Improving-LLM-Agent",
+      "url": "https://github.com/Wilson0406/Self-Improving-LLM-Agent",
+      "description": "A dual-agent, feedback-driven document extraction system using GPT-5 and Azure Document Intelligence that automatically improves its own prompts, reducing manual rule updates and adapting to evolving business requirements.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2025-11-24T05:34:08Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "self-improving"
+      ],
+      "dedup_key": "github_repo:1083832173"
+    },
+    {
+      "type": "github_repo",
+      "id": "1283368422",
+      "name": "DaylaHoang/entropix",
+      "url": "https://github.com/DaylaHoang/entropix",
+      "description": "Cost-aware LLM inference gateway. Routes requests via per-token Shannon entropy \u2014 91.6% cost reduction, 98.2% accuracy.",
+      "stars": 0,
+      "language": "Go",
+      "updated_at": "2026-06-28T21:49:35Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "cost reduction"
+      ],
+      "dedup_key": "github_repo:1283368422"
+    },
+    {
+      "type": "github_repo",
+      "id": "1203339756",
+      "name": "windyroad/agent-plugins",
+      "url": "https://github.com/windyroad/agent-plugins",
+      "description": "Claude Code plugins for architecture governance, risk management, TDD, and delivery quality by Windy Road Technology",
+      "stars": 2,
+      "language": "Shell",
+      "updated_at": "2026-07-03T06:51:32Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1203339756"
+    },
+    {
+      "type": "github_repo",
+      "id": "1226822783",
+      "name": "sublimate-toe9304/craftcms-claude-skills",
+      "url": "https://github.com/sublimate-toe9304/craftcms-claude-skills",
+      "description": "Automate Craft CMS 5 development with production-ready Claude Code skills, custom agents, and project templates for plugin and site architecture.",
+      "stars": 2,
+      "language": "Shell",
+      "updated_at": "2026-07-03T05:54:40Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1226822783"
+    },
+    {
+      "type": "github_repo",
+      "id": "1245697198",
+      "name": "shuu5/folio",
+      "url": "https://github.com/shuu5/folio",
+      "description": "AI-Agent-first architecture spec-writing framework + Claude Code plugin harness (Layer 0 META FRAMEWORK). HTML-only specs, 2-layer (folio + consumer), self-hosting.",
+      "stars": 0,
+      "language": "HTML",
+      "updated_at": "2026-07-03T05:51:23Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1245697198"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221410058",
+      "name": "tammychurchly25/ClaudeCode-Source-Analysis",
+      "url": "https://github.com/tammychurchly25/ClaudeCode-Source-Analysis",
+      "description": "Analyze Claude Code source leaks, map the architecture, and document its TypeScript, Bun, agent, and security systems.",
+      "stars": 1,
+      "language": "Rust",
+      "updated_at": "2026-07-03T05:50:44Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221410058"
+    },
+    {
+      "type": "hf_model",
+      "id": "swan07/bert-authorship-verification",
+      "downloads": 1058,
+      "likes": 0,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "bert",
+        "authorship-verification",
+        "sentence-similarity",
+        "en",
+        "dataset:swan07/authorship-verification",
+        "arxiv:2112.05125",
+        "license:mit",
+        "model-index",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "sentence-similarity",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:swan07/bert-authorship-verification"
+    },
+    {
+      "type": "hf_model",
+      "id": "gabrielloiseau/ModernBERT-base-authorship-verification",
+      "downloads": 165,
+      "likes": 1,
+      "tags": [
+        "sentence-transformers",
+        "safetensors",
+        "modernbert",
+        "sentence-similarity",
+        "base_model:answerdotai/ModernBERT-base",
+        "base_model:finetune:answerdotai/ModernBERT-base",
+        "text-embeddings-inference",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "sentence-similarity",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:gabrielloiseau/ModernBERT-base-authorship-verification"
+    },
+    {
+      "type": "hf_model",
+      "id": "blackhole33/uzbek-speaker-verification-v4",
+      "downloads": 31,
+      "likes": 1,
+      "tags": [
+        "nemo",
+        "pytorch",
+        "NeMo",
+        "license:cc-by-4.0",
+        "region:us"
+      ],
+      "pipeline_tag": "",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:blackhole33/uzbek-speaker-verification-v4"
+    },
+    {
+      "type": "hf_model",
+      "id": "DunnBC22/bert-base-uncased-Vitamin_C_Fact_Verification",
+      "downloads": 23,
+      "likes": 1,
+      "tags": [
+        "transformers",
+        "pytorch",
+        "tensorboard",
+        "bert",
+        "multiple-choice",
+        "generated_from_trainer",
+        "multiple_choice",
+        "question-answering",
+        "en",
+        "dataset:tasksource/bigbench",
+        "base_model:google-bert/bert-base-uncased",
+        "base_model:finetune:google-bert/bert-base-uncased",
+        "license:apache-2.0",
+        "endpoints_compatible",
+        "region:us"
+      ],
+      "pipeline_tag": "question-answering",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:DunnBC22/bert-base-uncased-Vitamin_C_Fact_Verification"
+    }
+  ]
+}

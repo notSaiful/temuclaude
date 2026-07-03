@@ -84,6 +84,11 @@ if __name__ == "__main__":
     print(f"=== AUTO-INTEGRATOR CONTEXT ===")
     
     # Filter to only NEW findings not yet reviewed
+    # Ensure all findings have an id field for dedup
+    for f in findings:
+        if "id" not in f or not f["id"]:
+            f["id"] = f.get("url", f.get("title", f.get("name", f.get("model_id", ""))))
+    
     findings_before = len(findings)
     findings = filter_new(findings, "integrator_reviewed", "id")
     findings_after = len(findings)
