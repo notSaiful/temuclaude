@@ -97,8 +97,34 @@ AGGREGATOR_MAP = {
     "default": "glm-5.2",
 }
 
-# Ollama API base
+# OpenRouter model IDs (for production — scales to thousands of concurrent users)
+OPENROUTER_MODELS = {
+    "glm-5.2": "z-ai/glm-5.2",
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+    "kimi-k2.6": "moonshotai/kimi-k2.6",
+    "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",
+    "minimax-m3": "minimax/minimax-m3",
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
+    "gpt-oss-120b": "openai/gpt-oss-120b",
+}
+
+# Free models on OpenRouter (no cost, rate limited)
+OPENROUTER_FREE_MODELS = {
+    "gpt-oss-120b": "openai/gpt-oss-120b:free",
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nemotron-3-super": "nvidia/nemotron-3-super-120b-a12b:free",
+}
+
+# API base URLs
 OLLAMA_API_BASE = "http://localhost:11434"
+OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
+
+# Auto-detect: use OpenRouter if key is set, otherwise Ollama
+import os as _os
+_USE_OPENROUTER = bool(_os.environ.get("OPENROUTER_API_KEY"))
+
+# Active API base (auto-detect)
+API_BASE = OPENROUTER_API_BASE if _USE_OPENROUTER else OLLAMA_API_BASE
 
 # LiteLLM proxy port
 LITELLM_PORT = 4000

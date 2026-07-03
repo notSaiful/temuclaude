@@ -22,6 +22,7 @@ if __package__:
         FUSION_PANEL,
         AGGREGATOR_MAP,
         OLLAMA_API_BASE,
+        API_BASE,
     )
     from .logger import QueryLogger
     from .fusion import fuse, get_panel, get_aggregator
@@ -41,6 +42,7 @@ else:
         FUSION_PANEL,
         AGGREGATOR_MAP,
         OLLAMA_API_BASE,
+        API_BASE,
     )
     from src.logger import QueryLogger
     from src.fusion import fuse, get_panel, get_aggregator
@@ -59,7 +61,7 @@ class Timuclaude:
     """
 
     def __init__(self) -> None:
-        self.client = AsyncOpenAI(base_url=f"{OLLAMA_API_BASE}/v1", api_key="ollama")
+        self.client = AsyncOpenAI(base_url=f"{API_BASE}/v1", api_key="ollama")
         self.logger = QueryLogger()
 
     async def classify_task(self, query: str) -> str:
@@ -154,12 +156,25 @@ class Timuclaude:
         return "medium"
 
     async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192, timeout: int = 120) -> str:
-        """Call a single Ollama Cloud model with timeout and retry."""
+        """Call a single model with timeout and retry. Auto-detects Ollama or OpenRouter."""
         # Thinking models use internal tokens for reasoning — don't cap too low
         if max_tokens < 200:
             max_tokens = 200
 
-        ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
+        # Determine which backend and model ID to use
+        if __package__:
+            from .models import OPENROUTER_MODELS, _USE_OPENROUTER
+        else:
+            from src.models import OPENROUTER_MODELS, _USE_OPENROUTER
+        if _USE_OPENROUTER:
+            # OpenRouter: use provider/model format
+            ollama_tag = OPENROUTER_MODELS.get(model, model)
+        else:
+            # Ollama: use :cloud suffix
+            ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
+
+        # Determine API key
+        api_key = os.environ.get("OPENROUTER_API_KEY", "ollama") if _USE_OPENROUTER else "ollama"
         
         for attempt in range(2):  # 1 retry max
             try:
@@ -169,6 +184,7 @@ class Timuclaude:
                         messages=messages,
                         temperature=temperature,
                         max_tokens=max_tokens,
+                        extra_headers={"Authorization": f"Bearer {api_key}"} if _USE_OPENROUTER else None,
                     ),
                     timeout=timeout,
                 )
