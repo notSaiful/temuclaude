@@ -62,24 +62,16 @@ def test_openrouter_config() -> bool:
 # TEST 2: Ollama Config Still Exists
 # ============================================================
 def test_ollama_config() -> bool:
-    """Test that Ollama config still exists for development."""
-    print("\n=== OLLAMA CONFIG TESTS ===")
+    """Test that only OpenRouter config exists (Ollama removed)."""
+    print("\n=== CONFIG CLEANUP TESTS ===")
     
-    config_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm-ollama.yaml")
-    if not os.path.isfile(config_path):
-        print(f"  FAIL: litellm-ollama.yaml missing")
+    # Ollama config should NOT exist (we shifted to OpenRouter)
+    ollama_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm-ollama.yaml")
+    if os.path.isfile(ollama_path):
+        print(f"  FAIL: litellm-ollama.yaml should not exist (OpenRouter only)")
         return False
     
-    import yaml
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
-    
-    model_names = [m["model_name"] for m in config.get("model_list", [])]
-    if "timuclaude" not in model_names:
-        print(f"  FAIL: no timuclaude model")
-        return False
-    
-    print(f"  OK: Ollama config exists for development ({len(model_names)} models)")
+    print(f"  OK: no Ollama config (OpenRouter only)")
     print(f"  1/1 passed")
     return True
 
@@ -88,8 +80,8 @@ def test_ollama_config() -> bool:
 # TEST 3: Default Config Auto-Detects Backend
 # ============================================================
 def test_auto_detect_config() -> bool:
-    """Test that default litellm.yaml exists and can auto-detect."""
-    print("\n=== AUTO-DETECT CONFIG TESTS ===")
+    """Test that default litellm.yaml is OpenRouter config."""
+    print("\n=== DEFAULT CONFIG TESTS ===")
     
     config_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm.yaml")
     if not os.path.isfile(config_path):
@@ -113,7 +105,14 @@ def test_auto_detect_config() -> bool:
         print(f"  FAIL: no fallbacks")
         return False
     
-    print(f"  OK: auto-detect config has {len(model_names)} models + fallbacks")
+    # Verify it's the OpenRouter config (models use openrouter/ prefix)
+    for m in config["model_list"]:
+        model_str = m["litellm_params"]["model"]
+        if "openrouter" not in model_str:
+            print(f"  FAIL: {m['model_name']} doesn't use OpenRouter: {model_str}")
+            return False
+    
+    print(f"  OK: litellm.yaml is OpenRouter config ({len(model_names)} models, all OpenRouter, fallbacks present)")
     print(f"  1/1 passed")
     return True
 
@@ -170,16 +169,12 @@ def test_free_models() -> bool:
 # TEST 6: API Base Auto-Detect
 # ============================================================
 def test_api_base() -> bool:
-    """Test that API_BASE is set correctly."""
+    """Test that API_BASE is always OpenRouter."""
     print("\n=== API BASE TESTS ===")
     
-    # Without OPENROUTER_API_KEY, should use Ollama
-    if "OPENROUTER_API_KEY" not in os.environ:
-        assert API_BASE == OLLAMA_API_BASE, f"Expected Ollama, got {API_BASE}"
-        print(f"  OK: no OPENROUTER_API_KEY → Ollama ({API_BASE})")
-    else:
-        assert API_BASE == OPENROUTER_API_BASE, f"Expected OpenRouter, got {API_BASE}"
-        print(f"  OK: OPENROUTER_API_KEY set → OpenRouter ({API_BASE})")
+    # API_BASE should always be OpenRouter (no auto-detect)
+    assert API_BASE == OPENROUTER_API_BASE, f"Expected OpenRouter ({OPENROUTER_API_BASE}), got {API_BASE}"
+    print(f"  OK: API_BASE always OpenRouter ({API_BASE})")
     
     print(f"  1/1 passed")
     return True

@@ -1,12 +1,6 @@
-# Timuclaude — Auto-Detect LiteLLM Configuration
-# Automatically selects backend: OpenRouter (production) or Ollama (development)
-#
-# If OPENROUTER_API_KEY is set → uses OpenRouter (scales to thousands of users)
-# If Ollama is running locally → uses Ollama (flat $20-100/mo, limited concurrency)
-#
-# To force a specific backend:
-#   litellm --config config/litellm-openrouter.yaml  (force OpenRouter)
-#   litellm --config config/litellm-ollama.yaml       (force Ollama)
+# Timuclaude — OpenRouter LiteLLM Configuration
+# Uses OpenRouter as backend (scales to thousands of concurrent users)
+# Requires OPENROUTER_API_KEY environment variable
 
 model_list:
   # === USER-FACING MODEL ===
@@ -14,44 +8,49 @@ model_list:
     litellm_params:
       model: openrouter/z-ai/glm-5.2
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
+      keep_alive: "30m"
 
-  # === INDIVIDUAL MODELS (OpenRouter) ===
+  # === INDIVIDUAL MODELS ===
   - model_name: glm-5.2
     litellm_params:
       model: openrouter/z-ai/glm-5.2
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
 
   - model_name: deepseek-v4-pro
     litellm_params:
       model: openrouter/deepseek/deepseek-v4-pro
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
 
   - model_name: kimi-k2.6
     litellm_params:
       model: openrouter/moonshotai/kimi-k2.6
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
 
   - model_name: minimax-m3
     litellm_params:
       model: openrouter/minimax/minimax-m3
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
 
   - model_name: nemotron-3-ultra
     litellm_params:
       model: openrouter/nvidia/nemotron-3-ultra-550b-a55b
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
 
+  # === CHEAP ROUTE (free models available on OpenRouter) ===
   - model_name: gpt-oss-120b
     litellm_params:
       model: openrouter/openai/gpt-oss-120b
       api_key: "os.environ/OPENROUTER_API_KEY"
-      api_base: "https://openrouter.ai/api/v1"
+
+  - model_name: gpt-oss-120b-free
+    litellm_params:
+      model: openrouter/openai/gpt-oss-120b:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
+
+  - model_name: nemotron-3-ultra-free
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
+      api_key: "os.environ/OPENROUTER_API_KEY"
 
 router_settings:
   routing_strategy: simple-shuffle
