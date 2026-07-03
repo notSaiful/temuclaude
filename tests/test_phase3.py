@@ -21,7 +21,7 @@ from src.orchestrator import Timuclaude
 # ============================================================
 # TEST 1: Self-QA Prompt Builder
 # ============================================================
-def test_qa_prompt_builder():
+def test_qa_prompt_builder() -> bool:
     """Test that build_qa_prompt creates valid messages."""
     print("\n=== SELF-QA PROMPT TESTS ===")
     
@@ -42,7 +42,7 @@ def test_qa_prompt_builder():
 # ============================================================
 # TEST 2: Score Extraction
 # ============================================================
-def test_score_extraction():
+def test_score_extraction() -> bool:
     """Test that extract_score correctly parses verifier responses."""
     print("\n=== SCORE EXTRACTION TESTS ===")
     
@@ -70,7 +70,7 @@ def test_score_extraction():
 # ============================================================
 # TEST 3: Skill Loading
 # ============================================================
-def test_skill_loading():
+def test_skill_loading() -> bool:
     """Test that skill principles are loaded for relevant task types."""
     print("\n=== SKILL LOADING TESTS ===")
     
@@ -127,7 +127,7 @@ def test_skill_loading():
 # ============================================================
 # TEST 4: Log Analysis
 # ============================================================
-def test_log_analysis():
+def test_log_analysis() -> bool:
     """Test that analyze_logs correctly parses and analyzes logs."""
     print("\n=== LOG ANALYSIS TESTS ===")
     
@@ -175,7 +175,7 @@ def test_log_analysis():
 # ============================================================
 # TEST 5: Adaptive Routing
 # ============================================================
-def test_adaptive_routing():
+def test_adaptive_routing() -> bool:
     """Test that adaptive routing loads, saves, and resets correctly."""
     print("\n=== ADAPTIVE ROUTING TESTS ===")
     
@@ -228,7 +228,7 @@ def test_adaptive_routing():
 # ============================================================
 # TEST 6: GEPA Prompt Loading
 # ============================================================
-def test_gepa_prompt_loading():
+def test_gepa_prompt_loading() -> bool:
     """Test that evolved prompts load correctly."""
     print("\n=== GEPA PROMPT LOADING TESTS ===")
     
@@ -259,7 +259,7 @@ def test_gepa_prompt_loading():
 # ============================================================
 # TEST 7: Self-QA Gate (live)
 # ============================================================
-def test_self_qa_gate_live():
+def test_self_qa_gate_live() -> bool:
     """Test that Self-QA gate scores a good answer and accepts it."""
     print("\n=== SELF-QA GATE LIVE TESTS ===")
     
@@ -309,7 +309,7 @@ def test_self_qa_gate_live():
 # ============================================================
 # TEST 8: Full Integration (live)
 # ============================================================
-def test_integration_live():
+def test_integration_live() -> bool:
     """Test that a medium-tier query uses adaptive routing + skills."""
     print("\n=== INTEGRATION LIVE TESTS ===")
     

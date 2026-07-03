@@ -19,7 +19,7 @@ from src.models import FUSION_PANEL, AGGREGATOR_MAP
 # ============================================================
 # TEST 1: Panel Selection
 # ============================================================
-def test_panel_selection():
+def test_panel_selection() -> bool:
     """Test that get_panel returns the right models for each task type."""
     print("\n=== PANEL SELECTION TESTS ===")
     
@@ -58,7 +58,7 @@ def test_panel_selection():
 # ============================================================
 # TEST 2: Dynamic Aggregator Selection
 # ============================================================
-def test_aggregator_selection():
+def test_aggregator_selection() -> bool:
     """Test that get_aggregator returns the right model per task type (Fugu pattern)."""
     print("\n=== AGGREGATOR SELECTION TESTS ===")
     
@@ -88,7 +88,7 @@ def test_aggregator_selection():
 # ============================================================
 # TEST 3: Answer Extraction (for self-consistency)
 # ============================================================
-def test_answer_extraction():
+def test_answer_extraction() -> bool:
     """Test that extract_answer correctly parses model responses."""
     print("\n=== ANSWER EXTRACTION TESTS ===")
     
@@ -116,7 +116,7 @@ def test_answer_extraction():
 # ============================================================
 # TEST 4: Majority Vote
 # ============================================================
-def test_majority_vote():
+def test_majority_vote() -> bool:
     """Test that majority_vote correctly picks the most common answer."""
     print("\n=== MAJORITY VOTE TESTS ===")
     
@@ -143,7 +143,7 @@ def test_majority_vote():
 # ============================================================
 # TEST 5: Code Extraction
 # ============================================================
-def test_code_extraction():
+def test_code_extraction() -> bool:
     """Test that extract_code correctly parses model responses."""
     print("\n=== CODE EXTRACTION TESTS ===")
     
@@ -170,7 +170,7 @@ def test_code_extraction():
 # ============================================================
 # TEST 6: Fusion Prompt Builder
 # ============================================================
-def test_fusion_prompt():
+def test_fusion_prompt() -> bool:
     """Test that build_fusion_prompt creates a valid prompt."""
     print("\n=== FUSION PROMPT TESTS ===")
     
@@ -202,7 +202,7 @@ def test_fusion_prompt():
 # ============================================================
 # TEST 7: Code Verification (live)
 # ============================================================
-def test_code_verification():
+def test_code_verification() -> bool:
     """Test that verify_with_code generates and executes code."""
     print("\n=== CODE VERIFICATION TESTS ===")
     
@@ -244,7 +244,7 @@ def test_code_verification():
 # ============================================================
 # TEST 8: Fusion (live)
 # ============================================================
-def test_fusion_live():
+def test_fusion_live() -> bool:
     """Test that Fusion actually calls multiple models and synthesizes."""
     print("\n=== FUSION LIVE TESTS ===")
     
@@ -287,7 +287,7 @@ def test_fusion_live():
 # ============================================================
 # TEST 9: Hard Tier Integration (live)
 # ============================================================
-def test_hard_tier():
+def test_hard_tier() -> bool:
     """Test that the hard tier uses Fusion for complex queries."""
     print("\n=== HARD TIER TESTS ===")
     
