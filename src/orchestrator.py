@@ -8,18 +8,34 @@ this module encodes the orchestration strategies as code.
 """
 import time
 import asyncio
+import os
+import sys
 from typing import Optional
 from openai import AsyncOpenAI
 
-from .models import (
-    MODEL_POOL,
-    CHEAP_MODELS,
-    TASK_MODEL_MAP,
-    FUSION_PANEL,
-    AGGREGATOR_MAP,
-    OLLAMA_API_BASE,
-)
-from .logger import QueryLogger
+# Handle both package import (from src.orchestrator) and direct script execution
+if __package__:
+    from .models import (
+        MODEL_POOL,
+        CHEAP_MODELS,
+        TASK_MODEL_MAP,
+        FUSION_PANEL,
+        AGGREGATOR_MAP,
+        OLLAMA_API_BASE,
+    )
+    from .logger import QueryLogger
+else:
+    # When run directly as: python src/orchestrator.py
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from src.models import (
+        MODEL_POOL,
+        CHEAP_MODELS,
+        TASK_MODEL_MAP,
+        FUSION_PANEL,
+        AGGREGATOR_MAP,
+        OLLAMA_API_BASE,
+    )
+    from src.logger import QueryLogger
 
 
 class Timuclaude:
@@ -123,27 +139,60 @@ class Timuclaude:
 
         return "medium"
 
-    async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192) -> str:
-        """Call a single Ollama Cloud model. Minimum max_tokens=200 for thinking models."""
+    async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192, timeout: int = 120) -> str:
+        """Call a single Ollama Cloud model with timeout and retry."""
         # Thinking models use internal tokens for reasoning — don't cap too low
         if max_tokens < 200:
             max_tokens = 200
 
         ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
-        try:
-            response = await self.client.chat.completions.create(
-                model=ollama_tag,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
-            return response.choices[0].message.content or ""
-        except Exception as e:
-            return f"[ERROR: {model} failed: {e}]"
+        
+        for attempt in range(2):  # 1 retry max
+            try:
+                response = await asyncio.wait_for(
+                    self.client.chat.completions.create(
+                        model=ollama_tag,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                    ),
+                    timeout=timeout,
+                )
+                content = response.choices[0].message.content or ""
+                if content.strip():
+                    return content
+                # Empty response — retry with higher max_tokens
+                max_tokens = max(max_tokens * 2, 500)
+            except asyncio.TimeoutError:
+                if attempt < 1:
+                    await asyncio.sleep(0.5)
+                    continue
+                return f"[ERROR: {model} timed out after {timeout}s]"
+            except Exception as e:
+                if attempt < 1:
+                    await asyncio.sleep(0.5)
+                    continue
+                return f"[ERROR: {model} failed: {e}]"
 
-    async def direct_response(self, model: str, messages: list, max_tokens: int = 8192) -> str:
-        """Get a direct response from a single model."""
-        return await self.call_model(model, messages, max_tokens=max_tokens)
+        return f"[ERROR: {model} returned empty response after 3 attempts]"
+
+    async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192) -> str:
+        """Call a model, and if it fails, try fallback models."""
+        answer = await self.call_model(model, messages, max_tokens=max_tokens)
+        if not answer.startswith("[ERROR"):
+            return answer
+
+        # Try fallback models based on task type
+        fallbacks = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
+        if model in fallbacks:
+            fallbacks.remove(model)
+
+        for fallback in fallbacks:
+            answer = await self.call_model(fallback, messages, max_tokens=max_tokens)
+            if not answer.startswith("[ERROR"):
+                return answer
+
+        return answer  # All failed, return last error
 
     async def complete(self, query: str, system_prompt: str = None) -> str:
         """
@@ -164,7 +213,7 @@ class Timuclaude:
                 {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant."},
                 {"role": "user", "content": query},
             ]
-            answer = await self.direct_response(model, messages, max_tokens=500)
+            answer = await self.call_model_with_fallback(model, messages, max_tokens=500)
             models_used = [model]
             strategy = "direct_cheap"
         elif tier == "medium":
@@ -174,7 +223,7 @@ class Timuclaude:
                 {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers."},
                 {"role": "user", "content": query},
             ]
-            answer = await self.direct_response(model, messages, max_tokens=8192)
+            answer = await self.call_model_with_fallback(model, messages, max_tokens=8192)
             models_used = [model]
             strategy = "direct_specialist"
         else:
@@ -185,7 +234,7 @@ class Timuclaude:
                 {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant. Think carefully and provide thorough, accurate answers."},
                 {"role": "user", "content": query},
             ]
-            answer = await self.direct_response(model, messages, max_tokens=8192)
+            answer = await self.call_model_with_fallback(model, messages, max_tokens=8192)
             models_used = [model]
             strategy = "direct_specialist_max_thinking"
 
@@ -211,3 +260,16 @@ def ask(query: str, system_prompt: str = None) -> str:
     """Simple function to ask Timuclaude a question."""
     tc = Timuclaude()
     return asyncio.run(tc.complete(query, system_prompt))
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Usage: python -m src.orchestrator 'Your question here'")
+        print("   or: python src/orchestrator.py 'Your question here'")
+        sys.exit(1)
+
+    query = " ".join(sys.argv[1:])
+    print(f"Question: {query}")
+    print(f"Answer: {ask(query)}")
