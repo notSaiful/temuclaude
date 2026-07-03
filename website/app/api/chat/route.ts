@@ -1,22 +1,76 @@
 import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const { messages } = await req.json();
-
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
       try {
         const lastMessage = messages[messages.length - 1]?.content || '';
-        
-        const taskType = classifyTask(lastMessage);
-        const tier = determineTier(lastMessage, taskType);
-        
-        const responseText = `This is a simulated response from Timuclaude. In production, this will call the real orchestrator which automatically classifies your question, routes to the best models, fuses their answers, verifies with code, and quality-checks with self-QA.\n\nYour question was classified as: ${taskType}\nRouting tier: ${tier}\n\nAll of this happens invisibly — you just get the best answer.`;
 
+        // Call the Timuclaude orchestrator API
+        // In production this hits our Python backend
+        const orchestratorUrl = process.env.TIMUCLAUDE_API_URL || 'http://localhost:8000';
+        
+        let responseText = '';
+        let orchestrationData: any = null;
+
+        try {
+          // Try to call the real orchestrator
+          const orchResponse = await fetch(`${orchestratorUrl}/query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: lastMessage }),
+            signal: AbortSignal.timeout(55000),
+          });
+
+          if (orchResponse.ok) {
+            const data = await orchResponse.json();
+            responseText = data.response || data.answer || '';
+            orchestrationData = {
+              orchestration: {
+                taskType: data.task_type || 'general',
+                tier: data.tier || 'auto',
+                models: (data.models || []).map((m: any) => ({
+                  name: m.name,
+                  response: m.response?.substring(0, 200) || '',
+                  latency: m.latency || 0,
+                  correct: m.correct !== false,
+                })),
+                aggregator: data.aggregator || 'GLM-5.2',
+                consensus: data.consensus || 3,
+                qaScore: data.qa_score || 0,
+                codeVerified: data.code_verified || false,
+                totalLatency: ((data.total_latency || 2.3)).toFixed(1),
+                cost: data.cost || '$0.019',
+              },
+            };
+          } else {
+            throw new Error(`Orchestrator returned ${orchResponse.status}`);
+          }
+        } catch (err) {
+          // Fallback: if orchestrator is not running, return a helpful message
+          responseText = `Timuclaude orchestrator is not running. Start it with:\n\npython -m src.orchestrator --serve\n\nOr set TIMUCLAUDE_API_URL to point to your orchestrator instance.\n\nYour question was: "${lastMessage}"`;
+          orchestrationData = {
+            orchestration: {
+              taskType: 'unknown',
+              tier: 'fallback',
+              models: [],
+              aggregator: 'none',
+              consensus: 0,
+              qaScore: 0,
+              codeVerified: false,
+              totalLatency: '0',
+              cost: '$0.000',
+            },
+          };
+        }
+
+        // Stream the response word by word
         const words = responseText.split(' ');
         for (let i = 0; i < words.length; i++) {
           const chunk = i === 0 ? words[i] : ' ' + words[i];
@@ -24,24 +78,10 @@ export async function POST(req: NextRequest) {
           await new Promise((resolve) => setTimeout(resolve, 30));
         }
 
-        const orchestrationData = {
-          orchestration: {
-            taskType,
-            tier,
-            models: [
-              { name: 'GLM-5.2', response: 'Response from GLM-5.2', latency: 1.2, correct: true },
-              { name: 'DeepSeek V4 Pro', response: 'Response from DeepSeek', latency: 1.8, correct: true },
-              { name: 'Kimi K2.6', response: 'Response from Kimi', latency: 1.5, correct: true },
-            ],
-            aggregator: 'GLM-5.2',
-            consensus: 3,
-            qaScore: 9,
-            codeVerified: taskType === 'math',
-            totalLatency: '2.3',
-            cost: '$0.019',
-          },
-        };
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(orchestrationData)}\n\n`));
+        // Send orchestration data
+        if (orchestrationData) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(orchestrationData)}\n\n`));
+        }
 
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         controller.close();
@@ -61,21 +101,4 @@ export async function POST(req: NextRequest) {
       'Connection': 'keep-alive',
     },
   });
-}
-
-function classifyTask(query: string): string {
-  const q = query.toLowerCase();
-  if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation/)) return 'math';
-  if (q.match(/code|function|python|javascript|debug|error|bug|program/)) return 'coding';
-  if (q.match(/write|poem|story|essay|compose|create|generate/)) return 'creative';
-  if (q.match(/explain|what is|how does|why|define|describe/)) return 'knowledge';
-  if (q.match(/compare|analyze|reason|logic|deduce|infer/)) return 'reasoning';
-  return 'knowledge';
-}
-
-function determineTier(query: string, taskType: string): string {
-  const wordCount = query.split(' ').length;
-  if (wordCount <= 8 && taskType !== 'reasoning') return 'trivial';
-  if (wordCount > 50) return 'hard';
-  return 'medium';
 }

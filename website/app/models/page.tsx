@@ -1,4 +1,5 @@
 import { Navbar } from '@/components/Navbar';
+import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
 const models = [
   { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', capabilities: ['Tools', 'Thinking', '1M Context'], desc: 'The primary orchestrator. Classifies queries, routes to specialists, and aggregates fusion responses.' },
@@ -31,20 +32,22 @@ export default function ModelsPage() {
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {models.map((model, i) => (
-              <div key={i} className="card">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-text-primary">{model.name}</h3>
-                  <span className="badge-muted">{model.role}</span>
+              <StaggerItem key={i}>
+                <div className="card h-full">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-text-primary">{model.name}</h3>
+                    <span className="badge-muted">{model.role}</span>
+                  </div>
+                  <p className="text-sm text-text-secondary mb-4">{model.desc}</p>
+                  <div className="flex flex-wrap gap-1.5 mb-4">{model.capabilities.map((cap, j) => <span key={j} className="badge-muted text-xs">{cap}</span>)}</div>
+                  <div className="text-xs text-text-muted">Context: <span className="text-text-secondary">{model.context}</span></div>
+                  <a href="/playground" className="btn-secondary w-full mt-4 text-xs">Try in Playground</a>
                 </div>
-                <p className="text-sm text-text-secondary mb-4">{model.desc}</p>
-                <div className="flex flex-wrap gap-1.5 mb-4">{model.capabilities.map((cap, j) => <span key={j} className="badge-muted text-xs">{cap}</span>)}</div>
-                <div className="text-xs text-text-muted">Context: <span className="text-text-secondary">{model.context}</span></div>
-                <a href="/playground" className="btn-secondary w-full mt-4 text-xs">Try in Playground</a>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerReveal>
         </div>
       </main>
     </>
