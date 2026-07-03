@@ -116,8 +116,8 @@ export default function HomePage() {
                 <StaggerItem key={i}>
                   <div className="card text-center" style={{ padding: '20px 12px' }}>
                     <div
-                      className="w-10 h-10 rounded-full mx-auto mb-3"
-                      style={{ background: model.tone, boxShadow: `0 0 12px ${model.tone}40` }}
+                      className="w-10 h-10 rounded-full mx-auto mb-3 glow-pulse"
+                      style={{ background: model.tone }}
                     />
                     <div className="text-sm font-medium text-text-primary">{model.name}</div>
                     <div className="text-xs text-text-muted mt-1">{model.role}</div>
