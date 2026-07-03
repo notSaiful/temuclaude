@@ -22,7 +22,7 @@ from benchmarks.benchmark_runner import run_benchmark, save_results
 from src.orchestrator import Timuclaude
 
 
-async def main():
+async def main() -> None:
     parser = argparse.ArgumentParser(description="Run baseline benchmark")
     parser.add_argument("--model", required=True, help="Model name (e.g., glm-5.2, deepseek-v4-pro)")
     parser.add_argument("--dataset", required=True, help="Dataset name ('hle', 'mrcr', 'sample') or path to JSON")
