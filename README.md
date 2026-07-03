@@ -180,6 +180,15 @@ timuclaude/
 - CLI scripts: run_baseline.py, run_timuclaude.py
 - 5 test suites pass (13 non-live + 1 live test, 100% accuracy on sample)
 
+**Phase 5 (Production):** Complete
+- In-memory response cache (LRU, TTL, hit/miss stats)
+- Dockerfile for container deployment (Fly.io, Railway, any container platform)
+- fly.toml for Fly.io deployment (Mumbai region, health check, auto-scaling)
+- start.sh production start script (checks Ollama, sets env, starts proxy)
+- .dockerignore (excludes .git, pycache, .env, logs, research docs)
+- landing_page.html (warm minimal design, benchmarks, pricing, API docs)
+- 9 test suites pass (cache basic/TTL/LRU/stats, start script, Dockerfile, fly.toml, landing page, dockerignore)
+
 ## License
 
 MIT
