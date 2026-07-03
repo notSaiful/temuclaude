@@ -1,0 +1,137 @@
+{
+  "model_name": "glm-5.2",
+  "total_questions": 10,
+  "correct": 9,
+  "accuracy": 0.9,
+  "results": [
+    {
+      "id": "1",
+      "question": "What is 15 * 12?",
+      "correct_answer": "180",
+      "response": "15 * 12 is 180.\n\nAnswer: 180",
+      "correct": true,
+      "extracted_answer": "180",
+      "category": "math",
+      "latency_ms": 3163
+    },
+    {
+      "id": "2",
+      "question": "What is the capital of France?",
+      "correct_answer": "Paris",
+      "response": "The capital of France is Paris.\n\nAnswer: Paris",
+      "correct": true,
+      "extracted_answer": "Paris",
+      "category": "knowledge",
+      "latency_ms": 2239
+    },
+    {
+      "id": "3",
+      "question": "What is the derivative of x^2?",
+      "correct_answer": "2x",
+      "response": "To find the derivative of \\( x^2 \\), you can use the power rule. The power rule states that the derivative of \\( x^n \\) is \\( n \\cdot x^{n-1} \\).\n\nApplying this to \\( x^2 \\):\n1. Bring the exponent down to the front: \\( 2 \\cdot x^2 \\)\n2. Subtract 1 from the exponent: \\( 2 \\cdot x^{2-1} = 2x \\)\n\nAnswer: 2x",
+      "correct": true,
+      "extracted_answer": "2x",
+      "category": "math",
+      "latency_ms": 5756
+    },
+    {
+      "id": "4",
+      "question": "Who wrote the play Hamlet?",
+      "correct_answer": "William Shakespeare",
+      "response": "The play Hamlet was written by the English playwright William Shakespeare, probably between 1599 and 1601.\n\nAnswer: William Shakespeare",
+      "correct": true,
+      "extracted_answer": "William Shakespeare",
+      "category": "knowledge",
+      "latency_ms": 3001
+    },
+    {
+      "id": "5",
+      "question": "What is the chemical formula for water?",
+      "correct_answer": "H2O",
+      "response": "The chemical formula for water is H2O.\n\nAnswer: H2O",
+      "correct": true,
+      "extracted_answer": "H2O",
+      "category": "science",
+      "latency_ms": 7455
+    },
+    {
+      "id": "6",
+      "question": "What is 25 * 4?",
+      "correct_answer": "100",
+      "response": "25 * 4 = 100\n\nAnswer: 100",
+      "correct": true,
+      "extracted_answer": "100",
+      "category": "math",
+      "latency_ms": 1840
+    },
+    {
+      "id": "7",
+      "question": "What is the largest planet in our solar system?",
+      "correct_answer": "Jupiter",
+      "response": "The largest planet in our solar system is Jupiter. It is a gas giant and has a mass more than twice that of all the other planets combined.\n\nAnswer: Jupiter",
+      "correct": true,
+      "extracted_answer": "Jupiter",
+      "category": "knowledge",
+      "latency_ms": 2578
+    },
+    {
+      "id": "8",
+      "question": "What is the square root of 144?",
+      "correct_answer": "12",
+      "response": "The square root of 144 is 12.\n\nAnswer: 12",
+      "correct": true,
+      "extracted_answer": "12",
+      "category": "math",
+      "latency_ms": 2798
+    },
+    {
+      "id": "9",
+      "question": "In what year did World War II end?",
+      "correct_answer": "1945",
+      "response": "World War II ended in 1945.\n\nAnswer: 1945",
+      "correct": true,
+      "extracted_answer": "1945",
+      "category": "history",
+      "latency_ms": 6249
+    },
+    {
+      "id": "10",
+      "question": "What is the speed of light in km/s (approximately)?",
+      "correct_answer": "300000",
+      "response": "The speed of light in a vacuum is approximately 300,000 kilometers per second. \n\nAnswer: 300,000 km/s",
+      "correct": false,
+      "extracted_answer": "",
+      "category": "physics",
+      "latency_ms": 4211
+    }
+  ],
+  "by_category": {
+    "math": {
+      "total": 4,
+      "correct": 4,
+      "accuracy": 1.0
+    },
+    "knowledge": {
+      "total": 3,
+      "correct": 3,
+      "accuracy": 1.0
+    },
+    "science": {
+      "total": 1,
+      "correct": 1,
+      "accuracy": 1.0
+    },
+    "history": {
+      "total": 1,
+      "correct": 1,
+      "accuracy": 1.0
+    },
+    "physics": {
+      "total": 1,
+      "correct": 0,
+      "accuracy": 0.0
+    }
+  },
+  "total_latency_ms": 39290,
+  "avg_latency_ms": 3929
+}
