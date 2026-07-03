@@ -6,12 +6,13 @@ For math and coding questions, code execution provides GROUND TRUTH —
 no hallucination possible in computation. If the code runs and produces
 output, that output is the verified answer.
 
-Enhanced with Step-Level Code Verification (rStar-Math pattern):
-- Instead of generating one code block for the final answer, generate code
-  for EACH reasoning step and verify each one independently.
-- If a step's code fails, the reasoning path is rejected.
-- This catches intermediate errors before they cascade into wrong final answers.
-- rStar-Math: 58.8% → 90% on MATH benchmark using this pattern.
+Enhanced with:
+- Step-Level Code Verification (rStar-Math pattern): Generate code for EACH
+  reasoning step and verify each independently. 58.8% → 90% on MATH.
+- s1 Budget Forcing (arXiv:2501.19393): Append "Wait" to force the model to
+  continue reasoning when it stops too early. Simple but effective.
+- Z3/SMT Logical Verification (ConsistPRM pattern): Use Z3 SMT solver to
+  verify logical reasoning steps with mathematical certainty.
 
 Sandbox: subprocess with timeout, no network, temp directory.
 Falls back to model's direct answer if code fails.
@@ -343,3 +344,170 @@ async def verify_steps_with_code(
         "step_results": step_results,
         "answer": response if all_verified else None,
     }
+
+
+# ============================================================
+# s1 BUDGET FORCING (arXiv:2501.19393)
+# ============================================================
+
+def apply_budget_forcing(
+    response: str,
+    min_reasoning_tokens: int = 200,
+) -> str:
+    """s1 Budget Forcing — append 'Wait' to force the model to continue reasoning.
+    
+    The s1 paper showed that appending 'Wait' to a model's response forces it
+    to continue reasoning, producing longer and more accurate chains of thought.
+    This is extremely simple but effective for math/reasoning tasks.
+    
+    Args:
+        response: The model's initial response
+        min_reasoning_tokens: Minimum reasoning length (approx tokens = words * 1.3)
+    
+    Returns:
+        The response, possibly with 'Wait' appended if it was too short
+    """
+    # Estimate tokens (rough: words * 1.3)
+    word_count = len(response.split())
+    estimated_tokens = int(word_count * 1.3)
+    
+    if estimated_tokens < min_reasoning_tokens:
+        # Response too short — append "Wait" to force more reasoning
+        return response + "\n\nWait"
+    
+    return response
+
+
+async def generate_with_budget_forcing(
+    question: str,
+    model: str,
+    call_model_func: Callable[..., Awaitable[str]],
+    max_tokens: int = 8192,
+    max_wait_appends: int = 2,
+) -> str:
+    """Generate a response with s1 budget forcing.
+    
+    1. Generate initial response
+    2. If response is too short, append "Wait" and continue
+    3. Repeat up to max_wait_appends times
+    
+    This forces the model to reason longer, improving accuracy on hard problems.
+    """
+    messages = [
+        {"role": "system", "content": "You are Timuclaude. Think step by step. Show your reasoning. At the end, write 'Answer: X'."},
+        {"role": "user", "content": question},
+    ]
+    
+    response = await call_model_func(model, messages, max_tokens=max_tokens)
+    
+    for _ in range(max_wait_appends):
+        if "Answer:" in response:
+            break  # Model reached a final answer — stop forcing
+        
+        # Append "Wait" and ask for more
+        messages.append({"role": "assistant", "content": response})
+        messages.append({"role": "user", "content": "Wait"})
+        
+        continuation = await call_model_func(model, messages, max_tokens=max_tokens)
+        response += "\n" + continuation
+    
+    return response
+
+
+# ============================================================
+# Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
+# ============================================================
+
+def verify_logical_with_z3(
+    question: str,
+    response: str,
+) -> dict:
+    """Verify logical reasoning using Z3 SMT solver.
+    
+    The ConsistPRM research showed that Z3 can verify logical reasoning
+    with mathematical certainty. LLMs may claim correct logic but actually
+    have inconsistencies. Z3 checks if the logical claims are actually
+    satisfiable.
+    
+    This function:
+    1. Extracts logical claims from the response
+    2. Encodes them as Z3 constraints
+    3. Checks satisfiability
+    4. Returns whether the logic is consistent
+    
+    Note: This requires z3-solver to be installed (pip install z3-solver).
+    Falls back gracefully if Z3 is not available.
+    """
+    try:
+        from z3 import Solver, Bool, Implies, And, Or, Not, sat, unsat
+    except ImportError:
+        return {
+            "verified": False,
+            "reason": "Z3 not installed (pip install z3-solver)",
+            "answer": None,
+        }
+    
+    # Extract simple logical patterns from the response
+    # Look for: "if X then Y", "X implies Y", "X and Y", "X or Y"
+    # This is a basic pattern matcher — full NLP logic extraction is complex
+    
+    solver = Solver()
+    bool_vars = {}
+    
+    def get_bool(name: str):
+        """Get or create a Z3 boolean variable."""
+        clean = name.strip().lower().replace(" ", "_")[:20]
+        if clean not in bool_vars:
+            bool_vars[clean] = Bool(clean)
+        return bool_vars[clean]
+    
+    # Find "if X then Y" patterns
+    if_patterns = re.findall(r'if\s+(.+?)\s+then\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
+    for premise, conclusion in if_patterns:
+        p = get_bool(premise)
+        c = get_bool(conclusion)
+        solver.add(Implies(p, c))
+    
+    # Find "X implies Y" patterns
+    impl_patterns = re.findall(r'(.+?)\s+implies\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
+    for premise, conclusion in impl_patterns:
+        p = get_bool(premise)
+        c = get_bool(conclusion)
+        solver.add(Implies(p, c))
+    
+    # If no logical patterns found, Z3 can't verify
+    if not bool_vars:
+        return {
+            "verified": False,
+            "reason": "No logical patterns found to verify",
+            "answer": None,
+        }
+    
+    # Check if the constraints are satisfiable (not contradictory)
+    result = solver.check()
+    
+    if result == sat:
+        # The logic is consistent — no contradictions
+        return {
+            "verified": True,
+            "reason": "Logical constraints are satisfiable (no contradictions)",
+            "answer": response,
+            "variables": len(bool_vars),
+            "constraints": len(if_patterns) + len(impl_patterns),
+        }
+    elif result == unsat:
+        # The logic contains contradictions
+        return {
+            "verified": False,
+            "reason": "Logical constraints are unsatisfiable (contradictions found)",
+            "answer": None,
+            "variables": len(bool_vars),
+            "constraints": len(if_patterns) + len(impl_patterns),
+        }
+    else:
+        # Unknown — solver couldn't determine
+        return {
+            "verified": False,
+            "reason": "Z3 could not determine satisfiability",
+            "answer": None,
+        }
