@@ -169,12 +169,16 @@ def test_free_models() -> bool:
 # TEST 6: API Base Auto-Detect
 # ============================================================
 def test_api_base() -> bool:
-    """Test that API_BASE is always OpenRouter."""
+    """Test that API_BASE is set correctly based on OPENROUTER_API_KEY."""
     print("\n=== API BASE TESTS ===")
     
-    # API_BASE should always be OpenRouter (no auto-detect)
-    assert API_BASE == OPENROUTER_API_BASE, f"Expected OpenRouter ({OPENROUTER_API_BASE}), got {API_BASE}"
-    print(f"  OK: API_BASE always OpenRouter ({API_BASE})")
+    # API_BASE should be OpenRouter if key is set, Ollama if not
+    if "OPENROUTER_API_KEY" in os.environ:
+        assert API_BASE == OPENROUTER_API_BASE, f"Expected OpenRouter, got {API_BASE}"
+        print(f"  OK: OPENROUTER_API_KEY set → OpenRouter ({API_BASE})")
+    else:
+        assert API_BASE == OLLAMA_API_BASE, f"Expected Ollama, got {API_BASE}"
+        print(f"  OK: no OPENROUTER_API_KEY → Ollama ({API_BASE})")
     
     print(f"  1/1 passed")
     return True

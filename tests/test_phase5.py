@@ -157,10 +157,11 @@ def test_start_script() -> bool:
     with open(start_path) as f:
         content = f.read()
     
-    # Check key elements (OpenRouter, not Ollama)
+    # Check key elements (auto-detect, both backends)
     checks = {
         "TIMUCLAUDE_MASTER_KEY": "TIMUCLAUDE_MASTER_KEY" in content,
         "OPENROUTER_API_KEY": "OPENROUTER_API_KEY" in content,
+        "Ollama check": "11434" in content,
         "litellm": "litellm" in content,
         "config/litellm.yaml": "config/litellm.yaml" in content,
         "port 4000": "4000" in content,
