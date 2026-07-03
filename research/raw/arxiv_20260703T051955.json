@@ -1,0 +1,24 @@
+{
+  "scout": "arxiv",
+  "timestamp": "20260703T051955",
+  "queries": [
+    "LLM orchestration multi-model fusion ensemble",
+    "model panel judge aggregator routing",
+    "tree search MCTS LLM reasoning step-by-step",
+    "process reward model PRM verification",
+    "self-consistency chain-of-thought majority vote",
+    "test-time compute scaling reasoning",
+    "multi-agent LLM debate consensus collaboration",
+    "LLM swarm intelligence collective",
+    "cost-efficient LLM inference routing cascade",
+    "speculative decoding early exit LLM",
+    "automated prompt optimization OPRO evolutionary",
+    "prompt engineering meta-prompting",
+    "model merging mixture of experts inference",
+    "ensemble LLM combination technique",
+    "self-verification LLM hallucination reduction code execution",
+    "LLM judge evaluator quality"
+  ],
+  "total_found": 0,
+  "papers": []
+}

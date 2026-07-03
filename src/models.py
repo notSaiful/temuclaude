@@ -118,12 +118,25 @@ OPENROUTER_FREE_MODELS = {
 # API base URLs
 OLLAMA_API_BASE = "http://localhost:11434"
 OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
+AIML_API_BASE = "https://api.aimlapi.com/v1"
+
+# ai/ml model IDs (emergency fallback — same provider/model format as OpenRouter)
+AIML_MODELS = {
+    "glm-5.2": "zhipu/glm-5.2",
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+    "kimi-k2.6": "moonshot/kimi-k2-6",
+    "kimi-k2.7-code": "moonshot/kimi-k2-7-code",
+    "minimax-m3": "minimax/minimax-m3",
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
+    "gpt-oss-120b": "openai/gpt-oss-120b",
+}
 
 # Auto-detect: use OpenRouter if key is set, otherwise Ollama
 import os as _os
 _USE_OPENROUTER = bool(_os.environ.get("OPENROUTER_API_KEY"))
+_HAS_AIML_KEY = bool(_os.environ.get("AIML_API_KEY"))
 
-# Active API base (auto-detect)
+# Active API base (auto-detect: OpenRouter if key set, else Ollama)
 API_BASE = OPENROUTER_API_BASE if _USE_OPENROUTER else OLLAMA_API_BASE
 
 # LiteLLM proxy port

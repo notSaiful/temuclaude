@@ -216,74 +216,88 @@ class Timuclaude:
         return f"[ERROR: {model} returned empty response after 3 attempts]"
 
     async def _try_other_backend(self, model: str, messages: list, temperature: float, max_tokens: int, timeout: int) -> Optional[str]:
-        """Try the other backend if the primary one fails.
+        """Try other backends if the primary one fails.
         
-        If using Ollama → try OpenRouter (if key is set).
-        If using OpenRouter → try Ollama (if running).
-        Returns the response or None if the other backend also fails.
+        Fallback order:
+        1. If primary is Ollama → try OpenRouter (if key), then ai/ml (if key)
+        2. If primary is OpenRouter → try Ollama (if running), then ai/ml (if key)
+        3. If primary is ai/ml → try OpenRouter (if key), then Ollama (if running)
+        
+        Returns the response or None if all backends fail.
         """
         if __package__:
-            from .models import OPENROUTER_MODELS, OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER
+            from .models import (
+                OPENROUTER_MODELS, AIML_MODELS, AIML_API_BASE,
+                OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER, _HAS_AIML_KEY,
+            )
         else:
-            from src.models import OPENROUTER_MODELS, OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER
+            from src.models import (
+                OPENROUTER_MODELS, AIML_MODELS, AIML_API_BASE,
+                OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER, _HAS_AIML_KEY,
+            )
         
-        if _USE_OPENROUTER:
-            # Primary was OpenRouter, try Ollama
+        # Build list of fallback backends to try (excluding the primary)
+        fallback_backends = []
+        
+        # Always try OpenRouter if key is set and it's not the primary
+        openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+        if openrouter_key and not _USE_OPENROUTER:
+            fallback_backends.append(("openrouter", openrouter_key, OPENROUTER_API_BASE, OPENROUTER_MODELS))
+        
+        # Always try ai/ml if key is set
+        aiml_key = os.environ.get("AIML_API_KEY", "")
+        if aiml_key:
+            fallback_backends.append(("aiml", aiml_key, AIML_API_BASE, AIML_MODELS))
+        
+        # Try Ollama if it's running and not the primary
+        if not _USE_OPENROUTER:
+            pass  # Ollama is primary, skip
+        else:
             # Check if Ollama is running
             try:
                 import aiohttp
                 async with aiohttp.ClientSession() as session:
                     async with session.get(f"{OLLAMA_API_BASE}/api/tags", timeout=aiohttp.ClientTimeout(total=5)) as resp:
-                        if resp.status != 200:
-                            return None
+                        if resp.status == 200:
+                            fallback_backends.append(("ollama", "ollama", f"{OLLAMA_API_BASE}/v1", None))
             except Exception:
-                return None  # Ollama not running
-            
-            # Ollama is running — try it
-            ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
-            fallback_client = AsyncOpenAI(base_url=f"{OLLAMA_API_BASE}/v1", api_key="ollama")
+                pass  # Ollama not running
+        
+        # Try each fallback backend
+        for backend_name, key, base_url, model_map in fallback_backends:
             try:
-                response = await asyncio.wait_for(
-                    fallback_client.chat.completions.create(
-                        model=ollama_tag,
-                        messages=messages,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                    ),
-                    timeout=timeout,
-                )
+                if backend_name == "ollama":
+                    ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
+                    fb_client = AsyncOpenAI(base_url=base_url, api_key="ollama")
+                    response = await asyncio.wait_for(
+                        fb_client.chat.completions.create(
+                            model=ollama_tag,
+                            messages=messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens,
+                        ),
+                        timeout=timeout,
+                    )
+                else:
+                    # OpenRouter or ai/ml — both OpenAI-compatible
+                    tag = model_map.get(model, model) if model_map else model
+                    fb_client = AsyncOpenAI(base_url=base_url, api_key=key)
+                    response = await asyncio.wait_for(
+                        fb_client.chat.completions.create(
+                            model=tag,
+                            messages=messages,
+                            temperature=temperature,
+                            max_tokens=max_tokens,
+                            extra_headers={"Authorization": f"Bearer {key}"},
+                        ),
+                        timeout=timeout,
+                    )
+                
                 content = response.choices[0].message.content or ""
                 if content.strip():
                     return content
             except Exception:
-                return None
-        else:
-            # Primary was Ollama, try OpenRouter (if key is set)
-            openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
-            if not openrouter_key:
-                return None  # No OpenRouter key
-            
-            openrouter_tag = OPENROUTER_MODELS.get(model, model)
-            fallback_client = AsyncOpenAI(
-                base_url=OPENROUTER_API_BASE,
-                api_key=openrouter_key,
-            )
-            try:
-                response = await asyncio.wait_for(
-                    fallback_client.chat.completions.create(
-                        model=openrouter_tag,
-                        messages=messages,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                        extra_headers={"Authorization": f"Bearer {openrouter_key}"},
-                    ),
-                    timeout=timeout,
-                )
-                content = response.choices[0].message.content or ""
-                if content.strip():
-                    return content
-            except Exception:
-                return None
+                continue
         
         return None
 

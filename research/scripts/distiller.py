@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""
+Distiller: Process raw scout findings, evaluate relevance, extract actionables.
+Reads all raw/*.json files, deduplicates, scores, and outputs distilled findings.
+"""
+import json
+import os
+import glob
+from datetime import datetime, timezone
+from collections import defaultdict
+
+RAW_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
+FINDINGS_DIR = os.path.join(os.path.dirname(__file__), "..", "findings")
+os.makedirs(FINDINGS_DIR, exist_ok=True)
+
+# Scoring keywords — higher weight = more relevant to timuclaude
+HIGH_VALUE_KEYWORDS = {
+    # Orchestration core
+    "orchestration": 10, "fusion": 10, "panel": 8, "judge": 8, "aggregator": 10,
+    "routing": 9, "cascade": 8, "ensemble": 9, "multi-model": 10,
+    # Reasoning
+    "mcts": 9, "tree search": 9, "process reward": 9, "prm": 9,
+    "self-consistency": 10, "chain-of-thought": 7, "self-refine": 8,
+    "test-time compute": 9, "best-of-n": 8, "verification": 8,
+    "step-by-step": 6, "reasoning": 6,
+    # Multi-agent
+    "multi-agent": 9, "debate": 8, "consensus": 8, "swarm": 8,
+    "collaborative": 6, "voting": 7,
+    # Cost/efficiency
+    "cost-efficient": 8, "cost reduction": 8, "speculative decoding": 7,
+    "early exit": 7, "caching": 6, "flat rate": 7,
+    # Prompt optimization
+    "opro": 9, "prompt optim": 9, "evolutionary prompt": 9,
+    "meta-prompt": 8, "gepa": 10, "prompt-of-thought": 8,
+    # Model combination
+    "model merge": 8, "mixture of experts": 7, "moe": 7,
+    # Benchmarks
+    "mmlu": 7, "hle": 8, "gdpval": 9, "scicode": 9, "mrcr": 7,
+    "benchmark": 5, "frontier": 6,
+    # Verification
+    "code execution": 8, "ground truth": 8, "hallucination": 6,
+    "self-evaluation": 7, "quality gate": 8,
+    # Breakthroughs
+    "breakthrough": 9, "state-of-the-art": 7, "sota": 7,
+    "novel": 6, "outperform": 7, "surpass": 7, "beat": 6,
+}
+
+def score_relevance(text):
+    text_lower = text.lower()
+    score = 0
+    matched = []
+    for kw, weight in HIGH_VALUE_KEYWORDS.items():
+        if kw in text_lower:
+            score += weight
+            matched.append(kw)
+    return score, matched
+
+def load_raw_findings():
+    """Load all raw JSON files."""
+    all_findings = []
+    for fpath in sorted(glob.glob(os.path.join(RAW_DIR, "*.json"))):
+        try:
+            with open(fpath) as f:
+                data = json.load(f)
+            all_findings.append(data)
+        except Exception as e:
+            print(f"Error loading {fpath}: {e}")
+    return all_findings
+
+def process_arxiv(raw):
+    papers = raw.get("papers", [])
+    results = []
+    for p in papers:
+        text = p.get("title", "") + " " + p.get("abstract", "")
+        score, matched = score_relevance(text)
+        if score < 10:  # Skip irrelevant
+            continue
+        results.append({
+            "type": "arxiv_paper",
+            "id": p.get("arxiv_id", ""),
+            "title": p.get("title", ""),
+            "abstract": p.get("abstract", "")[:500],
+            "authors": p.get("authors", []),
+            "published": p.get("published", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+            "url": p.get("arxiv_id", ""),
+        })
+    return results
+
+def process_github(raw):
+    repos = raw.get("repos", [])
+    results = []
+    for r in repos:
+        text = r.get("name", "") + " " + r.get("description", "") + " " + " ".join(r.get("topics", []))
+        score, matched = score_relevance(text)
+        if score < 8:
+            continue
+        results.append({
+            "type": "github_repo",
+            "id": str(r.get("repo_id", "")),
+            "name": r.get("name", ""),
+            "url": r.get("url", ""),
+            "description": r.get("description", ""),
+            "stars": r.get("stars", 0),
+            "language": r.get("language", ""),
+            "updated_at": r.get("updated_at", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    return results
+
+def process_huggingface(raw):
+    results = []
+    papers = raw.get("papers", [])
+    for p in papers:
+        text = p.get("title", "") + " " + p.get("abstract", "")
+        score, matched = score_relevance(text)
+        if score < 10:
+            continue
+        results.append({
+            "type": "hf_paper",
+            "id": p.get("paper_id", ""),
+            "title": p.get("title", ""),
+            "abstract": p.get("abstract", "")[:500],
+            "upvotes": p.get("upvotes", 0),
+            "url": p.get("url", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    
+    models = raw.get("models", [])
+    for m in models:
+        text = m.get("model_id", "") + " " + " ".join(m.get("tags", []))
+        score, matched = score_relevance(text)
+        if score < 8:
+            continue
+        results.append({
+            "type": "hf_model",
+            "id": m.get("model_id", ""),
+            "downloads": m.get("downloads", 0),
+            "likes": m.get("likes", 0),
+            "tags": m.get("tags", []),
+            "pipeline_tag": m.get("pipeline_tag", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    return results
+
+def deduplicate(findings):
+    """Deduplicate by type+id."""
+    seen = set()
+    unique = []
+    for f in findings:
+        key = f"{f['type']}:{f['id']}"
+        if key not in seen:
+            seen.add(key)
+            unique.append(f)
+    return unique
+
+def main():
+    raw_files = load_raw_findings()
+    all_findings = []
+    
+    for raw in raw_files:
+        scout = raw.get("scout", "")
+        if scout == "arxiv":
+            all_findings.extend(process_arxiv(raw))
+        elif scout == "github":
+            all_findings.extend(process_github(raw))
+        elif scout == "huggingface":
+            all_findings.extend(process_huggingface(raw))
+    
+    # Deduplicate
+    all_findings = deduplicate(all_findings)
+    
+    # Sort by relevance score (descending)
+    all_findings.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
+    
+    # Group by type
+    by_type = defaultdict(list)
+    for f in all_findings:
+        by_type[f["type"]].append(f)
+    
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    out_file = os.path.join(FINDINGS_DIR, f"distilled_{ts}.json")
+    with open(out_file, "w") as f:
+        json.dump({
+            "distilled_at": ts,
+            "total_raw_files": len(raw_files),
+            "total_findings": len(all_findings),
+            "by_type": {k: len(v) for k, v in by_type.items()},
+            "top_findings": all_findings[:50],  # Top 50
+            "all_findings": all_findings,
+        }, f, indent=2)
+    
+    # Clean up raw files older than 7 days (keep recent)
+    import time
+    now = time.time()
+    for fpath in glob.glob(os.path.join(RAW_DIR, "*.json")):
+        if os.path.getmtime(fpath) < now - 7 * 86400:
+            os.remove(fpath)
+    
+    print(f"Distiller: {len(all_findings)} findings from {len(raw_files)} raw files -> {out_file}")
+    if all_findings:
+        top = all_findings[0]
+        print(f"  Top finding (score {top['relevance_score']}): {top.get('title', top.get('name', ''))}")
+
+if __name__ == "__main__":
+    main()
