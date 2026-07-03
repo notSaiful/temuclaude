@@ -4,7 +4,7 @@ export default function EnterprisePage() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-20 px-6" aria-label="Enterprise">
+      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Enterprise">
         <div className="container-max">
           <div className="text-center mb-16">
             <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-4">Enterprise-grade AI orchestration</h1>

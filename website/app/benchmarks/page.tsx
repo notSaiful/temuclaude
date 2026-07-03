@@ -16,7 +16,7 @@ export default function BenchmarksPage() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-20 px-6" aria-label="Benchmark Results">
+      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Benchmark Results">
         <div className="container-max">
           <h1 className="text-3xl font-semibold text-text-primary mb-2">Benchmark Results</h1>
           <p className="text-text-secondary mb-8">Projected scores from research analysis. Live results will be published after full testing.</p>

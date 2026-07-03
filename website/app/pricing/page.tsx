@@ -15,7 +15,7 @@ export default function PricingPage() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-20 px-6" aria-label="Pricing">
+      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Pricing">
         <div className="container-max">
           <h1 className="text-3xl font-semibold text-text-primary mb-2 text-center">Pricing</h1>
           <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">Free to try in the playground. Pay only when you need more.</p>
