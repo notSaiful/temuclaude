@@ -19,7 +19,7 @@ from src.logger import QueryLogger
 # ============================================================
 # TEST 1: Task Classifier
 # ============================================================
-def test_classifier():
+def test_classifier() -> bool:
     """Test that the task classifier correctly categorizes queries."""
     tc = Timuclaude()
     loop = asyncio.new_event_loop()
@@ -81,7 +81,7 @@ def test_classifier():
 # ============================================================
 # TEST 2: Tier Determination
 # ============================================================
-def test_tier_determination():
+def test_tier_determination() -> bool:
     """Test that the routing tier is correctly determined."""
     tc = Timuclaude()
 
@@ -121,7 +121,7 @@ def test_tier_determination():
 # ============================================================
 # TEST 3: Model Pool Configuration
 # ============================================================
-def test_model_pool():
+def test_model_pool() -> bool:
     """Verify all models in the pool have correct configuration."""
     required_fields = ["ollama_tag", "role", "strengths", "cost_tier", "routing_weight"]
     required_models = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"]
@@ -184,7 +184,7 @@ def test_model_pool():
 # ============================================================
 # TEST 4: All Ollama Cloud Models Respond
 # ============================================================
-def test_all_models_respond():
+def test_all_models_respond() -> bool:
     """Test that every model in the pool can actually respond to a query."""
     tc = Timuclaude()
     loop = asyncio.new_event_loop()
@@ -235,7 +235,7 @@ def test_all_models_respond():
 # ============================================================
 # TEST 5: Error Handling — Model Failure
 # ============================================================
-def test_error_handling():
+def test_error_handling() -> bool:
     """Test that the orchestrator handles model failures gracefully."""
     tc = Timuclaude()
     loop = asyncio.new_event_loop()
@@ -335,7 +335,7 @@ def test_error_handling():
 # ============================================================
 # TEST 6: End-to-End Query
 # ============================================================
-def test_end_to_end():
+def test_end_to_end() -> bool:
     """Test a complete end-to-end query through the orchestrator."""
     tc = Timuclaude()
     loop = asyncio.new_event_loop()
@@ -385,7 +385,7 @@ def test_end_to_end():
 # ============================================================
 # TEST 7: Logger
 # ============================================================
-def test_logger():
+def test_logger() -> bool:
     """Test that the query logger works correctly."""
     logger = QueryLogger(log_dir="/tmp/timuclaude_test_logs")
 
@@ -421,7 +421,7 @@ def test_logger():
 # ============================================================
 # TEST 8: CLI Entry Point
 # ============================================================
-def test_cli():
+def test_cli() -> bool:
     """Test that the CLI entry point works."""
     import subprocess
 
@@ -455,14 +455,14 @@ def test_cli():
 # ============================================================
 # TEST 9: Concurrent Logger Writes
 # ============================================================
-def test_concurrent_logger():
+def test_concurrent_logger() -> bool:
     """Test that the logger handles concurrent writes safely."""
     import threading
 
     logger = QueryLogger(log_dir="/tmp/timuclaude_concurrent_test")
     errors = []
 
-    def write_log(i):
+    def write_log(i: int) -> None:
         try:
             logger.log(
                 user_query=f"Concurrent test {i}",
