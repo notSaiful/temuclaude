@@ -75,12 +75,27 @@ export async function POST(req: NextRequest) {
 async function runFullStack(query: string, messages: any[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]) {
   const fusionModels = [POOL.orchestrator, POOL.reasoning, POOL.vision];
 
+  // LAYER 0: WEB SEARCH (for knowledge/reasoning questions)
+  let searchContext = '';
+  if (taskType === 'knowledge' || taskType === 'reasoning' || taskType === 'creative') {
+    techniques.push('web-search');
+    const searchResults = await webSearch(query, 3);
+    if (searchResults) {
+      searchContext = `\n\nRelevant search results:\n${searchResults}`;
+    }
+  }
+
+  // Augment messages with search context if available
+  const augmentedMessages = searchContext
+    ? [...messages.slice(0, -1), { role: 'user', content: messages[messages.length - 1]?.content + searchContext }]
+    : messages;
+
   // LAYER 3: MoA 3-LAYER — Propose → Cross-Review → Aggregate
   techniques.push('moa-3-layer');
 
-  // Layer 1: 3 models propose independently
+  // Layer 1: 3 models propose independently (with search context)
   const proposeResults = await Promise.allSettled(
-    fusionModels.map(id => callModel(id, messages))
+    fusionModels.map(id => callModel(id, augmentedMessages))
   );
   const proposals: ModelResult[] = proposeResults.map((r, i) =>
     r.status === 'fulfilled' ? r.value : { name: fusionModels[i].split('/').pop()||'', content: '[failed]', latency: 0, ok: false }
@@ -345,4 +360,40 @@ function pickSpecialist(taskType: string): string {
   if (['math', 'coding', 'reasoning'].includes(taskType)) return POOL.reasoning;
   if (taskType === 'creative') return POOL.vision;
   return POOL.orchestrator;
+}
+
+// === WEB SEARCH (DuckDuckGo — free, unlimited, no API key) ===
+async function webSearch(query: string, numResults: number): Promise<string> {
+  try {
+    // DuckDuckGo HTML endpoint — no API key needed, no rate limits
+    const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query.substring(0, 200))}`;
+    const response = await fetch(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!response.ok) return '';
+
+    const html = await response.text();
+
+    // Extract result snippets from DuckDuckGo HTML
+    const results: string[] = [];
+    const resultRegex = /<a[^>]*class="result__a"[^>]*>([^<]*)<\/a>[\s\S]*?class="result__snippet"[^>]*>([\s\S]*?)<\/a>/g;
+    let match;
+    let count = 0;
+    while ((match = resultRegex.exec(html)) !== null && count < numResults) {
+      const title = match[1].replace(/<[^>]*>/g, '').trim();
+      const snippet = match[2].replace(/<[^>]*>/g, '').trim();
+      if (title && snippet) {
+        results.push(`[${count + 1}] ${title}\n${snippet}`);
+        count++;
+      }
+    }
+
+    return results.join('\n\n');
+  } catch {
+    return '';
+  }
 }
