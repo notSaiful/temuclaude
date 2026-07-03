@@ -27,6 +27,10 @@ if __package__:
     from .fusion import fuse, get_panel, get_aggregator
     from .consistency import self_consistency
     from .verifier import verify_with_code
+    from .self_qa import self_qa_gate
+    from .skills_loader import build_enhanced_system_prompt
+    from .adaptive import get_model_for_task
+    from .gepa import get_system_prompt
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -42,6 +46,10 @@ else:
     from src.fusion import fuse, get_panel, get_aggregator
     from src.consistency import self_consistency
     from src.verifier import verify_with_code
+    from src.self_qa import self_qa_gate
+    from src.skills_loader import build_enhanced_system_prompt
+    from src.adaptive import get_model_for_task
+    from src.gepa import get_system_prompt
 
 
 class Timuclaude:
@@ -212,26 +220,30 @@ class Timuclaude:
         tier = self.determine_tier(query, task_type)
 
         # Step 2: Route based on tier
+        # Phase 3: Use adaptive routing + skill-enhanced prompts + evolved prompts
         if tier == "trivial":
             # Use cheap model for trivial queries
             model = "gpt-oss-120b"
+            enhanced_prompt = build_enhanced_system_prompt(task_type, system_prompt)
             messages = [
-                {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant."},
+                {"role": "system", "content": enhanced_prompt},
                 {"role": "user", "content": query},
             ]
             answer = await self.call_model_with_fallback(model, messages, max_tokens=500)
             models_used = [model]
-            strategy = "direct_cheap"
+            strategy = "direct_cheap+skills"
         elif tier == "medium":
-            # Use best model for the task type
-            model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
+            # Use adaptive routing to pick best model (learned from logs)
+            model = get_model_for_task(task_type)
+            evolved_prompt = get_system_prompt(task_type, system_prompt)
+            enhanced_prompt = build_enhanced_system_prompt(task_type, evolved_prompt)
             messages = [
-                {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers."},
+                {"role": "system", "content": enhanced_prompt},
                 {"role": "user", "content": query},
             ]
             answer = await self.call_model_with_fallback(model, messages, max_tokens=8192)
             models_used = [model]
-            strategy = "direct_specialist"
+            strategy = "direct_specialist+skills+adaptive"
         else:
             # Hard tier: full orchestration
             # Strategy depends on task type:
@@ -280,6 +292,21 @@ class Timuclaude:
                     models_used.append(f"{consistency_model}+consistency")
                     strategy += "+consistency"
                 # If low agreement, keep the fusion answer
+
+            # Step 4: Self-QA gate (Phase 3)
+            # Score the answer, retry if below threshold
+            qa_result = await self_qa_gate(
+                query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
+                threshold=8, max_retries=2, max_tokens=2000
+            )
+            if qa_result["accepted"]:
+                answer = qa_result["final_answer"]
+                strategy += "+self_qa_passed"
+            elif qa_result["attempts"] > 1:
+                # Retried but still below threshold — use best attempt
+                answer = qa_result["final_answer"]
+                strategy += f"+self_qa_retry({qa_result['attempts']})"
+            # If only 1 attempt (first pass), keep the original answer
 
         latency_ms = int((time.time() - start_time) * 1000)
 
