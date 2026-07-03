@@ -22,7 +22,7 @@ from benchmarks.benchmark_runner import run_benchmark, save_results
 from src.orchestrator import Timuclaude
 
 
-async def main():
+async def main() -> None:
     parser = argparse.ArgumentParser(description="Run full Timuclaude benchmark")
     parser.add_argument("--dataset", required=True, help="Dataset name ('hle', 'mrcr', 'sample') or path to JSON")
     parser.add_argument("--sample", type=int, default=None, help="Limit to N questions")
@@ -50,7 +50,7 @@ async def main():
     tc = Timuclaude()
     
     # Define model function that uses full Timuclaude (complete method)
-    async def timuclaude_model_func(model_name, messages, max_tokens=8192, temperature=0.0, timeout=120):
+    async def timuclaude_model_func(model_name: str, messages: list, max_tokens: int = 8192, temperature: float = 0.0, timeout: int = 120) -> str:
         # Extract question from messages
         question = ""
         for msg in messages:
