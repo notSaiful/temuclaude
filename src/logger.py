@@ -5,6 +5,7 @@ import json
 import uuid
 import time
 import os
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -18,6 +19,7 @@ class QueryLogger:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
         self.log_file = self.log_dir / f"queries_{datetime.now().strftime('%Y%m%d')}.jsonl"
+        self._lock = threading.Lock()
 
     def log(
         self,
@@ -53,8 +55,9 @@ class QueryLogger:
             "success": success,
             "error": error,
         }
-        with open(self.log_file, "a") as f:
-            f.write(json.dumps(entry) + "\n")
+        with self._lock:
+            with open(self.log_file, "a") as f:
+                f.write(json.dumps(entry) + "\n")
         return entry["query_id"]
 
     def get_recent(self, n: int = 100):

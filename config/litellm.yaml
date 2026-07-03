@@ -1,5 +1,5 @@
-# Timuclaude — LiteLLM Proxy Configuration (minimal, no database)
-# Used for Phase 1 testing. Database (Postgres) added in Phase 3.
+# Timuclaude — LiteLLM Proxy Configuration
+# Phase 1: no database (cost tracking + adaptive router added in Phase 3 with Postgres)
 
 model_list:
   - model_name: timuclaude
