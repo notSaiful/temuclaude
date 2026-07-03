@@ -4,7 +4,7 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 const faqs = [
   { q: 'How is Timuclaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. Timuclaude orchestrates 5 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better, at 28x lower cost.' },
   { q: 'Is it really free?', a: 'Yes. Try it free in the playground. Self-host with our open-source code for unlimited free queries.' },
-  { q: 'Which models does Timuclaude use?', a: 'GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, MiniMax M3, Nemotron 3 Ultra, and GPT-OSS 120B. We route to the best model automatically — you never have to choose.' },
+  { q: 'Which models does Timuclaude use?', a: 'GLM-5.2, DeepSeek V4 Pro, DeepSeek V4 Flash, MiniMax M3, and Nemotron 3 Ultra. We route to the best model automatically — you never have to choose.' },
   { q: 'Can I self-host?', a: 'Yes. Clone the repo, install dependencies, and run. Full instructions in the docs. MIT licensed.' },
   { q: 'How does the orchestration work?', a: 'Timuclaude classifies your query, routes it to the best model(s), fuses multiple answers, verifies math with code execution, and quality-checks with a self-QA gate. You see the whole process in the playground.' },
   { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored.' },

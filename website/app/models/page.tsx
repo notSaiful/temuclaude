@@ -2,12 +2,11 @@ import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
 const models = [
-  { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', capabilities: ['Tools', 'Thinking', '1M Context'], desc: 'The primary orchestrator. Classifies queries, routes to specialists, and aggregates fusion responses.' },
-  { name: 'DeepSeek V4 Pro', role: 'Reasoning', context: '1.6T / 49B active', capabilities: ['Coding', 'Math', 'Reasoning'], desc: 'The reasoning powerhouse. Best for math, coding, and complex logical problems.' },
-  { name: 'Kimi K2.6', role: 'Long Context', context: '262K tokens', capabilities: ['Vision', 'Tools', 'Thinking'], desc: 'Long context specialist. Handles documents, multi-turn conversations, and visual inputs.' },
-  { name: 'MiniMax M3', role: 'Generation', context: '1M tokens', capabilities: ['Vision', 'Creative', 'Tools'], desc: 'The creative generator. Best for writing, content creation, and imaginative tasks.' },
-  { name: 'Nemotron 3 Ultra', role: 'Verifier', context: '1M tokens', capabilities: ['Evaluation', 'Agentic'], desc: 'The quality gate. Scores answers 0-10 in the self-QA step.' },
-  { name: 'GPT-OSS 120B', role: 'Cheap Route', context: '131K tokens', capabilities: ['Fast', 'Low cost'], desc: 'The budget model. Used for trivial queries. Fastest and cheapest in the pool.' },
+  { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', capabilities: ['Tools', 'Thinking', '1M Context', 'MIT License'], desc: 'The primary orchestrator. Classifies queries, routes to specialists, and aggregates fusion responses. Intelligence 51 — the smartest open-weight model.' },
+  { name: 'DeepSeek V4 Pro', role: 'Reasoning', context: '1M tokens', capabilities: ['Coding', 'Math', 'Reasoning', '3 Thinking Modes'], desc: 'The reasoning powerhouse. Best for math, coding, and complex logical problems. Cheapest smart model at $0.435/$0.87 per M tokens.' },
+  { name: 'DeepSeek V4 Flash', role: 'Fast Router', context: '1M tokens', capabilities: ['Fast', 'Low Cost', 'Hybrid Attention'], desc: 'The fast router. 284B/13B MoE — handles trivial queries at 77x lower cost than Fable 5. 1M context with hybrid attention.' },
+  { name: 'MiniMax M3', role: 'Vision + Generation', context: '1M tokens', capabilities: ['Vision', 'Creative', 'Tools', 'Best Hallucination Resist'], desc: 'The creative generator and vision specialist. Best GPQA (93%), best instruction following (83%), best hallucination resistance (84%).' },
+  { name: 'Nemotron 3 Ultra', role: 'QA Gate (Free)', context: '1M tokens', capabilities: ['Evaluation', 'Agentic', 'FREE'], desc: 'The quality gate. Scores answers on 4 rubrics (USVA). 550B/55B MoE. Completely free — QA costs nothing.' },
 ];
 
 export default function ModelsPage() {

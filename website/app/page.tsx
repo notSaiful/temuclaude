@@ -109,9 +109,9 @@ export default function HomePage() {
               {[
                 { name: 'GLM-5.2', role: 'Orchestrator', tone: '#E8D5C4' },
                 { name: 'DeepSeek V4 Pro', role: 'Reasoning', tone: '#D4A574' },
-                { name: 'Kimi K2.6', role: 'Long Context', tone: '#C97B50' },
-                { name: 'MiniMax M3', role: 'Generation', tone: '#D4A574' },
-                { name: 'Nemotron 3 Ultra', role: 'Verifier', tone: '#E8D5C4' },
+                { name: 'DeepSeek V4 Flash', role: 'Fast Router', tone: '#C97B50' },
+                { name: 'MiniMax M3', role: 'Vision', tone: '#D4A574' },
+                { name: 'Nemotron 3 Ultra', role: 'QA Gate (Free)', tone: '#E8D5C4' },
               ].map((model, i) => (
                 <StaggerItem key={i}>
                   <div className="card text-center" style={{ padding: '20px 12px' }}>
