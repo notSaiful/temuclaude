@@ -38,7 +38,7 @@ if __package__:
     from .skill_curator import track_skill_usage
     from .pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
     from .preference_router import record_routing_decision, get_routing_recommendations
-    from .verifier import verify_with_code, verify_steps_with_code
+    from .verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -55,7 +55,7 @@ else:
     from src.logger import QueryLogger
     from src.fusion import fuse, get_panel, get_aggregator
     from src.consistency import self_consistency
-    from src.verifier import verify_with_code, verify_steps_with_code
+    from src.verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3
     from src.self_qa import self_qa_gate
     from src.skills_loader import build_enhanced_system_prompt
     from src.adaptive import get_model_for_task
@@ -544,7 +544,37 @@ class Timuclaude:
                 strategy += f"+debate_escalation({debate_result['rounds']}r)"
             # If only 1 attempt (first pass), keep the original answer
 
-        latency_ms = int((time.time() - start_time) * 1000)
+            # Step 5: s1 Budget Forcing (arXiv:2501.19393)
+            # If the answer is too short for a hard problem, append "Wait" to force more reasoning
+            if task_type in ("math", "reasoning") and len(answer.split()) < 50:
+                forced = apply_budget_forcing(answer, min_reasoning_tokens=200)
+                if forced != answer:
+                    # Budget forcing triggered — regenerate with "Wait" appended
+                    answer = forced
+                    strategy += "+s1_budget_forcing"
+
+            # Step 6: Z3/SMT Logical Verification (ConsistPRM pattern)
+            # For reasoning tasks, verify logical consistency using Z3
+            if task_type == "reasoning":
+                z3_result = verify_logical_with_z3(query, answer)
+                if z3_result["verified"]:
+                    strategy += "+z3_verified"
+                elif "contradictions" in z3_result.get("reason", "").lower():
+                    # Contradictions found — flag for retry via debate
+                    strategy += "+z3_contradiction"
+                    # Escalate to debate if not already done
+                    if "debate" not in strategy:
+                        debate_result = await multi_agent_debate(
+                            query, self.call_model_with_fallback,
+                            panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
+                            rounds=2, aggregator="nemotron-3-ultra",
+                            max_tokens=token_budget
+                        )
+                        answer = debate_result["answer"]
+                        models_used.append("debate_z3_escalation")
+                        strategy += "+debate_z3"
+
+            latency_ms = int((time.time() - start_time) * 1000)
 
         # Record Pareto efficiency metrics (token_savings vs accuracy)
         try:

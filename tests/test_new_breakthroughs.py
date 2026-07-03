@@ -7,7 +7,10 @@ import asyncio
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from src.verifier import extract_reasoning_steps, verify_steps_with_code, verify_with_code, extract_code
+from src.verifier import (
+    extract_reasoning_steps, verify_steps_with_code, verify_with_code, extract_code,
+    apply_budget_forcing, verify_logical_with_z3
+)
 from src.pareto_tracker import calculate_pareto, record_query, get_adjusted_budgets, load_metrics, METRICS_FILE
 from src.preference_router import record_routing_decision, get_routing_recommendations, get_preference_dataset, load_preferences, PREFS_FILE
 
@@ -140,6 +143,75 @@ def test_preference_router() -> bool:
 
 
 # ============================================================
+# TEST 4: s1 Budget Forcing
+# ============================================================
+def test_budget_forcing() -> bool:
+    """Test that s1 budget forcing appends 'Wait' to short responses."""
+    print("\n=== s1 BUDGET FORCING TESTS ===")
+    
+    # Short response should get "Wait" appended
+    short_response = "The answer is 42."
+    forced = apply_budget_forcing(short_response, min_reasoning_tokens=200)
+    assert "Wait" in forced, f"Short response should get 'Wait' appended: {forced}"
+    assert forced != short_response, "Forced response should differ from original"
+    print(f"  OK: Short response gets 'Wait' appended")
+    
+    # Long response should NOT get "Wait" appended
+    long_response = "Let me think step by step. " * 50 + "Answer: 42."
+    forced2 = apply_budget_forcing(long_response, min_reasoning_tokens=200)
+    assert forced2 == long_response, "Long response should NOT get 'Wait' appended"
+    print(f"  OK: Long response is NOT modified")
+    
+    # Empty response edge case
+    forced3 = apply_budget_forcing("", min_reasoning_tokens=100)
+    assert "Wait" in forced3, "Empty response should get 'Wait' appended"
+    print(f"  OK: Empty response gets 'Wait' appended")
+    
+    print("  3/3 passed")
+    return True
+
+
+# ============================================================
+# TEST 5: Z3/SMT Logical Verification
+# ============================================================
+def test_z3_verification() -> bool:
+    """Test Z3/SMT logical verification."""
+    print("\n=== Z3/SMT LOGICAL VERIFICATION TESTS ===")
+    
+    # Test with logical patterns
+    response_with_logic = "If A then B. If B then C. A implies D."
+    result = verify_logical_with_z3("test question", response_with_logic)
+    
+    # Z3 may or may not be installed — test both paths
+    if "Z3 not installed" in result.get("reason", ""):
+        print(f"  OK: Z3 not installed — graceful fallback (pip install z3-solver to enable)")
+        print(f"  1/1 passed (with note)")
+        return True
+    
+    # Z3 IS installed — verify it works
+    assert "verified" in result, "Result should have 'verified' key"
+    assert result["verified"] == True, f"Consistent logic should be verified: {result}"
+    print(f"  OK: Consistent logic verified by Z3")
+    
+    # Test with contradictory logic
+    # "if A then B" + "if A then not B" → unsat
+    contradictory = "If A then B. If A then not B."
+    result2 = verify_logical_with_z3("test", contradictory)
+    assert result2["verified"] == False, "Contradictory logic should fail verification"
+    print(f"  OK: Contradictory logic rejected by Z3")
+    
+    # Test with no logical patterns
+    no_logic = "The weather is nice today."
+    result3 = verify_logical_with_z3("test", no_logic)
+    assert result3["verified"] == False, "No logic patterns should return not verified"
+    assert "No logical patterns" in result3["reason"], f"Should mention no patterns: {result3['reason']}"
+    print(f"  OK: No logical patterns — Z3 returns gracefully")
+    
+    print("  3/3 passed")
+    return True
+
+
+# ============================================================
 # RUN ALL TESTS
 # ============================================================
 def main():
@@ -152,6 +224,8 @@ def main():
         ("Step-Level Code Verification", test_step_extraction),
         ("Pareto Efficiency Tracking", test_pareto_tracking),
         ("Preference-Data Router", test_preference_router),
+        ("s1 Budget Forcing", test_budget_forcing),
+        ("Z3/SMT Logical Verification", test_z3_verification),
     ]
     
     passed = 0
