@@ -123,6 +123,14 @@ timuclaude/
 ├── src/
 │   ├── orchestrator.py    # Main orchestration: classify → route → respond
 │   ├── models.py           # Model pool config + task routing map
+│   ├── fusion.py           # Multi-model fusion (parallel + aggregator)
+│   ├── consistency.py      # Self-consistency voting (N samples, majority vote)
+│   ├── verifier.py          # Code execution verification (sandboxed)
+│   ├── self_qa.py          # Self-QA gate (score 0-10, retry if < 8)
+│   ├── skills_loader.py     # Skill auto-loading from Hermes skills
+│   ├── analyzer.py          # Query log analysis (success patterns)
+│   ├── adaptive.py          # Adaptive routing (learn from performance)
+│   ├── gepa.py              # GEPA prompt evolution (simplified)
 │   └── logger.py           # Query logging for self-improvement
 ├── config/
 │   └── litellm.yaml        # LiteLLM proxy config (all models)
@@ -153,6 +161,14 @@ timuclaude/
 - Dynamic aggregator selection: math→DeepSeek, knowledge→GLM-5.2, creative→MiniMax
 - Strategy matrix: hard tier uses Fusion + code verify + self-consistency per task type
 - 9 test suites pass (26 non-live + 3 live tests)
+
+**Phase 3 (Self-Improvement):** Complete
+- Self-QA gate: verifier model scores answer 0-10, retries if < 8 (max 2 retries)
+- Skill auto-loading: injects Hermes skills (TDD, debugging, humanizer) per task type
+- Log analyzer: analyzes past queries for success patterns per task/model/strategy
+- Adaptive routing: adjusts model selection based on performance data
+- GEPA prompt evolution: generates improved prompts for weak task types (manual trigger)
+- 8 test suites pass (14 non-live + 2 live tests)
 
 ## License
 
