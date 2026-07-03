@@ -12,6 +12,7 @@ import ssl
 import certifi
 import time
 from datetime import datetime, timezone
+from dedup import filter_new, get_seen_count
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -128,8 +129,19 @@ def main():
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     
     papers = search_hf_papers()
-    time.sleep(2)  # Rate limit between API calls
+    time.sleep(2)
     models = search_hf_models()
+    
+    # Cross-run dedup
+    papers_before = len(papers)
+    papers = filter_new(papers, "hf_papers", "paper_id")
+    papers_after = len(papers)
+    papers_seen = get_seen_count("hf_papers")
+    
+    models_before = len(models)
+    models = filter_new(models, "hf_models", "model_id")
+    models_after = len(models)
+    models_seen = get_seen_count("hf_models")
     
     out_file = os.path.join(OUT_DIR, f"huggingface_{ts}.json")
     with open(out_file, "w") as f:
@@ -138,11 +150,17 @@ def main():
             "timestamp": ts,
             "total_papers": len(papers),
             "total_models": len(models),
+            "papers_fetched": papers_before,
+            "papers_new": papers_after,
+            "papers_already_seen": papers_seen,
+            "models_fetched": models_before,
+            "models_new": models_after,
+            "models_already_seen": models_seen,
             "papers": papers,
             "models": models,
         }, f, indent=2)
     
-    print(f"Scout-HuggingFace: {len(papers)} papers, {len(models)} models -> {out_file}")
+    print(f"Scout-HuggingFace: {papers_after} new papers (seen {papers_seen}), {models_after} new models (seen {models_seen}) -> {out_file}")
 
 if __name__ == "__main__":
     main()

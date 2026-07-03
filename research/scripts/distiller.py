@@ -8,6 +8,7 @@ import os
 import glob
 from datetime import datetime, timezone
 from collections import defaultdict
+from dedup import filter_new
 
 RAW_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
 FINDINGS_DIR = os.path.join(os.path.dirname(__file__), "..", "findings")
@@ -281,8 +282,17 @@ def main():
         elif scout == "hermes-improvement":
             all_findings.extend(process_hermes_improvement(raw))
     
-    # Deduplicate
+    # In-run deduplicate
     all_findings = deduplicate(all_findings)
+    
+    # Add composite type:id for cross-run dedup
+    for f in all_findings:
+        f["dedup_key"] = f"{f['type']}:{f['id']}"
+    
+    # Cross-run dedup: only keep findings not yet distilled
+    before_distill = len(all_findings)
+    all_findings = filter_new(all_findings, "distilled_findings", "dedup_key")
+    after_distill = len(all_findings)
     
     # Sort by relevance score (descending)
     all_findings.sort(key=lambda x: x.get("relevance_score", 0), reverse=True)
@@ -299,22 +309,33 @@ def main():
             "distilled_at": ts,
             "total_raw_files": len(raw_files),
             "total_findings": len(all_findings),
+            "new_findings": after_distill,
+            "already_distilled": before_distill - after_distill,
             "by_type": {k: len(v) for k, v in by_type.items()},
             "top_findings": all_findings[:50],  # Top 50
             "all_findings": all_findings,
         }, f, indent=2)
     
-    # Clean up raw files older than 7 days (keep web-daily for auto-integrator)
+    # Clean up raw files older than 7 days (keep web-daily and frontier-docs for auto-integrator)
     import time
     now = time.time()
     for fpath in glob.glob(os.path.join(RAW_DIR, "*.json")):
-        # Skip web-daily files — auto-integrator needs them
-        if "web-daily" in os.path.basename(fpath) or "web_daily" in os.path.basename(fpath):
+        basename = os.path.basename(fpath)
+        # Skip LLM-generated findings — auto-integrator needs them
+        if "web-daily" in basename or "web_daily" in basename:
             continue
+        if "frontier" in basename:
+            continue
+        if "hermes" in basename:
+            continue
+        if "meta-skill" in basename:
+            continue
+        if basename.startswith("_"):
+            continue  # Don't delete _seen_state.json
         if os.path.getmtime(fpath) < now - 7 * 86400:
             os.remove(fpath)
     
-    print(f"Distiller: {len(all_findings)} findings from {len(raw_files)} raw files -> {out_file}")
+    print(f"Distiller: {after_distill} new findings ({before_distill - after_distill} already distilled) from {len(raw_files)} raw files -> {out_file}")
     if all_findings:
         top = all_findings[0]
         print(f"  Top finding (score {top['relevance_score']}): {top.get('title', top.get('name', ''))}")

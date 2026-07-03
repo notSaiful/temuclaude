@@ -11,6 +11,7 @@ import json
 import os
 import glob
 from datetime import datetime, timezone
+from dedup import filter_new, get_seen_count
 
 TIMUCLAUDE_DIR = os.path.expanduser("~/timuclaude")
 RESEARCH_DIR = os.path.join(TIMUCLAUDE_DIR, "research")
@@ -81,7 +82,14 @@ if __name__ == "__main__":
     source = get_current_source()
     
     print(f"=== AUTO-INTEGRATOR CONTEXT ===")
-    print(f"Findings: {len(findings)}")
+    
+    # Filter to only NEW findings not yet reviewed
+    findings_before = len(findings)
+    findings = filter_new(findings, "integrator_reviewed", "id")
+    findings_after = len(findings)
+    already_reviewed = get_seen_count("integrator_reviewed")
+    
+    print(f"Findings: {findings_after} new (already reviewed {already_reviewed}, fetched {findings_before})")
     print(f"Deep reports: {len(reports)}")
     print(f"Source files: {len(source)}")
     print(f"Source files: {list(source.keys())}")
