@@ -11,6 +11,7 @@ import os
 import ssl
 import certifi
 from datetime import datetime, timezone
+from dedup import filter_new, get_seen_count
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -89,14 +90,20 @@ def main():
     import time
     
     all_repos = []
-    seen_ids = set()
+    seen_ids = set()  # In-run dedup
     for q in QUERIES:
         repos = search_github(q, per_page=8)
         for r in repos:
             if r["repo_id"] not in seen_ids:
                 all_repos.append(r)
                 seen_ids.add(r["repo_id"])
-        time.sleep(3)  # GitHub API rate limit safety
+        time.sleep(3)
+    
+    # Cross-run dedup: only keep repos we haven't seen before
+    before = len(all_repos)
+    all_repos = filter_new(all_repos, "github", "repo_id")
+    after = len(all_repos)
+    already_seen = get_seen_count("github")
     
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     out_file = os.path.join(OUT_DIR, f"github_{ts}.json")
@@ -106,10 +113,13 @@ def main():
             "timestamp": ts,
             "queries": QUERIES,
             "total_found": len(all_repos),
+            "total_fetched": before,
+            "already_seen": already_seen,
+            "new_findings": after,
             "repos": all_repos,
         }, f, indent=2)
     
-    print(f"Scout-GitHub: Found {len(all_repos)} repos -> {out_file}")
+    print(f"Scout-GitHub: Fetched {before}, {after} new (already seen {already_seen}) -> {out_file}")
 
 if __name__ == "__main__":
     main()

@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import os
 import ssl
 import certifi
+from dedup import filter_new, get_seen_count
 
 _ssl_ctx = ssl.create_default_context(cafile=certifi.where())
 
@@ -98,14 +99,20 @@ def main():
     import time
     
     all_papers = []
-    seen_ids = set()
+    seen_ids = set()  # In-run dedup
     for q in QUERIES:
         papers = search_arxiv(q, max_results=8)
         for p in papers:
             if p["arxiv_id"] not in seen_ids:
                 all_papers.append(p)
                 seen_ids.add(p["arxiv_id"])
-        time.sleep(15)  # Rate limit: arXiv requires 3+ second gaps, 15s to be safe
+        time.sleep(15)
+    
+    # Cross-run dedup: only keep papers we haven't seen before
+    before = len(all_papers)
+    all_papers = filter_new(all_papers, "arxiv", "arxiv_id")
+    after = len(all_papers)
+    already_seen = get_seen_count("arxiv")
     
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     out_file = os.path.join(OUT_DIR, f"arxiv_{ts}.json")
@@ -115,10 +122,13 @@ def main():
             "timestamp": ts,
             "queries": QUERIES,
             "total_found": len(all_papers),
+            "total_fetched": before,
+            "already_seen": already_seen,
+            "new_findings": after,
             "papers": all_papers,
         }, f, indent=2)
     
-    print(f"Scout-arXiv: Found {len(all_papers)} papers → {out_file}")
+    print(f"Scout-arXiv: Fetched {before}, {after} new (already seen {already_seen}) → {out_file}")
 
 if __name__ == "__main__":
     main()
