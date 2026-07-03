@@ -166,6 +166,64 @@ def process_huggingface(raw):
         })
     return results
 
+def process_hermes_improvement(raw):
+    """Process Hermes self-improvement + skill discovery findings."""
+    results = []
+    findings = raw.get("findings", [])
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        text = f.get("title", "") + " " + f.get("description", "") + " " + f.get("implementation_notes", "") + " " + f.get("skill_name", "")
+        score, matched = score_relevance(text)
+        # Lower threshold — Hermes improvements are always relevant
+        if score < 5:
+            # Still include if it's a skill or hermes feature
+            if f.get("category") in ("skill", "hermes-feature", "mcp", "best-practice"):
+                score = max(score, 8)
+                matched.append("hermes-improvement")
+            else:
+                continue
+        results.append({
+            "type": "hermes_improvement",
+            "id": f.get("title", f.get("skill_name", "")),
+            "category": f.get("category", ""),
+            "title": f.get("title", ""),
+            "description": f.get("description", ""),
+            "applicable_to": f.get("applicable_to", ""),
+            "implementation_notes": f.get("implementation_notes", ""),
+            "skill_name": f.get("skill_name", ""),
+            "url": f.get("url", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    return results
+
+def process_frontier_docs(raw):
+    """Process frontier model docs research findings."""
+    results = []
+    findings = raw.get("findings", [])
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        text = f.get("model", "") + " " + f.get("technique", "") + " " + f.get("description", "") + " " + f.get("integration_notes", "")
+        score, matched = score_relevance(text)
+        if score < 8:
+            continue
+        results.append({
+            "type": "frontier_doc",
+            "id": f.get("source_url", f.get("model", "")),
+            "model": f.get("model", ""),
+            "technique": f.get("technique", ""),
+            "description": f.get("description", ""),
+            "benchmark": f.get("benchmark", ""),
+            "integrable": f.get("integrable", False),
+            "integration_notes": f.get("integration_notes", ""),
+            "source_url": f.get("source_url", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    return results
+
 def process_web_daily(raw):
     """Process web-daily scout findings."""
     results = []
@@ -218,6 +276,10 @@ def main():
             all_findings.extend(process_huggingface(raw))
         elif scout == "web-daily":
             all_findings.extend(process_web_daily(raw))
+        elif scout == "frontier-docs":
+            all_findings.extend(process_frontier_docs(raw))
+        elif scout == "hermes-improvement":
+            all_findings.extend(process_hermes_improvement(raw))
     
     # Deduplicate
     all_findings = deduplicate(all_findings)
