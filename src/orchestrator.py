@@ -36,6 +36,9 @@ if __package__:
     from .tot import tree_of_thoughts
     from .debate import multi_agent_debate
     from .skill_curator import track_skill_usage
+    from .pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
+    from .preference_router import record_routing_decision, get_routing_recommendations
+    from .verifier import verify_with_code, verify_steps_with_code
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -52,7 +55,7 @@ else:
     from src.logger import QueryLogger
     from src.fusion import fuse, get_panel, get_aggregator
     from src.consistency import self_consistency
-    from src.verifier import verify_with_code
+    from src.verifier import verify_with_code, verify_steps_with_code
     from src.self_qa import self_qa_gate
     from src.skills_loader import build_enhanced_system_prompt
     from src.adaptive import get_model_for_task
@@ -60,6 +63,8 @@ else:
     from src.tot import tree_of_thoughts
     from src.debate import multi_agent_debate
     from src.skill_curator import track_skill_usage
+    from src.pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
+    from src.preference_router import record_routing_decision, get_routing_recommendations
 
 
 class Timuclaude:
@@ -475,15 +480,27 @@ class Timuclaude:
             # Step 2: Code verification (for math/coding)
             if use_code_verify:
                 code_model = TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
-                code_result = await verify_with_code(
-                    query, code_model, self.call_model_with_fallback, max_tokens=4096
+                # Step-Level Code Verification (rStar-Math pattern)
+                # First verify the fusion answer's reasoning steps, then final answer
+                step_result = await verify_steps_with_code(
+                    query, answer, code_model, self.call_model_with_fallback,
+                    max_tokens=2048, execution_timeout=10
                 )
-                if code_result["verified"] and code_result["answer"]:
-                    # Code execution succeeded — use verified answer
-                    answer = code_result["answer"]
-                    models_used.append(f"{code_model}+code")
-                    strategy += "+code_verify"
-                # If code failed, keep the fusion answer
+                if step_result["verified"]:
+                    # Step-level verification passed — high confidence
+                    answer = step_result["answer"]
+                    models_used.append(f"{code_model}+step_verify({step_result['steps_verified']}/{step_result['steps_total']})")
+                    strategy += f"+step_verify({step_result['steps_verified']}/{step_result['steps_total']})"
+                else:
+                    # Step verification failed — try final-answer verification as fallback
+                    code_result = await verify_with_code(
+                        query, code_model, self.call_model_with_fallback, max_tokens=4096
+                    )
+                    if code_result["verified"] and code_result["answer"]:
+                        answer = code_result["answer"]
+                        models_used.append(f"{code_model}+code")
+                        strategy += "+code_verify"
+                    # If both failed, keep the fusion answer
 
             # Step 3: PRM-weighted self-consistency (for math/reasoning)
             if use_self_consistency:
@@ -528,6 +545,24 @@ class Timuclaude:
             # If only 1 attempt (first pass), keep the original answer
 
         latency_ms = int((time.time() - start_time) * 1000)
+
+        # Record Pareto efficiency metrics (token_savings vs accuracy)
+        try:
+            estimated_tokens = len(answer) // 4 if answer else 0  # Rough token estimate
+            record_pareto(tier, estimated_tokens, correct=None, task_type=task_type, strategy=strategy)
+        except Exception:
+            pass  # Don't let metrics break the response
+
+        # Record routing decision for preference-data collection (RouteLLM pattern)
+        try:
+            record_routing_decision(
+                query=query, task_type=task_type, tier=tier,
+                model=models_used[0] if models_used else "unknown",
+                models_used=models_used, strategy=strategy,
+                latency_ms=latency_ms, success=not answer.startswith("[ERROR"),
+            )
+        except Exception:
+            pass  # Don't let metrics break the response
 
         # Log the query
         self.logger.log(
