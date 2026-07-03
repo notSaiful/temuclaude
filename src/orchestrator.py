@@ -33,6 +33,9 @@ if __package__:
     from .skills_loader import build_enhanced_system_prompt
     from .adaptive import get_model_for_task
     from .gepa import get_system_prompt
+    from .tot import tree_of_thoughts
+    from .debate import multi_agent_debate
+    from .skill_curator import track_skill_usage
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -54,6 +57,9 @@ else:
     from src.skills_loader import build_enhanced_system_prompt
     from src.adaptive import get_model_for_task
     from src.gepa import get_system_prompt
+    from src.tot import tree_of_thoughts
+    from src.debate import multi_agent_debate
+    from src.skill_curator import track_skill_usage
 
 
 class Timuclaude:
@@ -171,9 +177,9 @@ class Timuclaude:
         - Hard: 8192 tokens (full reasoning)
         """
         budgets = {
-            "trivial": 500,    # Was 500, keep for compatibility
-            "medium": 2000,    # Was 8192, reduce for cost savings
-            "hard": 8192,      # Full tokens for complex problems
+            "trivial": 500,    # Quick answer, no reasoning needed
+            "medium": 4096,    # Standard response with some reasoning
+            "hard": 8192,      # Full reasoning for complex problems
         }
         return budgets.get(tier, 8192)
 
@@ -188,19 +194,29 @@ class Timuclaude:
         from .consistency import get_adaptive_n_samples
         return get_adaptive_n_samples(tier)
 
-    def should_use_self_moA(self, task_type: str) -> bool:
+    def should_use_self_moA(self, task_type: str, tier: str = "medium") -> bool:
         """Decide whether to use Self-MoA instead of heterogeneous panel.
         
         Self-MoA research (arXiv:2502.00674): Sampling one top model N times
         can outperform mixing different models by +6.6%. Use when one model
-        clearly dominates the task type.
+        clearly dominates the task type AND cost matters (trivial/medium tier).
         
-        Decision: Use Self-MoA for trivial and medium tiers where cost matters.
-        Use heterogeneous panel for hard tier where diversity helps.
+        For hard tier, heterogeneous panel is better — diversity helps on
+        complex problems. For trivial/medium, Self-MoA with the best model
+        is cheaper and potentially better.
+        
+        Args:
+            task_type: The classified task type
+            tier: The difficulty tier (trivial, medium, hard)
+        
+        Returns:
+            True if Self-MoA should be used, False for heterogeneous panel
         """
-        # For hard problems, heterogeneous panel is better (diversity helps)
-        # For easy/medium, Self-MoA with the best model is cheaper and better
-        return False  # Default: use heterogeneous panel. Can be made adaptive.
+        # Self-MoA for trivial and medium tiers (cost-sensitive)
+        # Heterogeneous panel for hard tier (diversity helps)
+        if tier in ("trivial", "medium"):
+            return True
+        return False
 
     async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192, timeout: int = 120) -> str:
         """Call a single model with timeout, retry, and cross-backend fallback.
@@ -393,6 +409,7 @@ class Timuclaude:
             model = "gpt-oss-120b"
             token_budget = self.get_adaptive_token_budget(tier)
             enhanced_prompt = build_enhanced_system_prompt(task_type, system_prompt)
+            track_skill_usage(task_type)  # Track for curator
             messages = [
                 {"role": "system", "content": enhanced_prompt},
                 {"role": "user", "content": query},
@@ -406,13 +423,32 @@ class Timuclaude:
             token_budget = self.get_adaptive_token_budget(tier)
             evolved_prompt = get_system_prompt(task_type, system_prompt)
             enhanced_prompt = build_enhanced_system_prompt(task_type, evolved_prompt)
+            track_skill_usage(task_type)  # Track for curator
             messages = [
                 {"role": "system", "content": enhanced_prompt},
                 {"role": "user", "content": query},
             ]
-            answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
+            
+            # For reasoning/math at medium tier, use Tree of Thoughts (arXiv:2305.10601)
+            # ToT gives +70pp on search-heavy tasks. Only for reasoning/math.
+            if task_type in ("reasoning", "math") and len(query.split()) > 15:
+                tot_result = await tree_of_thoughts(
+                    query, model, self.call_model_with_fallback,
+                    max_depth=3, branching=3, max_nodes=10,
+                    max_tokens=token_budget
+                )
+                if tot_result["found"]:
+                    answer = tot_result["answer"]
+                    strategy = f"tree_of_thoughts(d={3},nodes={tot_result['nodes_explored']})"
+                else:
+                    # ToT didn't find a final answer — fall back to direct
+                    answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
+                    strategy = "direct_specialist+tot_fallback"
+            else:
+                answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
+                strategy = "direct_specialist+skills+adaptive+adaptive_tokens"
+            
             models_used = [model]
-            strategy = "direct_specialist+skills+adaptive+adaptive_tokens"
         else:
             # Hard tier: full orchestration with 3-layer MoA + adaptive compute
             # Strategy depends on task type:
@@ -477,9 +513,18 @@ class Timuclaude:
                 answer = qa_result["final_answer"]
                 strategy += "+usva_qa_passed"
             elif qa_result["attempts"] > 1:
-                # Retried with reflexion but still below threshold — use best attempt
-                answer = qa_result["final_answer"]
-                strategy += f"+usva_reflexion_retry({qa_result['attempts']})"
+                # Retried with reflexion but still below threshold
+                # ESCALATION: Multi-agent debate (arXiv:2511.11306 — selective debate)
+                # Only trigger when self-QA fails — debate is expensive
+                debate_result = await multi_agent_debate(
+                    query, self.call_model_with_fallback,
+                    panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
+                    rounds=2, aggregator="nemotron-3-ultra",
+                    max_tokens=token_budget
+                )
+                answer = debate_result["answer"]
+                models_used.append("debate_panel+nemotron")
+                strategy += f"+debate_escalation({debate_result['rounds']}r)"
             # If only 1 attempt (first pass), keep the original answer
 
         latency_ms = int((time.time() - start_time) * 1000)
