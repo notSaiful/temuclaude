@@ -39,14 +39,15 @@ module.exports = {
         mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
       },
       borderRadius: {
-        sm: '6px',
-        md: '12px',
-        lg: '20px',
+        sm: '8px',
+        md: '16px',
+        lg: '24px',
       },
       boxShadow: {
-        sm: '0 1px 2px rgba(26, 24, 22, 0.04)',
-        md: '0 2px 8px rgba(26, 24, 22, 0.06)',
-        lg: '0 8px 24px rgba(26, 24, 22, 0.08)',
+        sm: '0 1px 3px rgba(26, 24, 22, 0.04)',
+        md: '0 4px 16px rgba(26, 24, 22, 0.08)',
+        lg: '0 8px 32px rgba(26, 24, 22, 0.10)',
+        glow: '0 0 24px rgba(217, 119, 87, 0.15)',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.25, 1, 0.5, 1)',
