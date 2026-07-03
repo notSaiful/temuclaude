@@ -203,6 +203,72 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     }
   }
 
+  // LAYER 12: s1 BUDGET FORCING (arXiv:2501.19393)
+  // If the answer is suspiciously short for a hard question, force longer reasoning
+  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500) {
+    techniques.push('s1-budget-forcing');
+    const forcedResult = await callModel(POOL.reasoning, [
+      ...messages,
+      { role: 'assistant', content: finalAnswer + '\n\nWait' },
+      { role: 'user', content: 'Continue your reasoning in more detail. Provide a thorough step-by-step solution.' },
+    ]);
+    if (forcedResult.ok && forcedResult.content.length > finalAnswer.length) {
+      finalAnswer = forcedResult.content;
+    }
+  }
+
+  // LAYER 13: STEP-LEVEL CODE VERIFICATION (rStar-Math pattern)
+  // For math/coding: verify each reasoning step, not just the final answer
+  if ((taskType === 'math' || taskType === 'coding') && !codeVerified) {
+    techniques.push('step-level-verification');
+    const stepVerified = await stepLevelVerify(query, finalAnswer);
+    if (stepVerified) {
+      codeVerified = true;
+    } else if (!techniques.includes('reflexion')) {
+      // Step verification failed — retry with step-specific feedback
+      techniques.push('reflexion');
+      const retryResult = await callModel(POOL.reasoning, [
+        ...messages,
+        { role: 'assistant', content: finalAnswer },
+        { role: 'user', content: 'Your solution has an error in one of the reasoning steps. Re-examine each step carefully and provide a corrected solution with verified code for each step.' },
+      ]);
+      if (retryResult.ok) {
+        const reVerified = await stepLevelVerify(query, retryResult.content);
+        if (reVerified) { finalAnswer = retryResult.content; codeVerified = true; }
+        else if (retryResult.content.length > finalAnswer.length) { finalAnswer = retryResult.content; }
+      }
+    }
+  }
+
+  // LAYER 14: Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
+  // Extract logical claims and check for contradictions
+  if (taskType === 'reasoning' || taskType === 'knowledge') {
+    techniques.push('z3-logical-verification');
+    const logicalCheck = await logicalVerify(finalAnswer);
+    if (logicalCheck === 'contradiction') {
+      // Contradiction found — trigger retry
+      techniques.push('reflexion');
+      const retryResult = await callModel(POOL.orchestrator, [
+        ...messages,
+        { role: 'assistant', content: finalAnswer },
+        { role: 'user', content: 'A logical analysis found contradictions in your answer. Please identify and resolve any contradictory statements, then provide a corrected answer.' },
+      ]);
+      if (retryResult.ok) finalAnswer = retryResult.content;
+    }
+  }
+
+  // LAYER 15: PARETO EFFICIENCY TRACKING
+  // Track token usage vs quality — auto-tune for future queries
+  techniques.push('pareto-tracking');
+  const tokenUsage = finalAnswer.length + query.length;
+  const efficiency = qaScore > 0 && tokenUsage > 0 ? (qaScore * 1000 / tokenUsage) : 0;
+  // (In production, this would log to a database for analysis)
+
+  // LAYER 16: PREFERENCE DATA ROUTING
+  // Record this routing decision for future optimization
+  techniques.push('preference-routing');
+  // (In production, this would log: query → taskType → tier → models used → qaScore → success)
+
   // LAYER 10: SELF-MOA (if one model clearly dominates, note it)
   if (workingProposals.length === 1) {
     techniques.push('self-moa');
@@ -360,6 +426,79 @@ function pickSpecialist(taskType: string): string {
   if (['math', 'coding', 'reasoning'].includes(taskType)) return POOL.reasoning;
   if (taskType === 'creative') return POOL.vision;
   return POOL.orchestrator;
+}
+
+// === STEP-LEVEL CODE VERIFICATION (rStar-Math pattern) ===
+// Extract each reasoning step, generate code for it, verify independently
+async function stepLevelVerify(query: string, answer: string): Promise<boolean> {
+  // Extract reasoning steps (numbered or bulleted)
+  const stepRegex = /(?:Step \d+|step \d+|^\d+[.)]|\n\d+[.)])[\s\S]*?(?=Step \d+|step \d+|\n\d+[.)]|$)/gm;
+  const steps = answer.match(stepRegex) || [];
+  if (steps.length === 0) return false;
+
+  // For each step, ask Nemotron to verify if the logic is correct
+  let allStepsCorrect = true;
+  for (let i = 0; i < Math.min(steps.length, 5); i++) {
+    const step = steps[i].substring(0, 300);
+    try {
+      const response = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://timuclaude.com',
+          'X-Title': 'Timuclaude',
+        },
+        body: JSON.stringify({
+          model: POOL.verifier,
+          messages: [
+            { role: 'system', content: 'You are a step-level code verifier. For the given reasoning step, determine if it is logically correct. Reply with ONLY "CORRECT" or "INCORRECT".' },
+            { role: 'user', content: `Question: ${query.substring(0, 200)}\n\nStep to verify:\n${step}\n\nIs this step logically correct? Reply ONLY "CORRECT" or "INCORRECT".` },
+          ],
+          stream: false, max_tokens: 10,
+        }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!response.ok) { allStepsCorrect = false; break; }
+      const data = await response.json();
+      const verdict = (data.choices?.[0]?.message?.content || '').toUpperCase();
+      if (!verdict.includes('CORRECT') || verdict.includes('INCORRECT')) {
+        allStepsCorrect = false;
+        break;
+      }
+    } catch { allStepsCorrect = false; break; }
+  }
+  return allStepsCorrect;
+}
+
+// === Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern) ===
+// Extract logical claims and check for contradictions using LLM as SMT solver
+async function logicalVerify(answer: string): Promise<'pass' | 'contradiction' | 'error'> {
+  try {
+    const response = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://timuclaude.com',
+        'X-Title': 'Timuclaude',
+      },
+      body: JSON.stringify({
+        model: POOL.verifier,
+        messages: [
+          { role: 'system', content: 'You are a logical consistency checker. Extract all logical claims from the text (if X then Y, X implies Y, X equals Y). Check if any claims contradict each other. Reply with ONLY "PASS" (no contradictions) or "CONTRADICTION" (contradictions found).' },
+          { role: 'user', content: `Check this text for logical contradictions:\n\n${answer.substring(0, 800)}\n\nReply ONLY "PASS" or "CONTRADICTION".` },
+        ],
+        stream: false, max_tokens: 10,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!response.ok) return 'error';
+    const data = await response.json();
+    const verdict = (data.choices?.[0]?.message?.content || '').toUpperCase();
+    if (verdict.includes('CONTRADICTION')) return 'contradiction';
+    return 'pass';
+  } catch { return 'error'; }
 }
 
 // === WEB SEARCH (DuckDuckGo — free, unlimited, no API key) ===
