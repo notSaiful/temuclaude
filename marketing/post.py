@@ -190,6 +190,12 @@ def parse_markdown_content(filepath):
         if not header.lower().startswith("tweet"):
             continue
 
+        # CRITICAL: Remove external links to avoid 30-94% algorithm suppression
+        # Links should go in replies, not in the tweet body
+        body = re.sub(r'https?://\S+', 'Link in bio.', body)
+        # Remove markdown bold
+        body = body.replace("**", "")
+
         tweets.append({"header": header, "text": body})
 
     return tweets

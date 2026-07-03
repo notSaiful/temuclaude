@@ -20,7 +20,7 @@ One model being wrong is a bug.
 Three models debating is a system.
 The system won.
 
-https://github.com/notSaiful/timuclaude-research
+Link in bio.
 
 ## Follow-up Tweet (optional)
 How did Timuclaude know which model to trust?
