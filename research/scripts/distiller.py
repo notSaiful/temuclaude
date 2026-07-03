@@ -9,6 +9,7 @@ import glob
 from datetime import datetime, timezone
 from collections import defaultdict
 from dedup import filter_new
+from priorities import RESEARCH_PRIORITIES, get_research_weight
 
 RAW_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
 FINDINGS_DIR = os.path.join(os.path.dirname(__file__), "..", "findings")
@@ -73,7 +74,34 @@ def score_relevance(text):
         if kw in text_lower:
             score += weight
             matched.append(kw)
-    return score, matched
+    
+    # Priority boosting — boost findings in RANK 1 research areas
+    priority_boosts = {
+        # RANK 1 boost (maximum research priority)
+        "mcts": 15, "tree search": 15, "rstar": 15,
+        "process reward": 15, "omega prm": 15, "v-star": 12,
+        "dspy": 15, "miprov2": 15, "gepa": 12,
+        "marketing": 15, "growth": 10, "launch strategy": 12,
+        "product hunt": 10, "developer marketing": 12,
+        # RANK 2 boost (high research priority)
+        "frontier model": 8, "benchmark": 8, "open weight": 8,
+        "cost reduction": 8, "routing": 8, "routellm": 10,
+        # RANK 3 no boost (medium — let keyword score stand)
+        # RANK 5 penalty (zero research — suppress)
+        "management science": -20, "fayol": -20, "mintzberg": -20,
+        "toyota production": -15, "poka-yoke": -15, "holacracy": -15,
+        "military planning": -15, "commander's intent": -15,
+    }
+    
+    for kw, boost in priority_boosts.items():
+        if kw in text_lower:
+            score += boost
+            if boost > 0:
+                matched.append(f"+{kw}")
+            elif boost < 0:
+                matched.append(f"-{kw}")
+    
+    return max(0, score), matched
 
 def load_raw_findings():
     """Load all raw JSON files."""

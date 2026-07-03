@@ -8,11 +8,15 @@ export default function HomePage() {
       <main id="main-content">
         {/* Hero Section — Premium redesign */}
         <section className="relative pt-40 pb-32 px-6 overflow-hidden">
-          {/* Subtle radial gradient background */}
+          {/* Mesh gradient background — multiple subtle radials like Stripe/Vercel */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(217, 119, 87, 0.08) 0%, transparent 60%)',
+              backgroundImage: `
+                radial-gradient(ellipse 60% 50% at 50% 0%, rgba(217, 119, 87, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 20% 20%, rgba(232, 213, 196, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 80% 20%, rgba(212, 165, 116, 0.05) 0%, transparent 50%)
+              `,
             }}
           />
           <div className="container-max relative">
@@ -24,7 +28,7 @@ export default function HomePage() {
 
               <h1
                 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-text-primary leading-[1.05] text-balance mb-8 animate-fade-in-up"
-                style={{ animationDelay: '100ms', letterSpacing: '-0.04em', fontWeight: 300 }}
+                style={{ animationDelay: '100ms', letterSpacing: '-0.055em', fontWeight: 300, lineHeight: '1.05' }}
               >
                 One question.<br />
                 Many minds.<br />
@@ -78,7 +82,7 @@ export default function HomePage() {
                 <div key={i}>
                   <div
                     className="text-5xl font-light text-accent-primary"
-                    style={{ fontWeight: 300, letterSpacing: '-0.03em' }}
+                    style={{ fontWeight: 300, letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}
                   >
                     {stat.value}
                   </div>
