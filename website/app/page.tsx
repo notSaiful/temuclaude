@@ -257,12 +257,14 @@ export default function HomePage() {
                   <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary">Playground</a></li>
                   <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary">Models</a></li>
                   <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
+                  <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Resources</h4>
                 <ul className="space-y-2">
                   <li><a href="/docs" className="text-sm text-text-secondary hover:text-accent-primary">Documentation</a></li>
+                  <li><a href="/enterprise" className="text-sm text-text-secondary hover:text-accent-primary">Enterprise</a></li>
                 </ul>
               </div>
               <div>
