@@ -23,11 +23,14 @@ QUERIES = [
     # Orchestration & fusion
     "LLM orchestration multi-model fusion ensemble",
     "model panel judge aggregator routing",
+    "mixture of agents layered aggregation",
     # Reasoning enhancements
     "tree search MCTS LLM reasoning step-by-step",
     "process reward model PRM verification",
     "self-consistency chain-of-thought majority vote",
     "test-time compute scaling reasoning",
+    "Tree of Thoughts Graph of Thoughts reasoning",
+    "LLM reflection self-refine iterative improvement",
     # Multi-agent
     "multi-agent LLM debate consensus collaboration",
     "LLM swarm intelligence collective",
@@ -36,16 +39,22 @@ QUERIES = [
     "speculative decoding early exit LLM",
     # Prompt optimization
     "automated prompt optimization OPRO evolutionary",
-    "prompt engineering meta-prompting",
+    "prompt engineering meta-prompting DSPy compiled",
     # Model combination
     "model merging mixture of experts inference",
     "ensemble LLM combination technique",
     # Verification
     "self-verification LLM hallucination reduction code execution",
     "LLM judge evaluator quality",
+    # Agent architecture
+    "AI agent architecture tool-use planning ReAct",
+    "LLM skill extraction Voyager library learning",
+    "self-improving LLM automatic improvement meta-learning",
+    # New models
+    "open weight LLM model release benchmark evaluation",
 ]
 
-ARXIV_API = "http://export.arxiv.org/api/query"
+ARXIV_API = "https://export.arxiv.org/api/query"
 
 def search_arxiv(query, max_results=10):
     params = urllib.parse.urlencode({
@@ -86,6 +95,8 @@ def search_arxiv(query, max_results=10):
     return papers
 
 def main():
+    import time
+    
     all_papers = []
     seen_ids = set()
     for q in QUERIES:
@@ -94,6 +105,7 @@ def main():
             if p["arxiv_id"] not in seen_ids:
                 all_papers.append(p)
                 seen_ids.add(p["arxiv_id"])
+        time.sleep(15)  # Rate limit: arXiv requires 3+ second gaps, 15s to be safe
     
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     out_file = os.path.join(OUT_DIR, f"arxiv_{ts}.json")

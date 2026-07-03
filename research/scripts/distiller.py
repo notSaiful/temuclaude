@@ -18,31 +18,50 @@ HIGH_VALUE_KEYWORDS = {
     # Orchestration core
     "orchestration": 10, "fusion": 10, "panel": 8, "judge": 8, "aggregator": 10,
     "routing": 9, "cascade": 8, "ensemble": 9, "multi-model": 10,
+    "mixture of agents": 10, "moa": 8, "layered aggregation": 9,
     # Reasoning
     "mcts": 9, "tree search": 9, "process reward": 9, "prm": 9,
     "self-consistency": 10, "chain-of-thought": 7, "self-refine": 8,
     "test-time compute": 9, "best-of-n": 8, "verification": 8,
-    "step-by-step": 6, "reasoning": 6,
+    "step-by-step": 6, "reasoning": 6, "tree of thoughts": 9,
+    "graph of thoughts": 8, "reflection": 8,
     # Multi-agent
     "multi-agent": 9, "debate": 8, "consensus": 8, "swarm": 8,
-    "collaborative": 6, "voting": 7,
+    "collaborative": 6, "voting": 7, "society of minds": 9,
     # Cost/efficiency
     "cost-efficient": 8, "cost reduction": 8, "speculative decoding": 7,
-    "early exit": 7, "caching": 6, "flat rate": 7,
+    "early exit": 7, "caching": 6, "flat rate": 7, "50x": 8,
     # Prompt optimization
     "opro": 9, "prompt optim": 9, "evolutionary prompt": 9,
     "meta-prompt": 8, "gepa": 10, "prompt-of-thought": 8,
+    "dspy": 9, "miprov2": 9, "compiled prompt": 8, "mipro": 8,
     # Model combination
     "model merge": 8, "mixture of experts": 7, "moe": 7,
+    "weight interpolation": 7, "task arithmetic": 7, "ties merging": 7,
     # Benchmarks
     "mmlu": 7, "hle": 8, "gdpval": 9, "scicode": 9, "mrcr": 7,
-    "benchmark": 5, "frontier": 6,
+    "benchmark": 5, "frontier": 6, "swe-bench": 8, "gpqa": 7,
+    "arena-hard": 6, "alpacaeval": 6, "math benchmark": 7,
+    "humaneval": 6, "livecodebench": 6, "agentbench": 6,
     # Verification
     "code execution": 8, "ground truth": 8, "hallucination": 6,
-    "self-evaluation": 7, "quality gate": 8,
+    "self-evaluation": 7, "quality gate": 8, "z3": 7, "smt solver": 7,
     # Breakthroughs
     "breakthrough": 9, "state-of-the-art": 7, "sota": 7,
     "novel": 6, "outperform": 7, "surpass": 7, "beat": 6,
+    # Agent architecture
+    "react": 6, "planning agent": 8, "tool-use": 7, "agentic": 7,
+    "agent framework": 7, "skill extraction": 9, "voyager": 9,
+    "self-improving": 9, "meta-learning": 7, "continual learning": 7,
+    "experience replay": 7, "memory augmented": 7,
+    # Coding agents
+    "claude code": 8, "codex": 7, "kilo": 6, "aider": 6,
+    "coding agent": 7, "code generation": 6,
+    # Open weight models
+    "open weight": 7, "open source model": 7, "ollama": 6,
+    "llama": 5, "deepseek": 6, "qwen": 5, "mistral": 5,
+    "gemma": 5, "phi-4": 6, "hermes": 7, "kimi": 6,
+    "nemotron": 6, "minimax": 5, "gpt-oss": 6,
 }
 
 def score_relevance(text):
@@ -147,6 +166,33 @@ def process_huggingface(raw):
         })
     return results
 
+def process_web_daily(raw):
+    """Process web-daily scout findings."""
+    results = []
+    findings = raw.get("findings", [])
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        text = f.get("title", "") + " " + f.get("description", "") + " " + f.get("integration_notes", "")
+        score, matched = score_relevance(text)
+        if score < 8:
+            continue
+        results.append({
+            "type": "web_finding",
+            "id": f.get("url", f.get("title", "")),
+            "title": f.get("title", ""),
+            "description": f.get("description", ""),
+            "url": f.get("url", ""),
+            "relevance": f.get("relevance", "unknown"),
+            "category": f.get("category", ""),
+            "integrable": f.get("integrable", False),
+            "integration_notes": f.get("integration_notes", ""),
+            "source_type": f.get("source_type", ""),
+            "relevance_score": score,
+            "matched_keywords": matched,
+        })
+    return results
+
 def deduplicate(findings):
     """Deduplicate by type+id."""
     seen = set()
@@ -170,6 +216,8 @@ def main():
             all_findings.extend(process_github(raw))
         elif scout == "huggingface":
             all_findings.extend(process_huggingface(raw))
+        elif scout == "web-daily":
+            all_findings.extend(process_web_daily(raw))
     
     # Deduplicate
     all_findings = deduplicate(all_findings)
@@ -194,10 +242,13 @@ def main():
             "all_findings": all_findings,
         }, f, indent=2)
     
-    # Clean up raw files older than 7 days (keep recent)
+    # Clean up raw files older than 7 days (keep web-daily for auto-integrator)
     import time
     now = time.time()
     for fpath in glob.glob(os.path.join(RAW_DIR, "*.json")):
+        # Skip web-daily files — auto-integrator needs them
+        if "web-daily" in os.path.basename(fpath) or "web_daily" in os.path.basename(fpath):
+            continue
         if os.path.getmtime(fpath) < now - 7 * 86400:
             os.remove(fpath)
     
