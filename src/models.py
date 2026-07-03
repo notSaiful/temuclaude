@@ -115,12 +115,16 @@ OPENROUTER_FREE_MODELS = {
     "nemotron-3-super": "nvidia/nemotron-3-super-120b-a12b:free",
 }
 
-# API base — OpenRouter only (no Ollama)
+# API base URLs
+OLLAMA_API_BASE = "http://localhost:11434"
 OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
-OLLAMA_API_BASE = "http://localhost:11434"  # kept for optional dev config only
 
-# Active API base — always OpenRouter
-API_BASE = OPENROUTER_API_BASE
+# Auto-detect: use OpenRouter if key is set, otherwise Ollama
+import os as _os
+_USE_OPENROUTER = bool(_os.environ.get("OPENROUTER_API_KEY"))
+
+# Active API base (auto-detect)
+API_BASE = OPENROUTER_API_BASE if _USE_OPENROUTER else OLLAMA_API_BASE
 
 # LiteLLM proxy port
 LITELLM_PORT = 4000
