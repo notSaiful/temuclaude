@@ -161,7 +161,11 @@ class Timuclaude:
         return "medium"
 
     async def call_model(self, model: str, messages: list, temperature: float = 0.0, max_tokens: int = 8192, timeout: int = 120) -> str:
-        """Call a single model with timeout and retry. Auto-detects Ollama or OpenRouter."""
+        """Call a single model with timeout, retry, and cross-backend fallback.
+        
+        If using Ollama and it fails, automatically falls back to OpenRouter (if key is set).
+        If using OpenRouter and it fails, automatically falls back to Ollama (if running).
+        """
         # Thinking models use internal tokens for reasoning — don't cap too low
         if max_tokens < 200:
             max_tokens = 200
@@ -211,13 +215,85 @@ class Timuclaude:
 
         return f"[ERROR: {model} returned empty response after 3 attempts]"
 
+    async def _try_other_backend(self, model: str, messages: list, temperature: float, max_tokens: int, timeout: int) -> Optional[str]:
+        """Try the other backend if the primary one fails.
+        
+        If using Ollama → try OpenRouter (if key is set).
+        If using OpenRouter → try Ollama (if running).
+        Returns the response or None if the other backend also fails.
+        """
+        if __package__:
+            from .models import OPENROUTER_MODELS, OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER
+        else:
+            from src.models import OPENROUTER_MODELS, OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER
+        
+        if _USE_OPENROUTER:
+            # Primary was OpenRouter, try Ollama
+            # Check if Ollama is running
+            try:
+                import aiohttp
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(f"{OLLAMA_API_BASE}/api/tags", timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                        if resp.status != 200:
+                            return None
+            except Exception:
+                return None  # Ollama not running
+            
+            # Ollama is running — try it
+            ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
+            fallback_client = AsyncOpenAI(base_url=f"{OLLAMA_API_BASE}/v1", api_key="ollama")
+            try:
+                response = await asyncio.wait_for(
+                    fallback_client.chat.completions.create(
+                        model=ollama_tag,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                    ),
+                    timeout=timeout,
+                )
+                content = response.choices[0].message.content or ""
+                if content.strip():
+                    return content
+            except Exception:
+                return None
+        else:
+            # Primary was Ollama, try OpenRouter (if key is set)
+            openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+            if not openrouter_key:
+                return None  # No OpenRouter key
+            
+            openrouter_tag = OPENROUTER_MODELS.get(model, model)
+            fallback_client = AsyncOpenAI(
+                base_url=OPENROUTER_API_BASE,
+                api_key=openrouter_key,
+            )
+            try:
+                response = await asyncio.wait_for(
+                    fallback_client.chat.completions.create(
+                        model=openrouter_tag,
+                        messages=messages,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        extra_headers={"Authorization": f"Bearer {openrouter_key}"},
+                    ),
+                    timeout=timeout,
+                )
+                content = response.choices[0].message.content or ""
+                if content.strip():
+                    return content
+            except Exception:
+                return None
+        
+        return None
+
     async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192, temperature: float = 0.0, timeout: int = 120) -> str:
-        """Call a model, and if it fails, try fallback models."""
+        """Call a model, and if it fails, try fallback models + cross-backend fallback."""
         answer = await self.call_model(model, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
         if not answer.startswith("[ERROR"):
             return answer
 
-        # Try fallback models based on task type
+        # Try fallback models on the same backend first
         fallbacks = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
         if model in fallbacks:
             fallbacks.remove(model)
@@ -226,6 +302,12 @@ class Timuclaude:
             answer = await self.call_model(fallback, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
             if not answer.startswith("[ERROR"):
                 return answer
+
+        # All same-backend models failed — try the OTHER backend
+        for fallback in [model] + fallbacks:
+            cross_backend = await self._try_other_backend(fallback, messages, temperature, max_tokens, timeout)
+            if cross_backend is not None:
+                return cross_backend
 
         return answer  # All failed, return last error
 
