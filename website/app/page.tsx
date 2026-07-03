@@ -189,86 +189,12 @@ export default function HomePage() {
               See it in action
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              Try Timuclaude right now — no signup required. Watch 5 models collaborate in real-time.
+              Try Timuclaude right now — no signup required. One model, five minds, one superior answer.
             </p>
             <a href="/playground" className="btn-accent inline-flex">
               Open Playground
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </a>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section className="py-20 px-6 bg-bg-secondary">
-          <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary text-center mb-4">
-              Pricing
-            </h2>
-            <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
-              Free to try in the playground. Pay only when you need more.
-            </p>
-
-            <StaggerReveal className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {[
-                {
-                  name: 'Self-Hosted',
-                  price: '$0',
-                  period: 'forever',
-                  desc: 'Run Timuclaude on your own infrastructure. Unlimited queries. Full orchestration. Community support.',
-                  features: ['Unlimited queries', 'Full orchestration', 'All 5 models', 'Community support', 'MIT licensed'],
-                  cta: 'Start Free',
-                  featured: false,
-                },
-                {
-                  name: 'Cloud',
-                  price: '$15',
-                  period: '/month',
-                  desc: 'Managed hosting. 3K queries/month. No setup required. Email support.',
-                  features: ['3K queries/month', 'Managed hosting', 'No setup required', 'Email support', 'All models included'],
-                  cta: 'Get Pro',
-                  featured: true,
-                },
-                {
-                  name: 'Enterprise',
-                  price: '$499',
-                  period: '/month',
-                  desc: '200K queries/month. SLA. SSO. Self-hosted option. Dedicated support.',
-                  features: ['200K queries/month', 'SLA guarantee', 'SSO/SAML', 'Self-hosted option', 'Dedicated support'],
-                  cta: 'Contact Sales',
-                  featured: false,
-                },
-              ].map((tier, i) => (
-                <StaggerItem key={i}>
-                  <div
-                    className={`card h-full ${tier.featured ? 'border-accent-primary border-2' : ''}`}
-                  >
-                  {tier.featured && (
-                    <div className="badge-accent mb-4 w-fit">Most Popular</div>
-                  )}
-                  <h3 className="text-lg font-semibold text-text-primary mb-1">{tier.name}</h3>
-                  <div className="mb-1 flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-text-primary">{tier.price}</span>
-                    <span className="text-sm text-text-muted">{tier.period}</span>
-                  </div>
-                  <p className="text-sm text-text-secondary mb-4">{tier.desc}</p>
-                  <ul className="space-y-2 mb-6">
-                    {tier.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-text-secondary">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#788C5D" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <a
-                    href={tier.cta === 'Contact Sales' ? '/enterprise' : '/playground'}
-                    className={tier.featured ? 'btn-accent w-full' : 'btn-secondary w-full'}
-                  >
-                    {tier.cta}
-                  </a>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerReveal>
           </div>
         </section>
 
@@ -291,10 +217,6 @@ export default function HomePage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.605-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
                 Star on GitHub
               </a>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-secondary rounded-sm border border-border-subtle">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#E8B547"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                <span className="text-sm font-medium text-text-primary">Star</span>
-              </div>
             </div>
           </div>
         </section>
@@ -335,7 +257,6 @@ export default function HomePage() {
                   <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary">Playground</a></li>
                   <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary">Models</a></li>
                   <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
-                  <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
               <div>
