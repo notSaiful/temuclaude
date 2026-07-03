@@ -35,8 +35,8 @@ export default function DocsPage() {
               <h2 className="text-xl font-semibold text-text-primary mb-3">Quickstart</h2>
               <p className="text-text-secondary mb-4">Get started with Timuclaude in under 5 minutes.</p>
               <div className="bg-bg-dark text-bg-tertiary font-mono text-sm p-4 rounded-md mb-4 overflow-x-auto">
-                <div className="flex items-center justify-between mb-2"><span className="text-xs text-text-muted">bash</span><button className="text-text-muted hover:text-text-inverse">Copy</button></div>
-                <pre><code>pip install timuclaude{'\n'}timuclaude --start</code></pre>
+                <div className="flex items-center justify-between mb-2"><span className="text-xs text-text-muted">bash</span><span className="text-text-muted">Copy</span></div>
+                <pre className="whitespace-pre-wrap"><code>{'pip install timuclaude\ntimuclaude --start'}</code></pre>
               </div>
               <p className="text-sm text-text-secondary">Or use the <a href="/playground" className="text-accent-primary hover:underline">playground</a> — no installation required.</p>
             </section>
@@ -52,6 +52,9 @@ export default function DocsPage() {
             <section id="fusion" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Fusion</h2>
               <p className="text-text-secondary">For hard questions, Timuclaude sends the query to 3-5 models in parallel. A dynamic aggregator synthesizes the best parts of each response. The aggregator is selected dynamically based on task type.</p>
+              <div className="mt-4 border-l-[3px] p-4 rounded-r-md" style={{ borderLeftColor: '#E8B547', background: 'rgba(232,181,71,0.05)' }}>
+                <p className="text-sm text-text-secondary"><strong className="text-text-primary">Note:</strong> The aggregator is selected dynamically. Math questions use DeepSeek V4 Pro, knowledge questions use GLM-5.2.</p>
+              </div>
             </section>
             <section id="self-qa" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-QA Gate</h2>
