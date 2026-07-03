@@ -544,37 +544,33 @@ class Timuclaude:
                 strategy += f"+debate_escalation({debate_result['rounds']}r)"
             # If only 1 attempt (first pass), keep the original answer
 
-            # Step 5: s1 Budget Forcing (arXiv:2501.19393)
-            # If the answer is too short for a hard problem, append "Wait" to force more reasoning
-            if task_type in ("math", "reasoning") and len(answer.split()) < 50:
-                forced = apply_budget_forcing(answer, min_reasoning_tokens=200)
-                if forced != answer:
-                    # Budget forcing triggered — regenerate with "Wait" appended
-                    answer = forced
-                    strategy += "+s1_budget_forcing"
+        # Step 5: s1 Budget Forcing (arXiv:2501.19393) — applies to ALL tiers
+        # If the answer is too short for a hard problem, append "Wait" to force more reasoning
+        if task_type in ("math", "reasoning") and len(answer.split()) < 50:
+            forced = apply_budget_forcing(answer, min_reasoning_tokens=200)
+            if forced != answer:
+                answer = forced
+                strategy += "+s1_budget_forcing"
 
-            # Step 6: Z3/SMT Logical Verification (ConsistPRM pattern)
-            # For reasoning tasks, verify logical consistency using Z3
-            if task_type == "reasoning":
-                z3_result = verify_logical_with_z3(query, answer)
-                if z3_result["verified"]:
-                    strategy += "+z3_verified"
-                elif "contradictions" in z3_result.get("reason", "").lower():
-                    # Contradictions found — flag for retry via debate
-                    strategy += "+z3_contradiction"
-                    # Escalate to debate if not already done
-                    if "debate" not in strategy:
-                        debate_result = await multi_agent_debate(
-                            query, self.call_model_with_fallback,
-                            panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
-                            rounds=2, aggregator="nemotron-3-ultra",
-                            max_tokens=token_budget
-                        )
-                        answer = debate_result["answer"]
-                        models_used.append("debate_z3_escalation")
-                        strategy += "+debate_z3"
+        # Step 6: Z3/SMT Logical Verification (ConsistPRM pattern) — applies to ALL tiers
+        if task_type == "reasoning":
+            z3_result = verify_logical_with_z3(query, answer)
+            if z3_result["verified"]:
+                strategy += "+z3_verified"
+            elif "contradictions" in z3_result.get("reason", "").lower():
+                strategy += "+z3_contradiction"
+                if "debate" not in strategy:
+                    debate_result = await multi_agent_debate(
+                        query, self.call_model_with_fallback,
+                        panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
+                        rounds=2, aggregator="nemotron-3-ultra",
+                        max_tokens=token_budget if tier == "hard" else 4096
+                    )
+                    answer = debate_result["answer"]
+                    models_used.append("debate_z3_escalation")
+                    strategy += "+debate_z3"
 
-            latency_ms = int((time.time() - start_time) * 1000)
+        latency_ms = int((time.time() - start_time) * 1000)
 
         # Record Pareto efficiency metrics (token_savings vs accuracy)
         try:
