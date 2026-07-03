@@ -29,7 +29,7 @@ export default function DocsPage() {
             <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-text-muted mb-6">
               <a href="/" className="hover:text-accent-primary">Home</a><span>/</span><span className="text-text-primary">Docs</span>
             </nav>
-            <h1 className="text-3xl font-semibold text-text-primary mb-2">Documentation</h1>
+            <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Documentation</h1>
             <p className="text-text-secondary mb-8">Everything you need to use Timuclaude.</p>
             <section id="quickstart" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Quickstart</h2>
