@@ -8,7 +8,7 @@ export default function EnterprisePage() {
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Enterprise">
         <div className="container-max">
           <div className="text-center mb-16">
-            <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-4">Enterprise-grade AI orchestration</h1>
+            <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Enterprise-grade AI orchestration</h1>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">Security, compliance, and scale for your team.</p>
             <a href="mailto:hello@timuclaude.com" className="btn-primary">Contact Sales</a>
           </div>

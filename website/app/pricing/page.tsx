@@ -18,7 +18,7 @@ export default function PricingPage() {
       <Navbar />
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Pricing">
         <div className="container-max">
-          <h1 className="text-3xl font-semibold text-text-primary mb-2 text-center">Pricing</h1>
+          <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3 text-center" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Pricing</h1>
           <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">Free to try in the playground. Pay only when you need more.</p>
 
           <StaggerReveal className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-20">

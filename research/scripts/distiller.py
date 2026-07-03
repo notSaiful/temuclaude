@@ -167,6 +167,40 @@ def process_huggingface(raw):
         })
     return results
 
+def process_marketing_research(raw):
+    """Process marketing research findings."""
+    results = []
+    findings = raw.get("findings", [])
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        text = f.get("title", "") + " " + f.get("description", "") + " " + f.get("implementation_notes", "")
+        # Marketing findings are always relevant — don't score with technical keywords
+        # Instead, include all with a base score + priority boost
+        score = 5  # Base score
+        priority = f.get("priority", "medium")
+        if priority == "high":
+            score += 5
+        elif priority == "medium":
+            score += 3
+        if f.get("actionable_for_timuclaude", False):
+            score += 3
+        
+        results.append({
+            "type": "marketing_finding",
+            "id": f.get("url", f.get("title", "")),
+            "category": f.get("category", ""),
+            "title": f.get("title", ""),
+            "description": f.get("description", ""),
+            "url": f.get("url", ""),
+            "actionable_for_timuclaude": f.get("actionable_for_timuclaude", False),
+            "implementation_notes": f.get("implementation_notes", ""),
+            "priority": priority,
+            "relevance_score": score,
+            "matched_keywords": ["marketing"],
+        })
+    return results
+
 def process_hermes_improvement(raw):
     """Process Hermes self-improvement + skill discovery findings."""
     results = []
@@ -281,6 +315,8 @@ def main():
             all_findings.extend(process_frontier_docs(raw))
         elif scout == "hermes-improvement":
             all_findings.extend(process_hermes_improvement(raw))
+        elif scout == "marketing-research":
+            all_findings.extend(process_marketing_research(raw))
     
     # In-run deduplicate
     all_findings = deduplicate(all_findings)
@@ -329,6 +365,8 @@ def main():
         if "hermes" in basename:
             continue
         if "meta-skill" in basename:
+            continue
+        if "marketing" in basename:
             continue
         if basename.startswith("_"):
             continue  # Don't delete _seen_state.json

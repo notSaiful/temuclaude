@@ -18,7 +18,7 @@ export default function BenchmarksPage() {
       <Navbar />
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Benchmark Results">
         <div className="container-max">
-          <h1 className="text-3xl font-semibold text-text-primary mb-2">Benchmark Results</h1>
+          <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Benchmark Results</h1>
           <p className="text-text-secondary mb-8">Projected scores from research analysis. Live results will be published after full testing.</p>
           <div className="overflow-x-auto mb-12">
             <table className="w-full text-sm">

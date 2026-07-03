@@ -16,7 +16,7 @@ export default function ModelsPage() {
       <Navbar />
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Model Pool">
         <div className="container-max">
-          <h1 className="text-3xl font-semibold text-text-primary mb-2">Model Pool</h1>
+          <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Model Pool</h1>
           <p className="text-text-secondary mb-8">5 models, each with a specific role. We route to the best model for your question automatically.</p>
 
           {/* Filter bar */}
