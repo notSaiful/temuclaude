@@ -317,6 +317,7 @@ export default function PlaygroundPage() {
         <main
           className="flex-1 flex flex-col h-[calc(100vh-4rem)]"
           aria-label="Timuclaude Playground"
+          id="main-content"
         >
           {/* Mobile sidebar toggle */}
           <button

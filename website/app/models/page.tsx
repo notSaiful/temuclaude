@@ -16,7 +16,21 @@ export default function ModelsPage() {
       <main className="pt-24 pb-20 px-6" aria-label="Model Pool">
         <div className="container-max">
           <h1 className="text-3xl font-semibold text-text-primary mb-2">Model Pool</h1>
-          <p className="text-text-secondary mb-12">5 models, each with a specific role. We route to the best model for your question automatically.</p>
+          <p className="text-text-secondary mb-8">5 models, each with a specific role. We route to the best model for your question automatically.</p>
+
+          {/* Filter bar */}
+          <div className="flex items-center gap-2 mb-8 flex-wrap">
+            <span className="text-sm text-text-muted">Filter:</span>
+            {['All', 'Reasoning', 'Coding', 'Vision', 'Tools', 'Fast'].map((filter, i) => (
+              <button
+                key={i}
+                className={`badge text-xs transition-colors ${i === 0 ? 'badge-accent' : 'badge-muted hover:bg-bg-tertiary'}`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {models.map((model, i) => (
               <div key={i} className="card">
