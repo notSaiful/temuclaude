@@ -30,6 +30,16 @@ QUERIES = [
     "model merging mixture experts inference",
     "LLM verifier self-check code execution",
     "test-time compute LLM scaling",
+    "LLM skill extraction Voyager library",
+    "self-improving LLM system automatic",
+    "AI agent framework tool-use planning",
+    "LLM speculative decoding draft verify",
+    "DSPy prompt optimization compiled",
+    "mixture of agents layered aggregation LLM",
+    "coding agent architecture Claude Code",
+    "Tree of Thoughts Graph of Thoughts reasoning",
+    "LLM reflection self-refine iterative",
+    "open weight model release 2025 2026",
 ]
 
 GITHUB_API = "https://api.github.com/search/repositories"
@@ -42,11 +52,17 @@ def search_github(query, sort="updated", per_page=10):
         "per_page": per_page,
     })
     url = f"{GITHUB_API}?{params}"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "Timuclaude-Research/1.0",
+    }
+    # Use GitHub token if available for higher rate limits (60/hour → 5000/hour)
+    github_token = os.environ.get("GITHUB_TOKEN", "")
+    if github_token:
+        headers["Authorization"] = f"token {github_token}"
+    
     try:
-        req = urllib.request.Request(url, headers={
-            "Accept": "application/vnd.github.v3+json",
-            "User-Agent": "Timuclaude-Research/1.0",
-        })
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except Exception as e:
@@ -70,6 +86,8 @@ def search_github(query, sort="updated", per_page=10):
     return repos
 
 def main():
+    import time
+    
     all_repos = []
     seen_ids = set()
     for q in QUERIES:
@@ -78,6 +96,7 @@ def main():
             if r["repo_id"] not in seen_ids:
                 all_repos.append(r)
                 seen_ids.add(r["repo_id"])
+        time.sleep(3)  # GitHub API rate limit safety
     
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     out_file = os.path.join(OUT_DIR, f"github_{ts}.json")

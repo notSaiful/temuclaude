@@ -10,6 +10,7 @@ import urllib.parse
 import os
 import ssl
 import certifi
+import time
 from datetime import datetime, timezone
 
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
@@ -32,10 +33,28 @@ def fetch_json(url, timeout=30):
         return None
 
 def search_hf_papers():
-    """Search HuggingFace daily papers for relevant topics."""
-    # HF daily papers endpoint
-    data = fetch_json(f"{HF_API}/papers/daily", timeout=30)
+    """Search HuggingFace papers for relevant topics."""
+    # Try multiple HF paper endpoints
+    endpoints = [
+        f"{HF_API}/papers",  # Recent papers
+        f"https://huggingface.co/api/papers?limit=100",
+    ]
+    
+    data = None
+    for url in endpoints:
+        data = fetch_json(url, timeout=30)
+        if data:
+            break
+    
     if not data:
+        return []
+    
+    # Handle both list and dict responses
+    if isinstance(data, dict):
+        papers_list = data.get("papers", data.get("items", []))
+    elif isinstance(data, list):
+        papers_list = data
+    else:
         return []
     
     keywords = [
@@ -48,17 +67,26 @@ def search_hf_papers():
     ]
     
     papers = []
-    for paper in data:
+    for paper in papers_list:
+        if not isinstance(paper, dict):
+            continue
         title = paper.get("title", "").lower()
-        abstract = paper.get("paper", {}).get("abstract", "").lower() if isinstance(paper.get("paper"), dict) else ""
+        # Abstract might be nested
+        abstract = ""
+        if "abstract" in paper:
+            abstract = paper.get("abstract", "").lower()
+        elif "paper" in paper and isinstance(paper["paper"], dict):
+            abstract = paper["paper"].get("abstract", "").lower()
+        
         text = title + " " + abstract
         if any(kw in text for kw in keywords):
+            paper_id = paper.get("id", paper.get("paper_id", ""))
             papers.append({
-                "paper_id": paper.get("paper", {}).get("id", "") if isinstance(paper.get("paper"), dict) else paper.get("id", ""),
+                "paper_id": paper_id,
                 "title": paper.get("title", ""),
-                "abstract": paper.get("paper", {}).get("abstract", "") if isinstance(paper.get("paper"), dict) else "",
-                "upvotes": paper.get("paper", {}).get("upvotes", 0) if isinstance(paper.get("paper"), dict) else paper.get("upvotes", 0),
-                "url": f"https://huggingface.co/papers/{paper.get('paper', {}).get('id', '')}" if isinstance(paper.get("paper"), dict) else "",
+                "abstract": abstract[:500],
+                "upvotes": paper.get("upvotes", paper.get("likes", 0)),
+                "url": f"https://huggingface.co/papers/{paper_id}" if paper_id else "",
                 "source": "huggingface",
             })
     return papers
@@ -93,12 +121,14 @@ def search_hf_models():
                 "query": query,
                 "source": "huggingface-models",
             })
+        time.sleep(2)  # Rate limit between model searches
     return models
 
 def main():
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
     
     papers = search_hf_papers()
+    time.sleep(2)  # Rate limit between API calls
     models = search_hf_models()
     
     out_file = os.path.join(OUT_DIR, f"huggingface_{ts}.json")
