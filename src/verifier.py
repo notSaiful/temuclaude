@@ -15,7 +15,7 @@ import re
 import sys
 import subprocess
 import tempfile
-from typing import Optional
+from typing import Optional, Callable, Awaitable
 
 
 CODE_GENERATION_PROMPT = (
@@ -63,7 +63,7 @@ def extract_code(response: str) -> str:
 async def verify_with_code(
     question: str,
     model: str,
-    call_model_func,
+    call_model_func: Callable[..., Awaitable[str]],
     max_tokens: int = 4096,
     execution_timeout: int = 10,
 ) -> dict:

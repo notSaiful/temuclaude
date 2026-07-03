@@ -50,7 +50,7 @@ class Timuclaude:
     All orchestration is internal and invisible to the user.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = AsyncOpenAI(base_url=f"{OLLAMA_API_BASE}/v1", api_key="ollama")
         self.logger = QueryLogger()
 
