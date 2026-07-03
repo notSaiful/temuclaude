@@ -193,6 +193,7 @@ export default function PlaygroundPage() {
     <>
       <Navbar />
       <div className="flex h-screen pt-16">
+        <h1 className="sr-only">Timuclaude Playground</h1>
         {/* Sidebar */}
         <aside
           className={`${

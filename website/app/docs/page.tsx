@@ -24,7 +24,7 @@ export default function DocsPage() {
             </div>
           ))}
         </aside>
-        <main className="flex-1 px-6 md:px-12 py-12" aria-label="Documentation">
+        <main id="main-content" className="flex-1 px-6 md:px-12 py-12" aria-label="Documentation">
           <div className="max-w-[680px] mx-auto">
             <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-text-muted mb-6">
               <a href="/" className="hover:text-accent-primary">Home</a><span>/</span><span className="text-text-primary">Docs</span>

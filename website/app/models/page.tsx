@@ -13,7 +13,7 @@ export default function ModelsPage() {
   return (
     <>
       <Navbar />
-      <main className="pt-24 pb-20 px-6" aria-label="Model Pool">
+      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Model Pool">
         <div className="container-max">
           <h1 className="text-3xl font-semibold text-text-primary mb-2">Model Pool</h1>
           <p className="text-text-secondary mb-8">5 models, each with a specific role. We route to the best model for your question automatically.</p>
