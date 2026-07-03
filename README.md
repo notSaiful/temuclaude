@@ -146,11 +146,13 @@ timuclaude/
 - Error handling (invalid model, empty query, long query)
 - 78 tests across 7 suites — all pass
 
-**Phase 2 (Core Orchestration):** Not started
-- Fusion (5 models in parallel + structured analysis)
-- Self-consistency (N=20 majority vote)
-- Code execution verification
-- Dynamic aggregator selection
+**Phase 2 (Core Orchestration):** Complete
+- Fusion: 3-5 models answer in parallel, dynamic aggregator synthesizes (Fugu pattern)
+- Self-consistency: N=10 samples, majority vote (proven +10-20% on reasoning)
+- Code execution verification: sandboxed Python execution for math/coding (ground truth)
+- Dynamic aggregator selection: math→DeepSeek, knowledge→GLM-5.2, creative→MiniMax
+- Strategy matrix: hard tier uses Fusion + code verify + self-consistency per task type
+- 9 test suites pass (26 non-live + 3 live tests)
 
 ## License
 

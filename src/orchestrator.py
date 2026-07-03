@@ -24,6 +24,9 @@ if __package__:
         OLLAMA_API_BASE,
     )
     from .logger import QueryLogger
+    from .fusion import fuse, get_panel, get_aggregator
+    from .consistency import self_consistency
+    from .verifier import verify_with_code
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,6 +39,9 @@ else:
         OLLAMA_API_BASE,
     )
     from src.logger import QueryLogger
+    from src.fusion import fuse, get_panel, get_aggregator
+    from src.consistency import self_consistency
+    from src.verifier import verify_with_code
 
 
 class Timuclaude:
@@ -176,9 +182,9 @@ class Timuclaude:
 
         return f"[ERROR: {model} returned empty response after 3 attempts]"
 
-    async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192) -> str:
+    async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192, temperature: float = 0.0, timeout: int = 120) -> str:
         """Call a model, and if it fails, try fallback models."""
-        answer = await self.call_model(model, messages, max_tokens=max_tokens)
+        answer = await self.call_model(model, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
         if not answer.startswith("[ERROR"):
             return answer
 
@@ -188,7 +194,7 @@ class Timuclaude:
             fallbacks.remove(model)
 
         for fallback in fallbacks:
-            answer = await self.call_model(fallback, messages, max_tokens=max_tokens)
+            answer = await self.call_model(fallback, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
             if not answer.startswith("[ERROR"):
                 return answer
 
@@ -227,16 +233,53 @@ class Timuclaude:
             models_used = [model]
             strategy = "direct_specialist"
         else:
-            # Hard tier: Phase 2 will implement Fusion here
-            # For now, use the best model with max thinking
-            model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
-            messages = [
-                {"role": "system", "content": system_prompt or "You are Timuclaude, a helpful AI assistant. Think carefully and provide thorough, accurate answers."},
-                {"role": "user", "content": query},
-            ]
-            answer = await self.call_model_with_fallback(model, messages, max_tokens=8192)
-            models_used = [model]
-            strategy = "direct_specialist_max_thinking"
+            # Hard tier: full orchestration
+            # Strategy depends on task type:
+            # - math: Fusion + code verification + self-consistency
+            # - coding: Fusion + code verification
+            # - knowledge: Fusion only
+            # - reasoning: Fusion + self-consistency
+            # - creative: Fusion only
+            # - agentic: Fusion only
+
+            use_code_verify = task_type in ("math", "coding")
+            use_self_consistency = task_type in ("math", "reasoning")
+
+            # Step 1: Run Fusion panel
+            fusion_result = await fuse(
+                query, task_type, self.call_model_with_fallback, max_tokens=8192
+            )
+            answer = fusion_result["answer"]
+            models_used = fusion_result["panel"] + [fusion_result["aggregator"]]
+            strategy = "fusion"
+
+            # Step 2: Code verification (for math/coding)
+            if use_code_verify:
+                code_model = TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
+                code_result = await verify_with_code(
+                    query, code_model, self.call_model_with_fallback, max_tokens=4096
+                )
+                if code_result["verified"] and code_result["answer"]:
+                    # Code execution succeeded — use verified answer
+                    answer = code_result["answer"]
+                    models_used.append(f"{code_model}+code")
+                    strategy += "+code_verify"
+                # If code failed, keep the fusion answer
+
+            # Step 3: Self-consistency (for math/reasoning)
+            if use_self_consistency:
+                consistency_model = get_aggregator(task_type)
+                # N=10 for speed (N=20 for benchmarks). Configurable in future.
+                consistency_result = await self_consistency(
+                    query, consistency_model, self.call_model_with_fallback,
+                    n_samples=10, temperature=0.7, max_tokens=8192
+                )
+                if consistency_result["confidence"] >= 0.6:
+                    # High agreement — use the consistency answer
+                    answer = consistency_result["answer"]
+                    models_used.append(f"{consistency_model}+consistency")
+                    strategy += "+consistency"
+                # If low agreement, keep the fusion answer
 
         latency_ms = int((time.time() - start_time) * 1000)
 
