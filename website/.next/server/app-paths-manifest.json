@@ -1,0 +1,11 @@
+{
+  "/api/chat/route": "app/api/chat/route.js",
+  "/page": "app/page.js",
+  "/playground/page": "app/playground/page.js",
+  "/docs/page": "app/docs/page.js",
+  "/models/page": "app/models/page.js",
+  "/benchmarks/page": "app/benchmarks/page.js",
+  "/pricing/page": "app/pricing/page.js",
+  "/enterprise/page": "app/enterprise/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
+}
