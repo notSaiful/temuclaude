@@ -17,4 +17,4 @@ Timuclaude is proof: 3 models working together beat any 1 model alone.
 
 The future isn't one model. It's orchestration.
 
-https://github.com/notSaiful/timuclaude-research
+Link in bio.

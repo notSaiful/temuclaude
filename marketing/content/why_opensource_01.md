@@ -15,4 +15,4 @@ No API keys. No cloud. No bills.
 
 This isn't a feature. It's a principle.
 
-https://github.com/notSaiful/timuclaude-research
+Link in bio.
