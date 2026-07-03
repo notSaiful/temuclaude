@@ -28,4 +28,5 @@ logs/*.jsonl
 .env
 config/secrets.*
 *secret*
-*key*
+*key*website/node_modules/
+website/.next/
