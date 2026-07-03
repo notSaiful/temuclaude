@@ -1,33 +1,48 @@
 import { Navbar } from '@/components/Navbar';
-import { OrchestrationDiagram } from '@/components/OrchestrationDiagram';
-import { ScrollReveal, StaggerReveal, StaggerItem, AnimatedCounter } from '@/components/Animations';
+import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
 export default function HomePage() {
   return (
     <>
       <Navbar />
       <main id="main-content">
-        {/* Hero Section */}
-        <section className="pt-32 pb-20 px-6">
-          <div className="container-max">
+        {/* Hero Section — Premium redesign */}
+        <section className="relative pt-40 pb-32 px-6 overflow-hidden">
+          {/* Subtle radial gradient background */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(217, 119, 87, 0.08) 0%, transparent 60%)',
+            }}
+          />
+          <div className="container-max relative">
             <div className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 badge-accent mb-6">
+              <div className="inline-flex items-center gap-2 badge-accent mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
                 <span className="w-2 h-2 rounded-full bg-accent-olive" />
                 Open Source · MIT Licensed
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-text-primary leading-tight text-balance mb-6">
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-text-primary leading-[1.05] text-balance mb-8 animate-fade-in-up"
+                style={{ animationDelay: '100ms', letterSpacing: '-0.04em', fontWeight: 300 }}
+              >
                 One question.<br />
                 Many minds.<br />
                 <span className="text-accent-primary">One superior answer.</span>
               </h1>
 
-              <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto">
+              <p
+                className="text-lg md:text-xl text-text-secondary mb-10 max-w-xl mx-auto leading-relaxed animate-fade-in-up"
+                style={{ animationDelay: '300ms', fontWeight: 400 }}
+              >
                 Timuclaude orchestrates 5 AI models to beat frontier models at 28x lower cost.
-                Open source. No black boxes. Try it free in the playground.
+                Open source. No black boxes.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <div
+                className="flex flex-col sm:flex-row gap-3 justify-center mb-8 animate-fade-in-up"
+                style={{ animationDelay: '500ms' }}
+              >
                 <a href="/playground" className="btn-primary">
                   Try the Playground
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
@@ -38,70 +53,84 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* Install command — for developers who want to self-host */}
-              <div className="inline-flex items-center gap-3 bg-bg-dark text-bg-tertiary font-mono text-sm px-4 py-2.5 rounded-sm">
+              {/* Install command — subtle, not prominent */}
+              <div
+                className="inline-flex items-center gap-3 bg-bg-dark text-bg-tertiary font-mono text-sm px-4 py-2.5 rounded-sm animate-fade-in-up opacity-60"
+                style={{ animationDelay: '700ms' }}
+              >
                 <span className="text-text-muted">$</span>
                 <span>pip install timuclaude</span>
-                <button className="text-text-muted hover:text-text-inverse" aria-label="Copy install command">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>
-                </button>
               </div>
-              <p className="text-xs text-text-muted mt-2">Or use the playground above — no installation required</p>
-            </div>
-
-            {/* Orchestration diagram */}
-            <div className="mt-16">
-              <OrchestrationDiagram />
             </div>
           </div>
         </section>
 
-        {/* Metrics Bar */}
-        <section className="py-8 px-6 border-y border-border-subtle bg-bg-secondary">
+        {/* Metrics Bar — Stripe-style: large light numbers, no animation */}
+        <section className="py-16 px-6 border-y border-border-subtle">
           <div className="container-max">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
                 { value: '5', label: 'AI Models' },
-                { value: '28', suffix: 'x', label: 'Cheaper' },
+                { value: '28x', label: 'Cheaper' },
                 { value: '9', label: 'Benchmarks' },
                 { value: 'MIT', label: 'Licensed' },
               ].map((stat, i) => (
                 <div key={i}>
-                  <div className="text-3xl font-bold text-accent-primary">
-                    <AnimatedCounter value={stat.value} suffix={stat.suffix || ''} />
+                  <div
+                    className="text-5xl font-light text-accent-primary"
+                    style={{ fontWeight: 300, letterSpacing: '-0.03em' }}
+                  >
+                    {stat.value}
                   </div>
-                  <div className="text-sm text-text-secondary mt-1">{stat.label}</div>
+                  <div className="text-sm text-text-secondary mt-2">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Platform Availability */}
-        <section className="py-6 px-6">
-          <div className="container-max text-center">
-            <p className="text-sm text-text-muted mb-3">Powered by the best open-weight models</p>
-            <div className="flex items-center justify-center gap-6 flex-wrap">
-              <span className="text-text-secondary font-medium text-sm">GLM-5.2</span>
-              <span className="text-text-muted">·</span>
-              <span className="text-text-secondary font-medium text-sm">DeepSeek V4 Pro</span>
-              <span className="text-text-muted">·</span>
-              <span className="text-text-secondary font-medium text-sm">Kimi K2.6</span>
-              <span className="text-text-muted">·</span>
-              <span className="text-text-secondary font-medium text-sm">MiniMax M3</span>
-              <span className="text-text-muted">·</span>
-              <span className="text-text-secondary font-medium text-sm">Nemotron 3 Ultra</span>
+        {/* Models — premium presentation */}
+        <section className="py-24 px-6">
+          <div className="container-max">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+                Powered by the best open-weight models
+              </h2>
+              <p className="text-text-secondary max-w-lg mx-auto">
+                Five models, each with a specific role. Timuclaude routes automatically — you never choose.
+              </p>
             </div>
+
+            <StaggerReveal className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {[
+                { name: 'GLM-5.2', role: 'Orchestrator', tone: '#E8D5C4' },
+                { name: 'DeepSeek V4 Pro', role: 'Reasoning', tone: '#D4A574' },
+                { name: 'Kimi K2.6', role: 'Long Context', tone: '#C97B50' },
+                { name: 'MiniMax M3', role: 'Generation', tone: '#D4A574' },
+                { name: 'Nemotron 3 Ultra', role: 'Verifier', tone: '#E8D5C4' },
+              ].map((model, i) => (
+                <StaggerItem key={i}>
+                  <div className="card text-center" style={{ padding: '20px 12px' }}>
+                    <div
+                      className="w-10 h-10 rounded-full mx-auto mb-3"
+                      style={{ background: model.tone, boxShadow: `0 0 12px ${model.tone}40` }}
+                    />
+                    <div className="text-sm font-medium text-text-primary">{model.name}</div>
+                    <div className="text-xs text-text-muted mt-1">{model.role}</div>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerReveal>
           </div>
         </section>
 
         {/* How It Works */}
-        <section className="py-20 px-6">
+        <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary text-center mb-4">
+            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               How it works
             </h2>
-            <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
+            <p className="text-text-secondary text-center mb-16 max-w-xl mx-auto">
               Three steps from your question to a superior answer
             </p>
 
@@ -136,12 +165,12 @@ export default function HomePage() {
         </section>
 
         {/* Benchmark Results */}
-        <section className="py-20 px-6 bg-bg-secondary">
+        <section className="py-24 px-6">
           <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary text-center mb-4">
+            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               Benchmark Results
             </h2>
-            <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
+            <p className="text-text-secondary text-center mb-16 max-w-xl mx-auto">
               Projected scores from research analysis. Live results coming after Phase 6 testing.
             </p>
 
@@ -185,7 +214,7 @@ export default function HomePage() {
         {/* Playground Preview */}
         <section className="py-20 px-6">
           <div className="container-max text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary mb-4">
+            <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               See it in action
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
@@ -201,7 +230,7 @@ export default function HomePage() {
         {/* Open Source Callout */}
         <section className="py-20 px-6">
           <div className="container-max text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary mb-4">
+            <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               No black boxes. No markup. Just code.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
@@ -224,7 +253,7 @@ export default function HomePage() {
         {/* Research & Blog */}
         <section className="py-20 px-6 bg-bg-secondary">
           <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-text-primary text-center mb-4">
+            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               Research & Updates
             </h2>
             <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
