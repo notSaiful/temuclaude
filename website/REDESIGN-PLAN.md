@@ -1,4 +1,4 @@
-# TIMUCLAUDE — HERO & DESIGN REDESIGN PLAN
+# TEMUCLAUDE — HERO & DESIGN REDESIGN PLAN
 ## Based on direct CSS extraction from Stripe, Linear, Anthropic, Framer
 
 ---

@@ -45,8 +45,8 @@ export function Navbar() {
       >
         <div className="container-max h-full flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2" aria-label="Timuclaude home">
-            {/* Timuclaude Synthesis Logo — 5 converging strokes forming T */}
+          <Link href="/" className="flex items-center gap-2" aria-label="Temuclaude home">
+            {/* Temuclaude Synthesis Logo — 5 converging strokes forming T */}
             <svg width="28" height="28" viewBox="0 0 200 200" className="shrink-0" aria-hidden="true">
               <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
               <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
@@ -57,7 +57,7 @@ export function Navbar() {
               <circle cx="100" cy="85" r="6" fill="#D97757"/>
             </svg>
             <span className="text-lg font-semibold tracking-tight text-text-primary">
-              Timuclaude
+              Temuclaude
             </span>
           </Link>
 

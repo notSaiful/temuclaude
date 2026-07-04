@@ -1,5 +1,5 @@
 """
-Timuclaude Self-QA Gate
+Temuclaude Self-QA Gate
 After generating a response, a verifier model scores it 0-10.
 If below threshold (8), retry with feedback. Max 3 retries.
 
@@ -150,7 +150,7 @@ def build_reflexion_prompt(question: str, failed_answer: str, score: float, reas
             reflection_context += f"{i}. {r}\n"
     
     system_prompt = (
-        "You are Timuclaude. Your previous answer was not good enough. "
+        "You are Temuclaude. Your previous answer was not good enough. "
         "Reflect on what went wrong and provide an improved answer.\n\n"
         f"The previous answer scored {score:.1f}/10.\n"
         f"Reason: {reasoning}\n"
@@ -298,7 +298,7 @@ async def self_qa_gate(
                 )
                 
                 retry_messages = [
-                    {"role": "system", "content": "You are Timuclaude. Improve your previous answer based on feedback."},
+                    {"role": "system", "content": "You are Temuclaude. Improve your previous answer based on feedback."},
                     {"role": "user", "content": feedback},
                 ]
                 

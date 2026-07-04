@@ -15,7 +15,7 @@ RAW_DIR = os.path.join(os.path.dirname(__file__), "..", "raw")
 FINDINGS_DIR = os.path.join(os.path.dirname(__file__), "..", "findings")
 os.makedirs(FINDINGS_DIR, exist_ok=True)
 
-# Scoring keywords — higher weight = more relevant to timuclaude
+# Scoring keywords — higher weight = more relevant to temuclaude
 HIGH_VALUE_KEYWORDS = {
     # Orchestration core
     "orchestration": 10, "fusion": 10, "panel": 8, "judge": 8, "aggregator": 10,
@@ -211,7 +211,7 @@ def process_marketing_research(raw):
             score += 5
         elif priority == "medium":
             score += 3
-        if f.get("actionable_for_timuclaude", False):
+        if f.get("actionable_for_temuclaude", False):
             score += 3
         
         results.append({
@@ -221,7 +221,7 @@ def process_marketing_research(raw):
             "title": f.get("title", ""),
             "description": f.get("description", ""),
             "url": f.get("url", ""),
-            "actionable_for_timuclaude": f.get("actionable_for_timuclaude", False),
+            "actionable_for_temuclaude": f.get("actionable_for_temuclaude", False),
             "implementation_notes": f.get("implementation_notes", ""),
             "priority": priority,
             "relevance_score": score,

@@ -1,5 +1,5 @@
 {
-  "name": "timuclaude-website",
+  "name": "temuclaude-website",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "crypto-js": "^4.2.0",
     "framer-motion": "^12.42.2",
     "next": "^15.1.0",
+    "razorpay": "^2.9.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

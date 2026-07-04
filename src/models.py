@@ -1,5 +1,5 @@
 """
-Timuclaude Model Pool — Configuration for all Ollama Cloud models
+Temuclaude Model Pool — Configuration for all Ollama Cloud models
 """
 
 # Model pool configuration
@@ -98,14 +98,19 @@ AGGREGATOR_MAP = {
 }
 
 # OpenRouter model IDs (production backend — scales to thousands of concurrent users)
+# 8-model pool — deep researched July 4, 2026
 OPENROUTER_MODELS = {
-    "glm-5.2": "z-ai/glm-5.2",
-    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
-    "kimi-k2.6": "moonshotai/kimi-k2.6",
-    "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",
-    "minimax-m3": "minimax/minimax-m3",
-    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
-    "gpt-oss-120b": "openai/gpt-oss-120b",
+    "glm-5.2": "z-ai/glm-5.2",                          # IQ 51 — orchestrator
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",      # IQ 44 — hard reasoning
+    "hy3-preview": "tencent/hy3-preview",                # cheapest — trivial router (60% of queries)
+    "mimo-v2.5": "xiaomi/mimo-v2.5",                     # IQ 40 — multimodal (image+video)
+    "gemini-3-flash": "google/gemini-3-flash-preview",  # IQ 50 — #1 Legal, #2 Health
+    "minimax-m3": "minimax/minimax-m3",                  # IQ 44 — vision + creative
+    "claude-sonnet-5": "anthropic/claude-sonnet-5",     # IQ 53 — frontier fallback (hardest 2%)
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",  # IQ 38 — verifier
+    "kimi-k2.6": "moonshotai/kimi-k2.6",                # legacy — kept for compatibility
+    "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",      # legacy — kept for compatibility
+    "gpt-oss-120b": "openai/gpt-oss-120b",              # legacy — kept for compatibility
 }
 
 # Free models on OpenRouter (no cost, rate limited)

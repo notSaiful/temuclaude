@@ -10,5 +10,5 @@
     <circle cx="100" cy="85" r="6" fill="#D97757"/>
   </g>
   <!-- Wordmark -->
-  <text x="110" y="48" font-family="Inter, sans-serif" font-size="28" font-weight="400" letter-spacing="-0.5" fill="#1A1816">Timuclaude</text>
+  <text x="110" y="48" font-family="Inter, sans-serif" font-size="28" font-weight="400" letter-spacing="-0.5" fill="#1A1816">Temuclaude</text>
 </svg>

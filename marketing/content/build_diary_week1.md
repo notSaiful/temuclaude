@@ -1,7 +1,7 @@
 # BUILD DIARY — WEEK 1
 
 ## Tweet (Monday)
-Day 1 of building Timuclaude in public.
+Day 1 of building Temuclaude in public.
 
 Today: restructured the fusion module. 3 models now answer simultaneously instead of sequentially. 40% faster.
 

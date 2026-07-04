@@ -1,4 +1,4 @@
-# TIMUCLAUDE — X/TWITTER MARKETING STRATEGY VIA ZERNIO
+# TEMUCLAUDE — X/TWITTER MARKETING STRATEGY VIA ZERNIO
 ## Comprehensive Plan for Maximum Influence & User Acquisition
 
 ---
@@ -6,20 +6,20 @@
 ## PART 1: WHAT WE ARE SELLING
 
 ### The Product
-Timuclaude is an open-source LLM orchestration platform that combines multiple AI models (GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, GPT-OSS-120B, etc.) using fusion, self-consistency, code verification, and self-QA to produce answers that beat any single frontier model.
+Temuclaude is an open-source LLM orchestration platform that combines multiple AI models (GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, GPT-OSS-120B, etc.) using fusion, self-consistency, code verification, and self-QA to produce answers that beat any single frontier model.
 
 ### The Core Value Proposition
 **"One question, many minds, one superior answer."**
 
-Timuclaude sends your question to multiple LLMs simultaneously, fuses their outputs, verifies the answer through code execution and self-QA, and returns a response that's measurably better than GPT-5.6 Sol, Gemini 3.5 Pro, or any single model alone.
+Temuclaude sends your question to multiple LLMs simultaneously, fuses their outputs, verifies the answer through code execution and self-QA, and returns a response that's measurably better than GPT-5.6 Sol, Gemini 3.5 Pro, or any single model alone.
 
 ### What We're Actually Selling (Based on Research)
 
-The research is clear: successful AI infrastructure companies don't sell the framework — they sell what the framework ENABLES. Here's what Timuclaude sells:
+The research is clear: successful AI infrastructure companies don't sell the framework — they sell what the framework ENABLES. Here's what Temuclaude sells:
 
 | What We Sell | To Whom | Why They Pay |
 |---|---|---|
-| **Superior AI accuracy** | Developers, researchers | Timuclaude beats single models on benchmarks. Better answers = better products. |
+| **Superior AI accuracy** | Developers, researchers | Temuclaude beats single models on benchmarks. Better answers = better products. |
 | **Cost optimization** | Startups, enterprises | Multi-model fusion with caching/deduplication saves 60-80% on inference costs (proven pattern from research) |
 | **Model independence** | Enterprises, privacy-conscious devs | No vendor lock-in. Switch models freely. Self-host with Ollama. Zero dependency on OpenAI/Google. |
 | **Production reliability** | Enterprise AI teams | 3-backend fallback (Ollama → OpenRouter → ai/ml). Circuit breakers. No single point of failure. |
@@ -34,7 +34,7 @@ The research shows 3 proven business models for AI orchestration:
 2. **API Consumption** (Together AI, OpenRouter)
 3. **Freemium Developer → Enterprise Upsell** (all successful companies)
 
-**Timuclaude's Model: Hybrid of All Three**
+**Temuclaude's Model: Hybrid of All Three**
 - **Free tier**: Open-source, self-host with Ollama (unlimited, free forever)
 - **API tier**: Pay-per-token via OpenRouter/ai/ml (usage-based, no seat fees)
 - **Enterprise tier**: Self-hosted with support, SLAs, custom integration, compliance
@@ -110,13 +110,13 @@ Based on the Cursor case study (0 → $100M ARR, zero marketing budget) and broa
 | Content Type | Engagement | Why It Works | Example |
 |---|---|---|---|
 | **Product demo videos** | HIGHEST | Show-don't-tell. 30-second demo > 1000 words. | Cursor's launch tweet showing bug-fixing |
-| **Benchmark results** | VERY HIGH | Developers trust numbers. Sparks debate = engagement. | "Timuclaude beats GPT-5.6 Sol on MMLU" |
-| **Before/after comparisons** | VERY HIGH | Visually demonstrates value. Highly shareable. | "Single model answer vs Timuclaude fusion answer" |
+| **Benchmark results** | VERY HIGH | Developers trust numbers. Sparks debate = engagement. | "Temuclaude beats GPT-5.6 Sol on MMLU" |
+| **Before/after comparisons** | VERY HIGH | Visually demonstrates value. Highly shareable. | "Single model answer vs Temuclaude fusion answer" |
 | **Founder threads** | HIGH | Personal authority + narrative. Thread = mini blog. | Architecture decisions, design philosophy |
 | **Build-in-public** | HIGH | Authenticity. Devs relate to struggles. | "Day 47: Got fusion working with 3 models" |
-| **Tutorials / how-to** | HIGH | Educational = bookmarks (algorithm boost) | "How to set up Timuclaude with Ollama in 3 min" |
+| **Tutorials / how-to** | HIGH | Educational = bookmarks (algorithm boost) | "How to set up Temuclaude with Ollama in 3 min" |
 | **Memes / hot takes** | MEDIUM-HIGH | Emotional engagement = retweets. Dev humor. | "When you realize one model isn't enough" |
-| **Customer wins / proof** | MEDIUM | Social proof drives conversion. | "Startup X reduced AI costs 70% with Timuclaude" |
+| **Customer wins / proof** | MEDIUM | Social proof drives conversion. | "Startup X reduced AI costs 70% with Temuclaude" |
 
 ### What Does NOT Work
 - Corporate-speak ("We're excited to announce...")
@@ -133,7 +133,7 @@ Based on the Cursor case study (0 → $100M ARR, zero marketing budget) and broa
 ### Phase 1: Foundation (Month 1)
 | Goal | Metric | Target |
 |---|---|---|
-| Establish Timuclaude X presence | Follower count | 500+ targeted followers |
+| Establish Temuclaude X presence | Follower count | 500+ targeted followers |
 | Prove technical credibility | Benchmark posts published | 3+ with full methodology |
 | Build initial community | GitHub stars | 100+ |
 | Content output | Posts per week | 14 (2/day) |
@@ -162,7 +162,7 @@ Before posting, every tweet must pass this checklist:
 1. Does it show proof (benchmark, demo, code, screenshot)?
 2. Would a developer share this with their team?
 3. Is it authentic (not corporate-speak)?
-4. Does it add value even if you never use Timuclaude?
+4. Does it add value even if you never use Temuclaude?
 5. Does it invite engagement (question, debate, comparison)?
 
 ---
@@ -182,17 +182,17 @@ The research revealed the exact playbook that made Cursor the fastest SaaS to $1
 7. **Build in public** — Share metrics, failures, milestones. Transparency = growth multiplier
 8. **Zero marketing budget** — Product-led growth + organic virality > paid ads
 
-### Timuclaude's Adaptation of the Cursor Blueprint
+### Temuclaude's Adaptation of the Cursor Blueprint
 
 **Phase 1: Founder Authority Building (Weeks 1-4)**
 - Post about LLM orchestration problems, multi-model fusion, benchmark results
-- Share insights from building Timuclaude (architecture decisions, what works, what fails)
+- Share insights from building Temuclaude (architecture decisions, what works, what fails)
 - Engage with AI Twitter (reply to Karpathy, Altman, Rauch, Masad with substantive takes)
-- Post benchmark comparisons (Timuclaude vs single models) with full methodology
+- Post benchmark comparisons (Temuclaude vs single models) with full methodology
 - Goal: Build authority as "the person who knows LLM orchestration"
 
 **Phase 2: Launch Virality (Week 5-6)**
-- Launch tweet: 60-second video demo showing Timuclaude answering a question that GPT-5.6 Sol gets wrong
+- Launch tweet: 60-second video demo showing Temuclaude answering a question that GPT-5.6 Sol gets wrong
 - Thread: "I built an open-source LLM orchestrator that beats GPT-5.6 Sol. Here's how it works 🧵"
 - Cross-post: Hacker News "Show HN" simultaneously
 - Simple landing page: GitHub repo + value prop + quickstart
@@ -203,7 +203,7 @@ The research revealed the exact playbook that made Cursor the fastest SaaS to $1
 - Share user success stories
 - Post behind-the-scenes architecture content
 - Create Discord/Telegram community
-- Run "challenge" posts (Can your model beat Timuclaude on this question?)
+- Run "challenge" posts (Can your model beat Temuclaude on this question?)
 
 ### Zernio Execution Plan
 
@@ -231,18 +231,18 @@ Zernio gives us:
 ### Pillar 1: BENCHMARK PROOF (30% of content)
 **The single most powerful content type for AI dev tools.**
 
-- Timuclaude vs GPT-5.6 Sol on MMLU/HLE/MRCR (with full methodology)
-- Timuclaude vs Gemini 3.5 Pro on reasoning tasks
+- Temuclaude vs GPT-5.6 Sol on MMLU/HLE/MRCR (with full methodology)
+- Temuclaude vs Gemini 3.5 Pro on reasoning tasks
 - "We ran 100 questions through 5 models. Here's who won."
-- Cost comparison: Timuclaude (Ollama, free) vs OpenAI API ($X/month)
+- Cost comparison: Temuclaude (Ollama, free) vs OpenAI API ($X/month)
 - Real-time leaderboard updates as new models drop
 
 Format:
 ```
-📊 BENCHMARK: Timuclaude vs GPT-5.6 Sol
+📊 BENCHMARK: Temuclaude vs GPT-5.6 Sol
 
 Dataset: MMLU (100 questions)
-Timuclaude: 87.3% accuracy
+Temuclaude: 87.3% accuracy
 GPT-5.6 Sol: 84.1% accuracy
 Improvement: +3.2%
 
@@ -255,7 +255,7 @@ Can your model beat this? Reply with your benchmark. 👇
 ### Pillar 2: BUILD IN PUBLIC (25% of content)
 **Authenticity is the #1 trust builder for developers.**
 
-- "Day X of building Timuclaude: Today I implemented fusion with 3 models"
+- "Day X of building Temuclaude: Today I implemented fusion with 3 models"
 - Architecture decision threads ("Why I chose async over sync for model calls")
 - Failures and lessons ("Tried MCTS for reasoning. Here's why it didn't work (yet)")
 - Metrics milestones ("50 GitHub stars! Here's what got us here")
@@ -277,19 +277,19 @@ Code: [GitHub link]
 ### Pillar 3: EDUCATIONAL TUTORIALS (20% of content)
 **High bookmark rate = algorithm boost.**
 
-- "How to set up Timuclaude with Ollama in 3 minutes"
+- "How to set up Temuclaude with Ollama in 3 minutes"
 - "Multi-model fusion explained: Why 3 models beat 1"
-- "How to add your own model to Timuclaude's pool"
+- "How to add your own model to Temuclaude's pool"
 - "Self-consistency vs self-QA: What's the difference?"
-- "Cost optimization: How Timuclaude saves 70% on inference"
+- "Cost optimization: How Temuclaude saves 70% on inference"
 
 Format (thread):
 ```
-🧵 HOW TO: Set up Timuclaude with Ollama (free, unlimited, local)
+🧵 HOW TO: Set up Temuclaude with Ollama (free, unlimited, local)
 
 1/ Install Ollama
-2/ pip install timuclaude
-3/ Set TIMUCLAUDE_BACKEND=ollama
+2/ pip install temuclaude
+3/ Set TEMUCLAUDE_BACKEND=ollama
 4/ tc.complete("Your question here")
 
 That's it. No API keys. No cloud. No cost.
@@ -303,7 +303,7 @@ Full tutorial: [link]
 - "LangChain's abstraction is killing your model's performance. Here's proof."
 - "One model is never enough. The future is fusion."
 - "Open-source AI will beat closed-source. Here's when."
-- "Why I'm building Timuclaude instead of using GPT-5.6 Sol"
+- "Why I'm building Temuclaude instead of using GPT-5.6 Sol"
 - "The 'multi-agent' label is 90% marketing. Here's what real orchestration looks like."
 
 Format:
@@ -312,7 +312,7 @@ Format:
 
 Research shows wrapping LLMs in complex frameworks truncates context and degrades output quality.
 
-Timuclaude takes the opposite approach: minimal abstraction, maximum transparency.
+Temuclaude takes the opposite approach: minimal abstraction, maximum transparency.
 
 Proof: [benchmark thread link]
 ```
@@ -320,15 +320,15 @@ Proof: [benchmark thread link]
 ### Pillar 5: COMMUNITY & SOCIAL PROOF (10% of content)
 **Developers trust other developers more than any marketing.**
 
-- User testimonials ("X used Timuclaude and saved $Y/month")
+- User testimonials ("X used Temuclaude and saved $Y/month")
 - GitHub milestone celebrations
 - Community contributions highlights
 - Retweet user implementations
-- "Challenge" posts (Can your model beat Timuclaude on this?)
+- "Challenge" posts (Can your model beat Temuclaude on this?)
 
 Format:
 ```
-👥 COMMUNITY: @user built a custom model pool for Timuclaude with 5 local models.
+👥 COMMUNITY: @user built a custom model pool for Temuclaude with 5 local models.
 
 Result: 90% accuracy on their domain-specific benchmark, running entirely on their laptop.
 
@@ -430,7 +430,7 @@ Based on the research, here are the non-negotiable elements:
 - [ ] Post 2 benchmark results per week
 - [ ] Share build-in-public updates daily
 - [ ] Engage with 10+ AI Twitter accounts per day (replies)
-- [ ] Run first "challenge" post (Can your model beat Timuclaude?)
+- [ ] Run first "challenge" post (Can your model beat Temuclaude?)
 
 ### Week 5-6: Launch Push
 - [ ] Launch tweet with 60-second video demo
@@ -479,7 +479,7 @@ Based on the research, here are the non-negotiable elements:
 
 ## SUMMARY: THE STRATEGY IN ONE SENTENCE
 
-Build founder authority on X/Twitter by posting benchmark proof, building in public, and sharing educational content — then launch with a video demo that shows Timuclaude beating a frontier model in 60 seconds, using Zernio to schedule, post, and analyze across the entire campaign.
+Build founder authority on X/Twitter by posting benchmark proof, building in public, and sharing educational content — then launch with a video demo that shows Temuclaude beating a frontier model in 60 seconds, using Zernio to schedule, post, and analyze across the entire campaign.
 
 ---
 

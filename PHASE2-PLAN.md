@@ -2,7 +2,7 @@
 
 ## What We're Building
 
-Phase 2 adds the real power: Fusion (multiple models in parallel), self-consistency (voting), code execution verification, and dynamic aggregator selection. This is where Timuclaude goes from "smart router" to "Fable 5 killer."
+Phase 2 adds the real power: Fusion (multiple models in parallel), self-consistency (voting), code execution verification, and dynamic aggregator selection. This is where Temuclaude goes from "smart router" to "Fable 5 killer."
 
 ## Components
 

@@ -1,4 +1,4 @@
-# Timuclaude — PLAN v6 (FINAL BREAKTHROUGH)
+# Temuclaude — PLAN v6 (FINAL BREAKTHROUGH)
 
 ## The Complete Architecture That Beats Frontier
 
@@ -240,7 +240,7 @@ For the hardest reasoning/math problems where Fusion isn't enough:
 
 ## 6. PROJECTED SCORECARD
 
-| Benchmark | Fable 5 / GPT-5.5 | Timuclaude (projected) | We Win? |
+| Benchmark | Fable 5 / GPT-5.5 | Temuclaude (projected) | We Win? |
 |-----------|-------------------|----------------------|---------|
 | Terminal-Bench v2.1 | 85% | 90-95% | **YES** |
 | GPQA Diamond | 94% | 95-98% | **YES** |
@@ -254,9 +254,9 @@ For the hardest reasoning/math problems where Fusion isn't enough:
 
 **We beat frontier on 6 out of 9 benchmarks.** On the 3 we lose, we match 70-90% of frontier quality at 50x lower cost.
 
-## 7. WHAT MAKES TIMUCLAUDE SUPERIOR TO FUGU
+## 7. WHAT MAKES TEMUCLAUDE SUPERIOR TO FUGU
 
-| Feature | Fugu | Timuclaude |
+| Feature | Fugu | Temuclaude |
 |---------|------|------------|
 | Orchestration | Trained model (SFT+ES+RL) | Hermes (no training needed) |
 | Strategies | 3 (debate, build-debug, specialist) | 8+ (Fusion, MCTS, self-consistency, OPRO, Reflexion, skill extraction, tool verify, direct) |
@@ -312,7 +312,7 @@ LiteLLM is our infrastructure layer. It provides:
 - Caching for repeated queries
 - Guardrails for safety
 
-### LiteLLM Config for Timuclaude:
+### LiteLLM Config for Temuclaude:
 
 ```yaml
 model_list:
@@ -363,7 +363,7 @@ model_list:
         strengths: ["factual_lookup", "writing", "general"]
 
   # Adaptive router — LEARNS over time
-  - model_name: timuclaude
+  - model_name: temuclaude
     litellm_params:
       model: auto_router/adaptive_router
       adaptive_router_config:
@@ -403,7 +403,7 @@ User Query → Hermes (orchestrator + skills + Fusion + MCTS + verification)
 - Test all models respond through LiteLLM unified API
 - Set up Postgres for Adaptive Router learning
 
-### Step 2: Timuclaude Orchestration Skill
+### Step 2: Temuclaude Orchestration Skill
 - Implement all 8 strategies as Hermes skill
 - Auto-skill loading from Hermes hub
 - Fusion pattern (panel + judge + structured analysis)
@@ -438,7 +438,7 @@ User Query → Hermes (orchestrator + skills + Fusion + MCTS + verification)
 
 ## 9. THE VALUE PROPOSITION
 
-**Timuclaude beats frontier on 6/9 benchmarks at 50x lower cost.**
+**Temuclaude beats frontier on 6/9 benchmarks at 50x lower cost.**
 
 Why people choose us over Fable 5:
 1. **Better on coding** (Terminal-Bench, LiveCodeBench, SciCode, SWE-Bench) — tool verification is ground truth
@@ -449,4 +449,4 @@ Why people choose us over Fable 5:
 6. **Hermes integration** — full agent platform, not just a model API
 7. **Self-improving** — OPRO + skill extraction + logging = gets better daily
 
-**Timuclaude is not "cheap Fugu." Timuclaude is "Fugu + Fusion + MCTS + self-consistency + skills + self-improvement at flat cost."**
+**Temuclaude is not "cheap Fugu." Temuclaude is "Fugu + Fusion + MCTS + self-consistency + skills + self-improvement at flat cost."**

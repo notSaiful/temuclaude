@@ -10,7 +10,7 @@ export default function EnterprisePage() {
           <div className="text-center mb-16">
             <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Enterprise-grade AI orchestration</h1>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">Security, compliance, and scale for your team.</p>
-            <a href="mailto:hello@timuclaude.com" className="btn-primary">Contact Sales</a>
+            <a href="mailto:hello@temuclaude.com" className="btn-primary">Contact Sales</a>
           </div>
 
           <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
@@ -35,7 +35,7 @@ export default function EnterprisePage() {
             <div className="card max-w-md mx-auto">
               <h3 className="text-lg font-semibold text-text-primary mb-2">Custom pricing</h3>
               <p className="text-sm text-text-secondary mb-4">Contact our team for a quote tailored to your needs.</p>
-              <a href="mailto:hello@timuclaude.com" className="btn-primary w-full">Contact Sales</a>
+              <a href="mailto:hello@temuclaude.com" className="btn-primary w-full">Contact Sales</a>
             </div>
           </div>
         </div>

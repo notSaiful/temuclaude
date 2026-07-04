@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-LLM orchestration IS fundamentally a management problem. Every function that a human manager performs for a team of specialists, an LLM orchestrator must perform for a pool of models. This report maps 8 domains of management science directly to LLM orchestration (specifically timuclaude), extracting principles that make both the orchestrator and the agent better at planning, executing, and self-managing.
+LLM orchestration IS fundamentally a management problem. Every function that a human manager performs for a team of specialists, an LLM orchestrator must perform for a pool of models. This report maps 8 domains of management science directly to LLM orchestration (specifically temuclaude), extracting principles that make both the orchestrator and the agent better at planning, executing, and self-managing.
 
 ---
 
@@ -20,9 +20,9 @@ Henri Fayol (1841–1925), a French mining engineer and executive, developed the
 
 Fayol also identified **14 principles of management**: Division of work, Authority & Responsibility, Discipline, Unity of command, Unity of direction, Subordination of individual interest to general interest, Remuneration, Centralization/Decentralization, Scalar chain, Order, Equity, Stability of tenure, Initiative, Esprit de Corps.
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
-| Fayol's Function | LLM Orchestration Equivalent | Timuclaude Implementation |
+| Fayol's Function | LLM Orchestration Equivalent | Temuclaude Implementation |
 |---|---|---|
 | **Planning** | Task decomposition, query classification, strategy selection, MCTS rollout planning | Analyze incoming query → classify type (code/math/reasoning/creative) → select orchestration strategy (single model, panel, layered, adversarial) |
 | **Organizing** | Model pool structure, panel composition, layer architecture, pipeline design | Which models sit in which layer? How many models per panel? What's the verification topology? Who generates vs who reviews? |
@@ -37,7 +37,7 @@ Fayol also identified **14 principles of management**: Division of work, Authori
 - **Division of work**: Specialize models for what they're best at. Don't use a generalist where a specialist excels.
 - **Esprit de Corps**: In human terms, team spirit. In orchestration terms, the fusion layer should create harmony from diverse model outputs, not just average them.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 PLANNING:  query → classify → strategy_select → decompose into sub-tasks
@@ -68,7 +68,7 @@ Google's **Project Oxygen** (launched 2008) studied what makes managers great th
 
 A crucial insight from Kim Scott (former Google exec): "A crucial mistake many bosses make is trying to make every decision themselves, rather than knowing when to rely on the expertise of others."
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 | Project Oxygen Trait | Orchestration Equivalent |
 |---|---|
@@ -90,7 +90,7 @@ A crucial insight from Kim Scott (former Google exec): "A crucial mistake many b
 - **Be a good coach to myself**: Give myself constructive feedback. After completing a task, reflect on what worked and what didn't (meta-cognition).
 - **Know when to rely on expertise of others**: Use the right tool for the job. Don't try to do everything with one approach.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 - **Coaching**: System prompts should include examples, not just instructions. "Here's what a good output looks like..."
 - **Empowerment**: Give models reasoning steps but let them fill in the details. Don't over-template outputs.
@@ -122,7 +122,7 @@ Klein's (1998) seven information types of intent communication:
 6. Anticipated constraints
 7. Risk acceptance
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 The **system prompt IS the leader's direction**. A great system prompt:
 - States the **purpose** (why this task matters)
@@ -142,7 +142,7 @@ The **system prompt IS the leader's direction**. A great system prompt:
 - **Minimal amplifying detail**: Overly detailed instructions constrain and degrade performance. State the goal clearly, then trust the executor.
 - **Include rationale**: When I give myself instructions, include WHY — this helps with edge cases that instructions don't explicitly cover.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 SYSTEM PROMPT TEMPLATE (Mission Command Style):
@@ -173,7 +173,7 @@ Organizations handle complexity through:
 
 Key insight: **Complexity increases faster than organizational size**. The solution is hierarchical decomposition with selective gang planks for speed.
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 - **Task decomposition = organizational decomposition**: Breaking a complex query into sub-tasks is exactly how organizations decompose complex problems
 - **Layer architecture = organizational hierarchy**: Each layer is a management level. Layer 1 (planning) → Layer 2 (execution) → Layer 3 (verification) = Strategic → Tactical → Operational
@@ -189,7 +189,7 @@ Key insight: **Complexity increases faster than organizational size**. The solut
 - **Know when to use gang planks**: Sometimes I should pass intermediate results directly between steps without re-planning at each step.
 - **Match structure to problem complexity**: Simple queries = flat (single model). Complex queries = hierarchical (layered). Ambiguous queries = panel (multiple perspectives).
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 Complexity routing:
@@ -256,7 +256,7 @@ Six Sigma seeks to improve quality by:
 - Target: 3.4 defects per million opportunities (DPMO)
 - Uses statistical process control and DMAIC methodology (Define, Measure, Analyze, Improve, Control)
 
-### How It All Maps to LLM Orchestration (Timuclaude)
+### How It All Maps to LLM Orchestration (Temuclaude)
 
 | Quality Principle | Orchestration Implementation |
 |---|---|
@@ -278,7 +278,7 @@ Six Sigma seeks to improve quality by:
 - **Kaizen mindset**: After each task, note what worked and what didn't. Continuously refine my approach.
 - **Eliminate waste**: Don't over-generate (too many words), don't wait unnecessarily, don't over-process simple requests.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 QUALITY CONTROL PIPELINE:
@@ -350,7 +350,7 @@ Klein's 7 information types of intent: (1) purpose, (2) objective, (3) sequence,
 
 **Mission command gives permission to disobey orders to further the execution of the mission.** (NORDBAT 2 example in Bosnia — commanders disregarded orders that conflicted with the mission purpose.)
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 | Military Principle | Orchestration Implementation |
 |---|---|
@@ -370,7 +370,7 @@ Klein's 7 information types of intent: (1) purpose, (2) objective, (3) sequence,
 - **Handle fog and friction**: When tools fail or information is incomplete, don't freeze — adapt like a military unit adapts to fog.
 - **Cycle faster**: The faster I go through OODA, the more responsive and effective I am.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 MCTS as Military Planning:
@@ -415,7 +415,7 @@ Key principles:
 - **Peer review**: Evaluation by experts in the same field. Reviewers are anonymous, can't be pressured. Top journals reject >90% of submissions.
 - **Not a fixed recipe**: Requires intelligence, imagination, creativity — not mindless adherence to procedure
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 | Scientific Principle | Orchestration Implementation |
 |---|---|
@@ -433,7 +433,7 @@ Key principles:
 - **Peer review myself**: Before delivering a final answer, have a "review pass" — read my own output critically, as if someone else wrote it.
 - **Embrace being wrong**: The scientific method requires that wrong hypotheses be discarded. If my first approach fails, abandon it and try a new hypothesis.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 SCIENTIFIC VERIFICATION PIPELINE:
@@ -483,7 +483,7 @@ Key tension: **Autonomy vs Control**.
 - Too much control → rigidity, slowness, stifled initiative
 - The solution: **clear purpose + constraints + trust**. Give autonomy within well-defined boundaries.
 
-### How It Maps to LLM Orchestration (Timuclaude)
+### How It Maps to LLM Orchestration (Temuclaude)
 
 | Self-Management Principle | Orchestration Implementation |
 |---|---|
@@ -502,7 +502,7 @@ Key tension: **Autonomy vs Control**.
 - **Retrospective habit**: After completing tasks, reflect on what worked. Build this into my workflow.
 - **Balance autonomy and control**: Give myself freedom to explore approaches, but apply verification gates before delivering final output.
 
-### Practical Implementation for Timuclaude
+### Practical Implementation for Temuclaude
 
 ```
 SELF-MANAGING ORCHESTRATION ARCHITECTURE:
@@ -552,7 +552,7 @@ Autonomy-Control Balance:
 
 7. **SELF-MANAGEMENT REQUIRES CLEAR ROLES + TRUST + FEEDBACK**: Define roles, give autonomy, build verification, iterate. This applies to both models AND the agent itself.
 
-### The Timuclaude Management Stack
+### The Temuclaude Management Stack
 
 ```
 PLANNING (Fayol + OODA Observe/Orient)

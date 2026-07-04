@@ -41,7 +41,7 @@ This means we can run 5 models in parallel for Fusion. Pro ($20/mo) only allows 
 ### Configuration for Ollama:
 ```yaml
 model_list:
-  - model_name: timuclaude
+  - model_name: temuclaude
     litellm_params:
       model: ollama_chat/glm-5.2:cloud
       api_base: http://localhost:11434
@@ -62,8 +62,8 @@ model_list:
 - **Adaptive Router**: bandit algorithm learns best model per task type (requires Postgres)
 - **Virtual keys**: create API keys with spend limits
 
-### For Timuclaude:
-- Use `model_name: timuclaude` as the user-facing model
+### For Temuclaude:
+- Use `model_name: temuclaude` as the user-facing model
 - Route to different Ollama Cloud models based on task
 - Fallbacks: if one model fails, try another
 - Cost tracking: track spend per query
@@ -72,7 +72,7 @@ model_list:
 ## Project Structure
 
 ```
-/Users/saiful/timuclaude/
+/Users/saiful/temuclaude/
 ├── src/
 │   ├── __init__.py
 │   ├── orchestrator.py       # Main orchestration logic

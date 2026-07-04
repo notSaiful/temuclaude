@@ -1,4 +1,4 @@
-# TIMUCLAUDE — INFORMATION CLASSIFICATION (CORRECTED)
+# TEMUCLAUDE — INFORMATION CLASSIFICATION (CORRECTED)
 ## What to Share, What to Keep Confidential
 
 ---
@@ -20,7 +20,7 @@ LESSON: Be radically transparent about technology (builds community + authority)
 
 "Forbes (Feb 2026): Nothing is sticky anymore. Customers can leave in a single afternoon. Only two kinds survive: the defaults (obvious, unavoidable) and the specialists (solve one hard problem irreplaceably)."
 
-Timuclaude's path: become THE specialist in multi-model orchestration. Transparency builds authority. Authority builds community. Community is the moat.
+Temuclaude's path: become THE specialist in multi-model orchestration. Transparency builds authority. Authority builds community. Community is the moat.
 
 ---
 
@@ -35,7 +35,7 @@ Timuclaude's path: become THE specialist in multi-model orchestration. Transpare
 
 ### Benchmark Results (honest, including losses)
 - Share headline numbers: "86.7% accuracy, 29% faster"
-- Share WHERE we lose: "Both GLM-5.2 and Timuclaude got the water jug problem wrong. Fusion didn't help because all 3 models failed the same way."
+- Share WHERE we lose: "Both GLM-5.2 and Temuclaude got the water jug problem wrong. Fusion didn't help because all 3 models failed the same way."
 - Share methodology: "15 hard reasoning questions, exact match scoring, run on Ollama with GLM-5.2 + DeepSeek V4 + Kimi K2.6"
 - WHY: The research showed "benchmark gaming is endemic — Meta, OpenAI, Google all cherry-pick. Being the honest broker in a market of cheaters is itself a moat." Sharing losses builds MORE trust than sharing only wins.
 
@@ -127,7 +127,7 @@ GOAL: Add commercial capture without losing community
 - Build a "Golden Standard" test suite of hard reasoning questions
 - Use it internally to verify every change improves performance
 - Never publish the specific questions
-- Publish the results: "Timuclaude passed 87/100 Golden Standard questions this week, up from 83 last week"
+- Publish the results: "Temuclaude passed 87/100 Golden Standard questions this week, up from 83 last week"
 - The test suite becomes the quality bar competitors can't see but can feel
 
 ---

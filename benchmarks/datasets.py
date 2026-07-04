@@ -1,5 +1,5 @@
 """
-Timuclaude Benchmark Dataset Loaders
+Temuclaude Benchmark Dataset Loaders
 Loads datasets from HuggingFace, local JSON, or custom formats.
 
 Supported:

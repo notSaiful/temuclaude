@@ -1,5 +1,5 @@
 """
-Timuclaude Phase 3 Test Suite
+Temuclaude Phase 3 Test Suite
 Tests: Self-QA gate, skill loading, log analysis, adaptive routing, GEPA
 """
 import sys
@@ -15,7 +15,7 @@ from src.skills_loader import load_skill_principles, build_enhanced_system_promp
 from src.analyzer import analyze_logs, print_report
 from src.adaptive import get_adaptive_routing, get_model_for_task, update_adaptive_routing, reset_adaptive_routing, ADAPTIVE_CONFIG_PATH
 from src.gepa import get_evolved_prompts, get_system_prompt, evolve_prompts
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 
 
 # ============================================================
@@ -111,8 +111,8 @@ def test_skill_loading() -> bool:
         knowledge_ok = False
     
     # Enhanced system prompt
-    enhanced = build_enhanced_system_prompt("coding", "You are Timuclaude.")
-    if "Timuclaude" in enhanced:
+    enhanced = build_enhanced_system_prompt("coding", "You are Temuclaude.")
+    if "Temuclaude" in enhanced:
         print(f"  OK: enhanced prompt built ({len(enhanced)} chars)")
         enhanced_ok = True
     else:
@@ -234,7 +234,7 @@ def test_gepa_prompt_loading() -> bool:
     
     # No evolved prompts yet → should return default
     prompt = get_system_prompt("math", "Default prompt")
-    assert "Default prompt" in prompt or "Timuclaude" in prompt, f"Should return default: {prompt}"
+    assert "Default prompt" in prompt or "Temuclaude" in prompt, f"Should return default: {prompt}"
     print(f"  OK: returns default when no evolved prompts")
     
     # Create a fake evolved prompt
@@ -263,7 +263,7 @@ def test_self_qa_gate_live() -> bool:
     """Test that Self-QA gate scores a good answer and accepts it."""
     print("\n=== SELF-QA GATE LIVE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     try:
@@ -313,7 +313,7 @@ def test_integration_live() -> bool:
     """Test that a medium-tier query uses adaptive routing + skills."""
     print("\n=== INTEGRATION LIVE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     # Medium coding query should use adaptive routing + skill-enhanced prompt
@@ -346,7 +346,7 @@ def test_integration_live() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 3 TEST SUITE")
+    print("TEMUCLAUDE — PHASE 3 TEST SUITE")
     print("=" * 60)
 
     results = []

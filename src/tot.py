@@ -1,5 +1,5 @@
 """
-Timuclaude Tree of Thoughts Module
+Temuclaude Tree of Thoughts Module
 Explores multiple reasoning paths as a tree using BFS with LLM self-evaluation.
 
 Based on:

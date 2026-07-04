@@ -8,7 +8,7 @@ GPT-5.6 Sol got this question wrong.
 GPT-5.6 Sol: [wrong answer]
 Correct answer: [correct answer]
 
-Timuclaude ran it through 3 models:
+Temuclaude ran it through 3 models:
 - GLM-5.2: [answer]
 - DeepSeek V4: [answer]
 - Kimi K2.6: [answer]
@@ -23,7 +23,7 @@ The system won.
 Link in bio.
 
 ## Follow-up Tweet (optional)
-How did Timuclaude know which model to trust?
+How did Temuclaude know which model to trust?
 
 It didn't pick one. It used weighted voting:
 

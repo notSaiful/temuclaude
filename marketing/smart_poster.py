@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Timuclaude Smart Poster — agent-generated tweets based on real project activity.
+Temuclaude Smart Poster — agent-generated tweets based on real project activity.
 This script is called by the cron job agent. It gathers context and provides it
 to the agent, who then crafts an authentic tweet and posts it.
 
@@ -36,14 +36,14 @@ def get_evergreen_fallback(slot):
     evergreen = {
         "morning": [
             "The AI industry wants ONE model to rule them all. Wrong game. The right game: use ALL of them. Together. Every model has different blind spots. Fusion catches them. The future is not one model. It is orchestration.",
-            "OpenAI spent $500M on GPT-5.6. Google spent $300M on Gemini 3.5. Timuclaude uses all of them. For free. On your laptop. No training budget. Just orchestration. Link in bio.",
+            "OpenAI spent $500M on GPT-5.6. Google spent $300M on Gemini 3.5. Temuclaude uses all of them. For free. On your laptop. No training budget. Just orchestration. Link in bio.",
         ],
         "midday": [
-            "Why is Timuclaude open-source? Because AI should not be locked behind API keys and credit cards. Because a student in India should not need OpenAI credits for world-class AI. Free with Ollama. No cloud. No bills. Link in bio.",
+            "Why is Temuclaude open-source? Because AI should not be locked behind API keys and credit cards. Because a student in India should not need OpenAI credits for world-class AI. Free with Ollama. No cloud. No bills. Link in bio.",
             "I spent 3 days debugging why fusion gave worse answers than a single model. Problem: averaging answers. Fix: weighted voting by confidence. Sure models get more weight. +12% accuracy overnight.",
         ],
         "evening": [
-            "Single LLMs get hard questions wrong. Not obviously wrong. Subtly, confidently wrong. The kind of wrong that ships to production and breaks things at 3 AM. And you do not know WHICH ones. That is the problem Timuclaude solves.",
+            "Single LLMs get hard questions wrong. Not obviously wrong. Subtly, confidently wrong. The kind of wrong that ships to production and breaks things at 3 AM. And you do not know WHICH ones. That is the problem Temuclaude solves.",
         ],
     }
     return evergreen.get(slot, evergreen["morning"])

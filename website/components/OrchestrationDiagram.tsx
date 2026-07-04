@@ -21,7 +21,7 @@ export function OrchestrationDiagram() {
   }, []);
 
   return (
-    <div ref={ref} className="w-full max-w-2xl mx-auto" aria-label="Orchestration diagram showing 5 AI models connecting to Timuclaude">
+    <div ref={ref} className="w-full max-w-2xl mx-auto" aria-label="Orchestration diagram showing 5 AI models connecting to Temuclaude">
       <svg viewBox="0 0 600 400" className="w-full h-auto">
         {/* Connection lines */}
         {[
@@ -91,7 +91,7 @@ export function OrchestrationDiagram() {
           </g>
         ))}
 
-        {/* Central hub — Timuclaude */}
+        {/* Central hub — Temuclaude */}
         <g
           style={{
             opacity: visible ? 1 : 0,

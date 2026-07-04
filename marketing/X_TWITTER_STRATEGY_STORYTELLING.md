@@ -1,4 +1,4 @@
-# TIMUCLAUDE — STORYTELLING-DRIVEN X/TWITTER MARKETING STRATEGY
+# TEMUCLAUDE — STORYTELLING-DRIVEN X/TWITTER MARKETING STRATEGY
 ## Reframed with Narrative Excellence via Deep Research
 
 ---
@@ -9,26 +9,26 @@
 
 Stories are processed by the brain differently than facts. When someone hears a story, their brain releases oxytocin (trust/bonding hormone), dopamine (engagement/reward), and cortisol (stress/attention during conflict). Facts activate 2 brain regions. Stories activate 7+. A story is 22x more memorable than a fact alone.
 
-This means: "Timuclaude achieves 87.3% accuracy on MMLU" is forgettable. "I watched 3 models disagree on a simple math question, built a system that makes them agree, and now it beats GPT-5.6 Sol" is unforgettable.
+This means: "Temuclaude achieves 87.3% accuracy on MMLU" is forgettable. "I watched 3 models disagree on a simple math question, built a system that makes them agree, and now it beats GPT-5.6 Sol" is unforgettable.
 
 ### The 7 Storytelling Frameworks We Will Use
 
 #### Framework 1: The Hero's Journey (Campbell, Adapted for Brands)
-The classic 12-stage journey, adapted for Timuclaude. The KEY insight from research: the CUSTOMER is the hero, not us. We are the guide.
+The classic 12-stage journey, adapted for Temuclaude. The KEY insight from research: the CUSTOMER is the hero, not us. We are the guide.
 
-Stages for Timuclaude:
+Stages for Temuclaude:
 1. Ordinary World: Developers use single LLMs (GPT-5.6, Claude, Gemini). It works, mostly.
 2. Problem: Single models get things wrong. Subtly. Expensively. Unpredictably.
 3. Call to Adventure: "What if multiple models could work together and catch each other's mistakes?"
-4. Meeting the Guide: Timuclaude appears — open-source, self-hostable, multi-model fusion.
-5. Crossing the Threshold: Developer installs Timuclaude, runs first question.
+4. Meeting the Guide: Temuclaude appears — open-source, self-hostable, multi-model fusion.
+5. Crossing the Threshold: Developer installs Temuclaude, runs first question.
 6. Tests/Allies/Enemies: Configuration, model selection, benchmark validation.
 7. Approach: Fusion runs. Models debate. Code verifies. Self-QA checks.
 8. Ordeal: The hard question that single models get wrong.
-9. Reward: Timuclaude gets it right. The "aha" moment.
+9. Reward: Temuclaude gets it right. The "aha" moment.
 10. The Road Back: Developer tries more questions. Consistently better.
 11. Resurrection: Production deployment. Real users. Real stakes.
-12. Return with Elixir: Developer shares Timuclaude with their team. The loop continues.
+12. Return with Elixir: Developer shares Temuclaude with their team. The loop continues.
 
 How we use this: Every piece of content maps to a stage. We don't dump the whole journey at once — we tell it chapter by chapter across weeks.
 
@@ -37,7 +37,7 @@ The fastest framework for individual tweets.
 
 - Problem: "One model gets hard questions wrong."
 - Agitate: "And you don't know WHICH questions it gets wrong. That's the scary part."
-- Solve: "Timuclaude runs 3+ models and fuses their answers. The ones that agree are right. The ones that disagree get verified. Open-source. Free with Ollama."
+- Solve: "Temuclaude runs 3+ models and fuses their answers. The ones that agree are right. The ones that disagree get verified. Open-source. Free with Ollama."
 
 Use for: Quick tweets, reply engagement, hot takes.
 
@@ -45,7 +45,7 @@ Use for: Quick tweets, reply engagement, hot takes.
 Strong for comparison posts and demo videos.
 
 - Before: "You ask GPT-5.6 Sol a reasoning question. It answers confidently. It's wrong. You ship the wrong answer to production."
-- After: "You ask Timuclaude the same question. Three models answer. Fusion combines them. Code verification checks. Self-QA validates. You ship the right answer."
+- After: "You ask Temuclaude the same question. Three models answer. Fusion combines them. Code verification checks. Self-QA validates. You ship the right answer."
 - Bridge: "The difference isn't a better model. It's a better system. Here's how it works: [demo video]"
 
 Use for: Demo videos, benchmark comparisons, before/after screenshots.
@@ -55,7 +55,7 @@ The most structured brand storytelling framework.
 
 1. A Character: The developer who uses AI models daily
 2. Has a Problem: Single models are unreliable on hard questions, and you can't tell when they're wrong
-3. Meets a Guide: Timuclaude — built by a developer who faced the same problem
+3. Meets a Guide: Temuclaude — built by a developer who faced the same problem
 4. Who Gives Them a Plan: Install in 3 minutes. Run any question. Get a verified answer.
 5. And Calls Them to Action: Try it free with Ollama. Star on GitHub.
 6. That Helps Them Avoid Failure: Shipping wrong AI answers to production. Paying too much for API calls. Being locked into one provider.
@@ -83,7 +83,7 @@ The most powerful framework for positioning against established competitors.
 - Old Game: "Pick the best single LLM. Pay per token. Hope it's right. When it's wrong, you don't know."
 - New Game: "Run multiple models simultaneously. Fuse their outputs. Verify with code. Check with self-QA. Get the right answer. Every time. For free."
 - The Obvious Winner: "The system that uses ALL models beats any SINGLE model. That's not opinion. That's math."
-- Why Timuclaude Embodies This: "We didn't build a better model. We built a better system. The future isn't one model to rule them all. It's many models working together."
+- Why Temuclaude Embodies This: "We didn't build a better model. We built a better system. The future isn't one model to rule them all. It's many models working together."
 
 Use for: Positioning threads, "why I built this" posts, hot takes about the AI industry.
 
@@ -92,7 +92,7 @@ Emma Coats' 22 Pixar storytelling rules, adapted for our content:
 
 Key rules we'll use:
 - Rule 1: "You admire a character for trying more than for their successes." → Show the failures, not just the wins.
-- Rule 6: "What is your character good at, comfortable with? Throw the polar opposite at them." → Show Timuclaude failing, then fixing it.
+- Rule 6: "What is your character good at, comfortable with? Throw the polar opposite at them." → Show Temuclaude failing, then fixing it.
 - Rule 7: "Come up with your ending before you figure out your middle." → Every thread starts with the payoff in mind.
 - Rule 14: "Coincidences to get characters INTO trouble are great; coincidences to get them OUT are cheating." → Don't fake happy endings. Show the real struggle and real solution.
 - Rule 16: "What are the stakes? Give us a reason to root for the character." → The stakes are real: wrong AI answers in production cost money, time, and trust.
@@ -112,7 +112,7 @@ Every viral thread follows this structure:
 #### Visual Proof Multiplies Engagement
 Threads with images/screenshots get 2-3x the engagement of text-only. Our content MUST include:
 - Benchmark result screenshots
-- Terminal output showing Timuclaude in action
+- Terminal output showing Temuclaude in action
 - Before/after comparison screenshots
 - Architecture diagrams
 - GitHub star count milestones
@@ -127,9 +127,9 @@ Storytelling on Twitter compounds. Each post adds to the narrative. A new follow
 #### Vulnerability as Trust Builder
 Research consistently shows: sharing failures, bugs, and mistakes builds MORE trust than sharing only successes. Developers are skeptical of perfect narratives. They trust builders who say "this didn't work, here's why, here's how I fixed it."
 
-Examples for Timuclaude:
+Examples for Temuclaude:
 - "Fusion with 3 models was 40% slower. Here's how I optimized it."
-- "Timuclaude got this question wrong. Here's why, and here's the fix I'm working on."
+- "Temuclaude got this question wrong. Here's why, and here's the fix I'm working on."
 - "OpenRouter ran out of credits mid-benchmark. Switched to Ollama. Here's why that's actually better."
 
 #### The "David vs Goliath" Narrative
@@ -139,7 +139,7 @@ This is the most naturally viral narrative in tech. Developers LOVE the underdog
 
 ---
 
-## PART 2: TIMUCLAUDE'S STORY — THE NARRATIVE ARC
+## PART 2: TEMUCLAUDE'S STORY — THE NARRATIVE ARC
 
 ### The Full Story (True, Not Manufactured)
 
@@ -158,7 +158,7 @@ Phase 5: Production. 3-backend fallback (Ollama → OpenRouter → ai/ml). Never
 Phase 5b: Auto-detect. Smart enough to pick the right backend automatically.
 
 CHAPTER 4: THE PROOF
-6 test suites, all passing. 30 Python files. 50 functions typed. Benchmarks showing Timuclaude beats single models on reasoning, math, and knowledge questions. Open-source on GitHub.
+6 test suites, all passing. 30 Python files. 50 functions typed. Benchmarks showing Temuclaude beats single models on reasoning, math, and knowledge questions. Open-source on GitHub.
 
 CHAPTER 5: THE MISSION
 This isn't just a product. It's open-source because the builder believes AI infrastructure should be free and accessible. It runs on Ollama (free, unlimited, local) because not everyone can afford API bills. It's built to serve the Ummah — to give Muslims access to world-class AI without depending on Western tech monopolies. The mission is bigger than the product.
@@ -186,7 +186,7 @@ The difference: every pillar is now a STORY TYPE, not just a content type. Every
 
 ### Story Pillar 1: THE PROOF STORY (30% of content)
 Was: "Benchmark results"
-Now: "Here's the question that broke GPT-5.6 Sol. Here's how Timuclaude got it right. Here's why."
+Now: "Here's the question that broke GPT-5.6 Sol. Here's how Temuclaude got it right. Here's why."
 
 Format (PAS + Before/After):
 ```
@@ -196,7 +196,7 @@ GPT-5.6 Sol got this question wrong.
 GPT-5.6 Sol: "0.3"
 Correct answer: 0.30000000000000004
 
-Timuclaude ran it through 3 models. Two said 0.3. One said 0.30000000000000004. Code verification executed it. The code confirmed the precision answer.
+Temuclaude ran it through 3 models. Two said 0.3. One said 0.30000000000000004. Code verification executed it. The code confirmed the precision answer.
 
 One model being wrong is a bug. Three models debating is a system. The system won.
 
@@ -209,7 +209,7 @@ Now: "Here's what I tried. Here's what failed. Here's what I learned. Here's wha
 
 Format (Origin Story + Vulnerability):
 ```
-Day 41 of building Timuclaude:
+Day 41 of building Temuclaude:
 
 Tried MCTS for reasoning enhancement. Implemented tree search with 5 rollouts per node.
 
@@ -254,7 +254,7 @@ This is the wrong game.
 
 The right game: use ALL of them. Together. Every model has different strengths. Different weaknesses. Different blind spots. Fusion doesn't pick a winner. It makes them all winners.
 
-Timuclaude is proof: 3 models working together beat any 1 model alone.
+Temuclaude is proof: 3 models working together beat any 1 model alone.
 
 The future isn't one model. It's orchestration.
 ```
@@ -301,13 +301,13 @@ Tweet 4 (THE BUILD):
 "6 phases. 30 Python files. 6 test suites. Multi-model fusion. Self-consistency voting. Code verification. Self-QA. 3-backend fallback (Ollama → OpenRouter → ai/ml)."
 
 Tweet 5 (THE PROOF):
-"Benchmark results: Timuclaude beats GPT-5.6 Sol on reasoning tasks. Full methodology and results: [link]. Reproducible. Open-source."
+"Benchmark results: Temuclaude beats GPT-5.6 Sol on reasoning tasks. Full methodology and results: [link]. Reproducible. Open-source."
 
 Tweet 6 (THE MISSION):
 "This is open-source because AI infrastructure should be free. It runs on Ollama (free, unlimited, local) because not everyone can afford API bills. It's built for the community, not for venture capital."
 
 Tweet 7 (CTA — subtle):
-"Timuclaude is on GitHub. Star it. Try it. Build with it. Or just watch — the research swarm is running 24/7, finding new techniques to make it better.
+"Temuclaude is on GitHub. Star it. Try it. Build with it. Or just watch — the research swarm is running 24/7, finding new techniques to make it better.
 
 The future isn't one model. It's orchestration.
 
@@ -315,7 +315,7 @@ GitHub: [link]"
 ```
 
 ### Campaign 2: THE "BROKE THE MODEL" SERIES (Weekly)
-Every week, pick one question that a frontier model gets wrong and show how Timuclaude gets it right. This is the Proof Story in action.
+Every week, pick one question that a frontier model gets wrong and show how Temuclaude gets it right. This is the Proof Story in action.
 
 Structure:
 ```
@@ -323,9 +323,9 @@ Structure:
 
 GPT-5.6 Sol got this wrong.
 
-[Question screenshot from Timuclaude showing correct answer with fusion breakdown]
+[Question screenshot from Temuclaude showing correct answer with fusion breakdown]
 
-Timuclaude got it right. Here's how:
+Temuclaude got it right. Here's how:
 - Model A said X
 - Model B said Y
 - Model C said Z
@@ -347,7 +347,7 @@ Examples:
 - "Day 55: 100 GitHub stars. Overwhelmed. Thank you."
 
 ### Campaign 4: THE "DAVID VS GOLIATH" CAMPAIGN (Bi-weekly)
-Position Timuclaude against billion-dollar AI companies. Not with arrogance — with honest confidence and proof.
+Position Temuclaude against billion-dollar AI companies. Not with arrogance — with honest confidence and proof.
 
 Structure:
 ```
@@ -355,7 +355,7 @@ OpenAI spent $500M training GPT-5.6 Sol.
 Google spent $300M training Gemini 3.5 Pro.
 Anthropic spent $200M training Claude 4.6.
 
-Timuclaude uses all three. For free. On your laptop.
+Temuclaude uses all three. For free. On your laptop.
 
 No $500M training budget needed. Just orchestration.
 
@@ -370,7 +370,7 @@ The mission-driven story. Why this matters beyond the product.
 
 Structure:
 ```
-Why is Timuclaude open-source?
+Why is Temuclaude open-source?
 
 Because AI infrastructure shouldn't be locked behind API keys and credit cards.
 
@@ -378,7 +378,7 @@ Because a student in India shouldn't need OpenAI credits to access world-class A
 
 Because the future of AI should be built by the community, not controlled by 3 companies.
 
-Timuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
+Temuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
 
 This isn't a feature. It's a principle.
 
@@ -437,12 +437,12 @@ Story arc: "How I built this and what I learned"
 - [ ] Post first Conviction Story (hot take with proof)
 - [ ] Post first David vs Goliath campaign
 - [ ] Engage with 10+ AI Twitter accounts daily (substantive replies, not spam)
-- [ ] Run first "challenge" post ("Can your model beat Timuclaude on this question?")
+- [ ] Run first "challenge" post ("Can your model beat Temuclaude on this question?")
 
 ### Phase 3: THE LAUNCH STORY (Weeks 5-6)
 Story arc: "This works. Here's the proof. Join the journey."
 
-- [ ] Launch tweet: 60-second video demo showing Timuclaude beating a frontier model
+- [ ] Launch tweet: 60-second video demo showing Temuclaude beating a frontier model
 - [ ] Cross-post to Hacker News (Show HN) with the origin story
 - [ ] Post updated Origin Story thread with launch metrics
 - [ ] Engage with every reply for 2 hours after launch
@@ -455,7 +455,7 @@ Story arc: "We're building this together. Here's where we're going."
 - [ ] Weekly "Broke the Model" posts
 - [ ] Bi-weekly Knowledge threads
 - [ ] Daily Build Diary posts
-- [ ] User success stories ("X used Timuclaude and...")
+- [ ] User success stories ("X used Temuclaude and...")
 - [ ] Community highlight posts (contributors, feedback)
 - [ ] Monthly "Why Open Source" campaign
 - [ ] First enterprise inbound stories
@@ -510,7 +510,7 @@ Before posting anything, read it aloud. If it sounds like a press release, rewri
 ### The Ultimate Test
 The ultimate test of storytelling: do people tell YOUR story to others?
 
-When someone says "Hey, have you heard about Timuclaude? It's this open-source project by a developer in India that beats GPT-5.6 Sol using multi-model fusion" — that's the story working. That's when marketing becomes a movement.
+When someone says "Hey, have you heard about Temuclaude? It's this open-source project by a developer in India that beats GPT-5.6 Sol using multi-model fusion" — that's the story working. That's when marketing becomes a movement.
 
 ---
 
@@ -519,7 +519,7 @@ When someone says "Hey, have you heard about Timuclaude? It's this open-source p
 | Old Strategy | New Strategy |
 |---|---|
 | 5 content pillars (information-based) | 5 story pillars (narrative-based) |
-| "Post benchmark results" | "Tell the story of how Timuclaude broke the model" |
+| "Post benchmark results" | "Tell the story of how Temuclaude broke the model" |
 | "Build in public" | "Tell the build story with vulnerability and lessons" |
 | "Post tutorials" | "Share knowledge earned through painful experience" |
 | "Post hot takes" | "Share convictions backed by proof" |
@@ -530,9 +530,9 @@ When someone says "Hey, have you heard about Timuclaude? It's this open-source p
 | Marketing content | Storytelling that happens to market |
 
 ### The Core Shift
-The old strategy was: "Here's what Timuclaude does. Here's proof it works. Try it."
+The old strategy was: "Here's what Temuclaude does. Here's proof it works. Try it."
 
-The new strategy is: "Here's why I built Timuclaude. Here's what it took. Here's what I learned. Here's the proof it works. Here's why it matters. Join the journey."
+The new strategy is: "Here's why I built Temuclaude. Here's what it took. Here's what I learned. Here's the proof it works. Here's why it matters. Join the journey."
 
 The first sells a product. The second builds a movement.
 
@@ -574,7 +574,7 @@ Rules for vulnerability:
 Maintain story arcs across weeks/months by referencing previous posts:
 
 - "Remember when I said fusion was giving worse answers than a single model? Fixed it. Here's the update:"
-- "3 weeks ago Timuclaude had 10 GitHub stars. Today: 200. Here's what changed:"
+- "3 weeks ago Temuclaude had 10 GitHub stars. Today: 200. Here's what changed:"
 - "Remember that bug where caching caused duplicate API calls? Found 3 more like it. Here's the pattern:"
 
 This creates a serialized narrative that rewards long-time followers and gives new followers a reason to go back and read the whole story.
@@ -584,8 +584,8 @@ This creates a serialized narrative that rewards long-time followers and gives n
 Declare goals publicly to create a story people follow to the outcome:
 
 - "Goal: 1,000 GitHub stars by end of August. Here's my plan:"
-- "Public commitment: Timuclaude will beat GPT-5.6 Sol on HLE benchmark by September. I'll post results either way."
-- "Challenge: Can Timuclaude get 90%+ on MMLU before August ends? Let's find out."
+- "Public commitment: Temuclaude will beat GPT-5.6 Sol on HLE benchmark by September. I'll post results either way."
+- "Challenge: Can Temuclaude get 90%+ on MMLU before August ends? Let's find out."
 
 Public goals work because:
 1. They create accountability (you said it publicly, you have to deliver)
@@ -602,7 +602,7 @@ From Cursor's viral growth strategy:
 3. Brief explanation of how it works (the reveal)
 4. "Try it yourself: [link]" (the invitation)
 
-Example for Timuclaude:
+Example for Temuclaude:
 ```
 Watch what happens when I ask 3 AI models the same question 👇
 
@@ -610,7 +610,7 @@ Watch what happens when I ask 3 AI models the same question 👇
 
 3 models. 3 different answers. 1 verified answer that's better than any single model.
 
-That's Timuclaude. Open-source. Free with Ollama.
+That's Temuclaude. Open-source. Free with Ollama.
 
 Try it: [GitHub link]
 ```
@@ -655,7 +655,7 @@ On X/Twitter specifically: the algorithm rewards engagement (replies, quote twee
 
 ## PART 11: OPEN-SOURCE STORYTELLING — BUILDING COMMUNITY THROUGH NARRATIVE
 
-### The Four-Act Structure for Framing Timuclaude as a Story
+### The Four-Act Structure for Framing Temuclaude as a Story
 
 Based on research on Linux, Python, React, Vue.js, Tailwind, Supabase, n8n, and Svelte:
 
@@ -669,7 +669,7 @@ ACT 3: THE SOLUTION (The Revelation)
 "What if you don't pick one model? What if you use ALL of them and let them check each other? The answer isn't a better model. It's a better system. Fusion + self-consistency + code verification + self-QA. The system beats any single model. That's not opinion. That's math."
 
 ACT 4: THE COMMUNITY (The Movement)
-"Now developers are running Timuclaude on their laptops with Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills. Every star on GitHub is a person who believes one model isn't enough. Every contributor is someone building the future of AI orchestration."
+"Now developers are running Temuclaude on their laptops with Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills. Every star on GitHub is a person who believes one model isn't enough. Every contributor is someone building the future of AI orchestration."
 
 How we use this: This four-act structure is our README, our pinned thread, our launch blog post, and our Hacker News submission. Same story, different channels.
 
@@ -682,7 +682,7 @@ From research: every successful OSS project has a human face.
 - Rich Harris → Svelte
 - Adam Wathan → Tailwind CSS
 
-The maintainer's personality, values, and story ARE the project's story. Anonymity kills narrative. Ggs, YOU are the protagonist of Timuclaude. Your story — a developer in Nagpur, India, building an open-source AI platform that beats billion-dollar frontier models — IS the narrative. We don't hide behind a brand. We lead with you.
+The maintainer's personality, values, and story ARE the project's story. Anonymity kills narrative. Ggs, YOU are the protagonist of Temuclaude. Your story — a developer in Nagpur, India, building an open-source AI platform that beats billion-dollar frontier models — IS the narrative. We don't hide behind a brand. We lead with you.
 
 ### The Origin Story Never Gets Old
 
@@ -703,10 +703,10 @@ Our equivalent: Share what went wrong in each phase. Not as complaints — as le
 
 The story-driven README structure (from research on Astro, Svelte, Tauri):
 
-1. THE HOOK (one sentence): "Timuclaude beats GPT-5.6 Sol by running multiple models simultaneously and fusing their answers. Open-source. Free with Ollama."
-2. THE WHY (2-3 sentences on the pain): "Single LLMs get hard questions wrong. Subtly. Confidently. You don't know which ones. That's the problem Timuclaude solves."
+1. THE HOOK (one sentence): "Temuclaude beats GPT-5.6 Sol by running multiple models simultaneously and fusing their answers. Open-source. Free with Ollama."
+2. THE WHY (2-3 sentences on the pain): "Single LLMs get hard questions wrong. Subtly. Confidently. You don't know which ones. That's the problem Temuclaude solves."
 3. THE REVELATION (the approach): "Don't pick one model. Use all of them. Fusion combines answers. Self-consistency votes. Code verification checks. Self-QA validates. The system beats any single model."
-4. THE PROOF (30-second quickstart): ```pip install timuclaude && tc.complete("What is 0.1+0.2?")``` — show the answer, show it's right.
+4. THE PROOF (30-second quickstart): ```pip install temuclaude && tc.complete("What is 0.1+0.2?")``` — show the answer, show it's right.
 5. THE COMMUNITY (social proof): GitHub stars, contributors, who's using it.
 6. THE REFERENCE (standard docs come AFTER the story, not before).
 
@@ -718,7 +718,7 @@ From research: communities with names build stronger identity.
 - Rust: "Rustaceans"
 - Vue: "Vuenivers"
 
-Timuclaude community name options: "Timuclauders", "The Fusion Community", "Orchestrators". We pick one early and use it consistently. It creates belonging.
+Temuclaude community name options: "Temuclauders", "The Fusion Community", "Orchestrators". We pick one early and use it consistently. It creates belonging.
 
 ### Mission-Driven Open Source — Our Unique Advantage
 
@@ -728,23 +728,23 @@ From research on Firefox, Signal, Mozilla, ProtonMail:
 - Mission creates an us-vs-them dynamic: open vs closed, free vs locked, community vs corporate
 - Mission provides long-term direction: contributors know the project won't pivot away from its values
 
-Timuclaude's mission (from your real story, Ggs):
+Temuclaude's mission (from your real story, Ggs):
 "AI infrastructure should be free and accessible. A student in India shouldn't need OpenAI credits to access world-class AI. The future of AI should be built by the community, not controlled by 3 companies."
 
-This mission is what makes Timuclaude different from EVERY other AI tool on Twitter. Every other company sells productivity. We serve a purpose. That's not just a story — it's a movement.
+This mission is what makes Temuclaude different from EVERY other AI tool on Twitter. Every other company sells productivity. We serve a purpose. That's not just a story — it's a movement.
 
 ### Narrative Velocity
 
 From research: Projects that ship regularly have more story to tell. Supabase's launch weeks, Svelte's version releases, React's conference reveals — each ship is a new chapter. Projects that go quiet lose their narrative momentum.
 
-For Timuclaude: the research swarm (automated scouts finding new techniques), weekly benchmark updates, and daily build diary posts maintain narrative velocity. Every new finding, every benchmark, every fix is a new chapter.
+For Temuclaude: the research swarm (automated scouts finding new techniques), weekly benchmark updates, and daily build diary posts maintain narrative velocity. Every new finding, every benchmark, every fix is a new chapter.
 
 ### Making Technical Content Emotional Without Being Fake
 
 From research:
 1. Lead with the developer's pain: "Have you ever shipped an AI answer to production and found out later it was wrong?"
 2. Show genuine excitement about technical decisions: "I'm genuinely excited about this fusion approach because it means 60% less API spend with better accuracy."
-3. Tell stories of real users (anonymized but specific): "A developer used Timuclaude to cut their AI API bill from $200/month to $0 by switching to Ollama."
+3. Tell stories of real users (anonymized but specific): "A developer used Temuclaude to cut their AI API bill from $200/month to $0 by switching to Ollama."
 4. Use vulnerability as authenticity: "I'm not sure MCTS is the right approach yet. Here are the tradeoffs."
 5. Write like you talk to a colleague: asides, honest opinions, occasional frustration.
 
@@ -752,7 +752,7 @@ From research:
 
 From research: projects that say "we believe" instead of "this tool believes" create community identity. "We" implies membership.
 
-Our "we" language: "We believe one model isn't enough. We're building the future of AI orchestration. We are Timuclauders."
+Our "we" language: "We believe one model isn't enough. We're building the future of AI orchestration. We are Temuclauders."
 
 ---
 
@@ -760,13 +760,13 @@ Our "we" language: "We believe one model isn't enough. We're building the future
 
 ### The 3 Levels of Problem (StoryBrand)
 
-Every story needs conflict at 3 levels. For Timuclaude:
+Every story needs conflict at 3 levels. For Temuclaude:
 1. EXTERNAL: "Single LLMs get hard questions wrong."
 2. INTERNAL: "And you don't know WHICH questions they get wrong. You feel anxious trusting any single model in production."
 3. PHILOSOPHICAL: "AI infrastructure shouldn't be controlled by 3 companies charging whatever they want. Better AI answers shouldn't require a credit card."
 
 ### The Pixar Story Spine
-"Once upon a time there was [developer]. Every day, [used one LLM and hoped it was right]. One day, [discovered Timuclaude]. Because of that, [got verified answers from 3+ models]. Because of that, [shipped AI features with confidence]. Until finally, [stopped worrying about wrong AI answers forever]."
+"Once upon a time there was [developer]. Every day, [used one LLM and hoped it was right]. One day, [discovered Temuclaude]. Because of that, [got verified answers from 3+ models]. Because of that, [shipped AI features with confidence]. Until finally, [stopped worrying about wrong AI answers forever]."
 
 ### The Zeigarnik Effect (Cliffhangers)
 Unfinished stories create cognitive tension — the brain remembers them better. Use open loops in threads: "Then something unexpected happened with the fusion results..."
@@ -775,7 +775,7 @@ Unfinished stories create cognitive tension — the brain remembers them better.
 When a storyteller and listener are engaged, their brain activity synchronizes. Authentic founder storytelling creates stronger neural coupling than brand marketing. When Ggs tells his real story, the reader's brain syncs with his.
 
 ### The Identifiable Victim Effect
-Stories about individuals outperform statistics. Instead of "12.3% improvement", say "GPT-5.6 Sol told Sarah her calculation was correct. It wasn't. It cost her 3 hours of debugging. Timuclaude would have caught it."
+Stories about individuals outperform statistics. Instead of "12.3% improvement", say "GPT-5.6 Sol told Sarah her calculation was correct. It wasn't. It cost her 3 hours of debugging. Temuclaude would have caught it."
 
 ### The Viral Story Formula
 Emotional Hook + High Stakes + Relatable Hero + Unexpected Obstacle + Dramatic Transformation + Shareable Insight = Viral Story
@@ -798,22 +798,22 @@ Emotional Hook + High Stakes + Relatable Hero + Unexpected Obstacle + Dramatic T
 AWARENESS (hears story) → IDENTIFICATION ("this is for me") → ACTION (stars GitHub) → LOYALTY (ongoing stories) → ADVOCACY (tells others) → COMMUNITY (connects with others)
 
 ### The Master Formula
-A relatable hero (developer) faces a meaningful problem (single models fail silently + AI shouldn't be controlled by 3 companies). They feel stuck. Timuclaude appears as the guide — built by a developer who faced the same problem, offering a clear plan (install in 3 minutes, free with Ollama). The hero takes action, overcomes obstacles, and transforms (ships AI with confidence, saves money, gains independence). The transformation is so powerful they tell others — growing our story into a movement.
+A relatable hero (developer) faces a meaningful problem (single models fail silently + AI shouldn't be controlled by 3 companies). They feel stuck. Temuclaude appears as the guide — built by a developer who faced the same problem, offering a clear plan (install in 3 minutes, free with Ollama). The hero takes action, overcomes obstacles, and transforms (ships AI with confidence, saves money, gains independence). The transformation is so powerful they tell others — growing our story into a movement.
 
 ### The "You:We" Ratio
 "You" should appear 3x more than "we" in all content.
-Bad: "We built Timuclaude. We achieved 87.3% accuracy."
+Bad: "We built Temuclaude. We achieved 87.3% accuracy."
 Good: "You ask a question. You get 3 models debating. You ship the right answer."
 
 ### The 5 Story Types (Kindra Hall framework)
-1. FOUNDER STORY: "Why I built Timuclaude"
+1. FOUNDER STORY: "Why I built Temuclaude"
 2. VALUE STORY: "Why open-source AI matters"
-3. PRODUCT STORY: "Watch Timuclaude beat GPT-5.6 Sol"
+3. PRODUCT STORY: "Watch Temuclaude beat GPT-5.6 Sol"
 4. PURPOSE STORY: "AI for everyone, not just those who can afford API bills"
-5. CUSTOMER STORY: "How X used Timuclaude to..."
+5. CUSTOMER STORY: "How X used Temuclaude to..."
 
 ### The One Sentence
-Timuclaude is an open-source LLM orchestration platform built by one developer in India that beats billion-dollar frontier models by running multiple AI models simultaneously — because the future of AI isn't one model, it's orchestration, and it should be free.
+Temuclaude is an open-source LLM orchestration platform built by one developer in India that beats billion-dollar frontier models by running multiple AI models simultaneously — because the future of AI isn't one model, it's orchestration, and it should be free.
 
 ### The Implementation Order
 1. Set up Zernio + connect X/Twitter
@@ -829,4 +829,4 @@ Timuclaude is an open-source LLM orchestration platform built by one developer i
 
 *Research sources: Donald Miller StoryBrand, Joseph Campbell Hero's Journey, Andy Raskin Strategic Narrative, Pixar/Emma Coats, Cursor $0-$100M case study, Pieter Levels ($3M ARR solo), Marc Lou ($1M ShipFast), Guillermo Rauch/Vercel, Amjad Masad/Replit, neuroscience (oxytocin/dopamine/cortisol), Jonah Berger STEPPS/Contagious, Kindra Hall Stories That Stick, Chip & Dan Heath Made to Stick, Seth Godin This Is Marketing, Carmine Gallo Talk Like TED, open-source storytelling (Linux, Python, React, Vue.js, Tailwind, Supabase, n8n, Svelte, Firefox, Signal, ProtonMail), Karl Fogel Producing Open Source Software, Ryan Dahl vulnerability-as-narrative, Nadia Eghbal Working in Public.*
 
-*Saved at: /Users/saiful/timuclaude/marketing/X_TWITTER_STRATEGY_STORYTELLING.md*
+*Saved at: /Users/saiful/temuclaude/marketing/X_TWITTER_STRATEGY_STORYTELLING.md*

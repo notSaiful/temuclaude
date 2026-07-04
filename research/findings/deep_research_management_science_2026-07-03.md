@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-This report applies Henri Fayol's 5 functions of management (Planning, Organizing, Staffing, Directing, Controlling) to AI agent systems, LLM orchestration, and autonomous systems. It bridges classical management theory (Fayol, Taylor, Drucker, Mintzberg, Deming) with modern AI agent research (ReAct, ReWOO, Plan-and-Solve, Tree of Thoughts, MetaGPT, Reflexion, Self-Refine, AutoGen, Voyager, and others). For each function, the report identifies specific principles, how they work, how they map to AI agent systems, and actionable improvements for both the individual agent and the timuclaude orchestration system.
+This report applies Henri Fayol's 5 functions of management (Planning, Organizing, Staffing, Directing, Controlling) to AI agent systems, LLM orchestration, and autonomous systems. It bridges classical management theory (Fayol, Taylor, Drucker, Mintzberg, Deming) with modern AI agent research (ReAct, ReWOO, Plan-and-Solve, Tree of Thoughts, MetaGPT, Reflexion, Self-Refine, AutoGen, Voyager, and others). For each function, the report identifies specific principles, how they work, how they map to AI agent systems, and actionable improvements for both the individual agent and the temuclaude orchestration system.
 
 ---
 
@@ -45,7 +45,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 ### OKRs (Objectives and Key Results)
 - **What**: Objectives are qualitative, inspirational goals. Key Results are quantitative measures (3-5 per objective) that indicate progress.
 - **How it works**: "Improve system reliability (Objective) → reduce error rate to <1%, achieve 99.9% uptime, mean time to recovery <5min (Key Results)."
-- **Application to AI agents**: Define task objectives with measurable key results. Instead of "fix the bug" (vague), use "fix the bug such that all tests pass, the CI pipeline is green, and the fix doesn't break any existing functionality." For timuclaude: each orchestration task should have an objective with 2-3 measurable key results.
+- **Application to AI agents**: Define task objectives with measurable key results. Instead of "fix the bug" (vague), use "fix the bug such that all tests pass, the CI pipeline is green, and the fix doesn't break any existing functionality." For temuclaude: each orchestration task should have an objective with 2-3 measurable key results.
 
 ### SMART Goals
 - **Specific**: Clear, unambiguous. Not "improve the system" but "reduce API response time by 30%."
@@ -75,7 +75,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 ### Reference Class Forecasting (RCF)
 - **What**: Instead of estimating from the inside (imagining the specific task), estimate from the outside (looking at the distribution of similar tasks).
 - **How it works**: 1) Identify a reference class of similar past tasks. 2) Obtain the distribution of outcomes for that class. 3) Use the base rate as your estimate. 4) Adjust for specific-case differences only with strong evidence.
-- **Application to AI agents**: When estimating task complexity or duration, don't reason from the specific task alone — reference past similar tasks. If similar file-editing tasks have taken 5 tool calls on average, estimate 5-7, not 2. For timuclaude: maintain a database of past task durations and complexities, use these as base rates for new task estimates.
+- **Application to AI agents**: When estimating task complexity or duration, don't reason from the specific task alone — reference past similar tasks. If similar file-editing tasks have taken 5 tool calls on average, estimate 5-7, not 2. For temuclaude: maintain a database of past task durations and complexities, use these as base rates for new task estimates.
 
 ### Techniques to Counter Planning Fallacy
 1. **Premortem (Gary Klein)**: Before executing, imagine the plan has failed. Ask "Why did it fail?" This surfaces risks that optimism hides.
@@ -153,7 +153,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 
 ### Unity of Command
 - **Fayol principle**: Each employee should receive instructions from only one superior. Multiple bosses create confusion and conflict.
-- **Application to multi-agent systems**: Each sub-agent should receive instructions from exactly one coordinator. Conflicting instructions from multiple coordinators lead to inconsistent behavior. In timuclaude: ensure each agent in the orchestration has a single, clear upstream controller.
+- **Application to multi-agent systems**: Each sub-agent should receive instructions from exactly one coordinator. Conflicting instructions from multiple coordinators lead to inconsistent behavior. In temuclaude: ensure each agent in the orchestration has a single, clear upstream controller.
 
 ### Unity of Direction
 - **Fayol principle**: One head, one plan for activities with the same objective. Different units working toward the same goal should have a unified plan.
@@ -165,7 +165,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 - **Principle**: "Organizations which design systems are constrained to produce designs which are copies of the communication structures of these organizations."
 - **How it works**: If your team is organized into 4 groups (frontend, backend, DB, infra), your system will have 4 modules with interfaces between them. The communication patterns in the organization become the interface patterns in the system.
 - **Inverse Conway Maneuver**: Deliberately organize the team to produce the desired architecture. If you want microservices, organize into small cross-functional teams each owning one service.
-- **Application to AI agent systems**: The structure of a multi-agent system will reflect the organization of its orchestration logic. If timuclaude's orchestration is organized as a single monolithic controller, the agent system will be centralized. If organized as modular sub-controllers, the system will be modular. Design the orchestration architecture intentionally.
+- **Application to AI agent systems**: The structure of a multi-agent system will reflect the organization of its orchestration logic. If temuclaude's orchestration is organized as a single monolithic controller, the agent system will be centralized. If organized as modular sub-controllers, the system will be modular. Design the orchestration architecture intentionally.
 - **Application to self**: My internal organization (how I structure my thinking: research first, then plan, then execute, then verify) directly shapes the quality of my output.
 
 ## 2.3 Organizing for Innovation vs Execution
@@ -183,7 +183,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 - **Advantages**: Clear authority, efficient communication downward, easy to scale.
 - **Disadvantages**: Information bottlenecks at the top, slow bottom-up feedback.
 - **Example**: MetaGPT — Product Manager → Architect → Engineer → QA. Each role receives output from the previous and adds their expertise.
-- **Application to timuclaude**: For complex orchestration tasks, use hierarchical structure. The main orchestrator decomposes the task and delegates to specialized sub-orchestrators.
+- **Application to temuclaude**: For complex orchestration tasks, use hierarchical structure. The main orchestrator decomposes the task and delegates to specialized sub-orchestrators.
 
 ### Flat / Peer-to-Peer
 - **Structure**: All agents are peers. No central coordinator. Agents communicate directly.
@@ -195,13 +195,13 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 - **Structure**: Agents bid/compete for tasks. No fixed hierarchy. Dynamic formation of teams.
 - **Advantages**: Efficient resource allocation through market mechanisms, high flexibility.
 - **Disadvantages**: Overhead of bidding/negotiation, requires clear pricing/valuation.
-- **Application to timuclaude**: For routing tasks — multiple agents "bid" on a subtask based on their capabilities, and the best match is selected.
+- **Application to temuclaude**: For routing tasks — multiple agents "bid" on a subtask based on their capabilities, and the best match is selected.
 
 ### Matrix
 - **Structure**: Agents belong to functional teams (coding, research, writing) but are assigned to project teams temporarily.
 - **Advantages**: Expertise depth (functional) + project focus (project team).
 - **Disadvantages**: Dual reporting can cause conflicts (violates unity of command).
-- **Application to timuclaude**: Agents have primary capabilities (e.g., "code writer," "researcher") but are dynamically assigned to different tasks requiring those capabilities.
+- **Application to temuclaude**: Agents have primary capabilities (e.g., "code writer," "researcher") but are dynamically assigned to different tasks requiring those capabilities.
 
 ## 2.5 Information Flow and Communication Patterns
 
@@ -240,7 +240,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 
 ### Application to AI Systems
 - LATM (Cai et al., 2305.17126) implements this directly: "Recognizing that tool-making requires more sophisticated capabilities, we assign this task to a powerful, albeit resource-intensive, model. Conversely, the simpler tool-using phase is delegated to a lightweight model. This strategic division of labor allows the once-off cost of tool-making to be spread over multiple instances of tool-using, significantly reducing average costs."
-- **Principle for timuclaude**: Use expensive/large models for complex reasoning tasks (planning, design, code generation) and cheap/small models for routine tasks (formatting, simple lookups, status checks).
+- **Principle for temuclaude**: Use expensive/large models for complex reasoning tasks (planning, design, code generation) and cheap/small models for routine tasks (formatting, simple lookups, status checks).
 
 ## 3.2 Choosing the Right Model/Agent for the Right Task
 
@@ -296,7 +296,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 3. **AI as manager**: AI coordinates, human provides domain expertise or final approval.
 4. **Human-in-the-loop**: AI executes autonomously but checkpoints with human at decision points.
 
-### Application to timuclaude
+### Application to temuclaude
 - Design orchestration with clear human-in-the-loop checkpoints for high-stakes decisions.
 - Use AI for routine execution, human for judgment calls, domain expertise, and final approval.
 
@@ -310,7 +310,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 
 ### Application to AI Agents
 - Context window is the AI equivalent of "capacity." Long conversations exhaust context. Solution: checkpoint state, start fresh sessions, use external memory (RAG, files).
-- For timuclaude: monitor token usage across agents in the orchestration. If one agent consistently hits context limits, either increase its context window or break its tasks into smaller pieces.
+- For temuclaude: monitor token usage across agents in the orchestration. If one agent consistently hits context limits, either increase its context window or break its tasks into smaller pieces.
 
 ---
 
@@ -738,7 +738,7 @@ This report applies Henri Fayol's 5 functions of management (Planning, Organizin
 4. **Self-RAG pattern.** When uncertain, retrieve more information rather than guessing.
 5. **Never declare done based on "I think it works."** Always verify objectively.
 
-## 9.2 For timuclaude Orchestration System
+## 9.2 For temuclaude Orchestration System
 
 ### Planning Layer
 1. **Implement explicit task decomposition** before dispatching to agents. Use a planning agent that produces a structured plan (DAG of subtasks with dependencies).

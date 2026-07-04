@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Resume ALL timuclaude research swarm cron jobs.
+Resume ALL temuclaude research swarm cron jobs.
 Dynamically fetches current job list — always accurate, no hardcoded IDs.
 
 Usage: python3 scripts/resume_swarm.py
@@ -10,7 +10,7 @@ import subprocess
 import json
 import sys
 
-# Jobs to EXCLUDE from resuming (non-timuclaude jobs)
+# Jobs to EXCLUDE from resuming (non-temuclaude jobs)
 EXCLUDE_NAMES = {"Agentive Weekly Plan"}
 
 def get_all_jobs():

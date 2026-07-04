@@ -1,5 +1,5 @@
 """
-Timuclaude Skill Curator
+Temuclaude Skill Curator
 Background maintenance for the skill library — prevents skill bloat.
 
 Based on Hermes Agent's Curator pattern:

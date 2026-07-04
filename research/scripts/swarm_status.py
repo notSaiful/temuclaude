@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Check the status of all timuclaude research swarm cron jobs.
+Check the status of all temuclaude research swarm cron jobs.
 Usage: python3 scripts/swarm_status.py
 Or just tell Hermes: "swarm status"
 """
 import subprocess
 import sys
 
-# All current timuclaude research swarm job IDs
+# All current temuclaude research swarm job IDs
 JOB_IDS = [
     ("aa2649e8061c", "RANK 1 Dynamic Deep Research"),
     ("ba16699034a9", "RANK 2 Dynamic Competitive Intelligence"),
@@ -19,7 +19,7 @@ JOB_IDS = [
 ]
 
 print("=" * 60)
-print("TIMUCLAUDE RESEARCH SWARM — STATUS")
+print("TEMUCLAUDE RESEARCH SWARM — STATUS")
 print("=" * 60)
 
 active = 0

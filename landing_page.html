@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timuclaude — Open-Source Model That Beats Frontier at 50x Lower Cost</title>
+    <title>Temuclaude — Open-Source Model That Beats Frontier at 50x Lower Cost</title>
     <style>
         :root {
             --bg: #faf8f5;
@@ -152,10 +152,10 @@
         <!-- Hero -->
         <div class="hero">
             <div class="tagline">Open Source · 5 Models · $20-100/mo</div>
-            <h1>Timuclaude</h1>
+            <h1>Temuclaude</h1>
             <p>The open-source model that beats frontier models (Claude Fable 5, GPT-5.5) on benchmarks at 50x lower cost.</p>
             <div class="cta">
-                <a href="https://github.com/notSaiful/timuclaude-research" class="btn btn-primary">GitHub</a>
+                <a href="https://github.com/notSaiful/temuclaude-research" class="btn btn-primary">GitHub</a>
                 <a href="#benchmark" class="btn btn-secondary">Benchmark Results</a>
                 <a href="#api" class="btn btn-secondary">API Docs</a>
             </div>
@@ -214,7 +214,7 @@ python -m litellm --config config/litellm.yaml --port 4000
 <span class="keyword">import</span> openai
 client = openai.OpenAI(base_url=<span class="string">"http://localhost:4000/v1"</span>, api_key=<span class="string">"your-key"</span>)
 response = client.chat.completions.create(
-    model=<span class="string">"timuclaude"</span>,
+    model=<span class="string">"temuclaude"</span>,
     messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"What is 15*12?"</span>}]
 )
 <span class="keyword">print</span>(response.choices[0].message.content)  <span class="comment"># "180"</span>
@@ -280,7 +280,7 @@ GET  /docs                   <span class="comment"># Swagger UI</span>
 GET  /health                 <span class="comment"># Health check</span>
 
 <span class="comment"># Models</span>
-timuclaude          <span class="comment"># Default (routes to best model per query)</span>
+temuclaude          <span class="comment"># Default (routes to best model per query)</span>
 glm-5.2             <span class="comment"># GLM-5.2 (orchestrator)</span>
 deepseek-v4-pro     <span class="comment"># DeepSeek V4 Pro (reasoning)</span>
 kimi-k2.6           <span class="comment"># Kimi K2.6 (long context)</span>
@@ -292,9 +292,9 @@ gpt-oss-120b        <span class="comment"># GPT-OSS 120B (cheap routing)</span>
 
         <!-- Footer -->
         <div class="footer">
-            <p>Timuclaude — Open-source model orchestration. MIT License.</p>
+            <p>Temuclaude — Open-source model orchestration. MIT License.</p>
             <p style="margin-top: 8px;">
-                <a href="https://github.com/notSaiful/timuclaude-research">GitHub</a> ·
+                <a href="https://github.com/notSaiful/temuclaude-research">GitHub</a> ·
                 Built by Mohammad Saiful Haque (Ggs) with Hermes Agent
             </p>
         </div>

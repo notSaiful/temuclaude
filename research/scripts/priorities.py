@@ -1,5 +1,5 @@
 """
-Timuclaude Research Swarm — Priority Configuration
+Temuclaude Research Swarm — Priority Configuration
 Defines research priority levels and token allocation.
 
 PRIORITY SYSTEM (based on marginal value of research):
@@ -160,7 +160,7 @@ RESEARCH_PRIORITIES = {
     "skill_discovery": {
         "rank": 3,
         "weight": 3,
-        "description": "Useful skills for timuclaude — scan only",
+        "description": "Useful skills for temuclaude — scan only",
         "search_frequency": "weekly",
         "deep_read": False,
         "token_budget": "low",
@@ -195,7 +195,7 @@ RESEARCH_PRIORITIES = {
     "ai_agent_architecture": {
         "rank": 4,
         "weight": 2,
-        "description": "Not urgent for timuclaude — scan only",
+        "description": "Not urgent for temuclaude — scan only",
         "search_frequency": "weekly",
         "deep_read": False,
         "token_budget": "minimal",

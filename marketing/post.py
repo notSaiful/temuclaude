@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Timuclaude Marketing — Zernio Posting Script (v2)
+Temuclaude Marketing — Zernio Posting Script (v2)
 Posts content to X/Twitter via Zernio Python SDK.
 
 Usage:

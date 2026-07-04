@@ -1,5 +1,5 @@
 """
-Timuclaude Adaptive Routing
+Temuclaude Adaptive Routing
 Adjusts which model is used for each task type based on performance data.
 
 Based on log analysis: if a different model performs better than the default

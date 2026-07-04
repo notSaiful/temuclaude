@@ -1,4 +1,4 @@
-# Timuclaude — PLAN v4 (The Breakthrough)
+# Temuclaude — PLAN v4 (The Breakthrough)
 
 ## How Sakana Fugu Actually Beats Frontier Models
 
@@ -55,7 +55,7 @@ Fugu-Ultra matches or beats Fable 5 and Mythos Preview on:
 
 ---
 
-## THE BREAKTHROUGH FOR TIMUCLAUDE
+## THE BREAKTHROUGH FOR TEMUCLAUDE
 
 ### What I Got Wrong Before:
 
@@ -77,12 +77,12 @@ Hermes IS already an orchestrator model. It:
 
 The key realization: **Hermes + Ollama Cloud models = a poor man's Fugu.**
 
-### The Timuclaude Architecture (Final):
+### The Temuclaude Architecture (Final):
 
 ```
                         ┌─────────────────────┐
      User Query ──────► │   HERMES (Orchestrator)    │
-                        │   with Timuclaude skill     │
+                        │   with Temuclaude skill     │
                         └──────────┬──────────┘
                                    │
                     Hermes analyzes query and dynamically
@@ -133,20 +133,20 @@ The key realization: **Hermes + Ollama Cloud models = a poor man's Fugu.**
 
 7. **We can fine-tune the orchestrator.** Not RL (too expensive), but we can:
    - Collect logs of which strategies work for which query types
-   - Create a "timuclaude-orchestration" skill that encodes the best strategies
+   - Create a "temuclaude-orchestration" skill that encodes the best strategies
    - Update the skill weekly based on performance data
    - This is "training" via skills, not weights
 
-### The Timuclaude Skill (The Core Innovation):
+### The Temuclaude Skill (The Core Innovation):
 
 Instead of training a model with RL, we create a SKILL that teaches Hermes how to orchestrate:
 
 ```yaml
-name: timuclaude-orchestration
+name: temuclaude-orchestration
 description: Orchestrate multiple Ollama Cloud models to beat frontier performance
 ---
 
-# Timuclaude Orchestration
+# Temuclaude Orchestration
 
 ## Your Role
 You are the orchestrator. You don't answer directly. You devise a plan,
@@ -215,7 +215,7 @@ time taken, cost. Update this skill with new patterns that work.
 - All 5 models on Ollama Cloud verified
 - Logging infrastructure
 
-### Step 2: The Timuclaude Skill
+### Step 2: The Temuclaude Skill
 - Write the orchestration skill (the core innovation)
 - Implement all 4 strategies
 - Auto-skill-loading for domain expertise
@@ -233,7 +233,7 @@ time taken, cost. Update this skill with new patterns that work.
 
 ### Step 5: Production API
 - OpenAI-compatible wrapper
-- Users point at Timuclaude instead of GPT-4
+- Users point at Temuclaude instead of GPT-4
 - Cost: $20-100/mo Ollama Cloud (no per-query cost)
 - Quality: target 55-60+ intelligence index
 
@@ -258,6 +258,6 @@ Can we beat Claude Fable 5 (intelligence 60)?
 4. **Improving:** Gets better every week as skills accumulate
 5. **Skills:** Free domain expertise that Fugu/Claude/GPT don't have
 
-**People will use Timuclaude because it's 90-95% as good as frontier at 1/50th the cost, with skills that make it BETTER than frontier on specific domains.**
+**People will use Temuclaude because it's 90-95% as good as frontier at 1/50th the cost, with skills that make it BETTER than frontier on specific domains.**
 
 That's the value proposition. That's how we win.

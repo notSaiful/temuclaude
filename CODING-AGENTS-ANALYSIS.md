@@ -1,4 +1,4 @@
-# Coding Agents + LangChain/LangGraph — Deep Analysis for Timuclaude
+# Coding Agents + LangChain/LangGraph — Deep Analysis for Temuclaude
 
 ---
 
@@ -22,7 +22,7 @@
 - Can work autonomously for 12+ hours on complex tasks
 - Stripe reported: "compressed months of engineering into days"
 
-**For Timuclaude:** Claude Code is a CODING agent — it uses ONE model (Claude) with an agentic loop. Timuclaude is an ORCHESTRATION system — it uses 5+ models with multiple strategies. We don't compete with Claude Code directly; we could power it. If Timuclaude exposes an OpenAI-compatible API (via LiteLLM proxy), Claude Code could be pointed at Timuclaude instead of Anthropic.
+**For Temuclaude:** Claude Code is a CODING agent — it uses ONE model (Claude) with an agentic loop. Temuclaude is an ORCHESTRATION system — it uses 5+ models with multiple strategies. We don't compete with Claude Code directly; we could power it. If Temuclaude exposes an OpenAI-compatible API (via LiteLLM proxy), Claude Code could be pointed at Temuclaude instead of Anthropic.
 
 ### B. KILO CODE (Kilo-Org/kilocode, 25K stars)
 
@@ -50,7 +50,7 @@
 - Self-checking catches its own errors
 - MCP marketplace = extensible
 
-**For Timuclaude:** Kilo Code's mid-task model switching is exactly what our Adaptive Router does — but Kilo does it manually, we do it automatically. Kilo's specialized agents (Code/Plan/Ask/Debug/Review) map to our orchestration strategies. Kilo's self-checking is our tool verification. We could integrate Timuclaude as a model provider for Kilo Code — users point Kilo at our LiteLLM proxy.
+**For Temuclaude:** Kilo Code's mid-task model switching is exactly what our Adaptive Router does — but Kilo does it manually, we do it automatically. Kilo's specialized agents (Code/Plan/Ask/Debug/Review) map to our orchestration strategies. Kilo's self-checking is our tool verification. We could integrate Temuclaude as a model provider for Kilo Code — users point Kilo at our LiteLLM proxy.
 
 ### C. OPENCLAW (openclaw/openclaw, 381K stars)
 
@@ -79,7 +79,7 @@
 - Skills registry (ClawHub) = extensible
 - NVIDIA + OpenAI + GitHub sponsorship = credibility
 
-**For Timuclaude:** OpenClaw is Hermes Agent's biggest competitor. They share the same philosophy (personal AI assistant, local-first, multi-channel, skills). Key differences:
+**For Temuclaude:** OpenClaw is Hermes Agent's biggest competitor. They share the same philosophy (personal AI assistant, local-first, multi-channel, skills). Key differences:
 - OpenClaw: 381K stars, Hermes: 207K stars
 - OpenClaw: Node.js/TypeScript, Hermes: Python
 - OpenClaw: ClawHub skills, Hermes: 90K+ skills
@@ -112,7 +112,7 @@
 - Containerization patterns for isolation
 - RFCs for long-term planning
 
-**For Timuclaude:** Pi's architecture is clean and worth studying. The session sharing concept (publish sessions to HuggingFace) is interesting for benchmark data — we could share Timuclaude sessions as training data for GEPA. The containerization patterns (Gondolin, OpenShell) are relevant for production deployment.
+**For Temuclaude:** Pi's architecture is clean and worth studying. The session sharing concept (publish sessions to HuggingFace) is interesting for benchmark data — we could share Temuclaude sessions as training data for GEPA. The containerization patterns (Gondolin, OpenShell) are relevant for production deployment.
 
 ---
 
@@ -141,7 +141,7 @@
 - LangSmith = best-in-class observability and debugging
 - Deep Agents = higher-level package for planning + subagents + file system
 
-**For Timuclaude:** LangGraph's durable execution is what Hermes Kanban provides — but LangGraph is more sophisticated (automatic checkpointing, graph-based). However, we don't need LangGraph because:
+**For Temuclaude:** LangGraph's durable execution is what Hermes Kanban provides — but LangGraph is more sophisticated (automatic checkpointing, graph-based). However, we don't need LangGraph because:
 1. Hermes already has durable task management (Kanban)
 2. Hermes has session persistence (SQLite + checkpoints)
 3. Hermes has delegate_task for subagent management
@@ -181,7 +181,7 @@
 - LangSmith = best observability in the industry
 - Model-agnostic (works with any provider)
 
-**For Timuclaude:** LangChain is useful for the RAG layer. When we need knowledge-augmented generation (for benchmarks like Humanity's Last Exam where our models are weak), LangChain's RAG integrations could help. But for orchestration, we use Hermes + LiteLLM, not LangChain.
+**For Temuclaude:** LangChain is useful for the RAG layer. When we need knowledge-augmented generation (for benchmarks like Humanity's Last Exam where our models are weak), LangChain's RAG integrations could help. But for orchestration, we use Hermes + LiteLLM, not LangChain.
 
 **What we take from LangChain:**
 - The RAG pattern for knowledge tasks
@@ -214,7 +214,7 @@
 
 ---
 
-## 5. WHAT TIMUCLAUDE TAKES FROM EACH
+## 5. WHAT TEMUCLAUDE TAKES FROM EACH
 
 ### From Claude Code:
 - The iterative coding loop: write → test → fix → iterate
@@ -230,7 +230,7 @@
 
 ### From OpenClaw:
 - **Multi-agent routing** (route channels to different model profiles)
-- **Multi-channel delivery** (deliver Timuclaude results to any platform)
+- **Multi-channel delivery** (deliver Temuclaude results to any platform)
 - **DM pairing security** (for production API access control)
 - **Live Canvas** (visual workspace for benchmark results)
 - **Onboarding wizard** (smooth user onboarding)
@@ -255,10 +255,10 @@
 
 ---
 
-## 6. THE TIMUCLAUDE ADVANTAGE OVER ALL CODING AGENTS
+## 6. THE TEMUCLAUDE ADVANTAGE OVER ALL CODING AGENTS
 
 **Coding agents (Claude Code, Kilo, Pi) use ONE model with an agentic loop.**
-**Timuclaude uses FIVE+ models with EIGHT orchestration strategies + self-improvement.**
+**Temuclaude uses FIVE+ models with EIGHT orchestration strategies + self-improvement.**
 
 No coding agent:
 - Runs a Fusion panel of 5 models
@@ -270,8 +270,8 @@ No coding agent:
 - Has durable Kanban multi-agent collaboration
 - Has session search for past successful strategies
 
-**Coding agents are single-model loops. Timuclaude is a multi-model intelligence system.**
+**Coding agents are single-model loops. Temuclaude is a multi-model intelligence system.**
 
-The key insight: we don't compete with coding agents — we POWER them. By exposing Timuclaude as an OpenAI-compatible API (via LiteLLM proxy), any coding agent (Claude Code, Kilo, Pi, OpenCode, Cursor) can point at Timuclaude and get multi-model orchestration behind a single endpoint. They send one query; we orchestrate 5 models, verify, synthesize, and return one answer.
+The key insight: we don't compete with coding agents — we POWER them. By exposing Temuclaude as an OpenAI-compatible API (via LiteLLM proxy), any coding agent (Claude Code, Kilo, Pi, OpenCode, Cursor) can point at Temuclaude and get multi-model orchestration behind a single endpoint. They send one query; we orchestrate 5 models, verify, synthesize, and return one answer.
 
-**Timuclaude is not a coding agent. Timuclaude is the brain behind coding agents.**
+**Temuclaude is not a coding agent. Temuclaude is the brain behind coding agents.**

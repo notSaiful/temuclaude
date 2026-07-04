@@ -1,5 +1,5 @@
 """
-Timuclaude Skill Auto-Loader
+Temuclaude Skill Auto-Loader
 Injects domain-specific expertise from Hermes skills into the system prompt.
 
 Before answering a query, checks the task type and loads relevant skill
@@ -111,13 +111,13 @@ def build_enhanced_system_prompt(task_type: str, base_prompt: Optional[str] = No
     
     Args:
         task_type: The classified task type
-        base_prompt: The base system prompt (default: standard Timuclaude prompt)
+        base_prompt: The base system prompt (default: standard Temuclaude prompt)
     
     Returns:
         Enhanced system prompt with skill principles injected
     """
     if base_prompt is None:
-        base_prompt = "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers."
+        base_prompt = "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers."
     
     skill_principles = load_skill_principles(task_type)
     

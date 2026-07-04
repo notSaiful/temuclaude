@@ -4,7 +4,7 @@
 
 Phase 3 adds the self-improvement layer: Self-QA gate (model scores its own work), skill auto-loading (inject domain expertise), query log analysis (learn from past performance), and adaptive routing (adjust model weights based on results).
 
-This is what makes Timuclaude get better over time — without retraining.
+This is what makes Temuclaude get better over time — without retraining.
 
 ## Components
 
@@ -47,7 +47,7 @@ def load_skill_principles(task_type):
 
 **Integration in orchestrator:**
 - Before calling models, inject skill principles into system prompt
-- "You are Timuclaude. Domain expertise: {skill_principles}"
+- "You are Temuclaude. Domain expertise: {skill_principles}"
 
 ### 3. Query Log Analysis (src/analyzer.py)
 Analyze past query logs to find patterns: which task types have lowest success, which models perform best per task.

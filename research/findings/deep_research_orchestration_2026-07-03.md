@@ -1,7 +1,7 @@
 # Comprehensive Research Report: LLM Orchestration & Multi-Model Combination Breakthroughs
 
 **Date:** July 3, 2026
-**Purpose:** Identify NEW breakthroughs that can be integrated into Timuclaude to beat frontier models at 50x lower cost.
+**Purpose:** Identify NEW breakthroughs that can be integrated into Temuclaude to beat frontier models at 50x lower cost.
 
 ---
 
@@ -20,7 +20,7 @@
   - AlpacaEval 2.0: **65.1%** using only open-source models vs GPT-4o's 57.5% (+7.6 points)
   - MT-Bench, FLASK: SOTA across all benchmarks
   - Aggregator quality has **2x more impact** than proposer quality (coefficients 0.588 vs 0.281)
-- **Timuclaude integration:** HIGHLY INTEGRABLE. Timuclaude's current panel+judge is essentially a 2-layer MoA. Adding a 3rd layer where the 5 models (GLM-5.2, DeepSeek V4, Kimi K2.6, MiniMax M3, Nemotron) first propose, then cross-review each other's outputs, then a final aggregator synthesizes — this is a direct upgrade path.
+- **Temuclaude integration:** HIGHLY INTEGRABLE. Temuclaude's current panel+judge is essentially a 2-layer MoA. Adding a 3rd layer where the 5 models (GLM-5.2, DeepSeek V4, Kimi K2.6, MiniMax M3, Nemotron) first propose, then cross-review each other's outputs, then a final aggregator synthesizes — this is a direct upgrade path.
 
 ### 1.2 Self-MoA — Single Model Sampled Multiple Times
 - **Paper:** Li et al., "Rethinking Mixture-of-Agents: Is Mixing Different Large Language Models Beneficial?" arXiv:2502.00674 (Feb 2025)
@@ -30,12 +30,12 @@
   - Single top model sampled N times beats diverse model mixtures
   - Cross-model diversity can HURT if it lowers average quality
   - In-model diversity (temperature sampling) provides sufficient variation
-- **Timuclaude integration:** HIGHLY RELEVANT. Instead of always using all 5 models, Timuclaude could dynamically decide: when one model clearly performs best on a task type, use Self-MoA (sample that model N times) instead of heterogeneous panel. This is cheaper and potentially better.
+- **Temuclaude integration:** HIGHLY RELEVANT. Instead of always using all 5 models, Temuclaude could dynamically decide: when one model clearly performs best on a task type, use Self-MoA (sample that model N times) instead of heterogeneous panel. This is cheaper and potentially better.
 
 ### 1.3 Sequential MoA — On-the-Fly Aggregation
 - **Paper:** Same Self-MoA paper (arXiv:2502.00674)
 - **What it is:** A sequential version of Self-MoA that aggregates LLM outputs on-the-fly over multiple rounds, as effective as aggregating all outputs at once.
-- **Timuclaude integration:** Can reduce latency by not waiting for all models to respond before starting aggregation.
+- **Temuclaude integration:** Can reduce latency by not waiting for all models to respond before starting aggregation.
 
 ### 1.4 Key MoA Configuration Insights
 | Objective | Configuration |
@@ -72,7 +72,7 @@
   4. Repeat for R rounds (typically 3-5)
   5. Final answer = majority vote or final round consensus
 - **Benchmarks:** 14.8-point accuracy gains on arithmetic benchmarks. Improves factuality and reasoning across 6 benchmarks.
-- **Timuclaude integration:** INTEGRABLE as an escalation mechanism. When the self-QA gate score is <8 and simple retry fails, escalate to multi-agent debate between the 5 models.
+- **Temuclaude integration:** INTEGRABLE as an escalation mechanism. When the self-QA gate score is <8 and simple retry fails, escalate to multi-agent debate between the 5 models.
 
 ### 2.2 Multi-LLM Debate Framework (NeurIPS 2024)
 - **Paper:** "Multi-LLM Debate: Framework, Principals, and Interventions" (NeurIPS 2024)
@@ -81,7 +81,7 @@
 ### 2.3 iMAD — Intelligent Multi-Agent Debate (Nov 2025)
 - **Paper:** arXiv:2511.11306 (Nov 2025)
 - **What it is:** Adaptive MAD that only triggers debate for queries that need it (not every query). This addresses the efficiency problem of always-debate.
-- **Timuclaude integration:** Directly relevant — adaptive debate triggering based on query difficulty is exactly what Timuclaude's adaptive routing already does. Can combine: only debate on hard queries.
+- **Temuclaude integration:** Directly relevant — adaptive debate triggering based on query difficulty is exactly what Temuclaude's adaptive routing already does. Can combine: only debate on hard queries.
 
 ### 2.4 Critical Findings — Debate Limitations (2025)
 - **Paper:** "Can LLM Agents Really Debate?" arXiv:2511.07784 (2025)
@@ -90,7 +90,7 @@
   - **65% of debate failures are "Collective Delusion"** — agents reinforce each other's errors
   - Bias amplification and echo chambers when agents share similar training
   - Sycophancy inflates costs (CONSENSAGENT, ACL 2025 Findings)
-- **Implication for Timuclaude:** Debate should be used selectively, not as default. Timuclaude's diversity of models (GLM, DeepSeek, Kimi, MiniMax, Nemotron) is actually a STRENGTH here — different training reduces echo chamber risk.
+- **Implication for Temuclaude:** Debate should be used selectively, not as default. Temuclaude's diversity of models (GLM, DeepSeek, Kimi, MiniMax, Nemotron) is actually a STRENGTH here — different training reduces echo chamber risk.
 
 ### 2.5 CONSENSAGENT (ACL 2025)
 - Addresses sycophancy in multi-agent debate — agents agreeing too quickly to reduce debate rounds.
@@ -109,7 +109,7 @@
   2. At inference, router processes query → routes to appropriate model
   3. Strong generalization: works even with models not in training set
 - **Benchmarks:** Up to **2x cost reduction** while maintaining quality. Maintains performance even when routing between unseen LLMs.
-- **Timuclaude integration:** DIRECTLY APPLICABLE. Timuclaude already has adaptive routing. RouteLLM's preference-data training approach can improve routing decisions. Can train router on Timuclaude's performance history data.
+- **Temuclaude integration:** DIRECTLY APPLICABLE. Temuclaude already has adaptive routing. RouteLLM's preference-data training approach can improve routing decisions. Can train router on Temuclaude's performance history data.
 
 ### 3.2 Unified Routing + Cascading (ICLR 2025)
 - **Paper:** Dekoninck et al., "A Unified Approach to Routing and Cascading for LLMs," arXiv:2410.10347
@@ -119,13 +119,13 @@
   2. If model confidence is low, cascade to next (stronger) model
   3. Quality estimators are the critical factor for success
 - **Benchmarks:** Consistently outperforms both routing and cascading alone across all settings.
-- **Timuclaude integration:** HIGHLY INTEGRABLE. Timuclaude's self-QA gate is essentially a cascade trigger. Combining routing (model selection) + cascading (escalation when quality is low) into a unified strategy is exactly what Timuclaude should do.
+- **Temuclaude integration:** HIGHLY INTEGRABLE. Temuclaude's self-QA gate is essentially a cascade trigger. Combining routing (model selection) + cascading (escalation when quality is low) into a unified strategy is exactly what Temuclaude should do.
 
 ### 3.3 BEST-Route (June 2025)
 - **Paper:** Ding & Mallick, "BEST-Route: Adaptive LLM Routing with Test-Time Optimal Compute" (2025)
 - **What it adds:** Chooses BOTH the model AND the number of response samples based on query difficulty and quality thresholds.
 - **Benchmarks:** Reduces costs by up to **60%** with less than 1% performance drop.
-- **Timuclaude integration:** Directly extends Timuclaude's adaptive routing to also decide how many samples to draw. Easy queries → 1 sample from cheap model. Hard queries → N samples + self-consistency from best model.
+- **Temuclaude integration:** Directly extends Temuclaude's adaptive routing to also decide how many samples to draw. Easy queries → 1 sample from cheap model. Hard queries → N samples + self-consistency from best model.
 
 ### 3.4 Cascadia — Cascade Serving Framework
 - Novel cascade serving framework for scheduling request routing and model cascades.
@@ -162,13 +162,13 @@
   - Mean gain of **+1.62** for Llama 8B with 10 merged checkpoints
   - Compared 6 merging techniques across 4 LLM architectures and 16 benchmarks
 
-### 4.4 Timuclaude Integration Assessment
-- **Challenge:** Model merging operates at the WEIGHT level, not the output level. Timuclaude uses Ollama Cloud to serve separate models, so it can't directly merge weights.
+### 4.4 Temuclaude Integration Assessment
+- **Challenge:** Model merging operates at the WEIGHT level, not the output level. Temuclaude uses Ollama Cloud to serve separate models, so it can't directly merge weights.
 - **Possible approaches:**
   1. **Pre-merge models offline:** Merge GLM-5.2 + DeepSeek V4 weights → deploy merged model. But this requires same architecture family.
   2. **Output-level merging:** Already done via MoA/fusion.
-  3. **Future:** If Timuclaude self-hosts models, weight merging becomes viable.
-- **Verdict:** LOW immediate integrability for cloud-served models. HIGH potential if Timuclaude moves to self-hosted inference.
+  3. **Future:** If Temuclaude self-hosts models, weight merging becomes viable.
+- **Verdict:** LOW immediate integrability for cloud-served models. HIGH potential if Temuclaude moves to self-hosted inference.
 
 ---
 
@@ -195,13 +195,13 @@
 - **Paper:** "Speculative decoding with CTC-based draft model for LLM inference" (NeurIPS 2024)
 - **What it adds:** Uses CTC (Connectionist Temporal Classification) based draft model for more efficient speculation.
 
-### 5.4 Timuclaude Integration Assessment
-- **Challenge:** Speculative decoding operates at the TOKEN level during inference, requiring direct access to model internals (logits, KV cache). Timuclaude uses cloud API calls, so it can't access intermediate states.
+### 5.4 Temuclaude Integration Assessment
+- **Challenge:** Speculative decoding operates at the TOKEN level during inference, requiring direct access to model internals (logits, KV cache). Temuclaude uses cloud API calls, so it can't access intermediate states.
 - **Possible approaches:**
   1. **If self-hosting via vLLM/Ollama:** Enable speculative decoding at serving level (vLLM supports it natively)
-  2. **Cascade speculation (output-level analog):** Use cheap model to generate draft answer → expensive model verifies/refines. This is essentially what Timuclaude's cascade routing does already.
-  3. **Future integration:** If Timuclaude deploys vLLM with speculative decoding enabled, it gets 2-3x speedup for free.
-- **Verdict:** MEDIUM integrability. The output-level analog (draft-verify pattern) is already in Timuclaude via cascading. Token-level speculative decoding requires infrastructure changes.
+  2. **Cascade speculation (output-level analog):** Use cheap model to generate draft answer → expensive model verifies/refines. This is essentially what Temuclaude's cascade routing does already.
+  3. **Future integration:** If Temuclaude deploys vLLM with speculative decoding enabled, it gets 2-3x speedup for free.
+- **Verdict:** MEDIUM integrability. The output-level analog (draft-verify pattern) is already in Temuclaude via cascading. Token-level speculative decoding requires infrastructure changes.
 
 ---
 
@@ -224,7 +224,7 @@
   - Hard problems: 0.2% token savings, 0% accuracy loss (same performance)
   - **35.9% efficiency ratio gain**
   - Pareto improvement confirmed
-- **Timuclaude integration:** HIGHLY INTEGRABLE. This is almost exactly Timuclaude's existing architecture (difficulty estimation → routing → generation → self-QA gate → escalation). Key additions:
+- **Temuclaude integration:** HIGHLY INTEGRABLE. This is almost exactly Temuclaude's existing architecture (difficulty estimation → routing → generation → self-QA gate → escalation). Key additions:
   1. Explicit token budgets per difficulty level
   2. USVA 4-rubric verification (more detailed than current 0-10 score)
   3. Pareto efficiency tracking
@@ -236,7 +236,7 @@
   1. **Early exiting:** Exit from intermediate transformer layers when confidence is high
   2. **Adaptive depth:** Use fewer layers for easy queries
   3. **Token-level early exit:** Stop generation when model is confident in answer
-- **Timuclaude integration:** The output-level analog is already in Timuclaude (self-QA gate with threshold). Adding explicit difficulty-based token budgets (like ATTS) is a direct improvement.
+- **Temuclaude integration:** The output-level analog is already in Temuclaude (self-QA gate with threshold). Adding explicit difficulty-based token budgets (like ATTS) is a direct improvement.
 
 ### 6.3 BEST-Route Cost Reduction (June 2025)
 - **Up to 60% cost reduction** with <1% performance drop
@@ -248,7 +248,7 @@
 
 ---
 
-## PRIORITY RECOMMENDATIONS FOR TIMUCLAUDE
+## PRIORITY RECOMMENDATIONS FOR TEMUCLAUDE
 
 ### Tier 1 — Implement Immediately (Highest ROI, Lowest Effort)
 
@@ -282,12 +282,12 @@
 
 6. **Unified Routing + Cascading (from arXiv:2410.10347)**
    - Combine model selection (routing) with quality-based escalation (cascading) into unified strategy
-   - Timuclaude already has both components — just need to unify the decision logic
+   - Temuclaude already has both components — just need to unify the decision logic
    - Expected: Consistently outperforms either approach alone
 
 7. **Selective Multi-Agent Debate**
    - Only trigger debate for hard queries where self-QA gate fails after retry
-   - Use Timuclaude's model diversity as advantage against echo chambers
+   - Use Temuclaude's model diversity as advantage against echo chambers
    - Limit to 2-3 rounds to control cost
 
 8. **Pareto Efficiency Tracking**
@@ -297,11 +297,11 @@
 ### Tier 3 — Future Consideration (Higher Effort)
 
 9. **Preference-Data Trained Router (RouteLLM approach)**
-   - Train a router model on Timuclaude's accumulated performance data
+   - Train a router model on Temuclaude's accumulated performance data
    - Better routing decisions → more cost savings
 
 10. **Model Weight Merging (if self-hosting)**
-    - If Timuclaude moves to self-hosted vLLM, merge model weights using TIES/Task Arithmetic
+    - If Temuclaude moves to self-hosted vLLM, merge model weights using TIES/Task Arithmetic
     - Half the top HuggingFace leaderboard models are merges
 
 11. **Token-Level Speculative Decoding (if self-hosting)**
@@ -312,7 +312,7 @@
 
 ## SUMMARY OF KEY PAPERS
 
-| # | Paper | arXiv | Year | Key Result | Timuclaude Relevance |
+| # | Paper | arXiv | Year | Key Result | Temuclaude Relevance |
 |---|-------|-------|------|------------|---------------------|
 | 1 | Mixture-of-Agents | 2406.04692 | 2024 | 65.1% AlpacaEval (beats GPT-4o 57.5%) | Direct upgrade to fusion |
 | 2 | Self-MoA / Rethinking MoA | 2502.00674 | 2025 | +6.6% over MoA, single model better | Cost optimization mode |

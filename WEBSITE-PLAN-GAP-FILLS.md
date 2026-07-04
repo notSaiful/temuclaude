@@ -1,4 +1,4 @@
-# TIMUCLAUDE — WEBSITE PLAN: GAP FILLS (10 Items)
+# TEMUCLAUDE — WEBSITE PLAN: GAP FILLS (10 Items)
 
 ---
 
@@ -7,7 +7,7 @@
 ### Desktop Navigation (1024px+)
 - Height: 64px, sticky, transparent over hero
 - Background on scroll: rgba(250, 248, 245, 0.85) + backdrop-filter: blur(12px)
-- Left: Logo (32px mark + "Timuclaude" wordmark)
+- Left: Logo (32px mark + "Temuclaude" wordmark)
 - Center-right: Nav links (Inter 500, 0.875rem, #5E5B56, hover #1A1816)
   - Models
   - Playground
@@ -177,18 +177,18 @@
 5. Reproducibility section
 
 ### Interactive Chart
-- Bar chart comparing Timuclaude vs Fable 5, GPT-5.5, Gemini 3.1 Pro
+- Bar chart comparing Temuclaude vs Fable 5, GPT-5.5, Gemini 3.1 Pro
 - X-axis: benchmarks (GPQA, HLE, LiveCodeBench, etc.)
 - Y-axis: score (%)
-- Timuclaude bars: #D97757 (clay)
+- Temuclaude bars: #D97757 (clay)
 - Competitor bars: #8E8B85 (muted gray)
 - Hover: tooltip with exact score, methodology link
-- Toggle: switch between "All benchmarks" and "Timuclaude wins"
+- Toggle: switch between "All benchmarks" and "Temuclaude wins"
 - Library: Recharts (React-native, open source, ~40KB)
 
 ### Full Comparison Table
 - Same as Fugu's approach: bold for highest, underline for second
-- Columns: Benchmark, Timuclaude, Fable 5, GPT-5.5, Gemini 3.1 Pro
+- Columns: Benchmark, Temuclaude, Fable 5, GPT-5.5, Gemini 3.1 Pro
 - Footnotes: † = from published results, * = our measurement
 - Responsive: horizontal scroll on mobile (overflow-x: auto)
 - Alternating row colors: #FAF8F5 and #F0EDE6
@@ -202,7 +202,7 @@
 
 ### Reproducibility Section
 - "Run it yourself" heading
-- Code block: `python benchmarks/run_timuclaude.py --dataset hle --sample 100`
+- Code block: `python benchmarks/run_temuclaude.py --dataset hle --sample 100`
 - Link to GitHub: benchmark scripts, datasets, results JSON
 - "Full results: [View on GitHub]"
 
@@ -227,7 +227,7 @@
 ### Implementation
 ```tsx
 // Plausible script (loaded only after cookie consent)
-<Script defer data-domain="timuclaude.com" src="https://plausible.io/js/script.js" />
+<Script defer data-domain="temuclaude.com" src="https://plausible.io/js/script.js" />
 
 // Custom events
 window.plausible('Query Sent', { props: { mode: 'fusion', models: 3 } });
@@ -295,10 +295,10 @@ const OrchestrationView = dynamic(() => import('@/components/OrchestrationView')
 
 ### Hero
 H1: "One question. Many minds. One superior answer."
-Subtext: "Timuclaude orchestrates 5 AI models to beat frontier models at 28x lower cost. Free with Ollama. Open source. MIT licensed."
+Subtext: "Temuclaude orchestrates 5 AI models to beat frontier models at 28x lower cost. Free with Ollama. Open source. MIT licensed."
 CTA Primary: "Try the Playground"
 CTA Secondary: "View on GitHub"
-Install command: "pip install timuclaude"
+Install command: "pip install temuclaude"
 Backend tabs: "Ollama (Free)" | "OpenRouter" | "ai/ml API"
 
 ### Metrics Bar
@@ -306,7 +306,7 @@ Backend tabs: "Ollama (Free)" | "OpenRouter" | "ai/ml API"
 
 ### How It Works (3 cards)
 01. "Understanding your question"
-    "Timuclaude classifies your query — math, code, reasoning, knowledge — and routes it to the best model for the task."
+    "Temuclaude classifies your query — math, code, reasoning, knowledge — and routes it to the best model for the task."
 
 02. "Combining multiple answers"
     "For hard questions, 3-5 models answer in parallel. A dynamic aggregator synthesizes the best parts of each response."
@@ -320,11 +320,11 @@ Backend tabs: "Ollama (Free)" | "OpenRouter" | "ai/ml API"
 ### Benchmark Section
 Heading: "Benchmark Results"
 Subtext: "Projected scores from research analysis. Live results coming after Phase 6 testing."
-Table intro: "Timuclaude vs frontier models across 9 benchmarks."
+Table intro: "Temuclaude vs frontier models across 9 benchmarks."
 
 ### Playground Preview
 Heading: "See it in action"
-Text: "Try Timuclaude right now — no signup required. Watch 5 models collaborate in real-time."
+Text: "Try Temuclaude right now — no signup required. Watch 5 models collaborate in real-time."
 Button: "Open Playground"
 
 ### Pricing
@@ -339,16 +339,16 @@ Text: "MIT licensed. Read every line. Modify it. Self-host it. Bring your own ke
 Button: "Star on GitHub"
 
 ### FAQ (Pricing page, expandable)
-1. "How is Timuclaude different from using GPT-5.5 directly?"
-   "GPT-5.5 is one model. Timuclaude orchestrates 5 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better on benchmarks, at 28x lower cost."
+1. "How is Temuclaude different from using GPT-5.5 directly?"
+   "GPT-5.5 is one model. Temuclaude orchestrates 5 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better on benchmarks, at 28x lower cost."
 2. "Is it really free?"
    "Yes. Self-host with Ollama and it's free forever, unlimited queries. The cloud version costs $15/month for managed hosting."
-3. "Which models does Timuclaude use?"
+3. "Which models does Temuclaude use?"
    "GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, MiniMax M3, Nemotron 3 Ultra, and GPT-OSS 120B. You can add your own models too."
 4. "Can I use my own API keys?"
    "Yes. Bring your own OpenRouter, ai/ml, or Ollama keys. No markup on your costs."
 5. "How does the orchestration work?"
-   "Timuclaude classifies your query, routes it to the best model(s), fuses multiple answers when needed, verifies math with code execution, and quality-checks with a self-QA gate. You see the whole process in the playground."
+   "Temuclaude classifies your query, routes it to the best model(s), fuses multiple answers when needed, verifies math with code execution, and quality-checks with a self-QA gate. You see the whole process in the playground."
 6. "Is my data stored?"
    "No. Queries are processed in real-time and not stored. Your API keys are stored only in your browser session (sessionStorage) and cleared when you close the tab."
 7. "Can I self-host?"
@@ -357,7 +357,7 @@ Button: "Star on GitHub"
    "Enterprise includes SSO, SLA, self-hosted deployment, dedicated support, and 200K queries/month. Contact us for custom pricing."
 
 ### Empty State (Playground)
-Heading: "Ask Timuclaude anything"
+Heading: "Ask Temuclaude anything"
 Subtext: "5 AI models are ready to collaborate on your question."
 Example chips: "What is 9.9 vs 9.11?" | "Write a Python merge function" | "Explain quantum entanglement" | "Derivative of x³+2x²-5x+1?"
 
@@ -430,13 +430,13 @@ jobs:
 
 ### Preview Deployments
 - Vercel automatically creates preview deployment on every PR
-- Preview URL: timuclaude-pr-123.vercel.app
+- Preview URL: temuclaude-pr-123.vercel.app
 - Comment on PR with preview link
 - Lighthouse runs on preview and reports scores in PR comment
 
 ### Production Deployment
 - Push to `main` branch → Vercel auto-deploys to production
-- Domain: timuclaude.com (or timuclaude.vercel.app initially)
+- Domain: temuclaude.com (or temuclaude.vercel.app initially)
 - Custom domain setup: add in Vercel dashboard, update DNS
 
 ### Environment Variables
@@ -444,16 +444,16 @@ jobs:
 # Production (.env.production — stored in Vercel dashboard)
 OPENROUTER_API_KEY=sk-or-v1-xxx
 AIML_API_KEY=xxx
-TIMUCLAUDE_MASTER_KEY=xxx
-NEXT_PUBLIC_PLAUSIBLE_DOMAIN=timuclaude.com
-NEXT_PUBLIC_GITHUB_REPO=notSaiful/timuclaude-research
+TEMUCLAUDE_MASTER_KEY=xxx
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=temuclaude.com
+NEXT_PUBLIC_GITHUB_REPO=notSaiful/temuclaude-research
 ```
 
 ### Domain Setup
-- Purchase: timuclaude.com (or timuclaude.ai if .com unavailable)
+- Purchase: temuclaude.com (or temuclaude.ai if .com unavailable)
 - DNS: point to Vercel (A record + CNAME)
 - SSL: automatic via Vercel
-- WWW redirect: www.timuclaude.com → timuclaude.com
+- WWW redirect: www.temuclaude.com → temuclaude.com
 
 ### Monitoring
 - Vercel Analytics (free, built-in): page views, Web Vitals
@@ -562,7 +562,7 @@ NEXT_PUBLIC_GITHUB_REPO=notSaiful/timuclaude-research
 ### Design
 - Size: 1200×630px
 - Background: #FAF8F5 (warm ivory)
-- Left side: Logo mark (orchestration nodes) + "Timuclaude" wordmark
+- Left side: Logo mark (orchestration nodes) + "Temuclaude" wordmark
 - Center: "One question. Many minds. One superior answer." in Inter 600, 48px, #1A1816
 - Below: "Open-source LLM orchestration · 28x cheaper than frontier models" in Inter 400, 20px, #5E5B56
 - Bottom: "5 models · 3 backends · MIT licensed" in Inter 500, 16px, #D97757

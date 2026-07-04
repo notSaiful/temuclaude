@@ -1,4 +1,4 @@
-# Timuclaude — Final Plan v3 (Honest, Research-Verified)
+# Temuclaude — Final Plan v3 (Honest, Research-Verified)
 
 ## The Truth
 
@@ -155,12 +155,12 @@ Query → Router classifies task type
 | Debugging | systematic-debugging, python-debugpy | Root cause analysis, not symptom fixing |
 | Review | requesting-code-review, simplify-code | Security scan, quality gates |
 
-### Custom Timuclaude Skills:
+### Custom Temuclaude Skills:
 
-1. **timuclaude-router** — routing rules, model selection logic, task classification
-2. **timuclaude-verifier** — verification prompts and scoring criteria for math/code
-3. **timuclaude-benchmark** — auto-benchmark new models, track scores over time
-4. **timuclaude-optimizer** — analyze logs, adjust routing rules, A/B test pairings
+1. **temuclaude-router** — routing rules, model selection logic, task classification
+2. **temuclaude-verifier** — verification prompts and scoring criteria for math/code
+3. **temuclaude-benchmark** — auto-benchmark new models, track scores over time
+4. **temuclaude-optimizer** — analyze logs, adjust routing rules, A/B test pairings
 
 ### How skills make cheap models better:
 
@@ -218,11 +218,11 @@ Not AI self-improvement (debunked). Data-driven routing optimization (proven).
 | Claude Fable 5 | $2.75 | 60 |
 | GPT-5.5 | $1.03 | 55 |
 | GLM-5.2 alone | $0.06 | 51 |
-| **Timuclaude** | **~$0.10** | **52-55** |
+| **Temuclaude** | **~$0.10** | **52-55** |
 
-**Timuclaude is 10-27x cheaper than frontier, at 87-92% of frontier quality.**
+**Temuclaude is 10-27x cheaper than frontier, at 87-92% of frontier quality.**
 
-On cost-adjusted performance (intelligence per dollar): **Timuclaude is #1.**
+On cost-adjusted performance (intelligence per dollar): **Temuclaude is #1.**
 
 ---
 
@@ -278,6 +278,6 @@ On cost-adjusted performance (intelligence per dollar): **Timuclaude is #1.**
 | Improve over time via self-improvement | YES — data-driven routing optimization is proven |
 | Auto-download and use skills | YES — Hermes skill system already does this |
 
-**Timuclaude is not "cheap Claude." It's "smart routing + skills + verification at wholesale prices."**
+**Temuclaude is not "cheap Claude." It's "smart routing + skills + verification at wholesale prices."**
 
 The value proposition isn't matching frontier quality — it's delivering 87-92% of frontier quality at 10-27x lower cost, with genuine superiority on verifiable tasks. That's what we build.

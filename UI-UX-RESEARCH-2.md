@@ -1,4 +1,4 @@
-# TIMUCLAUDE — UI/UX RESEARCH: ADDITIONAL COMPETITORS
+# TEMUCLAUDE — UI/UX RESEARCH: ADDITIONAL COMPETITORS
 ## Learnings from Sakana Fugu, Hermes Agent, Google AI Studio, MiniMax, Kilo AI
 
 ---
@@ -59,7 +59,7 @@
 7. **Video element**: Shows the product in action
 8. **Minimal footer**: Just "NOUS PORTAL" + "VIEW ALL OUR PLANS"
 
-### Lessons for Timuclaude
+### Lessons for Temuclaude
 - A bold, unexpected color can be more memorable than a "safe" palette
 - Light-weight headings at large sizes feel premium
 - Install command in the hero = immediate action (no scrolling to find how to start)
@@ -85,7 +85,7 @@
 6. **Case studies section**: "How developers build with Gemini API" — 3 case study links
 7. **Comprehensive footer**: Models, Product, Capabilities, Information — 4 columns
 
-### Lessons for Timuclaude
+### Lessons for Temuclaude
 - Model carousel is a great way to show available models (we can show our 6 models)
 - "Projects ready to Remix" = "Example prompts ready to try" in our playground
 - Getting started steps (API key → SDK → Tools) = our Quickstart flow
@@ -110,7 +110,7 @@
 5. **Cookie consent**: Full cookie consent banner with Reject/Customize/Accept
 6. **Footer**: 4 columns (Model, Product, API, Company) with all sub-links
 
-### Lessons for Timuclaude
+### Lessons for Temuclaude
 - Mega menu works when you have many products (we have 6 models, could group them)
 - Research blog cards with dates build credibility over time
 - Footer with categorized links is standard and expected
@@ -138,7 +138,7 @@
 10. **"Bring your own keys"**: Same as our Ollama/OpenRouter approach
 11. **Entire site in JetBrains Mono**: Bold choice that says "this is for developers." Unique and memorable.
 
-### Lessons for Timuclaude
+### Lessons for Temuclaude
 - GitHub stars in the hero = immediate credibility
 - Platform/backend selector with dynamic install command = great UX
 - "No markup", "No black boxes", "Bring your own keys" = transparent pricing language

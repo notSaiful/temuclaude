@@ -1,5 +1,5 @@
 """
-Timuclaude Core Orchestrator
+Temuclaude Core Orchestrator
 The main entry point. User sends a query → gets one response.
 All orchestration is invisible.
 
@@ -67,9 +67,9 @@ else:
     from src.preference_router import record_routing_decision, get_routing_recommendations
 
 
-class Timuclaude:
+class Temuclaude:
     """
-    Timuclaude — one model, one endpoint, one response.
+    Temuclaude — one model, one endpoint, one response.
     All orchestration is internal and invisible to the user.
     """
 
@@ -607,8 +607,8 @@ class Timuclaude:
 
 # Synchronous wrapper for easy testing
 def ask(query: str, system_prompt: str = None) -> str:
-    """Simple function to ask Timuclaude a question."""
-    tc = Timuclaude()
+    """Simple function to ask Temuclaude a question."""
+    tc = Temuclaude()
     return asyncio.run(tc.complete(query, system_prompt))
 
 

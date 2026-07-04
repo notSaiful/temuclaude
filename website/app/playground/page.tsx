@@ -33,20 +33,74 @@ export default function PlaygroundPage() {
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
+  const [freeQueriesUsed, setFreeQueriesUsed] = useState(0);
+  const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Generate or retrieve anonymous identifier (stored in localStorage)
+  const getIdentifier = useCallback(() => {
+    if (typeof window === 'undefined') return 'anonymous';
+    let id = localStorage.getItem('temuclaude_id');
+    if (!id) {
+      id = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      localStorage.setItem('temuclaude_id', id);
+    }
+    return id;
+  }, []);
+
+  // Check usage on mount and after each query
+  const checkUsage = useCallback(async () => {
+    try {
+      const identifier = getIdentifier();
+      const res = await fetch('/api/usage/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier }),
+      });
+      const data = await res.json();
+      if (data.allowed === false) {
+        setLimitMessage(data.message);
+        setShowUpgradeBanner(true);
+      } else {
+        setLimitMessage(null);
+        setFreeQueriesUsed(data.queriesToday || 0);
+      }
+    } catch (err) {
+      // Silently fail — don't block the user if the check endpoint is down
+    }
+  }, [getIdentifier]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    checkUsage();
+  }, [checkUsage]);
+
   const handleSend = useCallback(async () => {
     if (!input.trim() || status === 'submitted' || status === 'streaming') return;
+
+    // Check if user has reached free tier limit
+    if (limitMessage) {
+      setShowUpgradeBanner(true);
+      return;
+    }
 
     const userMessage: Message = { role: 'user', content: input.trim() };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setStatus('submitted');
+
+    // Increment usage counter (fire and forget)
+    const identifier = getIdentifier();
+    fetch('/api/usage/check', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, inputTokens: 1000, outputTokens: 1000 }),
+    }).then(() => checkUsage()).catch(() => {});
 
     try {
       const response = await fetch('/api/chat', {
@@ -119,7 +173,7 @@ export default function PlaygroundPage() {
         setMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
       }
     }
-  }, [input, status, messages]);
+  }, [input, status, messages, limitMessage, getIdentifier, checkUsage]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
@@ -130,9 +184,24 @@ export default function PlaygroundPage() {
     <>
       <Navbar />
       <div className="flex h-screen pt-16">
-        <h1 className="sr-only">Timuclaude Playground</h1>
+        <h1 className="sr-only">Temuclaude Playground</h1>
 
-        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="Timuclaude Playground" id="main-content">
+        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="Temuclaude Playground" id="main-content">
+          {/* Free tier limit banner */}
+          {showUpgradeBanner && limitMessage && (
+            <div className="bg-accent-primary/10 border-b border-accent-primary/20 px-4 py-3">
+              <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+                <p className="text-sm text-text-primary">{limitMessage}</p>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button onClick={() => setShowUpgradeBanner(false)} className="text-text-muted hover:text-text-primary text-xs" aria-label="Dismiss">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                  </button>
+                  <a href="/pricing" className="btn-accent text-xs !py-1.5 !px-3">Upgrade</a>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
             <div className="max-w-3xl mx-auto space-y-6">
@@ -140,10 +209,10 @@ export default function PlaygroundPage() {
               {messages.length === 0 && (
                 <div className="text-center pt-12">
                   <h2 className="text-2xl font-semibold text-text-primary mb-2">
-                    Ask Timuclaude anything
+                    Ask Temuclaude anything
                   </h2>
                   <p className="text-text-secondary mb-8">
-                    One model. Five minds behind the scenes. One superior answer.
+                    One model. Eight minds behind the scenes. One superior answer.
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {EXAMPLE_PROMPTS.map((prompt, i) => (
@@ -233,6 +302,15 @@ export default function PlaygroundPage() {
           {/* Input Bar */}
           <div className="border-t border-border-subtle bg-bg-primary p-4">
             <div className="max-w-3xl mx-auto">
+              {/* Free tier counter */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-text-muted">
+                  {freeQueriesUsed < 50 ? `${50 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
+                </span>
+                {freeQueriesUsed >= 30 && freeQueriesUsed < 50 && (
+                  <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
+                )}
+              </div>
               <div className="flex gap-2 items-end">
                 <textarea
                   value={input}
@@ -243,7 +321,7 @@ export default function PlaygroundPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Ask Timuclaude anything..."
+                  placeholder="Ask Temuclaude anything..."
                   rows={1}
                   className="input flex-1 resize-none min-h-[44px] max-h-32"
                   aria-label="Enter your question"

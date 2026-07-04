@@ -190,4 +190,4 @@ The key: MRCR v2 is a DECOMPOSITION problem, not a KNOWLEDGE problem. The MGH pa
 
 **We don't need bigger models. We need better management of the geniuses we already have.**
 
-That's the Mismanaged Geniuses Hypothesis. That's Timuclaude.
+That's the Mismanaged Geniuses Hypothesis. That's Temuclaude.

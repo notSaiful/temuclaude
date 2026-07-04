@@ -1,10 +1,10 @@
-# Timuclaude — OpenRouter LiteLLM Configuration
+# Temuclaude — OpenRouter LiteLLM Configuration
 # Uses OpenRouter as backend (scales to thousands of concurrent users)
 # Requires OPENROUTER_API_KEY environment variable
 
 model_list:
   # === USER-FACING MODEL ===
-  - model_name: timuclaude
+  - model_name: temuclaude
     litellm_params:
       model: openrouter/z-ai/glm-5.2
       api_key: "os.environ/OPENROUTER_API_KEY"
@@ -60,7 +60,7 @@ router_settings:
 
 # Fallbacks: if a model fails, try the next one
 fallbacks:
-  - timuclaude: ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
+  - temuclaude: ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
   - glm-5.2: ["deepseek-v4-pro", "kimi-k2.6"]
   - deepseek-v4-pro: ["glm-5.2", "kimi-k2.6"]
   - kimi-k2.6: ["glm-5.2", "deepseek-v4-pro"]
@@ -73,4 +73,4 @@ litellm_settings:
   set_verbose: false
 
 general_settings:
-  master_key: "os.environ/TIMUCLAUDE_MASTER_KEY"
+  master_key: "os.environ/TEMUCLAUDE_MASTER_KEY"

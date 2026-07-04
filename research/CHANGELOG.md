@@ -1,4 +1,4 @@
-# Timuclaude Research Swarm — CHANGELOG
+# Temuclaude Research Swarm — CHANGELOG
 
 All automatic integrations logged here.
 

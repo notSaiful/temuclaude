@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Timuclaude Benchmark — Baseline Runner
+Temuclaude Benchmark — Baseline Runner
 Runs a single model on a benchmark dataset.
 
 Usage:
@@ -19,7 +19,7 @@ sys.path.insert(0, project_root)
 
 from benchmarks.datasets import load_dataset_by_name, create_sample_dataset
 from benchmarks.benchmark_runner import run_benchmark, save_results
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 
 
 async def main() -> None:
@@ -48,7 +48,7 @@ async def main() -> None:
     print()
     
     # Create orchestrator
-    tc = Timuclaude()
+    tc = Temuclaude()
     
     # Run benchmark
     results = await run_benchmark(

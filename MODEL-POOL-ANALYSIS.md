@@ -1,4 +1,4 @@
-# TIMUCLAUDE MODEL POOL ANALYSIS — July 2026
+# TEMUCLAUDE MODEL POOL ANALYSIS — July 2026
 ## Real Data from OpenRouter API + ArtificialAnalysis Intelligence Index v4.1
 
 ---
@@ -184,7 +184,7 @@
 
 ## BENCHMARK PROJECTIONS (with new pool)
 
-| Benchmark | Fable 5 | GPT-5.5 | Timuclaude (projected) | How |
+| Benchmark | Fable 5 | GPT-5.5 | Temuclaude (projected) | How |
 |-----------|---------|---------|----------------------|-----|
 | Terminal-Bench | 85% | 82% | 92-97% | DeepSeek V4 Pro + code verify |
 | GPQA Diamond | 88% | 94% | 95-98% | Fusion (3 models) + self-consistency |

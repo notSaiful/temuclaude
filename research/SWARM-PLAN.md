@@ -1,10 +1,10 @@
-# Timuclaude Research Swarm — 24/7 Autonomous Deep Research System
+# Temuclaude Research Swarm — 24/7 Autonomous Deep Research System
 
 ## Mission
 
 Continuously discover, evaluate, and integrate breakthroughs in LLM orchestration,
 multi-agent systems, reasoning enhancement, and cost-efficient AI — to make
-Timuclaude beat frontier models (GPT-5.6 Sol, Gemini 3.5 Pro, Mythos) at 50x
+Temuclaude beat frontier models (GPT-5.6 Sol, Gemini 3.5 Pro, Mythos) at 50x
 lower cost.
 
 ## Architecture
@@ -30,7 +30,7 @@ lower cost.
 │                         ↓                                   │
 │              ┌─────────────────────┐                        │
 │              │  INTEGRATOR          │                        │
-│              │  Maps to timuclaude  │                        │
+│              │  Maps to temuclaude  │                        │
 │              │  modules             │                        │
 │              │  Writes findings MD  │                        │
 │              └──────────┬──────────┘                        │

@@ -1,16 +1,16 @@
-# Timuclaude X/Twitter Marketing Launch Plan
+# Temuclaude X/Twitter Marketing Launch Plan
 
 > **For Hermes:** Use subagent-driven-development skill to implement this plan task-by-task.
 
-**Goal:** Launch a storytelling-driven X/Twitter marketing campaign for Timuclaude via Zernio that builds founder authority, proves technical credibility through benchmarks, and drives GitHub stars and user adoption.
+**Goal:** Launch a storytelling-driven X/Twitter marketing campaign for Temuclaude via Zernio that builds founder authority, proves technical credibility through benchmarks, and drives GitHub stars and user adoption.
 
 **Architecture:** Zernio API (Python SDK) for scheduled posting + analytics. Content organized as 5 story pillars serialized across a 90-day narrative arc. GitHub README rewritten as a story. Origin Story thread pinned as the profile anchor.
 
 **Tech Stack:** Zernio Python SDK, Zernio MCP Server, Ollama (for content draft generation), GitHub (README + repo), X/Twitter (delivery platform)
 
 **Strategy Documents:**
-- /Users/saiful/timuclaude/marketing/X_TWITTER_STRATEGY_STORYTELLING.md (full 12-part strategy)
-- /Users/saiful/timuclaude/marketing/X_TWITTER_STRATEGY.md (original research-based strategy)
+- /Users/saiful/temuclaude/marketing/X_TWITTER_STRATEGY_STORYTELLING.md (full 12-part strategy)
+- /Users/saiful/temuclaude/marketing/X_TWITTER_STRATEGY.md (original research-based strategy)
 - /Users/saiful/marketing-storytelling-research.md (storytelling research raw data)
 
 ---
@@ -49,20 +49,20 @@ Expected: JSON response with connected account list
 
 ### Task 0.2: Identify Which X/Twitter Accounts to Use
 
-**Objective:** Determine which of the 6 Zernio accounts will be used for Timuclaude marketing.
+**Objective:** Determine which of the 6 Zernio accounts will be used for Temuclaude marketing.
 
 **Decision needed from Ggs:**
-- Which X/Twitter account(s) will be the primary Timuclaude voice?
+- Which X/Twitter account(s) will be the primary Temuclaude voice?
 - Is there an existing account, or do we create a new one?
 - Will Ggs use his personal account as the founder voice (recommended by research — founder-led content outperforms brand accounts 10x)?
-- Or a dedicated Timuclaude account that Ggs posts through?
+- Or a dedicated Temuclaude account that Ggs posts through?
 
 **Research recommendation:** Founder-led content (like Cursor's Aman Sanger, Pieter Levels, Marc Lou) outperforms brand accounts. The account should have Ggs's personality, not a corporate voice.
 
 **Step 1: Document the decision**
-- Primary account: [@handle] (Ggs's personal or new Timuclaude account)
+- Primary account: [@handle] (Ggs's personal or new Temuclaude account)
 - Secondary accounts (if any): for amplification/retweets
-- Bio to use: "Building Timuclaude — open-source LLM orchestration that beats frontier models. Multi-model fusion. Free with Ollama. 🧵"
+- Bio to use: "Building Temuclaude — open-source LLM orchestration that beats frontier models. Multi-model fusion. Free with Ollama. 🧵"
 
 ---
 
@@ -71,7 +71,7 @@ Expected: JSON response with connected account list
 **Objective:** Install the SDK for programmatic posting.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/requirements.txt
+- Create: /Users/saiful/temuclaude/marketing/requirements.txt
 
 **Step 1: Install SDK**
 ```bash
@@ -85,7 +85,7 @@ python -c "import zernio; print(zernio.__version__)"
 
 **Step 3: Create requirements file**
 ```
-# /Users/saiful/timuclaude/marketing/requirements.txt
+# /Users/saiful/temuclaude/marketing/requirements.txt
 zernio>=1.0.0
 ```
 
@@ -98,7 +98,7 @@ zernio>=1.0.0
 **Objective:** Understand what exists before rewriting.
 
 **Files:**
-- Read: /Users/saiful/timuclaude/README.md
+- Read: /Users/saiful/temuclaude/README.md
 
 **Step 1: Read the current README**
 - Note what's good, what's missing, what needs restructuring
@@ -111,11 +111,11 @@ zernio>=1.0.0
 **Objective:** Rewrite README using the four-act story structure from the strategy.
 
 **Files:**
-- Modify: /Users/saiful/timuclaude/README.md
+- Modify: /Users/saiful/temuclaude/README.md
 
 **Structure (from strategy Part 11):**
 
-1. THE HOOK (one sentence): "Timuclaude beats GPT-5.6 Sol by running multiple models simultaneously and fusing their answers. Open-source. Free with Ollama."
+1. THE HOOK (one sentence): "Temuclaude beats GPT-5.6 Sol by running multiple models simultaneously and fusing their answers. Open-source. Free with Ollama."
 2. THE WHY (2-3 sentences on the pain): "Single LLMs get hard questions wrong. Subtly. Confidently. You don't know which ones."
 3. THE REVELATION (the approach): "Don't pick one model. Use all of them."
 4. THE PROOF (30-second quickstart): pip install + 3-line code example
@@ -125,7 +125,7 @@ zernio>=1.0.0
 **Step 1: Write the new README**
 
 ```markdown
-# Timuclaude
+# Temuclaude
 
 > Beats GPT-5.6 Sol by running multiple models simultaneously and fusing their answers. Open-source. Free with Ollama.
 
@@ -137,18 +137,18 @@ Single LLMs get hard questions wrong. Not obviously wrong — subtly, confidentl
 
 What if you don't pick one model? What if you use ALL of them and let them check each other?
 
-Timuclaude sends your question to multiple LLMs simultaneously (GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, GPT-OSS-120B, and more). It fuses their outputs using weighted voting. It verifies answers with code execution. It checks itself with self-QA. The result: answers that are measurably better than any single model alone.
+Temuclaude sends your question to multiple LLMs simultaneously (GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, GPT-OSS-120B, and more). It fuses their outputs using weighted voting. It verifies answers with code execution. It checks itself with self-QA. The result: answers that are measurably better than any single model alone.
 
 ## Quick Start (30 seconds)
 
 ```bash
-pip install timuclaude
+pip install temuclaude
 ```
 
 ```python
-from timuclaude import Timuclaude
+from temuclaude import Temuclaude
 
-tc = Timuclaude()  # auto-detects Ollama (free) or OpenRouter (paid)
+tc = Temuclaude()  # auto-detects Ollama (free) or OpenRouter (paid)
 answer = await tc.complete("What is 0.1 + 0.2 in floating point?")
 print(answer)  # 0.30000000000000004 — correct, not 0.3
 ```
@@ -169,7 +169,7 @@ No API keys needed with Ollama. No cloud. No bills. Free and unlimited.
 
 ## Benchmark Results
 
-| Benchmark | Timuclaude | GPT-5.6 Sol | Improvement |
+| Benchmark | Temuclaude | GPT-5.6 Sol | Improvement |
 |-----------|-----------|-------------|-------------|
 | MMLU | [TBD]% | [TBD]% | +[TBD]% |
 | HLE | [TBD]% | [TBD]% | +[TBD]% |
@@ -184,19 +184,19 @@ Full methodology and reproducible results: [benchmarks link]
 # Install Ollama: https://ollama.ai
 ollama pull glm-5.2
 ollama pull deepseek-v4-pro
-pip install timuclaude
+pip install temuclaude
 ```
 
 ### Option 2: OpenRouter (Production, Pay-Per-Token)
 ```bash
 export OPENROUTER_API_KEY="sk-or-..."
-pip install timuclaude
+pip install temuclaude
 ```
 
 ### Option 3: ai/ml API (Backup)
 ```bash
 export AIML_API_KEY="..."
-pip install timuclaude
+pip install temuclaude
 ```
 
 ## Architecture
@@ -217,7 +217,7 @@ Question -> [Model A, Model B, Model C] -> Fusion -> Self-Consistency -> Code Ve
 
 AI infrastructure should be free and accessible. A student in India shouldn't need OpenAI credits to access world-class AI. The future of AI should be built by the community, not controlled by 3 companies.
 
-Timuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
+Temuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
 
 ## License
 
@@ -234,7 +234,7 @@ PRs welcome. See CONTRIBUTING.md (coming soon).
 
 **Step 3: Commit**
 ```bash
-cd /Users/saiful/timuclaude
+cd /Users/saiful/temuclaude
 git add README.md
 git commit -m "docs: rewrite README as story-driven narrative (four-act structure)"
 git push
@@ -247,7 +247,7 @@ git push
 **Objective:** Visual proof makes the README more compelling and shareable.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/assets/architecture.png (or .svg)
+- Create: /Users/saiful/temuclaude/assets/architecture.png (or .svg)
 
 **Step 1: Create a simple architecture diagram**
 - Use excalidraw skill or create a clean SVG showing: Question -> 3 Models -> Fusion -> Verification -> Answer
@@ -270,7 +270,7 @@ git push
 **Objective:** Create the pinned origin story thread — the most important piece of content.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/origin_story_thread.md
+- Create: /Users/saiful/temuclaude/marketing/content/origin_story_thread.md
 
 **Structure (from strategy Part 4, Campaign 1):**
 - Tweet 1: HOOK — "I'm a developer in India who built an open-source AI platform that beats GPT-5.6 Sol..."
@@ -314,7 +314,7 @@ Then I thought: what if I don't pick one model?
 What if I use ALL of them and let them check each other?
 
 ## Tweet 4 (THE BUILD)
-So I built Timuclaude.
+So I built Temuclaude.
 
 6 phases. 30 Python files. 6 test suites.
 
@@ -327,8 +327,8 @@ So I built Timuclaude.
 ## Tweet 5 (THE PROOF)
 Benchmark results:
 
-Timuclaude vs GPT-5.6 Sol on [benchmark]:
-- Timuclaude: [X]%
+Temuclaude vs GPT-5.6 Sol on [benchmark]:
+- Temuclaude: [X]%
 - GPT-5.6 Sol: [Y]%
 - Improvement: +[Z]%
 
@@ -342,7 +342,7 @@ It runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
 Because a student in India shouldn't need OpenAI credits to access world-class AI.
 
 ## Tweet 7 (CTA)
-Timuclaude is on GitHub.
+Temuclaude is on GitHub.
 
 Star it. Try it. Build with it.
 
@@ -361,7 +361,7 @@ GitHub: [link]
 
 **Step 3: Save and commit**
 ```bash
-cd /Users/saiful/timuclaude
+cd /Users/saiful/temuclaude
 git add marketing/content/origin_story_thread.md
 git commit -m "content: add origin story thread for X/Twitter launch"
 git push
@@ -374,7 +374,7 @@ git push
 **Objective:** Create the first week of daily build diary content.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/build_diary_week1.md
+- Create: /Users/saiful/temuclaude/marketing/content/build_diary_week1.md
 
 **Format (from strategy Part 4, Campaign 3):**
 Each post: honest, specific, vulnerability + progress. 280 chars or less per post.
@@ -385,7 +385,7 @@ Each post: honest, specific, vulnerability + progress. 280 chars or less per pos
 # BUILD DIARY — WEEK 1
 
 ## Day 1 (Monday)
-Day 1 of building Timuclaude in public.
+Day 1 of building Temuclaude in public.
 
 Today: restructured the fusion module. 3 models now answer simultaneously instead of sequentially. 40% faster.
 
@@ -418,7 +418,7 @@ Day 4: The research scout found 3 new papers on process reward models.
 
 Reading through them. The idea: instead of judging the final answer, judge each STEP that led to it.
 
-This could be huge for Timuclaude. If we can verify the reasoning process, not just the output...
+This could be huge for Temuclaude. If we can verify the reasoning process, not just the output...
 
 More soon.
 
@@ -476,13 +476,13 @@ git push
 
 ### Task 2.3: Write First "Broke the Model" Proof Story
 
-**Objective:** Create the first weekly proof post showing Timuclaude beating a frontier model.
+**Objective:** Create the first weekly proof post showing Temuclaude beating a frontier model.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/broke_the_model_01.md
+- Create: /Users/saiful/temuclaude/marketing/content/broke_the_model_01.md
 
 **Format (from strategy Part 3, Story Pillar 1 — Proof Story):**
-PAS + Before/After. Show the question, the wrong answer from a frontier model, and how Timuclaude got it right.
+PAS + Before/After. Show the question, the wrong answer from a frontier model, and how Temuclaude got it right.
 
 **IMPORTANT:** This requires ACTUAL benchmark data. We need to run a real benchmark first (see Task 4.1). The content below is a TEMPLATE — fill in with real results.
 
@@ -499,7 +499,7 @@ GPT-5.6 Sol got this question wrong.
 GPT-5.6 Sol: [wrong answer]
 Correct answer: [correct answer]
 
-Timuclaude ran it through 3 models. Here's what happened:
+Temuclaude ran it through 3 models. Here's what happened:
 
 Model A (GLM-5.2): [answer]
 Model B (DeepSeek V4): [answer]  
@@ -516,7 +516,7 @@ Full breakdown: [link]
 Try it yourself: [GitHub link]
 
 ## Follow-up Tweet (optional thread)
-How did Timuclaude know which model to trust?
+How did Temuclaude know which model to trust?
 
 It didn't pick one. It used weighted voting:
 
@@ -545,14 +545,14 @@ git push
 **Objective:** Create the monthly mission-driven story post.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/why_opensource_01.md
+- Create: /Users/saiful/temuclaude/marketing/content/why_opensource_01.md
 
 **Step 1: Write the post**
 
 ```markdown
 # WHY OPEN SOURCE — Post 1
 
-Why is Timuclaude open-source?
+Why is Temuclaude open-source?
 
 Because AI infrastructure shouldn't be locked behind API keys and credit cards.
 
@@ -560,7 +560,7 @@ Because a student in India shouldn't need OpenAI credits to access world-class A
 
 Because the future of AI should be built by the community, not controlled by 3 companies.
 
-Timuclaude runs on Ollama. Free. Unlimited. Local.
+Temuclaude runs on Ollama. Free. Unlimited. Local.
 
 No API keys. No cloud. No bills.
 
@@ -583,7 +583,7 @@ git push
 **Objective:** Create the bi-weekly underdog positioning post.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/david_vs_goliath_01.md
+- Create: /Users/saiful/temuclaude/marketing/content/david_vs_goliath_01.md
 
 **Step 1: Write the post**
 
@@ -594,7 +594,7 @@ OpenAI spent $500M training GPT-5.6 Sol.
 Google spent $300M training Gemini 3.5 Pro.
 Anthropic spent $200M training Claude 4.6.
 
-Timuclaude uses all three. For free. On your laptop.
+Temuclaude uses all three. For free. On your laptop.
 
 No $500M training budget needed. Just orchestration.
 
@@ -618,7 +618,7 @@ git push
 **Objective:** Create the first conviction/hot-take post.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/conviction_01.md
+- Create: /Users/saiful/temuclaude/marketing/content/conviction_01.md
 
 **Step 1: Write the post**
 
@@ -637,7 +637,7 @@ Every model has different strengths. Different weaknesses. Different blind spots
 
 Fusion doesn't pick a winner. It makes them all winners.
 
-Timuclaude is proof: 3 models working together beat any 1 model alone.
+Temuclaude is proof: 3 models working together beat any 1 model alone.
 
 The future isn't one model. It's orchestration.
 
@@ -660,14 +660,14 @@ git push
 **Objective:** Build a Python script that posts tweets via Zernio API.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/post.py
+- Create: /Users/saiful/temuclaude/marketing/post.py
 
 **Step 1: Write the posting script**
 
 ```python
 #!/usr/bin/env python3
 """
-Timuclaude Marketing — Zernio Posting Script
+Temuclaude Marketing — Zernio Posting Script
 Posts content to X/Twitter via Zernio API.
 
 Usage:
@@ -731,8 +731,8 @@ def parse_markdown_content(filepath):
         # Clean up the tweet text
         # Remove markdown formatting that doesn't work on Twitter
         body = body.replace("**", "")
-        body = body.replace("[link]", "https://github.com/notSaiful/timuclaude-research")
-        body = body.replace("[GitHub link]", "https://github.com/notSaiful/timuclaude-research")
+        body = body.replace("[link]", "https://github.com/notSaiful/temuclaude-research")
+        body = body.replace("[GitHub link]", "https://github.com/notSaiful/temuclaude-research")
         
         tweets.append(body)
     
@@ -859,7 +859,7 @@ if __name__ == "__main__":
 
 **Step 2: Test dry run**
 ```bash
-cd /Users/saiful/timuclaude/marketing
+cd /Users/saiful/temuclaude/marketing
 python post.py --file content/origin_story_thread.md --thread --dry-run
 ```
 Expected: Prints all 7 tweets with character counts, no posting
@@ -878,14 +878,14 @@ git push
 **Objective:** Build a script that manages the weekly content schedule.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/calendar.py
+- Create: /Users/saiful/temuclaude/marketing/calendar.py
 
 **Step 1: Write the calendar script**
 
 ```python
 #!/usr/bin/env python3
 """
-Timuclaude Marketing — Content Calendar
+Temuclaude Marketing — Content Calendar
 Manages the weekly posting schedule per the storytelling strategy.
 
 Schedule (from strategy):
@@ -966,7 +966,7 @@ def print_schedule(week_num=1):
     """Print a human-readable schedule."""
     schedule = get_week_schedule()
     print(f"\n{'='*70}")
-    print(f"TIMUCLAUDE CONTENT SCHEDULE — WEEK {week_num}")
+    print(f"TEMUCLAUDE CONTENT SCHEDULE — WEEK {week_num}")
     print(f"{'='*70}")
     
     for slot in schedule:
@@ -991,7 +991,7 @@ def export_schedule(filepath, week_num=1):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Content calendar for Timuclaude marketing")
+    parser = argparse.ArgumentParser(description="Content calendar for Temuclaude marketing")
     parser.add_argument("--week", type=int, default=1, help="Week number")
     parser.add_argument("--export", help="Export schedule to JSON file")
     args = parser.parse_args()
@@ -1004,7 +1004,7 @@ if __name__ == "__main__":
 
 **Step 2: Test it**
 ```bash
-cd /Users/saiful/timuclaude/marketing
+cd /Users/saiful/temuclaude/marketing
 python calendar.py --week 1
 ```
 Expected: Prints the full weekly schedule with days, times, and content types
@@ -1023,14 +1023,14 @@ git push
 **Objective:** Track engagement metrics via Zernio Analytics API.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/analytics.py
+- Create: /Users/saiful/temuclaude/marketing/analytics.py
 
 **Step 1: Write the analytics script**
 
 ```python
 #!/usr/bin/env python3
 """
-Timuclaude Marketing — Analytics Tracker
+Temuclaude Marketing — Analytics Tracker
 Pulls engagement metrics from Zernio Analytics API.
 
 Tracks: impressions, reach, engagement, follower growth, reply sentiment.
@@ -1073,7 +1073,7 @@ def get_analytics(client, account_id=None, days=7):
 def print_report(results):
     """Print a human-readable analytics report."""
     print(f"\n{'='*60}")
-    print(f"TIMUCLAUDE X/TWITTER ANALYTICS REPORT")
+    print(f"TEMUCLAUDE X/TWITTER ANALYTICS REPORT")
     print(f"{'='*60}")
     
     if isinstance(results, dict):
@@ -1097,7 +1097,7 @@ def print_report(results):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="Analytics for Timuclaude X/Twitter")
+    parser = argparse.ArgumentParser(description="Analytics for Temuclaude X/Twitter")
     parser.add_argument("--days", type=int, default=7, help="Number of days to analyze")
     parser.add_argument("--account", help="Account ID")
     parser.add_argument("--export", help="Export to JSON file")
@@ -1134,13 +1134,13 @@ git push
 
 ## Phase 4: Benchmark Data (Required for Proof Stories)
 
-### Task 4.1: Run Timuclaude vs GPT-5.6 Sol Benchmark
+### Task 4.1: Run Temuclaude vs GPT-5.6 Sol Benchmark
 
 **Objective:** Generate real benchmark data for proof stories.
 
 **Files:**
-- Use: /Users/saiful/timuclaude/benchmarks/run_baseline.py
-- Use: /Users/saiful/timuclaude/benchmarks/run_timuclaude.py
+- Use: /Users/saiful/temuclaude/benchmarks/run_baseline.py
+- Use: /Users/saiful/temuclaude/benchmarks/run_temuclaude.py
 
 **CRITICAL:** The "Broke the Model" posts and benchmark claims in the Origin Story thread REQUIRE real data. We cannot post benchmark claims without verified results.
 
@@ -1152,7 +1152,7 @@ ollama pull glm-5.2  # if not present
 
 **Step 2: Run baseline (single model)**
 ```bash
-cd /Users/saiful/timuclaude
+cd /Users/saiful/temuclaude
 unset OPENROUTER_API_KEY
 unset AIML_API_KEY
 /Users/saiful/.hermes/hermes-agent/venv/bin/python benchmarks/run_baseline.py \
@@ -1163,9 +1163,9 @@ unset AIML_API_KEY
 ```
 Expected: JSON results file in benchmarks/results/
 
-**Step 3: Run full Timuclaude**
+**Step 3: Run full Temuclaude**
 ```bash
-/Users/saiful/.hermes/hermes-agent/venv/bin/python benchmarks/run_timuclaude.py \
+/Users/saiful/.hermes/hermes-agent/venv/bin/python benchmarks/run_temuclaude.py \
   --dataset sample \
   --sample 10 \
   --exact-match
@@ -1180,8 +1180,8 @@ sys.path.insert(0, '.')
 from benchmarks.results import compare_files
 import glob
 baseline = glob.glob('benchmarks/results/glm-5.2_*.json')[0]
-timuclaude = glob.glob('benchmarks/results/timuclaude_*.json')[0]
-compare_files(baseline, timuclaude)
+temuclaude = glob.glob('benchmarks/results/temuclaude_*.json')[0]
+compare_files(baseline, temuclaude)
 "
 ```
 
@@ -1207,7 +1207,7 @@ git push
 
 **Step 1: Update profile bio**
 ```
-Building @timuclaude — open-source LLM orchestration that beats frontier models.
+Building @temuclaude — open-source LLM orchestration that beats frontier models.
 
 Multi-model fusion. Self-hosting. Free with Ollama.
 
@@ -1215,11 +1215,11 @@ One model isn't enough. 🧵
 ```
 
 **Step 2: Update profile picture**
-- Use a clean, recognizable avatar (Ggs's photo or Timuclaude logo)
+- Use a clean, recognizable avatar (Ggs's photo or Temuclaude logo)
 - Founder-led content works best with a real person's face
 
 **Step 3: Update header image**
-- Simple text on dark background: "Timuclaude — The future isn't one model. It's orchestration."
+- Simple text on dark background: "Temuclaude — The future isn't one model. It's orchestration."
 
 **Step 4: Pin the Origin Story thread**
 - Post the origin story thread using post.py
@@ -1233,7 +1233,7 @@ One model isn't enough. 🧵
 
 **Step 1: Post the Origin Story thread**
 ```bash
-cd /Users/saiful/timuclaude/marketing
+cd /Users/saiful/temuclaude/marketing
 python post.py --file content/origin_story_thread.md --thread
 ```
 
@@ -1248,7 +1248,7 @@ python post.py --file content/build_diary_week1.md --day 1
 **Step 4: Engage with AI Twitter**
 - Find 5 relevant AI tweets (from Karpathy, Altman, Rauch, Masad, etc.)
 - Reply with substantive, on-topic responses (not promotions)
-- Example reply: "Interesting point. We're testing this with multi-model fusion in Timuclaude — when 3 models disagree, the confidence-weighted vote catches individual mistakes. [relevant insight]"
+- Example reply: "Interesting point. We're testing this with multi-model fusion in Temuclaude — when 3 models disagree, the confidence-weighted vote catches individual mistakes. [relevant insight]"
 
 ---
 
@@ -1308,7 +1308,7 @@ hermes mcp list  # verify zernio server is connected
 - Search for "LLM orchestration", "multi-model", "AI fusion" and engage in those conversations
 
 **Weekly actions:**
-- Run 1 "challenge" post ("Can your model beat Timuclaude on this question?")
+- Run 1 "challenge" post ("Can your model beat Temuclaude on this question?")
 - Share 1 user success story (once we have users)
 - Post 1 GitHub milestone celebration (every time we hit a star milestone)
 
@@ -1318,7 +1318,7 @@ hermes mcp list  # verify zernio server is connected
 
 **Every Sunday:**
 ```bash
-cd /Users/saiful/timuclaude/marketing
+cd /Users/saiful/temuclaude/marketing
 python analytics.py --days 7 --export weekly_report.json
 ```
 
@@ -1338,7 +1338,7 @@ Review:
 **Objective:** The 60-second video demo that will be the launch tweet.
 
 **Step 1: Record screen capture**
-- Show: a question being sent to Timuclaude
+- Show: a question being sent to Temuclaude
 - Show: 3 models answering simultaneously (terminal split view)
 - Show: fusion combining answers
 - Show: code verification running
@@ -1351,7 +1351,7 @@ Review:
 - Show the "wow moment" (correct answer) within the first 10 seconds
 
 **Step 3: Save video**
-- Save to /Users/saiful/timuclaude/marketing/assets/launch_demo.mp4
+- Save to /Users/saiful/temuclaude/marketing/assets/launch_demo.mp4
 
 ---
 
@@ -1360,7 +1360,7 @@ Review:
 **Objective:** The single most important tweet — the launch.
 
 **Files:**
-- Create: /Users/saiful/timuclaude/marketing/content/launch_tweet.md
+- Create: /Users/saiful/temuclaude/marketing/content/launch_tweet.md
 
 **Step 1: Write the launch tweet**
 
@@ -1369,13 +1369,13 @@ Review:
 
 Watch what happens when I ask 3 AI models the same question 👇
 
-[Video: 60-second demo showing Timuclaude in action]
+[Video: 60-second demo showing Temuclaude in action]
 
 3 models. 3 different answers. 1 verified answer that beats GPT-5.6 Sol.
 
-That's Timuclaude. Open-source. Free with Ollama. Built by one developer.
+That's Temuclaude. Open-source. Free with Ollama. Built by one developer.
 
-GitHub: https://github.com/notSaiful/timuclaude-research
+GitHub: https://github.com/notSaiful/temuclaude-research
 ```
 
 **Step 2: Prepare Hacker News Show HN post**
@@ -1383,7 +1383,7 @@ GitHub: https://github.com/notSaiful/timuclaude-research
 ```markdown
 # SHOW HN POST
 
-Title: Show HN: Timuclaude – Open-source LLM orchestration that beats frontier models
+Title: Show HN: Temuclaude – Open-source LLM orchestration that beats frontier models
 
 Text:
 I built an open-source LLM orchestrator that runs multiple models simultaneously, fuses their answers, and produces results that beat any single model on reasoning tasks.
@@ -1399,7 +1399,7 @@ It runs on Ollama (free, unlimited, local) or OpenRouter (production, pay-per-to
 
 Benchmark results: [link to results]
 
-GitHub: https://github.com/notSaiful/timuclaude-research
+GitHub: https://github.com/notSaiful/temuclaude-research
 
 I'm a developer in India who built this solo. No funding, no team. Just a belief that one model isn't enough and AI infrastructure should be free.
 
@@ -1414,7 +1414,7 @@ Happy to answer questions about the architecture, the fusion algorithm, or the b
 
 **Step 1: Post launch tweet with video**
 ```bash
-cd /Users/saiful/timuclaude/marketing
+cd /Users/saiful/temuclaude/marketing
 python post.py --file content/launch_tweet.md
 ```
 
@@ -1431,7 +1431,7 @@ python post.py --file content/launch_tweet.md
 **Step 4: Post launch milestone updates**
 - "100 GitHub stars in 24 hours. Thank you." (when it happens)
 - "First user testimonial: [quote]" (when it happens)
-- "Timuclaude is now trending on HN. Here's what I learned from the comments:" (if it happens)
+- "Temuclaude is now trending on HN. Here's what I learned from the comments:" (if it happens)
 
 ---
 
@@ -1443,7 +1443,7 @@ python post.py --file content/launch_tweet.md
 
 **Step 1: Create Discord server**
 - Channels: #general, #benchmarks, #questions, #contributions, #research
-- Welcome message telling the Timuclaude story
+- Welcome message telling the Temuclaude story
 - Link in X/Twitter bio and pinned tweet
 
 **Step 2: Create Telegram channel**
@@ -1452,7 +1452,7 @@ python post.py --file content/launch_tweet.md
 
 **Step 3: Announce community on X/Twitter**
 ```
-We just launched a Discord for Timuclaude.
+We just launched a Discord for Temuclaude.
 
 Come talk about:
 - Multi-model fusion
@@ -1472,7 +1472,7 @@ Or just hang out with people who believe one model isn't enough.
 **Objective:** Give the community an identity.
 
 **From strategy Part 11:**
-Options: "Timuclauders", "The Fusion Community", "Orchestrators"
+Options: "Temuclauders", "The Fusion Community", "Orchestrators"
 
 **Decision needed from Ggs:** Which name resonates?
 
@@ -1517,7 +1517,7 @@ Phase 8: Community building (week 7+)
 | Risk | Mitigation |
 |------|-----------|
 | Zernio API changes or downtime | Have manual posting as fallback (post directly on X/Twitter) |
-| Benchmark results don't show improvement | Run more samples, try different datasets, tune fusion parameters. If Timuclaude doesn't beat single models on some benchmarks, be honest — share the results anyway. Vulnerability builds trust. |
+| Benchmark results don't show improvement | Run more samples, try different datasets, tune fusion parameters. If Temuclaude doesn't beat single models on some benchmarks, be honest — share the results anyway. Vulnerability builds trust. |
 | X/Twitter account suspension (new account aggression) | Start slow (1-2 posts/day), engage genuinely, don't spam hashtags, follow Twitter's API limits |
 | Negative feedback on HN or Twitter | Engage honestly, acknowledge limitations, share what we're working on. Never get defensive. |
 | Content runs out (build diary gets repetitive) | The research swarm generates new content daily. Each new finding, each benchmark, each user interaction is a new story chapter. |
@@ -1527,8 +1527,8 @@ Phase 8: Community building (week 7+)
 
 ## Open Questions for Ggs
 
-1. **Which X/Twitter account?** Personal account (recommended) or new Timuclaude account?
-2. **Community name?** Timuclauders, Fusion Community, Orchestrators, or something else?
+1. **Which X/Twitter account?** Personal account (recommended) or new Temuclaude account?
+2. **Community name?** Temuclauders, Fusion Community, Orchestrators, or something else?
 3. **Personal story in content?** comfortable sharing the Nagpur/India/developer angle? (research shows this is the most viral narrative)
 4. **University admission story?** comfortable sharing the Prince Mugrin University tuition drive? (extremely viral but deeply personal — your call)
 5. **Benchmark priority?** Which benchmark to run first — MMLU, HLE, MRCR, or custom?
@@ -1552,4 +1552,4 @@ Before going live with first post:
 
 ---
 
-*Plan saved at: /Users/saiful/timuclaude/.hermes/plans/2026-07-03_130000-x-twitter-marketing-launch.md*
+*Plan saved at: /Users/saiful/temuclaude/.hermes/plans/2026-07-03_130000-x-twitter-marketing-launch.md*

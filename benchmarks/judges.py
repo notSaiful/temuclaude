@@ -1,5 +1,5 @@
 """
-Timuclaude Benchmark Judges
+Temuclaude Benchmark Judges
 LLM-as-judge scoring: extracts the final answer from a model response
 and compares it to the ground truth.
 

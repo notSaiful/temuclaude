@@ -31,7 +31,7 @@
 - 5 phases: Skills (done) → Tool descriptions → System prompts → Tool code → Continuous loop
 - Guardrails: Full test suite must pass, size limits (Skills ≤15KB), semantic preservation
 - Repo: github.com/NousResearch/hermes-agent-self-evolution
-- INTEGRATION: THIS IS THE BLUEPRINT for timuclaude's self-improvement
+- INTEGRATION: THIS IS THE BLUEPRINT for temuclaude's self-improvement
 
 ### DSPy Teacher-Student Pattern
 - Distill reasoning of expensive models into optimized prompts for cheap models
@@ -159,7 +159,7 @@ Session Storage (SQLite + FTS5) | Tool Backends (Terminal×6, Browser×5, Web×4
 
 ### Meta-Skill (WoJiSama)
 - A skill that produces skills — distills any codebase into skills
-- INTEGRATION: Timuclaude could have a skill that auto-generates new skills from successful interactions
+- INTEGRATION: Temuclaude could have a skill that auto-generates new skills from successful interactions
 
 ---
 
@@ -204,7 +204,7 @@ Session Storage (SQLite + FTS5) | Tool Backends (Terminal×6, Browser×5, Web×4
 | Kimi K2 | 1T (32B active) | Long context, agentic | Modified MIT |
 | Hermes 4 | (Nous Research) | Agent-optimized | Open |
 
-### Best Models for Timuclaude Pool
+### Best Models for Temuclaude Pool
 1. DeepSeek V3/R1 — Top reasoning, MIT license
 2. Llama 4 Maverick — Highest quality open MoE
 3. Qwen 3 235B — Strong multilingual, Apache 2.0
@@ -218,7 +218,7 @@ Session Storage (SQLite + FTS5) | Tool Backends (Terminal×6, Browser×5, Web×4
 
 ## 8. BENCHMARK LANDSCAPE
 
-### Key Benchmarks for Timuclaude
+### Key Benchmarks for Temuclaude
 | Benchmark | Tests | Priority |
 |-----------|-------|----------|
 | MMLU-Pro | Multi-task language understanding | HIGH |
@@ -245,7 +245,7 @@ Session Storage (SQLite + FTS5) | Tool Backends (Terminal×6, Browser×5, Web×4
 
 ---
 
-## KEY ACTIONABLE RECOMMENDATIONS FOR TIMUCLAUDE
+## KEY ACTIONABLE RECOMMENDATIONS FOR TEMUCLAUDE
 
 ### Tier 1 — Implement Now
 1. Adopt Hermes Self-Evolution architecture (DSPy+GEPA, trace reading, constraint gates, $2-10/run)

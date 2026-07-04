@@ -1,5 +1,5 @@
 """
-Timuclaude GEPA — Simplified Prompt Evolution
+Temuclaude GEPA — Simplified Prompt Evolution
 Analyzes query logs, generates prompt variations, tests on samples, selects best.
 
 This is a simplified version of the full GEPA (Genetic Algorithm for Prompt
@@ -42,7 +42,7 @@ def get_system_prompt(task_type: str, default: Optional[str] = None) -> str:
     evolved = get_evolved_prompts()
     if task_type in evolved:
         return evolved[task_type]
-    return default or "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers."
+    return default or "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers."
 
 
 PROMPT_VARIATION_TEMPLATE = (
@@ -97,7 +97,7 @@ async def evolve_prompts(
     # Step 2: Get current prompt for the weakest task type
     evolved = get_evolved_prompts()
     current_prompt = evolved.get(weakest_task, 
-        "You are Timuclaude, a helpful AI assistant. Provide thorough, accurate answers.")
+        "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers.")
     
     task_success_rate = analysis["by_task_type"].get(weakest_task, {}).get("success_rate", 0.0)
     

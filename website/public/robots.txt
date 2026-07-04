@@ -3,4 +3,4 @@ Allow: /
 Disallow: /playground
 Disallow: /api/
 
-Sitemap: https://timuclaude.com/sitemap.xml
+Sitemap: https://temuclaude.com/sitemap.xml
