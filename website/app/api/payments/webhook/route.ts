@@ -6,10 +6,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/razorpay';
 import { updateSubscriptionStatus, updateUserPlan, getUser, getActiveSubscription, updatePaymentStatus } from '@/lib/db';
-import { getPlanByRazorpayPlanId } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+// Get plan from Razorpay subscription plan_id (matched against env vars)
+function getPlanByRazorpayPlanIdLocal(razorpayPlanId: string): { id: string } | null {
+  if (process.env.RAZORPAY_PLAN_PRO_ID === razorpayPlanId) return { id: 'pro' };
+  if (process.env.RAZORPAY_PLAN_ENTERPRISE_ID === razorpayPlanId) return { id: 'enterprise' };
+  return null;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +45,7 @@ export async function POST(req: NextRequest) {
         updateSubscriptionStatus(sub.id, 'active');
 
         // Update user plan
-        const plan = getPlanByRazorpayPlanId(sub.plan_id);
+        const plan = getPlanByRazorpayPlanIdLocal(sub.plan_id);
         if (plan) {
           // Find user from notes
           const userId = sub.notes?.user_id;
@@ -54,7 +60,7 @@ export async function POST(req: NextRequest) {
         const sub = payload.subscription.entity;
         updateSubscriptionStatus(sub.id, 'active');
 
-        const plan = getPlanByRazorpayPlanId(sub.plan_id);
+        const plan = getPlanByRazorpayPlanIdLocal(sub.plan_id);
         if (plan) {
           const userId = sub.notes?.user_id;
           if (userId) {
