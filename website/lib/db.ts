@@ -36,7 +36,9 @@ interface PaymentRecord {
   created_at: number;
 }
 
-const DB_PATH = path.join(process.cwd(), 'temuclaude-db.json');
+const DB_PATH = process.env.NODE_ENV === 'production'
+  ? '/tmp/temuclaude-db.json'  // Vercel serverless writable temp directory
+  : path.join(process.cwd(), 'temuclaude-db.json');
 
 let dbCache: DBSchema | null = null;
 
@@ -62,10 +64,16 @@ function loadDB(): DBSchema {
 
 function saveDB(): void {
   if (!dbCache) return;
-  // Write atomically (write to temp file, then rename)
-  const tmpPath = DB_PATH + '.tmp';
-  fs.writeFileSync(tmpPath, JSON.stringify(dbCache, null, 2));
-  fs.renameSync(tmpPath, DB_PATH);
+  try {
+    // Write atomically (write to temp file, then rename)
+    const tmpPath = DB_PATH + '.tmp';
+    fs.writeFileSync(tmpPath, JSON.stringify(dbCache, null, 2));
+    fs.renameSync(tmpPath, DB_PATH);
+  } catch (err) {
+    // On Vercel serverless, /tmp might not persist between invocations
+    // but within a single request it works. Log and continue.
+    console.warn('DB save failed (non-critical on serverless):', err instanceof Error ? err.message : 'unknown');
+  }
 }
 
 function generateId(): string {

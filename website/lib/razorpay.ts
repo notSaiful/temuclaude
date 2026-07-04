@@ -1,33 +1,52 @@
 // Razorpay client initialization (server-side only)
-import Razorpay from 'razorpay';
+// Uses direct fetch calls instead of the SDK for maximum compatibility
 import crypto from 'crypto';
 
-function getRazorpayInstance(): Razorpay {
+function getAuthHeader(): string {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
-    throw new Error('Razorpay keys not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env');
+    throw new Error(`Razorpay keys not configured. RAZORPAY_KEY_ID: ${keyId ? 'set' : 'missing'}, RAZORPAY_KEY_SECRET: ${keySecret ? 'set' : 'missing'}`);
   }
 
-  return new Razorpay({
-    key_id: keyId,
-    key_secret: keySecret,
+  // Basic auth: base64(keyId:keySecret)
+  return 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+}
+
+const RAZORPAY_BASE = 'https://api.razorpay.com/v1';
+
+async function razorpayRequest(method: string, endpoint: string, body?: any): Promise<any> {
+  const headers: Record<string, string> = {
+    'Authorization': getAuthHeader(),
+    'Content-Type': 'application/json',
+  };
+
+  const response = await fetch(`${RAZORPAY_BASE}${endpoint}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
   });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    const error: any = new Error(data?.error?.description || `Razorpay API error: ${response.status}`);
+    error.statusCode = response.status;
+    error.error = data?.error;
+    throw error;
+  }
+
+  return data;
 }
 
 // Create a one-time order (for PAYG credits or one-time purchases)
 export async function createOrder(amountINR: number, notes: Record<string, string> = {}) {
-  const rzp = getRazorpayInstance();
-  const order = await rzp.orders.create({
-    amount: amountINR, // in paise
+  return razorpayRequest('POST', '/orders', {
+    amount: amountINR,
     currency: 'INR',
-    notes: {
-      ...notes,
-      source: 'temuclaude-website',
-    },
+    notes: { ...notes, source: 'temuclaude-website' },
   });
-  return order;
 }
 
 // Create a subscription plan (run once during setup)
@@ -38,8 +57,7 @@ export async function createPlan(params: {
   interval?: number;
   description?: string;
 }) {
-  const rzp = getRazorpayInstance();
-  const plan = await rzp.plans.create({
+  return razorpayRequest('POST', '/plans', {
     period: params.period,
     interval: params.interval || 1,
     item: {
@@ -49,36 +67,33 @@ export async function createPlan(params: {
       description: params.description || '',
     },
   });
-  return plan;
 }
 
 // Create a subscription for a customer
 export async function createSubscription(params: {
   planId: string;
   customerId?: string;
-  totalCount?: number; // total billing cycles (min 1)
+  totalCount?: number;
   notes?: Record<string, string>;
 }) {
-  const rzp = getRazorpayInstance();
-  const subscription = await rzp.subscriptions.create({
+  return razorpayRequest('POST', '/subscriptions', {
     plan_id: params.planId,
     customer_notify: 1,
-    total_count: params.totalCount || 12, // default to 12 billing cycles (1 year)
+    total_count: params.totalCount || 12,
     notes: params.notes || {},
   });
-  return subscription;
 }
 
 // Fetch subscription details
 export async function fetchSubscription(subscriptionId: string) {
-  const rzp = getRazorpayInstance();
-  return rzp.subscriptions.fetch(subscriptionId);
+  return razorpayRequest('GET', `/subscriptions/${subscriptionId}`);
 }
 
 // Cancel a subscription
 export async function cancelSubscription(subscriptionId: string, cancelAtCycleEnd = true) {
-  const rzp = getRazorpayInstance();
-  return rzp.subscriptions.cancel(subscriptionId, cancelAtCycleEnd ? 1 : 0);
+  return razorpayRequest('POST', `/subscriptions/${subscriptionId}/cancel`, {
+    cancel_at_cycle_end: cancelAtCycleEnd ? 1 : 0,
+  });
 }
 
 // Verify payment signature (from Razorpay checkout)
@@ -122,8 +137,7 @@ export async function createCustomer(params: {
   contact?: string;
   notes?: Record<string, string>;
 }) {
-  const rzp = getRazorpayInstance();
-  return rzp.customers.create({
+  return razorpayRequest('POST', '/customers', {
     name: params.name,
     email: params.email,
     contact: params.contact,
