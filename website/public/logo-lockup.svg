@@ -1,0 +1,14 @@
+<svg width="400" height="80" viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo icon -->
+  <g transform="translate(10, 0) scale(0.35)">
+    <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" stroke-width="7" stroke-linecap="round"/>
+    <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" stroke-width="7" stroke-linecap="round"/>
+    <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" stroke-width="7" stroke-linecap="round"/>
+    <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" stroke-width="7" stroke-linecap="round"/>
+    <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" stroke-width="7" stroke-linecap="round"/>
+    <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
+    <circle cx="100" cy="85" r="6" fill="#D97757"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="110" y="48" font-family="Inter, sans-serif" font-size="28" font-weight="400" letter-spacing="-0.5" fill="#1A1816">Timuclaude</text>
+</svg>
