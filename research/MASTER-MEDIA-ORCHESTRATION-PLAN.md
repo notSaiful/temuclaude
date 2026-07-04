@@ -1,4 +1,4 @@
-# TIMUCLAUDE MEDIA ORCHESTRATION — MASTER PLAN
+# TEMUCLAUDE MEDIA ORCHESTRATION — MASTER PLAN
 ## Beat GPT-Image-2 and Seedance 2.0 by miles using multi-model orchestration
 
 **Compiled:** July 3, 2026
@@ -8,7 +8,7 @@
 
 # EXECUTIVE SUMMARY
 
-Timuclaude will expand from LLM orchestration to MEDIA orchestration (text-to-image, text-to-video, image-to-video). The strategy: orchestrate multiple specialist models in parallel, use LLM intelligence to enhance prompts and judge outputs, and post-process results to exceed any single frontier model — at lower cost and faster speed.
+Temuclaude will expand from LLM orchestration to MEDIA orchestration (text-to-image, text-to-video, image-to-video). The strategy: orchestrate multiple specialist models in parallel, use LLM intelligence to enhance prompts and judge outputs, and post-process results to exceed any single frontier model — at lower cost and faster speed.
 
 **Targets to beat:**
 - GPT-Image-2 (ELO 1338, $0.21/img, 180s generation, 2K max, OpenAI API only)
@@ -16,7 +16,7 @@ Timuclaude will expand from LLM orchestration to MEDIA orchestration (text-to-im
 
 **How we beat them:** Best-of-N generation across specialist models + LLM prompt enhancement + LLM judging + post-processing pipeline (upscale, face restore, frame interpolation, color grading). No single model beats an orchestrated swarm.
 
-**Critical competitive gap:** Higgsfield (the closest competitor, $1.3B valuation, 22M users) does ROUTING (pick one model per step) but NOT ensembling, fusion, self-QA, best-of-N, or prompt evolution. Timuclaude already has ALL of these skills from LLM orchestration.
+**Critical competitive gap:** Higgsfield (the closest competitor, $1.3B valuation, 22M users) does ROUTING (pick one model per step) but NOT ensembling, fusion, self-QA, best-of-N, or prompt evolution. Temuclaude already has ALL of these skills from LLM orchestration.
 
 ---
 
@@ -128,8 +128,8 @@ STEP 6: DELIVERY
 | Strategy | Cost/Image | Time | Effective ELO | Max Resolution |
 |---|---|---|---|---|
 | GPT-Image-2 alone | $0.21 | 180s | 1338 | 2K |
-| **timuclaude full orchestration** | **$0.17-0.25** | **30-40s** | **~1350+** | **4K (upscaled)** |
-| timuclaude cascade (90% of requests) | $0.02-0.05 | 8-12s | ~1280 | 4K (upscaled) |
+| **temuclaude full orchestration** | **$0.17-0.25** | **30-40s** | **~1350+** | **4K (upscaled)** |
+| temuclaude cascade (90% of requests) | $0.02-0.05 | 8-12s | ~1280 | 4K (upscaled) |
 
 **Result:** Same or lower cost than GPT-Image-2, 5x faster, higher ELO, 4K resolution, plus capabilities GPT-Image-2 can't do (vector output, LoRA brand consistency, content freedom).
 
@@ -200,7 +200,7 @@ STEP 6: DELIVERY
 | 5 | Stable Video Diffusion | 12GB VRAM | Moderate | Image-to-video, mature |
 | 6 | Mochi 1 | 40GB VRAM | Good | Open-source, decent quality |
 
-### Key API Providers (priority order for timuclaude):
+### Key API Providers (priority order for temuclaude):
 1. **fal.ai** — 100+ video model endpoints, fastest inference, unified API
 2. **Runway API** — multi-model aggregator (Veo 3.1, Kling 3.0, Seedance, Gen-4.5)
 3. **Luma API** — direct access to Luma Photon
@@ -263,9 +263,9 @@ STEP 7: DELIVERY
 |---|---|---|---|---|---|
 | Seedance 2.0 alone (720p) | $0.99 | 30-60s | Good, native audio | 15s max | 24fps |
 | Seedance 2.0 alone (4K) | $5.06 | 4-8 min | Good, 4K native | 15s max | 24fps |
-| **timuclaude orchestration (720p)** | **$1-3** | **60-120s** | **Best-of-3, post-processed** | **45-60s (stitched)** | **60fps** |
-| **timuclaude orchestration (1080p+upscale)** | **$2-5** | **2-3 min** | **4K upscaled, 60fps, graded** | **45-60s** | **60fps** |
-| timuclaude cascade (draft) | $0.15-0.40 | 30s | Wan/Hailuo quality | 5-10s | 24fps |
+| **temuclaude orchestration (720p)** | **$1-3** | **60-120s** | **Best-of-3, post-processed** | **45-60s (stitched)** | **60fps** |
+| **temuclaude orchestration (1080p+upscale)** | **$2-5** | **2-3 min** | **4K upscaled, 60fps, graded** | **45-60s** | **60fps** |
+| temuclaude cascade (draft) | $0.15-0.40 | 30s | Wan/Hailuo quality | 5-10s | 24fps |
 
 **Result:** Comparable or lower cost than Seedance, better quality (best-of-N), 3-4x longer duration (clip stitching), 2.5x smoother (60fps), better physics (Veo routing), better camera control (Runway routing), full post-processing pipeline.
 
@@ -333,7 +333,7 @@ STEP 6: Delivery (4K, 60fps, post-processed)
 
 ## 3.4 Combined Text-to-Image-to-Video Pipeline
 
-Timuclaude's killer feature: text → image → video in one call.
+Temuclaude's killer feature: text → image → video in one call.
 
 ```
 User: "Create a 10-second video of a coffee brand ad"
@@ -387,7 +387,7 @@ No single platform does this end-to-end with best-of-N at each stage.
 
 ## 5.1 Higgsfield Supercomputer (closest competitor)
 
-| Dimension | Higgsfield | Timuclaude |
+| Dimension | Higgsfield | Temuclaude |
 |---|---|---|
 | **Approach** | Routing (pick 1 model per step) | Ensembling (best-of-N + fusion) |
 | **Models** | Veo, Kling, Seedance, Sora, Wan, FLUX, etc. | Same pool + any API model |
@@ -416,11 +416,11 @@ No single platform does this end-to-end with best-of-N at each stage.
 | Ideogram | Single model (text specialist) | No orchestration |
 | Pika | Single model (consumer) | No orchestration |
 
-**timuclaude's position:** The only platform that combines multi-model ensembling + LLM prompt enhancement + LLM judging + self-QA + GEPA prompt evolution + full post-processing pipeline. Model-agnostic, developer-facing, open-source.
+**temuclaude's position:** The only platform that combines multi-model ensembling + LLM prompt enhancement + LLM judging + self-QA + GEPA prompt evolution + full post-processing pipeline. Model-agnostic, developer-facing, open-source.
 
 ---
 
-# PART 6: IMPLEMENTATION ROADMAP FOR TIMUCLAUDE
+# PART 6: IMPLEMENTATION ROADMAP FOR TEMUCLAUDE
 
 ## Phase M1: Image Orchestration Core
 - Add image model adapters (OpenRouter, fal.ai, Recraft, Ideogram APIs)
@@ -479,7 +479,7 @@ No single platform does this end-to-end with best-of-N at each stage.
 
 ## Image (vs GPT-Image-2)
 
-| Dimension | GPT-Image-2 | Timuclaude | Advantage |
+| Dimension | GPT-Image-2 | Temuclaude | Advantage |
 |---|---|---|---|
 | Quality (ELO) | 1338 | ~1350+ (best-of-N + post-proc) | **+12+ ELO** |
 | Speed | 180s | 30-40s (full), 8s (cascade) | **4-22x faster** |
@@ -489,11 +489,11 @@ No single platform does this end-to-end with best-of-N at each stage.
 | Artistic | ★★★ | ★★★★★ (Reve 2.0) | **+2 stars** |
 | Design/Vector | ❌ | ✅ (Recraft V4.1) | **Can't do → Can do** |
 | Brand Consistency | ❌ (no LoRA) | ✅ (FLUX LoRAs) | **Can't do → Can do** |
-| Content Freedom | Restricted | Flexible (routing) | **timuclaude** |
+| Content Freedom | Restricted | Flexible (routing) | **temuclaude** |
 
 ## Video (vs Seedance 2.0)
 
-| Dimension | Seedance 2.0 | Timuclaude | Advantage |
+| Dimension | Seedance 2.0 | Temuclaude | Advantage |
 |---|---|---|---|
 | Motion Quality | ★★★★★ | ★★★★★+ (best-of-N) | **Picks best** |
 | Physics | ★★★★ | ★★★★★ (Veo routing) | **+1 star** |
@@ -502,17 +502,17 @@ No single platform does this end-to-end with best-of-N at each stage.
 | FPS | 24fps | 60fps (interpolated) | **2.5x smoother** |
 | Cost (4K final) | $5.06/5s | $3-7 (1080p+upscale) | **Comparable/cheaper** |
 | Post-Processing | None | Full pipeline | **Seedance can't** |
-| Content Freedom | CCP restrictions | Flexible (routing) | **timuclaude** |
+| Content Freedom | CCP restrictions | Flexible (routing) | **temuclaude** |
 
 ---
 
 # APPENDIX: RESEARCH FILES
 
-1. ~/timuclaude/research/competitor-research-gpt-image-2-and-seedance-2.md — Deep dive on both targets + battle plan (667 lines)
-2. ~/timuclaude/research/text-to-image-models-research.md — Full image model catalog, ELO leaderboard, pricing (500+ lines)
-3. ~/timuclaude/research/video-models-research-report.md — Full video model catalog, ELO leaderboard, pricing (500+ lines)
-4. ~/timuclaude/research/higgsfield-media-orchestration-research.md — Higgsfield deep dive + orchestration strategies (500+ lines)
+1. ~/temuclaude/research/competitor-research-gpt-image-2-and-seedance-2.md — Deep dive on both targets + battle plan (667 lines)
+2. ~/temuclaude/research/text-to-image-models-research.md — Full image model catalog, ELO leaderboard, pricing (500+ lines)
+3. ~/temuclaude/research/video-models-research-report.md — Full video model catalog, ELO leaderboard, pricing (500+ lines)
+4. ~/temuclaude/research/higgsfield-media-orchestration-research.md — Higgsfield deep dive + orchestration strategies (500+ lines)
 
 ---
 
-**Bottom line: timuclaude doesn't need to build a better single model. It orchestrates the right combination of specialists, enhances prompts intelligently, judges outputs with LLM vision, and post-processes results. This beats both GPT-Image-2 and Seedance 2.0 on quality, speed, cost, and capabilities — by miles.**
+**Bottom line: temuclaude doesn't need to build a better single model. It orchestrates the right combination of specialists, enhances prompts intelligently, judges outputs with LLM vision, and post-processes results. This beats both GPT-Image-2 and Seedance 2.0 on quality, speed, cost, and capabilities — by miles.**

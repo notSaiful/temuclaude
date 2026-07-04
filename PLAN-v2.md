@@ -1,4 +1,4 @@
-# Timuclaude — Revised Plan v2 (Ground Truth Research)
+# Temuclaude — Revised Plan v2 (Ground Truth Research)
 
 ## Real Data from ArtificialAnalysis.ai + Ollama Cloud (July 2026)
 
@@ -256,11 +256,11 @@ This is NOT "self-improving" in the AI sense (which was debunked). This is **dat
 
 ## 4. SKILLS INTEGRATION
 
-The user requested that Timuclaude auto-utilize and auto-download skills. Here's how:
+The user requested that Temuclaude auto-utilize and auto-download skills. Here's how:
 
 ### Hermes Skills for Quality Boost
 
-Hermes has a skill system that loads domain-specific instructions. For Timuclaude:
+Hermes has a skill system that loads domain-specific instructions. For Temuclaude:
 
 1. **Auto-load skills per task type:**
    - Coding tasks → load `test-driven-development`, `systematic-debugging`, `codebase-inspection` skills
@@ -273,11 +273,11 @@ Hermes has a skill system that loads domain-specific instructions. For Timuclaud
    - If a relevant skill exists, install and use it
    - Skills get cached after first use
 
-3. **Custom Timuclaude skills:**
-   - `timuclaude-routing` — routing rules and model selection logic
-   - `timuclaude-verification` — verifier prompts and scoring criteria
-   - `timuclaude-synthesis` — synthesis templates for combining model outputs
-   - `timuclaude-benchmark` — auto-benchmark new model combinations
+3. **Custom Temuclaude skills:**
+   - `temuclaude-routing` — routing rules and model selection logic
+   - `temuclaude-verification` — verifier prompts and scoring criteria
+   - `temuclaude-synthesis` — synthesis templates for combining model outputs
+   - `temuclaude-benchmark` — auto-benchmark new model combinations
 
 4. **Prompt engineering skills:**
    - Chain-of-thought prompts for reasoning tasks
@@ -312,9 +312,9 @@ The key insight: Ollama Cloud charges by GPU time, not tokens. Models are catego
 | Claude Fable 5 direct | $2.75/task | 60 |
 | GPT-5.5 direct | $1.03/task | 55 |
 | GLM-5.2 alone | $0.06/task | 51 |
-| Timuclaude Simple (1 model) | ~$0.06/task | 51-53 |
-| Timuclaude Medium (3 gen + verify) | ~$0.20/task | 53-57 |
-| Timuclaude Hard (5 gen + verify + synth) | ~$0.50/task | 55-60+ |
+| Temuclaude Simple (1 model) | ~$0.06/task | 51-53 |
+| Temuclaude Medium (3 gen + verify) | ~$0.20/task | 53-57 |
+| Temuclaude Hard (5 gen + verify + synth) | ~$0.50/task | 55-60+ |
 
 **Target: match or beat Claude Fable 5 (60) at ~$0.50/task vs $2.75/task — 5.5x cheaper.**
 

@@ -1,5 +1,5 @@
 """
-Timuclaude Logger — Logs every query for self-improvement
+Temuclaude Logger — Logs every query for self-improvement
 """
 import json
 import uuid

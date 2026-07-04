@@ -1,10 +1,10 @@
-# Japanese AI Model Ecosystem — Deep Analysis for Timuclaude
+# Japanese AI Model Ecosystem — Deep Analysis for Temuclaude
 
-## Why This Matters for Timuclaude
+## Why This Matters for Temuclaude
 
 These Japanese models represent a different philosophy from the Chinese models we're using: lightweight, culturally specialized, efficiency-focused. Like Sakana AI (which means "fish" in Japanese), they follow a nature-inspired, efficient approach.
 
-**For Timuclaude, the relevance is:**
+**For Temuclaude, the relevance is:**
 1. Some of these models are available on Ollama and could join our model pool
 2. Their fine-tuning approaches (continual pre-training on specific corpora) could inform our skill design
 3. For Japanese/bilingual tasks, these models could beat our Chinese models
@@ -33,13 +33,13 @@ These Japanese models represent a different philosophy from the Chinese models w
 - 19 datasets
 - Permissive licenses (commercial use allowed)
 
-**Key strength:** Takes the best open architectures and adds deep Japanese language understanding through continual pre-training. This is exactly what we could do for Timuclaude — take our models and continually pre-train on benchmark-specific data.
+**Key strength:** Takes the best open architectures and adds deep Japanese language understanding through continual pre-training. This is exactly what we could do for Temuclaude — take our models and continually pre-train on benchmark-specific data.
 
 **Architecture:** Llama-based (LlamaForCausalLM), so compatible with Ollama.
 
 **Ollama availability:** Likely available via community GGUF conversions. Llama-based models convert easily.
 
-**Relevance for Timuclaude:** If we need Japanese language support, Swallow models are the best open-weight option. They also prove that continual pre-training on domain-specific data works — we could apply the same technique to our model pool for benchmark optimization.
+**Relevance for Temuclaude:** If we need Japanese language support, Swallow models are the best open-weight option. They also prove that continual pre-training on domain-specific data works — we could apply the same technique to our model pool for benchmark optimization.
 
 ---
 
@@ -51,11 +51,11 @@ These Japanese models represent a different philosophy from the Chinese models w
 - Llama-3-ELYZA-JP-8B — 7,227 downloads, 149 likes
 - Based on Llama 3 architecture
 
-**Key strength:** Highly efficient Japanese conversational AI. Excel at natural conversational routing — exactly the kind of routing we need for Timuclaude's query classification.
+**Key strength:** Highly efficient Japanese conversational AI. Excel at natural conversational routing — exactly the kind of routing we need for Temuclaude's query classification.
 
 **Architecture:** LlamaForCausalLM, Ollama-compatible.
 
-**Relevance for Timuclaude:** Could serve as a lightweight router model for Japanese queries. ELYZA's approach (fine-tuning for instruction-following) is what we do with skills — but at the weight level.
+**Relevance for Temuclaude:** Could serve as a lightweight router model for Japanese queries. ELYZA's approach (fine-tuning for instruction-following) is what we do with skills — but at the weight level.
 
 ---
 
@@ -75,7 +75,7 @@ These Japanese models represent a different philosophy from the Chinese models w
 
 **Ollama availability:** Uncertain — custom architecture may need conversion. The 1B model could run locally.
 
-**Relevance for Timuclaude:** PLaMo's from-scratch bilingual approach is interesting but not directly useful for our orchestration. However, their hybrid state space model architecture (unlimited context) is worth studying — could inform how we handle very long context tasks.
+**Relevance for Temuclaude:** PLaMo's from-scratch bilingual approach is interesting but not directly useful for our orchestration. However, their hybrid state space model architecture (unlimited context) is worth studying — could inform how we handle very long context tasks.
 
 ---
 
@@ -96,7 +96,7 @@ These Japanese models represent a different philosophy from the Chinese models w
 
 **Ollama availability:** 671B is very large. Would need significant hardware or cloud hosting. The 7B and 2B variants are Ollama-friendly.
 
-**Relevance for Timuclaude:** **This is significant.** RakutenAI-3.0 is a 671B MoE model on the same architecture as DeepSeek V4 Pro. If it's available on Ollama Cloud (or could be), it could serve as a Japanese-specialized alternative to DeepSeek V4 Pro. For Japanese benchmarks, this could outperform our Chinese models.
+**Relevance for Temuclaude:** **This is significant.** RakutenAI-3.0 is a 671B MoE model on the same architecture as DeepSeek V4 Pro. If it's available on Ollama Cloud (or could be), it could serve as a Japanese-specialized alternative to DeepSeek V4 Pro. For Japanese benchmarks, this could outperform our Chinese models.
 
 **The 7B/2B variants** could serve as lightweight Japanese routers — cheap, fast, locally deployable.
 
@@ -117,7 +117,7 @@ These Japanese models represent a different philosophy from the Chinese models w
 
 **Key strength:** The "thinking" models are the most interesting — they have reasoning capabilities similar to DeepSeek R1's chain-of-thought. The VL (vision-language) thinking model could handle multimodal Japanese tasks.
 
-**Relevance for Timuclaude:** The 32B thinking model could be a lightweight reasoning specialist for Japanese tasks. The VL thinking model could handle vision tasks in Japanese — something our current pool doesn't specialize in.
+**Relevance for Temuclaude:** The 32B thinking model could be a lightweight reasoning specialist for Japanese tasks. The VL thinking model could handle vision tasks in Japanese — something our current pool doesn't specialize in.
 
 ---
 
@@ -132,7 +132,7 @@ These Japanese models represent a different philosophy from the Chinese models w
 
 **Key strength:** Stability AI's expertise in efficient architectures. The 3B model is extremely lightweight.
 
-**Relevance for Timuclaude:** The 3B model could serve as an ultra-lightweight Japanese router — fast, cheap, locally deployable. For simple Japanese queries, this costs almost nothing.
+**Relevance for Temuclaude:** The 3B model could serve as an ultra-lightweight Japanese router — fast, cheap, locally deployable. For simple Japanese queries, this costs almost nothing.
 
 ---
 
@@ -150,7 +150,7 @@ These Japanese models represent a different philosophy from the Chinese models w
 
 **Key strength:** Rinna's philosophy is Sakana-like — lightweight, efficient, edge-deployable. They distill large models (DeepSeek R1, QwQ) into Japanese-optimized versions. The "bakeneko" (化け猫, supernatural cat) line is their flagship.
 
-**Relevance for Timuclaude:** **The DeepSeek R1 distillation for Japanese is very interesting.** It takes DeepSeek R1's reasoning capability and optimizes it for Japanese. If we need Japanese reasoning, this could be our specialist — lighter than full DeepSeek V4 Pro but with similar reasoning quality for Japanese tasks.
+**Relevance for Temuclaude:** **The DeepSeek R1 distillation for Japanese is very interesting.** It takes DeepSeek R1's reasoning capability and optimizes it for Japanese. If we need Japanese reasoning, this could be our specialist — lighter than full DeepSeek V4 Pro but with similar reasoning quality for Japanese tasks.
 
 The 2B baku model could be an ultra-cheap Japanese router.
 
@@ -167,7 +167,7 @@ The 2B baku model could be an ultra-cheap Japanese router.
 
 **Key strength:** Trained entirely on Japanese infrastructure with Japanese data. Strict adherence to Japanese cultural and corporate standards. The GGUF version is Ollama-ready.
 
-**Relevance for Timuclaude:** The 13B GGUF model could run on Ollama for Japanese-specific tasks. It's the most "domestically Japanese" model — no foreign pre-training data. For tasks requiring strict Japanese cultural compliance, this is the specialist.
+**Relevance for Temuclaude:** The 13B GGUF model could run on Ollama for Japanese-specific tasks. It's the most "domestically Japanese" model — no foreign pre-training data. For tasks requiring strict Japanese cultural compliance, this is the specialist.
 
 ---
 
@@ -186,7 +186,7 @@ The 2B baku model could be an ultra-cheap Japanese router.
 
 ---
 
-## HOW THESE FIT INTO TIMUCLAUDE
+## HOW THESE FIT INTO TEMUCLAUDE
 
 ### Scenario 1: Japanese Benchmark Support
 If we want to compete on Japanese benchmarks (like Japanese-SimpleQA where DeepSeek V4 Pro scores 84.4%), we could add:
@@ -201,10 +201,10 @@ For routing Japanese queries cheaply:
 - **Rinna Baku 2B** — smallest, cheapest
 
 ### Scenario 3: Multilingual Expansion
-The philosophy of these models — continual pre-training on domain-specific corpora — is exactly what we could do for Timuclaude:
+The philosophy of these models — continual pre-training on domain-specific corpora — is exactly what we could do for Temuclaude:
 - Take our 5 Ollama Cloud models
 - Apply continual pre-training on benchmark-specific data
-- Create Timuclaude-specialized variants
+- Create Temuclaude-specialized variants
 
 ### Scenario 4: Cultural Compliance
 For users who need strict data sovereignty (like Japanese enterprise):
@@ -213,7 +213,7 @@ For users who need strict data sovereignty (like Japanese enterprise):
 
 ---
 
-## KEY INSIGHTS FOR TIMUCLAUDE
+## KEY INSIGHTS FOR TEMUCLAUDE
 
 1. **The Japanese ecosystem proves continual pre-training works.** Swallow takes Llama and makes it Japanese-expert. We could take GLM-5.2 and make it benchmark-expert.
 
@@ -225,6 +225,6 @@ For users who need strict data sovereignty (like Japanese enterprise):
 
 5. **Thinking models matter.** Karakuri and Rinna both have "thinking" variants. Our DeepSeek V4 Pro already has 3 thinking modes. The lesson: always use max thinking for hard problems.
 
-6. **Cultural specialization is a market.** These companies exist because Japanese users need Japanese-optimized AI. Timuclaude could specialize per language/region — something Fugu (closed, Japan-focused) doesn't offer as a feature.
+6. **Cultural specialization is a market.** These companies exist because Japanese users need Japanese-optimized AI. Temuclaude could specialize per language/region — something Fugu (closed, Japan-focused) doesn't offer as a feature.
 
 7. **Open-weight philosophy is shared.** All 8 companies release open-weight models. This aligns with our mission. We're not alone in believing open beats closed.

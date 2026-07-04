@@ -1,5 +1,5 @@
 """
-Timuclaude Self-Consistency Module
+Temuclaude Self-Consistency Module
 Samples N responses from the same model, votes on the final answer.
 
 Based on published research:
@@ -169,7 +169,7 @@ async def self_consistency(
         {
             "role": "system",
             "content": (
-                "You are Timuclaude, a helpful AI assistant. "
+                "You are Temuclaude, a helpful AI assistant. "
                 "Think carefully and provide a thorough answer. "
                 "At the very end of your response, write 'Answer: ' followed by your final answer."
             ),

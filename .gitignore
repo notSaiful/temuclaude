@@ -16,6 +16,7 @@ logs/*.jsonl
 
 # Database
 *.db
+temuclaude-db.json
 
 # IDE
 .vscode/
@@ -24,9 +25,15 @@ logs/*.jsonl
 # OS
 .DS_Store
 
-# .env file with secrets
+# Secrets
 .env
 config/secrets.*
 *secret*
-*key*website/node_modules/
+
+# Website
+website/node_modules/
 website/.next/
+website/.vercel
+
+# Hermes
+hermes-backup/

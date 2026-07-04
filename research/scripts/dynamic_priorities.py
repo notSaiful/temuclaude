@@ -1,8 +1,8 @@
 """
-Dynamic Priority Engine for Timuclaude Research Swarm.
+Dynamic Priority Engine for Temuclaude Research Swarm.
 
 Instead of fixed priority ranks, this engine calculates REAL-TIME priority
-based on what timuclaude actually needs RIGHT NOW. It reads:
+based on what temuclaude actually needs RIGHT NOW. It reads:
 - Current source code (what's implemented vs missing)
 - Research findings (what's been discovered vs what's still unknown)
 - CHANGELOG (what was recently integrated vs rejected)
@@ -24,9 +24,9 @@ from collections import defaultdict
 from typing import Dict, List, Tuple
 
 
-TIMUCLAUDE_DIR = os.path.expanduser("~/timuclaude")
-RESEARCH_DIR = os.path.join(TIMUCLAUDE_DIR, "research")
-SRC_DIR = os.path.join(TIMUCLAUDE_DIR, "src")
+TEMUCLAUDE_DIR = os.path.expanduser("~/temuclaude")
+RESEARCH_DIR = os.path.join(TEMUCLAUDE_DIR, "research")
+SRC_DIR = os.path.join(TEMUCLAUDE_DIR, "src")
 CHANGELOG = os.path.join(RESEARCH_DIR, "CHANGELOG.md")
 TRACKER = os.path.join(RESEARCH_DIR, "TRACKER.md")
 RAW_DIR = os.path.join(RESEARCH_DIR, "raw")
@@ -202,7 +202,7 @@ def get_source_file_count() -> int:
 
 def get_test_status() -> Dict:
     """Check if test files exist and are recent."""
-    test_dir = os.path.join(TIMUCLAUDE_DIR, "tests")
+    test_dir = os.path.join(TEMUCLAUDE_DIR, "tests")
     tests = {}
     for fpath in glob.glob(os.path.join(test_dir, "test_*.py")):
         name = os.path.basename(fpath).replace("test_", "").replace(".py", "")
@@ -220,7 +220,7 @@ def calculate_dynamic_priorities() -> Dict[str, Dict]:
     Calculate real-time priority scores for each research area.
     
     Factors:
-    1. Impact score (how much would this improve timuclaude?)
+    1. Impact score (how much would this improve temuclaude?)
     2. Implementation gap (is it implemented? missing? blocked?)
     3. Research saturation (have we already researched this enough?)
     4. Recency (have we researched this recently? if so, lower priority)
@@ -350,7 +350,7 @@ def generate_priority_report() -> str:
     
     report = []
     report.append("=" * 60)
-    report.append("TIMUCLAUDE RESEARCH SWARM — DYNAMIC PRIORITY REPORT")
+    report.append("TEMUCLAUDE RESEARCH SWARM — DYNAMIC PRIORITY REPORT")
     report.append(f"Generated: {datetime.now(timezone.utc).isoformat()}")
     report.append("=" * 60)
     

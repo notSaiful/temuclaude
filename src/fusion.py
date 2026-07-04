@@ -1,8 +1,8 @@
 """
-Timuclaude Fusion Module
+Temuclaude Fusion Module
 Calls multiple models in parallel, then a dynamic aggregator synthesizes the best answer.
 
-This is the core of Timuclaude's power — the "invisible orchestration" that makes
+This is the core of Temuclaude's power — the "invisible orchestration" that makes
 5 models act as one. The user sees one response. Internally, 5 models answered
 in parallel, an aggregator analyzed their responses, and synthesized the best answer.
 
@@ -93,7 +93,7 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> l
         response_text += f"\n\n{label}:\n{response}"
 
     system_prompt = (
-        "You are Timuclaude, an AI synthesis engine. You are reviewing answers "
+        "You are Temuclaude, an AI synthesis engine. You are reviewing answers "
         "from multiple AI models that attempted the same question. Your job is to:\n"
         "1. Identify where the models AGREE (consensus) — this is high confidence.\n"
         "2. Identify where the models DISAGREE (contradictions) — analyze which is correct.\n"
@@ -197,7 +197,7 @@ async def fuse(
 
     # Build messages for each panel model
     messages = [
-        {"role": "system", "content": f"You are Timuclaude, a helpful AI assistant. Answer the following question thoroughly and accurately."},
+        {"role": "system", "content": f"You are Temuclaude, a helpful AI assistant. Answer the following question thoroughly and accurately."},
         {"role": "user", "content": question},
     ]
 

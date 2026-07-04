@@ -6,19 +6,19 @@ export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem('timuclaude_cookie_consent');
+    const consent = localStorage.getItem('temuclaude_cookie_consent');
     if (!consent) {
       setVisible(true);
     }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem('timuclaude_cookie_consent', 'accepted');
+    localStorage.setItem('temuclaude_cookie_consent', 'accepted');
     setVisible(false);
   };
 
   const handleReject = () => {
-    localStorage.setItem('timuclaude_cookie_consent', 'rejected');
+    localStorage.setItem('temuclaude_cookie_consent', 'rejected');
     setVisible(false);
   };
 

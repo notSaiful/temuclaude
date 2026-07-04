@@ -1,4 +1,4 @@
-# TIMUCLAUDE — REPLY TARGET LIST
+# TEMUCLAUDE — REPLY TARGET LIST
 ## 17 AI/tech accounts to reply to daily for growth
 
 ## HOW TO USE THIS LIST
@@ -17,7 +17,7 @@
 
 1. @LlmStats — 1,650 followers
    - Posts: Independent AI evaluations lab, benchmarks models on intelligence/watt/sec
-   - Why: Directly relevant to multi-model comparison. Perfect for Timuclaude insights.
+   - Why: Directly relevant to multi-model comparison. Perfect for Temuclaude insights.
    - Reply angle: When they post model benchmarks, reply with multi-model fusion perspective
 
 2. @BruceWlee2 — 475 followers
@@ -69,7 +69,7 @@
 
 11. @TheAhmadOsman — 65,900 followers
     - Posts: Open-source & local AI, GPU setups, running LLMs locally, vLLM
-    - Why: Very active in open-source AI / local LLM space. Perfect for Timuclaude.
+    - Why: Very active in open-source AI / local LLM space. Perfect for Temuclaude.
     - Reply angle: Open-source multi-model orchestration on local hardware (Ollama)
 
 12. @ryaneshea — 30,000 followers
@@ -86,7 +86,7 @@
 
 14. @rasbt (Sebastian Raschka) — ~50K-100K
     - Posts: Practical ML/LLM tutorials, architecture breakdowns, building from scratch
-    - Why: Audience is builders and developers — exactly Timuclaude's target.
+    - Why: Audience is builders and developers — exactly Temuclaude's target.
     - Reply angle: Multi-model building insights, practical implementation
 
 15. @simonw (Simon Willison) — ~50K-100K

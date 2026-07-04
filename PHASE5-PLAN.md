@@ -2,7 +2,7 @@
 
 ## What We're Building
 
-Phase 5 takes Timuclaude from a development project to a production-ready API service. This includes: Dockerfile for deployment, a start script that runs the LiteLLM proxy with our orchestrator, an in-memory cache, a landing page, and a Dockerfile for Fly.io.
+Phase 5 takes Temuclaude from a development project to a production-ready API service. This includes: Dockerfile for deployment, a start script that runs the LiteLLM proxy with our orchestrator, an in-memory cache, a landing page, and a Dockerfile for Fly.io.
 
 ## Components
 
@@ -29,7 +29,7 @@ Phase 5 takes Timuclaude from a development project to a production-ready API se
 - Saves API calls for repeated questions
 
 ### 5. landing_page.html — Simple Landing Page
-- What Timuclaude is
+- What Temuclaude is
 - Benchmark results placeholder
 - API documentation link
 - Pricing tiers
@@ -37,7 +37,7 @@ Phase 5 takes Timuclaude from a development project to a production-ready API se
 - Warm minimal design (matching Ggs's preferences)
 
 ### 6. fly.toml — Fly.io Deployment Config
-- App name: timuclaude
+- App name: temuclaude
 - Region: closest to user
 - Port: 4000
 - Auto-scaling: 1-3 instances

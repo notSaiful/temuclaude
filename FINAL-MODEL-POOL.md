@@ -1,4 +1,4 @@
-# TIMUCLAUDE — FINAL MODEL POOL & ORCHESTRATION STRATEGY
+# TEMUCLAUDE — FINAL MODEL POOL & ORCHESTRATION STRATEGY
 ## Frontier Killer: Beat Fable 5, GPT-5.5, Gemini 3.5 Pro at fraction of cost
 
 ---
@@ -76,7 +76,7 @@
 - **License:** NVIDIA Open Model
 - **Strengths:** FREE. Fast (141 tok/s). Good instruction following (81%). 550B/55B MoE. High Openness Index (83/100).
 - **Weaknesses:** Lower intelligence (38). No vision.
-- **Why this role:** Quality gate. After fusion produces an answer, Nemotron scores it 0-10. If below 8, Timuclaude retries. FREE means QA costs nothing. Intelligence 38 is enough to judge answer quality — you don't need a genius to check if an answer is correct, you need a careful evaluator.
+- **Why this role:** Quality gate. After fusion produces an answer, Nemotron scores it 0-10. If below 8, Temuclaude retries. FREE means QA costs nothing. Intelligence 38 is enough to judge answer quality — you don't need a genius to check if an answer is correct, you need a careful evaluator.
 
 ### MODELS CONSIDERED BUT REJECTED
 
@@ -144,7 +144,7 @@
 
 ## BENCHMARK PROJECTIONS
 
-| Benchmark | Fable 5 | GPT-5.5 | Timuclaude | How we win |
+| Benchmark | Fable 5 | GPT-5.5 | Temuclaude | How we win |
 |-----------|---------|---------|-----------|------------|
 | Terminal-Bench v2.1 | 85% | 79% | 92-97% | DeepSeek V4 Pro (64%) + fusion + code verify |
 | GPQA Diamond | 94% | 94% | 95-98% | MiniMax M3 (93%) + fusion + self-consistency |
@@ -161,10 +161,10 @@
 
 ## COST COMPARISON
 
-| Model | Cost per query (avg) | vs Timuclaude |
+| Model | Cost per query (avg) | vs Temuclaude |
 |-------|---------------------|---------------|
 | Claude Fable 5 | $0.060 | 20x more expensive |
 | GPT-5.5 | $0.035 | 12x more expensive |
 | Gemini 3.5 Flash | $0.050 | 17x more expensive |
 | Fugu Ultra | $0.175 | 58x more expensive |
-| **Timuclaude** | **$0.003** | **—** |
+| **Temuclaude** | **$0.003** | **—** |

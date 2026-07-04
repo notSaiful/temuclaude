@@ -1,4 +1,4 @@
-# TIMUCLAUDE RESEARCH SWARM — MASTER BREAKTHROUGHS REPORT
+# TEMUCLAUDE RESEARCH SWARM — MASTER BREAKTHROUGHS REPORT
 # Compiled: 2026-07-03 11:10 IST
 # Sources: 3 deep research agents + GitHub/HuggingFace scouts + distiller
 # Status: COMPLETE — 3/3 agents returned
@@ -33,7 +33,7 @@ TIER 1 — IMPLEMENT NOW (Low effort, high impact)
    - Medium (d<7): THINKING, 500 tokens
    - Hard (d≥7): DEEP, 1000+ tokens
    Result: 28% token savings, 2% accuracy cost
-   Effort: Fork repo, adapt to timuclaude's model pool
+   Effort: Fork repo, adapt to temuclaude's model pool
 
 3. REFLEXION MEMORY
    Source: arXiv:2303.11366
@@ -63,7 +63,7 @@ TIER 1 — IMPLEMENT NOW (Low effort, high impact)
 
 6. MIXTURE-OF-AGENTS 3-LAYER UPGRADE
    Source: arXiv:2406.04692 (TogetherAI)
-   What: Current timuclaude is 2-layer MoA (panel → judge). Add 3rd layer:
+   What: Current temuclaude is 2-layer MoA (panel → judge). Add 3rd layer:
    Panel → Cross-Review (models review each other) → Judge
    Result: 65.1% AlpacaEval with open-source models vs GPT-4o's 57.5%
    Layer scaling: 1L=44%, 2L=61%, 3L=65% (Pareto optimal)
@@ -107,7 +107,7 @@ TIER 1 — IMPLEMENT NOW (Low effort, high impact)
 12. UNIFIED ROUTING + CASCADING
    Source: arXiv:2410.10347 (ICLR 2025)
    What: Combine model selection (routing) + quality escalation (cascading)
-   into unified strategy. Timuclaude already has both — just unify the logic.
+   into unified strategy. Temuclaude already has both — just unify the logic.
    Result: Consistently outperforms either approach alone
    Effort: LOW — unify existing components
 
@@ -186,7 +186,7 @@ TIER 3 — FRONTIER-LEVEL (High effort, breakthrough impact)
 
 24. PREFERENCE-DATA TRAINED ROUTER (RouteLLM)
    Source: arXiv:2406.18665, github.com/lm-sys/RouteLLM
-   What: Train router on timuclaude's accumulated performance data.
+   What: Train router on temuclaude's accumulated performance data.
    Result: 2x cost reduction while maintaining quality
    Effort: Collect routing data, train classifier
 
@@ -209,7 +209,7 @@ TIER 3 — FRONTIER-LEVEL (High effort, breakthrough impact)
    Effort: HIGH — infrastructure change
 
 ================================================================
-NEW MODEL CANDIDATES FOR TIMUCLAUDE POOL
+NEW MODEL CANDIDATES FOR TEMUCLAUDE POOL
 ================================================================
 
 Current pool: GLM-5.2, DeepSeek V4 Pro, Kimi K2.6, MiniMax M3, Nemotron 3 Ultra, GPT-OSS 120B
@@ -311,4 +311,4 @@ KEY REPOS TO STUDY/INTEGRATE
 - Weekly Digest: Mon 9am IST (full synthesis + implementation plan)
 
 The swarm will keep finding new breakthroughs, papers, repos, models, and
-techniques 24/7. Check ~/timuclaude/research/TRACKER.md for latest discoveries.
+techniques 24/7. Check ~/temuclaude/research/TRACKER.md for latest discoveries.

@@ -68,7 +68,7 @@ From AIMultiple benchmark:
 
 **Available as a skill:** `npx skills add massgen/skills --all` — works in Claude Code, Cursor, Copilot, and 40+ agents.
 
-**For Timuclaude:** This is the self-consistency + debate pattern COMBINED. Multiple models work the same problem, refine through observation, vote on best answer. We can integrate MassGen's approach into our Fusion panel — instead of just generating independently, agents see each other's work and refine.
+**For Temuclaude:** This is the self-consistency + debate pattern COMBINED. Multiple models work the same problem, refine through observation, vote on best answer. We can integrate MassGen's approach into our Fusion panel — instead of just generating independently, agents see each other's work and refine.
 
 **What we take:** The voting/convergence detection mechanism. Instead of a judge picking the best (Fusion pattern), agents VOTE when they agree. This is more democratic and catches errors better.
 
@@ -79,7 +79,7 @@ From AIMultiple benchmark:
 
 **Works with:** Claude Code, Codex CLI, OpenCode, **Hermes**, Gemini, Kiro, Copilot, Pi.
 
-**For Timuclaude:** The specification-first approach is relevant for benchmark tasks. Instead of just sending a query to models, we:
+**For Temuclaude:** The specification-first approach is relevant for benchmark tasks. Instead of just sending a query to models, we:
 1. Interview the query (understand what's being asked)
 2. Crystallize into immutable spec (lock the task requirements)
 3. Execute with models (our Fusion panel)
@@ -96,19 +96,19 @@ From AIMultiple benchmark:
 Agent client → one virtual model endpoint → your workflow → trace/tokens/cost → final answer
 ```
 
-**For Timuclaude:** This is an alternative to LiteLLM for the gateway layer. It natively supports Fusion-style workflows (panel + synthesis), observability, and mounting models as tools. Could be used alongside LiteLLM.
+**For Temuclaude:** This is an alternative to LiteLLM for the gateway layer. It natively supports Fusion-style workflows (panel + synthesis), observability, and mounting models as tools. Could be used alongside LiteLLM.
 
 **What we take:** The "mount model as tool" pattern — e.g., mount a vision model as a tool for text models. Our text models (GLM-5.2, DeepSeek) can "call" a vision model (Kimi K2.6, MiniMax M3) when they need vision capability.
 
 ### D. Cliclaw — PARALLEL CODING AGENTS
 **What:** Orchestrate AI coding agents (Claude Code, Codex) as parallel subagents over tmux. Loop-engineering runtime with auto-continue, execute-then-review, cross-session memory.
 
-**For Timuclaude:** The "execute-then-review" pattern is our build-and-debug strategy. The cross-session memory is what Hermes already provides.
+**For Temuclaude:** The "execute-then-review" pattern is our build-and-debug strategy. The cross-session memory is what Hermes already provides.
 
 ### E. ainativelang (AINL) — AI-NATIVE PROGRAMMING
 **What:** Turns AI from "smart conversation" into "structured worker." Graph-canonical, AI-native programming system for deterministic execution. Multi-step, state, memory, tool use, repeatable execution, validation, control.
 
-**For Timuclaude:** The deterministic execution approach is relevant for benchmarks — we need repeatable, verifiable results, not creative variation.
+**For Temuclaude:** The deterministic execution approach is relevant for benchmarks — we need repeatable, verifiable results, not creative variation.
 
 ---
 
@@ -153,7 +153,7 @@ From all research, here is every known orchestration pattern:
 
 ---
 
-## 5. WHAT TIMUCLAUDE TAKES FROM EACH
+## 5. WHAT TEMUCLAUDE TAKES FROM EACH
 
 | Source | What We Take | How |
 |--------|------------|-----|
@@ -175,9 +175,9 @@ From all research, here is every known orchestration pattern:
 
 ---
 
-## 6. THE COMPLETE TIMUCLAUDE ORCHESTRATION STACK (27 PATTERNS)
+## 6. THE COMPLETE TEMUCLAUDE ORCHESTRATION STACK (27 PATTERNS)
 
-No system in the world combines all 27 patterns. Timuclaude does.
+No system in the world combines all 27 patterns. Temuclaude does.
 
 **Generation (10 patterns):** Direct, Best-of-N, Self-consistency, Fusion panel, Debate, MassGen voting, Build-and-debug, Specialist routing, Cheap-first escalate, MCTS+PRM
 
@@ -198,7 +198,7 @@ From AIMultiple's orchestration benchmark (100 runs, 5-agent workflow):
 - **AutoGen:** Moderate, consistent coordination
 - **CrewAI:** Longest delays (autonomous deliberation before tool calls)
 
-**For Timuclaude:** We use Hermes delegate_task (not LangGraph/CrewAI/AutoGen). Hermes is already optimized for delegation with isolated contexts. We don't need a separate orchestration framework — Hermes IS the framework.
+**For Temuclaude:** We use Hermes delegate_task (not LangGraph/CrewAI/AutoGen). Hermes is already optimized for delegation with isolated contexts. We don't need a separate orchestration framework — Hermes IS the framework.
 
 ---
 
@@ -214,4 +214,4 @@ From AIMultiple's orchestration benchmark (100 runs, 5-agent workflow):
 
 5. **Hermes GEPA** is the only built-in prompt evolution system. It genetically optimizes prompts based on execution traces. This is our OPRO layer — no need to build it.
 
-6. **The combination of MassGen voting + Fusion structured analysis + tool verification + GEPA evolution** is unique to Timuclaude. No competitor has all four.
+6. **The combination of MassGen voting + Fusion structured analysis + tool verification + GEPA evolution** is unique to Temuclaude. No competitor has all four.

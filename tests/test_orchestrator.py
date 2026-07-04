@@ -1,5 +1,5 @@
 """
-Timuclaude — Comprehensive Test Suite
+Temuclaude — Comprehensive Test Suite
 Run with: python -m pytest tests/test_orchestrator.py -v
 Or:      python tests/test_orchestrator.py
 """
@@ -11,7 +11,7 @@ import time
 # Add parent dir to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 from src.models import MODEL_POOL, CHEAP_MODELS, TASK_MODEL_MAP, FUSION_PANEL, AGGREGATOR_MAP
 from src.logger import QueryLogger
 
@@ -21,7 +21,7 @@ from src.logger import QueryLogger
 # ============================================================
 def test_classifier() -> bool:
     """Test that the task classifier correctly categorizes queries."""
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
 
     test_cases = [
@@ -83,7 +83,7 @@ def test_classifier() -> bool:
 # ============================================================
 def test_tier_determination() -> bool:
     """Test that the routing tier is correctly determined."""
-    tc = Timuclaude()
+    tc = Temuclaude()
 
     test_cases = [
         # (query, task_type, expected_tier)
@@ -186,7 +186,7 @@ def test_model_pool() -> bool:
 # ============================================================
 def test_all_models_respond() -> bool:
     """Test that every model in the pool can actually respond to a query."""
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
 
     all_models = list(MODEL_POOL.keys()) + list(CHEAP_MODELS.keys())
@@ -237,7 +237,7 @@ def test_all_models_respond() -> bool:
 # ============================================================
 def test_error_handling() -> bool:
     """Test that the orchestrator handles model failures gracefully."""
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
 
     # Test 1: Invalid model name should return error string, not crash
@@ -337,7 +337,7 @@ def test_error_handling() -> bool:
 # ============================================================
 def test_end_to_end() -> bool:
     """Test a complete end-to-end query through the orchestrator."""
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
 
     test_cases = [
@@ -387,7 +387,7 @@ def test_end_to_end() -> bool:
 # ============================================================
 def test_logger() -> bool:
     """Test that the query logger works correctly."""
-    logger = QueryLogger(log_dir="/tmp/timuclaude_test_logs")
+    logger = QueryLogger(log_dir="/tmp/temuclaude_test_logs")
 
     # Log a test query
     query_id = logger.log(
@@ -412,7 +412,7 @@ def test_logger() -> bool:
 
     # Clean up
     import shutil
-    shutil.rmtree("/tmp/timuclaude_test_logs", ignore_errors=True)
+    shutil.rmtree("/tmp/temuclaude_test_logs", ignore_errors=True)
 
     print(f"\n=== LOGGER TESTS: {'1/1' if passed else '0/1'} passed ===")
     return passed
@@ -459,7 +459,7 @@ def test_concurrent_logger() -> bool:
     """Test that the logger handles concurrent writes safely."""
     import threading
 
-    logger = QueryLogger(log_dir="/tmp/timuclaude_concurrent_test")
+    logger = QueryLogger(log_dir="/tmp/temuclaude_concurrent_test")
     errors = []
 
     def write_log(i: int) -> None:
@@ -501,7 +501,7 @@ def test_concurrent_logger() -> bool:
 
     # Clean up
     import shutil
-    shutil.rmtree("/tmp/timuclaude_concurrent_test", ignore_errors=True)
+    shutil.rmtree("/tmp/temuclaude_concurrent_test", ignore_errors=True)
 
     print(f"\n=== CONCURRENT LOGGER TESTS: {'1/1' if passed else '0/1'} passed ===")
     return passed
@@ -512,7 +512,7 @@ def test_concurrent_logger() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 1 TEST SUITE")
+    print("TEMUCLAUDE — PHASE 1 TEST SUITE")
     print("=" * 60)
 
     results = []

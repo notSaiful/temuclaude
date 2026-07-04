@@ -1,5 +1,5 @@
 # COMPETITOR RESEARCH: GPT-Image-2 & Seedance 2.0
-## Battle Plan for timuclaude's Multi-Model Orchestration
+## Battle Plan for temuclaude's Multi-Model Orchestration
 
 **Research Date:** July 3, 2026
 **Sources:** OpenAI official docs, Azure pricing, ArtificialAnalysis Image Arena, EvoLink, MindStudio, Medium/Data Science Collective, APIYI guide
@@ -510,8 +510,8 @@ STEP 6: DELIVERY
 | Strategy | Cost/Image | Time | Effective Quality |
 |---|---|---|---|
 | GPT-Image-2 alone | $0.21 | 180s | ELO 1338, 2K max |
-| **timuclaude orchestration (full)** | **$0.17-0.25** | **30-40s** | **ELO ~1350+, 4K upscaled** |
-| timuclaude cascade (90% at FLUX dev) | $0.02-0.05 | 8-12s | ELO ~1280, 4K upscaled |
+| **temuclaude orchestration (full)** | **$0.17-0.25** | **30-40s** | **ELO ~1350+, 4K upscaled** |
+| temuclaude cascade (90% at FLUX dev) | $0.02-0.05 | 8-12s | ELO ~1280, 4K upscaled |
 
 **The orchestration costs about the same as GPT-Image-2 for full quality mode, but:**
 - 5x faster (40s vs 180s)
@@ -589,9 +589,9 @@ STEP 7: DELIVERY
 |---|---|---|---|
 | Seedance 2.0 alone (720p) | $0.99 | 30-60s | Good, native audio |
 | Seedance 2.0 alone (4K) | $5.06 | 4-8 min | Good, 4K native |
-| **timuclaude orchestration (720p)** | **$2-5** | **60-120s** | **Best-of-3, post-processed** |
-| **timuclaude orchestration (1080p+upscale)** | **$3-7** | **2-3 min** | **4K upscaled, 60fps, graded** |
-| timuclaude cascade (draft) | $0.40 | 30s | Kling 3.0 quality |
+| **temuclaude orchestration (720p)** | **$2-5** | **60-120s** | **Best-of-3, post-processed** |
+| **temuclaude orchestration (1080p+upscale)** | **$3-7** | **2-3 min** | **4K upscaled, 60fps, graded** |
+| temuclaude cascade (draft) | $0.40 | 30s | Kling 3.0 quality |
 
 **The orchestration costs 2-5x more than Seedance alone but delivers:**
 - Better motion quality (best-of-3 models)
@@ -603,56 +603,56 @@ STEP 7: DELIVERY
 
 **Cascade mode for drafts:** 2.5x cheaper than Seedance at $0.40/clip.
 
-## 4.3 Summary: Why timuclaude Wins
+## 4.3 Summary: Why temuclaude Wins
 
 ### Image (vs GPT-Image-2):
 
-| Dimension | GPT-Image-2 | timuclaude | Advantage |
+| Dimension | GPT-Image-2 | temuclaude | Advantage |
 |---|---|---|---|
-| **Quality (ELO)** | 1338 | ~1350+ (best-of-N + post-proc) | **timuclaude +12+** |
-| **Speed** | 180s | 30-40s (full), 8s (cascade) | **timuclaude 4-22x faster** |
-| **Cost (full)** | $0.21/img | $0.17-0.25/img | **timuclaude ~same or cheaper** |
-| **Cost (cascade)** | $0.21/img | $0.02-0.05/img | **timuclaude 4-10x cheaper** |
-| **Max Resolution** | 2K | 4K (upscaled) | **timuclaude 2x resolution** |
+| **Quality (ELO)** | 1338 | ~1350+ (best-of-N + post-proc) | **temuclaude +12+** |
+| **Speed** | 180s | 30-40s (full), 8s (cascade) | **temuclaude 4-22x faster** |
+| **Cost (full)** | $0.21/img | $0.17-0.25/img | **temuclaude ~same or cheaper** |
+| **Cost (cascade)** | $0.21/img | $0.02-0.05/img | **temuclaude 4-10x cheaper** |
+| **Max Resolution** | 2K | 4K (upscaled) | **temuclaude 2x resolution** |
 | **Text Rendering** | Multilingual ★★★★★ | English ★★★★★ + Multilingual ★★★★ | GPT-Image-2 slight edge |
-| **Artistic** | ★★★ | ★★★★★ (Reve 2.0 + Midjourney) | **timuclaude +2 stars** |
-| **Design/Vector** | ❌ | ✅ (Recraft V4.1) | **timuclaude (GPT can't do)** |
-| **Brand Consistency** | ❌ (no LoRA) | ✅ (FLUX LoRAs) | **timuclaude (GPT can't do)** |
-| **Content Freedom** | Restricted | Flexible (model routing) | **timuclaude** |
+| **Artistic** | ★★★ | ★★★★★ (Reve 2.0 + Midjourney) | **temuclaude +2 stars** |
+| **Design/Vector** | ❌ | ✅ (Recraft V4.1) | **temuclaude (GPT can't do)** |
+| **Brand Consistency** | ❌ (no LoRA) | ✅ (FLUX LoRAs) | **temuclaude (GPT can't do)** |
+| **Content Freedom** | Restricted | Flexible (model routing) | **temuclaude** |
 
 ### Video (vs Seedance 2.0):
 
-| Dimension | Seedance 2.0 | timuclaude | Advantage |
+| Dimension | Seedance 2.0 | temuclaude | Advantage |
 |---|---|---|---|
-| **Motion Quality** | ★★★★★ | ★★★★★+ (best-of-N) | **timuclaude (picks best)** |
+| **Motion Quality** | ★★★★★ | ★★★★★+ (best-of-N) | **temuclaude (picks best)** |
 | **Audio Sync** | ★★★★★ | ★★★★★ (uses Seedance for audio) | Tie |
-| **Physics** | ★★★★ | ★★★★★ (Veo 3 routing) | **timuclaude +1 star** |
-| **Camera Control** | ★★★ | ★★★★★ (Runway routing) | **timuclaude +2 stars** |
-| **Max Duration** | 15s | 45-60s (clip stitching) | **timuclaude 3-4x longer** |
-| **Resolution** | 4K native (expensive) | 4K upscaled (cheap) | **timuclaude 50% cheaper at 4K** |
-| **FPS** | 24fps | 60fps (interpolated) | **timuclaude 2.5x smoother** |
+| **Physics** | ★★★★ | ★★★★★ (Veo 3 routing) | **temuclaude +1 star** |
+| **Camera Control** | ★★★ | ★★★★★ (Runway routing) | **temuclaude +2 stars** |
+| **Max Duration** | 15s | 45-60s (clip stitching) | **temuclaude 3-4x longer** |
+| **Resolution** | 4K native (expensive) | 4K upscaled (cheap) | **temuclaude 50% cheaper at 4K** |
+| **FPS** | 24fps | 60fps (interpolated) | **temuclaude 2.5x smoother** |
 | **Cost (draft)** | $0.37 (Fast 480p) | $0.40 (Kling 3.0 720p) | Comparable |
-| **Cost (final 4K)** | $5.06 | $3-7 (1080p+upscale) | **timuclaude comparable or cheaper** |
-| **Content Freedom** | CCP restrictions | Flexible (model routing) | **timuclaude** |
-| **Post-Processing** | None | Full pipeline | **timuclaude (Seedance can't)** |
+| **Cost (final 4K)** | $5.06 | $3-7 (1080p+upscale) | **temuclaude comparable or cheaper** |
+| **Content Freedom** | CCP restrictions | Flexible (model routing) | **temuclaude** |
+| **Post-Processing** | None | Full pipeline | **temuclaude (Seedance can't)** |
 
 ---
 
 # CONCLUSION
 
-## timuclaude's orchestration beats both frontier models by a wide margin because:
+## temuclaude's orchestration beats both frontier models by a wide margin because:
 
 ### 1. No single model is best at everything.
 GPT-Image-2 wins on aggregate ELO (1338) but loses to specialists in every individual dimension: FLUX.2 [max] for photorealism, Reve 2.0 for art, Ideogram for text, Recraft for design. Best-of-N with LLM judging captures the best of all worlds.
 
 ### 2. Speed and cost are crippling weaknesses of GPT-Image-2.
-180s generation time and $211/1k images make it impractical for iteration. timuclaude's cascade approach handles 90% of requests at 10x lower cost and 22x faster.
+180s generation time and $211/1k images make it impractical for iteration. temuclaude's cascade approach handles 90% of requests at 10x lower cost and 22x faster.
 
 ### 3. Post-processing is a multiplier neither model has.
 Upscaling to 4K, face restoration, frame interpolation to 60fps, color grading — these add 10-20% quality on top of any base generation. Neither GPT-Image-2 nor Seedance 2.0 includes post-processing.
 
 ### 4. Video stitching and compositing break the duration limit.
-Seedance 2.0 caps at 15s. timuclaude chains clips from multiple models for 45-60s sequences with consistent quality.
+Seedance 2.0 caps at 15s. temuclaude chains clips from multiple models for 45-60s sequences with consistent quality.
 
 ### 5. Model routing exploits content policy gaps.
 GPT-Image-2's conservative filters and ByteDance's CCP restrictions are bypassed by routing to models with appropriate content policies for the specific request.
@@ -661,8 +661,8 @@ GPT-Image-2's conservative filters and ByteDance's CCP restrictions are bypassed
 Automatic prompt decomposition, model-specific translation, and constraint injection improve output quality by 15-30% before any pixel is generated. Neither competitor has this.
 
 ### 7. The economics work.
-- Image: $0.02-0.25/image (timuclaude) vs $0.21/image (GPT-Image-2)
-- Video: $0.40-7/clip (timuclaude) vs $0.99-5.06/clip (Seedance 2.0)
+- Image: $0.02-0.25/image (temuclaude) vs $0.21/image (GPT-Image-2)
+- Video: $0.40-7/clip (temuclaude) vs $0.99-5.06/clip (Seedance 2.0)
 - At scale: 10x cheaper for images (cascade mode), 2x cheaper for 4K video
 
-**Bottom line: timuclaude doesn't need to build a better single model. It needs to orchestrate the right combination of existing models, enhance prompts intelligently, and post-process outputs. This approach beats both GPT-Image-2 and Seedance 2.0 on quality, speed, cost, and capabilities — by a wide margin.**
+**Bottom line: temuclaude doesn't need to build a better single model. It needs to orchestrate the right combination of existing models, enhance prompts intelligently, and post-process outputs. This approach beats both GPT-Image-2 and Seedance 2.0 on quality, speed, cost, and capabilities — by a wide margin.**

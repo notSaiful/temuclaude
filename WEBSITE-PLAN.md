@@ -1,4 +1,4 @@
-# TIMUCLAUDE — WEBSITE, PLAYGROUND & DESIGN PLAN
+# TEMUCLAUDE — WEBSITE, PLAYGROUND & DESIGN PLAN
 ## Comprehensive Research-Backed Plan for Theme, UI, UX, Playground, Frontend
 
 ---
@@ -12,7 +12,7 @@ From the marketing session research, our audience breaks into 3 personas:
 - **Where**: X/Twitter, Reddit r/LocalLLaMA, GitHub, Hacker News
 - **What they want**: 5-minute setup, multi-model support, low cost, self-hosting, open source, good docs
 - **What scares them**: Over-abstraction (LangChain fatigue), cost unpredictability, provider lock-in
-- **What makes them try**: A playground where they can see Timuclaude beat a single model in 30 seconds
+- **What makes them try**: A playground where they can see Temuclaude beat a single model in 30 seconds
 - **Design implication**: Playground must be front and center. No signup wall for first try. Code examples visible immediately.
 
 ### Persona B: AI Researcher (20% of traffic)
@@ -28,7 +28,7 @@ From the marketing session research, our audience breaks into 3 personas:
 - **Design implication**: Enterprise page with compliance badges, security section, dedicated CTA to contact sales
 
 ### Key Insight from Research
-The #1 growth lever is the "5-minute wow" (Cursor playbook, $0 to $100M ARR). The playground IS the acquisition channel. If a developer can type a question and see Timuclaude's multi-model fusion produce a better answer than a single model — in 30 seconds, no signup — they'll tell others.
+The #1 growth lever is the "5-minute wow" (Cursor playbook, $0 to $100M ARR). The playground IS the acquisition channel. If a developer can type a question and see Temuclaude's multi-model fusion produce a better answer than a single model — in 30 seconds, no signup — they'll tell others.
 
 ---
 
@@ -50,7 +50,7 @@ The #1 growth lever is the "5-minute wow" (Cursor playbook, $0 to $100M ARR). Th
 Dark mode dominates (5 of 7 companies). But Anthropic's warm ivory (#FAF9F5) is the most distinctive and memorable. It stands out precisely because it's NOT dark.
 
 ### Our Position
-Timuclaude should use **warm light minimal** — matching Ggs's preference and differentiating from the dark-mode sea. Anthropic's palette is our foundation, adapted with our own identity.
+Temuclaude should use **warm light minimal** — matching Ggs's preference and differentiating from the dark-mode sea. Anthropic's palette is our foundation, adapted with our own identity.
 
 ---
 
@@ -184,7 +184,7 @@ Abstract geometric mark suggesting **orchestration** — multiple elements worki
 
 ### Concept: "The Conductor"
 - 3-5 small circles (representing individual LLM models) arranged in an arc
-- Connected by thin lines to a central larger circle (the orchestrator/Timuclaude)
+- Connected by thin lines to a central larger circle (the orchestrator/Temuclaude)
 - Like a network graph or constellation
 - Solid color, no gradients
 - Works at 16px (favicon) to billboard scale
@@ -195,7 +195,7 @@ Abstract geometric mark suggesting **orchestration** — multiple elements worki
 - On dark backgrounds: #FAF8F5 (ivory)
 
 ### Logo Variations
-1. **Full lockup**: Logo mark + "Timuclaude" wordmark (Inter 600, -0.02em)
+1. **Full lockup**: Logo mark + "Temuclaude" wordmark (Inter 600, -0.02em)
 2. **Mark only**: Just the orchestration nodes (favicon, social avatar)
 3. **Monochrome**: Single color version for documentation/printing
 4. **Animated**: Nodes pulse/connect sequentially (for website hero, loading states)
@@ -397,7 +397,7 @@ No competitor shows the orchestration happening. OpenRouter's Fusion page shows 
 │  - Math Q  │  └──────────────────────────────────┘   │
 │  - Code Q  │                                          │
 │  - Reason  │  ┌──────────────────────────────────┐   │
-│            │  │ Timuclaude:                       │   │
+│            │  │ Temuclaude:                       │   │
 │  Examples: │  │                                   │   │
 │  - 9.9 vs  │  │  The derivative is 3x² + 4x - 5  │   │
 │    9.11    │  │                                   │   │
@@ -614,7 +614,7 @@ The user can type a question and get a response WITHOUT creating an account. Thi
 ### Hero Animation (Orchestration Diagram)
 - SVG-based (not a video — for performance)
 - 5 model nodes (small circles) arranged in an arc
-- 1 central hub (Timuclaude logo mark)
+- 1 central hub (Temuclaude logo mark)
 - Animated connection lines (draw in from node to hub)
 - Data "pulses" travel along the lines (small dots moving)
 - Loops every 4 seconds
@@ -738,7 +738,7 @@ The user can type a question and get a response WITHOUT creating an account. Thi
 
 ## SUMMARY
 
-Timuclaude's website should be warm, minimal, and crafted — like Anthropic's but with its own identity. The playground is the star: no signup wall, streaming responses, and the unique "show how this answer was built" panel that reveals our orchestration magic. Warm ivory (#FAF8F5) background, clay accent (#D97757), Inter + JetBrains Mono typography, animated SVG orchestration diagram in the hero, and a 3-mode playground (Quick/Fusion/Verify) that shows the user exactly how multiple models collaborate to produce a superior answer.
+Temuclaude's website should be warm, minimal, and crafted — like Anthropic's but with its own identity. The playground is the star: no signup wall, streaming responses, and the unique "show how this answer was built" panel that reveals our orchestration magic. Warm ivory (#FAF8F5) background, clay accent (#D97757), Inter + JetBrains Mono typography, animated SVG orchestration diagram in the hero, and a 3-mode playground (Quick/Fusion/Verify) that shows the user exactly how multiple models collaborate to produce a superior answer.
 
 The design stands out because every other AI company uses dark mode. We use warm light. Every other company hides their internals. We show them. Every other company requires signup. We let you try first.
 

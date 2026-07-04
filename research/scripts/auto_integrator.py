@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Auto-Integrator: Reads research findings, implements improvements into timuclaude.
+Auto-Integrator: Reads research findings, implements improvements into temuclaude.
 This is the HANDS of the swarm. It reads what the scouts found, evaluates it
 against the current codebase, writes patches, tests them, and commits.
 
@@ -13,8 +13,8 @@ import glob
 from datetime import datetime, timezone
 from dedup import filter_new, get_seen_count
 
-TIMUCLAUDE_DIR = os.path.expanduser("~/timuclaude")
-RESEARCH_DIR = os.path.join(TIMUCLAUDE_DIR, "research")
+TEMUCLAUDE_DIR = os.path.expanduser("~/temuclaude")
+RESEARCH_DIR = os.path.join(TEMUCLAUDE_DIR, "research")
 FINDINGS_DIR = os.path.join(RESEARCH_DIR, "findings")
 RAW_DIR = os.path.join(RESEARCH_DIR, "raw")
 CHANGELOG = os.path.join(RESEARCH_DIR, "CHANGELOG.md")
@@ -56,8 +56,8 @@ def load_deep_reports():
     return reports
 
 def get_current_source():
-    """Get a summary of current timuclaude source files."""
-    src_dir = os.path.join(TIMUCLAUDE_DIR, "src")
+    """Get a summary of current temuclaude source files."""
+    src_dir = os.path.join(TEMUCLAUDE_DIR, "src")
     files = {}
     for fpath in sorted(glob.glob(os.path.join(src_dir, "*.py"))):
         try:
@@ -113,11 +113,11 @@ if __name__ == "__main__":
     print("2. Read the current source files in src/")
     print("3. Identify the TOP 1-3 improvements that can be implemented NOW")
     print("4. Write the code changes to the appropriate src/*.py files")
-    print("5. Run tests: cd ~/timuclaude && python tests/test_orchestrator.py && python tests/test_phase2.py && python tests/test_phase3.py && python tests/test_phase4.py && python tests/test_phase5.py && python tests/test_phase5b.py")
+    print("5. Run tests: cd ~/temuclaude && python tests/test_orchestrator.py && python tests/test_phase2.py && python tests/test_phase3.py && python tests/test_phase4.py && python tests/test_phase5.py && python tests/test_phase5b.py")
     print("6. If ALL tests pass: git add -A && git commit -m 'auto-improve: <description>' && git push")
     print("7. If tests FAIL: revert changes, log failure in CHANGELOG.md, do NOT commit")
-    print("8. Log what you did in ~/timuclaude/research/CHANGELOG.md")
-    print("9. Update ~/timuclaude/research/TRACKER.md with new integration status")
+    print("8. Log what you did in ~/temuclaude/research/CHANGELOG.md")
+    print("9. Update ~/temuclaude/research/TRACKER.md with new integration status")
     print("")
     print("RULES:")
     print("- Only implement Tier 1 techniques (low risk, high impact)")

@@ -2,11 +2,11 @@
 
 ## What We're Building
 
-A universal benchmark framework that can run Timuclaude against ANY question/answer dataset. This lets us:
+A universal benchmark framework that can run Temuclaude against ANY question/answer dataset. This lets us:
 - Test on HLE (when HF token available)
 - Test on MRCR v2
 - Test on custom benchmarks
-- Compare baseline (single model) vs full Timuclaude
+- Compare baseline (single model) vs full Temuclaude
 - Produce reproducible results
 
 ## Components
@@ -36,7 +36,7 @@ A universal benchmark framework that can run Timuclaude against ANY question/ans
 ### 4. results.py — Results Reporter
 - Load results JSON
 - Print human-readable report
-- Compare two runs (baseline vs Timuclaude)
+- Compare two runs (baseline vs Temuclaude)
 - Per-category breakdown
 - Export CSV for external analysis
 
@@ -45,8 +45,8 @@ A universal benchmark framework that can run Timuclaude against ANY question/ans
 - Uses direct model calls (no Fusion)
 - Records results
 
-### 6. run_timuclaude.py — Full Timuclaude Runner
-- Run full Timuclaude (with Fusion, self-consistency, code verify, Self-QA)
+### 6. run_temuclaude.py — Full Temuclaude Runner
+- Run full Temuclaude (with Fusion, self-consistency, code verify, Self-QA)
 - Uses orchestrator.complete()
 - Records results
 
@@ -72,18 +72,18 @@ A universal benchmark framework that can run Timuclaude against ANY question/ans
 # Run baseline (GLM-5.2 alone) on custom benchmark
 python benchmarks/run_baseline.py --model glm-5.2 --dataset benchmarks/data/sample.json --sample 10
 
-# Run full Timuclaude on same benchmark
-python benchmarks/run_timuclaude.py --dataset benchmarks/data/sample.json --sample 10
+# Run full Temuclaude on same benchmark
+python benchmarks/run_temuclaude.py --dataset benchmarks/data/sample.json --sample 10
 
 # Compare results
-python benchmarks/results.py --compare baseline_results.json timuclaude_results.json
+python benchmarks/results.py --compare baseline_results.json temuclaude_results.json
 ```
 
 ## HLE Integration (when HF_TOKEN available)
 
 ```bash
 export HF_TOKEN=your-token
-python benchmarks/run_timuclaude.py --dataset hle --sample 50 --text-only
+python benchmarks/run_temuclaude.py --dataset hle --sample 50 --text-only
 ```
 
 ## What's NOT in Phase 4

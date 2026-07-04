@@ -1,4 +1,4 @@
-# Timuclaude
+# Temuclaude
 
 > Beats frontier models by running multiple LLMs simultaneously and fusing their answers. Open-source. Free with Ollama.
 
@@ -16,7 +16,7 @@ What if you don't pick one model?
 
 What if you use ALL of them and let them check each other?
 
-Timuclaude sends your question to multiple LLMs simultaneously. It fuses their outputs using weighted confidence voting. It verifies answers with code execution. It checks itself with self-QA. The result: answers that are measurably better than any single model alone.
+Temuclaude sends your question to multiple LLMs simultaneously. It fuses their outputs using weighted confidence voting. It verifies answers with code execution. It checks itself with self-QA. The result: answers that are measurably better than any single model alone.
 
 The future isn't one model. It's orchestration.
 
@@ -33,7 +33,7 @@ sys.path.insert(0, ".")
 
 from src.orchestrator import ask
 
-# Ask Timuclaude a question
+# Ask Temuclaude a question
 answer = ask("What is 0.1 + 0.2 in floating point?")
 print(answer)  # 0.30000000000000004 — correct, not 0.3
 ```
@@ -72,8 +72,8 @@ Question → [Model A, Model B, Model C] → Fusion → Self-Consistency → Cod
 # Install Ollama: https://ollama.com
 ollama pull glm-5.2
 
-git clone https://github.com/notSaiful/timuclaude-research.git
-cd timuclaude-research
+git clone https://github.com/notSaiful/temuclaude-research.git
+cd temuclaude-research
 pip install -r requirements.txt
 ```
 
@@ -81,8 +81,8 @@ pip install -r requirements.txt
 
 ```bash
 export OPENROUTER_API_KEY="sk-or-..."
-git clone https://github.com/notSaiful/timuclaude-research.git
-cd timuclaude-research
+git clone https://github.com/notSaiful/temuclaude-research.git
+cd temuclaude-research
 pip install -r requirements.txt
 ```
 
@@ -90,15 +90,15 @@ pip install -r requirements.txt
 
 ```bash
 export AIML_API_KEY="..."
-git clone https://github.com/notSaiful/timuclaude-research.git
-cd timuclaude-research
+git clone https://github.com/notSaiful/temuclaude-research.git
+cd temuclaude-research
 pip install -r requirements.txt
 ```
 
 ## Architecture
 
 ```
-timuclaude/
+temuclaude/
 ├── src/
 │   ├── orchestrator.py    # Main orchestration: classify → route → respond
 │   ├── models.py           # Model pool config + task routing map
@@ -118,7 +118,7 @@ timuclaude/
 │   ├── benchmark_runner.py # Per-question scoring, category breakdown
 │   ├── results.py          # Human-readable report + comparison
 │   ├── run_baseline.py     # Run single-model benchmark
-│   └── run_timuclaude.py   # Run full Timuclaude benchmark
+│   └── run_temuclaude.py   # Run full Temuclaude benchmark
 ├── tests/                  # 6 test suites (all passing)
 ├── config/
 │   └── litellm.yaml        # LiteLLM proxy config (all models)
@@ -162,15 +162,15 @@ All 6 test suites pass (78+ tests total).
 
 AI infrastructure should be free and accessible. A student in India shouldn't need OpenAI credits to access world-class AI. The future of AI should be built by the community, not controlled by 3 companies.
 
-Timuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
+Temuclaude runs on Ollama. Free. Unlimited. Local. No API keys. No cloud. No bills.
 
 This isn't a feature. It's a principle.
 
 ## Community
 
-- GitHub: [notSaiful/timuclaude-research](https://github.com/notSaiful/timuclaude-research)
-- X/Twitter: [@Timuclaude](https://x.com/Timuclaude)
-- YouTube: [@timuclaude](https://youtube.com/@timuclaude)
+- GitHub: [notSaiful/temuclaude-research](https://github.com/notSaiful/temuclaude-research)
+- X/Twitter: [@Temuclaude](https://x.com/Temuclaude)
+- YouTube: [@temuclaude](https://youtube.com/@temuclaude)
 
 ## License
 

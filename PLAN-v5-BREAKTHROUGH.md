@@ -1,4 +1,4 @@
-# Timuclaude — PLAN v5 (THE BREAKTHROUGH)
+# Temuclaude — PLAN v5 (THE BREAKTHROUGH)
 
 ## How We Beat Frontier Models
 
@@ -91,7 +91,7 @@ From published research:
 
 ## 5. THE BREAKTHROUGH ARCHITECTURE
 
-### The Timuclaude Stack (8 layers Fugu doesn't have):
+### The Temuclaude Stack (8 layers Fugu doesn't have):
 
 ```
 User Query
@@ -122,9 +122,9 @@ Output
 ### Why This Beats Fugu:
 
 **Fugu = trained coordinator + 3 strategies (debate, build-debug, specialist)**
-**Timuclaude = Hermes orchestrator + 8 strategies + skills + tools + self-improvement**
+**Temuclaude = Hermes orchestrator + 8 strategies + skills + tools + self-improvement**
 
-| Advantage | Fugu | Timuclaude |
+| Advantage | Fugu | Temuclaude |
 |-----------|------|------------|
 | Orchestrator | Trained model (SFT+ES+RL) | Hermes (already capable, no training needed) |
 | Strategies | 3 discovered | 8+ (including all 3 Fugu uses + 5 more) |
@@ -207,7 +207,7 @@ Apply the stack:
 - Python project, asyncio, Ollama Cloud connections for all 5 models
 - Logging infrastructure (every query, every technique, every result)
 
-### Step 2: The Timuclaude Skill
+### Step 2: The Temuclaude Skill
 Write the orchestration skill that encodes all 8 strategies:
 - Direct routing (simple queries)
 - Best-of-N + tool verification (verifiable tasks)
@@ -240,7 +240,7 @@ Write the orchestration skill that encodes all 8 strategies:
 
 ---
 
-## 7. WHY PEOPLE WILL USE TIMUCLAUDE OVER FUGU
+## 7. WHY PEOPLE WILL USE TEMUCLAUDE OVER FUGU
 
 1. **We beat frontier on more benchmarks** — Fugu beats frontier on 7/9, we target 5-6/9 but with DIFFERENT techniques (MCTS, self-consistency, skills) that Fugu doesn't use
 
@@ -256,6 +256,6 @@ Write the orchestration skill that encodes all 8 strategies:
 
 7. **No vendor lock-in** — swap any model on Ollama Cloud. Fugu's pool is curated by Sakana.
 
-**Timuclaude is not "cheap Fugu." Timuclaude is "Fugu + skills + MCTS + self-consistency + self-improvement at flat cost."**
+**Temuclaude is not "cheap Fugu." Temuclaude is "Fugu + skills + MCTS + self-consistency + self-improvement at flat cost."**
 
 That's how we win.

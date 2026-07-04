@@ -6,13 +6,17 @@ export const maxDuration = 60;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// TIMUCLAUDE MODEL POOL — Frontier Killer (5 models)
+// TEMUCLAUDE MODEL POOL — 8 models, frontier killer
+// Research: July 4, 2026 — deep analysis of OpenRouter rankings
 const POOL = {
-  orchestrator: 'z-ai/glm-5.2',
-  reasoning: 'deepseek/deepseek-v4-pro',
-  fastRoute: 'deepseek/deepseek-v4-flash',
-  vision: 'minimax/minimax-m3',
-  verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+  orchestrator: 'z-ai/glm-5.2',           // IQ 51 — best orchestrator, highest open-weight IQ
+  reasoning: 'deepseek/deepseek-v4-pro',   // IQ 44 — #1 Finance, hard math/coding
+  fastRoute: 'tencent/hy3-preview',        // Cheapest on OpenRouter ($0.063/$0.21), #6 Academia
+  multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal, cheaper than Flash, image+video
+  specialist: 'google/gemini-3-flash-preview', // IQ 50 — #1 Legal, #2 Health, multimodal
+  vision: 'minimax/minimax-m3',            // IQ 44 — best vision + creative + generation
+  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — beats Fable 5 on hard queries (used for hardest 5%)
+  verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free', // Free — QA gate + verification
 };
 
 type ModelResult = { name: string; content: string; latency: number; ok: boolean };
@@ -38,11 +42,11 @@ export async function POST(req: NextRequest) {
         const techniques: string[] = [];
 
         if (tier === 'trivial') {
-          // Layer 1: Direct route to cheapest model
+          // Layer 1: Direct route to cheapest model (Hy3 Preview — $0.063/$0.21)
           techniques.push('direct-routing');
           const result = await callModel(POOL.fastRoute, messages);
           streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'v4-flash', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.001', techniques);
+          sendOrch(controller, encoder, taskType, tier, [{ name: 'hy3-preview', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.0005', techniques);
         } else if (tier === 'medium') {
           // Layer 2: Specialist routing
           techniques.push('specialist-routing');
@@ -73,7 +77,9 @@ export async function POST(req: NextRequest) {
 
 // === FULL STACK (hard queries) ===
 async function runFullStack(query: string, messages: any[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]) {
-  const fusionModels = [POOL.orchestrator, POOL.reasoning, POOL.vision];
+  // Fusion panel: top 3 models by complementary strengths
+  // GLM-5.2 (IQ 51, orchestrator) + DeepSeek V4 Pro (IQ 44, reasoning) + Gemini 3 Flash (IQ 50, specialist)
+  const fusionModels = [POOL.orchestrator, POOL.reasoning, POOL.specialist];
 
   // LAYER 0: WEB SEARCH (for knowledge/reasoning questions)
   let searchContext = '';
@@ -115,7 +121,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
-    const reviewResult = await callModel(reviewer.name.includes('glm') ? POOL.orchestrator : reviewer.name.includes('deepseek') ? POOL.reasoning : POOL.vision, [
+    const reviewResult = await callModel(reviewer.name.includes('glm') ? POOL.orchestrator : reviewer.name.includes('deepseek') ? POOL.reasoning : POOL.specialist, [
       { role: 'system', content: 'You are reviewing other AI models\' responses. Identify errors, missing information, and strengths. Provide an improved response.' },
       { role: 'user', content: reviewPrompt },
     ]);
@@ -126,7 +132,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   techniques.push('structured-aggregation');
   const fusionPrompt = buildFusionPrompt(query, crossReviewResults.filter(r => r.ok));
   const aggResult = await callModel(POOL.orchestrator, [
-    { role: 'system', content: 'You are Timuclaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
+    { role: 'system', content: 'You are Temuclaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
     { role: 'user', content: fusionPrompt },
   ]);
   let finalAnswer = aggResult.ok ? aggResult.content : workingProposals[0].content;
@@ -274,6 +280,23 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     techniques.push('self-moa');
   }
 
+  // LAYER 17: FRONTIER FALLBACK (Claude Sonnet 5, IQ 53)
+  // For the hardest queries where QA score is still low after all retries
+  if (qaScore < 0.75 && needsFrontier(query, taskType)) {
+    techniques.push('frontier-fallback');
+    const frontierResult = await callModel(POOL.frontier, [
+      { role: 'system', content: 'You are Temuclaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
+      { role: 'user', content: `Question: ${query}\n\nPrevious best answer (scored ${qaScore.toFixed(2)}/1.0):\n${finalAnswer.substring(0, 2000)}\n\nProvide a better answer:` },
+    ]);
+    if (frontierResult.ok) {
+      const newScore = await runUSVA(query, frontierResult.content);
+      if (newScore > qaScore) {
+        finalAnswer = frontierResult.content;
+        qaScore = newScore;
+      }
+    }
+  }
+
   // Stream final answer
   streamText(controller, encoder, finalAnswer);
 
@@ -314,8 +337,8 @@ async function callModel(model: string, messages: any[]): Promise<ModelResult> {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://timuclaude.com',
-        'X-Title': 'Timuclaude',
+        'HTTP-Referer': 'https://temuclaude.com',
+        'X-Title': 'Temuclaude',
       },
       body: JSON.stringify({
         model, messages: messages.map(m => ({ role: m.role, content: m.content })),
@@ -348,7 +371,7 @@ async function runUSVA(question: string, answer: string): Promise<number> {
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://timuclaude.com', 'X-Title': 'Timuclaude' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'Temuclaude' },
       body: JSON.stringify({
         model: POOL.verifier,
         messages: [
@@ -380,7 +403,7 @@ async function verifyCode(answer: string): Promise<boolean> {
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://timuclaude.com', 'X-Title': 'Timuclaude' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'Temuclaude' },
       body: JSON.stringify({
         model: POOL.verifier,
         messages: [
@@ -402,6 +425,10 @@ function classifyTask(query: string): string {
   if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation|math|sum|product|factor|theorem|prove/)) return 'math';
   if (q.match(/code|function|python|javascript|debug|error|bug|program|script|algorithm|sort|merge|binary|array/)) return 'coding';
   if (q.match(/write|poem|story|essay|compose|create|generate|design|draft|blog|article/)) return 'creative';
+  // Legal queries → specialist routing to Gemini 3 Flash (#1 Legal)
+  if (q.match(/legal|law|lawsuit|contract|clause|liability|statute|regulation|compliance|gdpr|copyright|patent|trademark/)) return 'legal';
+  // Health/medical queries → specialist routing to Gemini 3 Flash (#2 Health)
+  if (q.match(/health|medical|disease|symptom|treatment|diagnosis|patient|clinical|drug|dosage|therapy/)) return 'health';
   if (q.match(/explain|what is|how does|why|define|describe|who|when|where|which/)) return 'knowledge';
   if (q.match(/compare|analyze|reason|logic|deduce|infer|evaluate|assess|argue|prove|step by step/)) return 'reasoning';
   return 'knowledge';
@@ -423,9 +450,34 @@ function determineTier(difficulty: number): string {
 }
 
 function pickSpecialist(taskType: string): string {
-  if (['math', 'coding', 'reasoning'].includes(taskType)) return POOL.reasoning;
-  if (taskType === 'creative') return POOL.vision;
-  return POOL.orchestrator;
+  // Optimized routing — use cheap models for most, expensive only when needed
+  // Math/coding/reasoning → DeepSeek V4 Pro (expensive but best, only 10% of medium)
+  if (['math', 'coding'].includes(taskType)) return POOL.reasoning;                   // DeepSeek V4 Pro
+  // Creative → MiniMax M3 (vision + creative specialist, only 5% of medium)
+  if (taskType === 'creative') return POOL.vision;                                     // MiniMax M3
+  // Legal/health → Gemini 3 Flash (#1 Legal, #2 Health, IQ 50)
+  if (q_match(taskType, ['legal', 'health', 'medical', 'law'])) return POOL.specialist; // Gemini 3 Flash
+  // General knowledge and everything else → GLM-5.2 (cheap, IQ 51, 70% of medium)
+  return POOL.orchestrator;                                                            // GLM-5.2
+}
+
+// Helper: check if task type matches keywords in the query
+function q_match(taskType: string, keywords: string[]): boolean {
+  // This is a simple check — in production, classifyTask would return these types
+  return keywords.some(k => taskType.includes(k));
+}
+
+// Route hardest queries through the frontier model (Claude Sonnet 5, IQ 53)
+function needsFrontier(query: string, taskType: string): boolean {
+  // Use frontier model for the hardest 5% of queries
+  const q = query.toLowerCase();
+  // Complex multi-step problems
+  if (q.includes('prove') || q.includes('derive') || q.includes('theorem')) return true;
+  // Long autonomous tasks
+  if (query.split(' ').length > 50 && ['math', 'reasoning', 'coding'].includes(taskType)) return true;
+  // Complex codebase questions
+  if (q.includes('refactor') || q.includes('architecture') || q.includes('system design')) return true;
+  return false;
 }
 
 // === STEP-LEVEL CODE VERIFICATION (rStar-Math pattern) ===
@@ -446,8 +498,8 @@ async function stepLevelVerify(query: string, answer: string): Promise<boolean> 
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://timuclaude.com',
-          'X-Title': 'Timuclaude',
+          'HTTP-Referer': 'https://temuclaude.com',
+          'X-Title': 'Temuclaude',
         },
         body: JSON.stringify({
           model: POOL.verifier,
@@ -480,8 +532,8 @@ async function logicalVerify(answer: string): Promise<'pass' | 'contradiction' |
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://timuclaude.com',
-        'X-Title': 'Timuclaude',
+        'HTTP-Referer': 'https://temuclaude.com',
+        'X-Title': 'Temuclaude',
       },
       body: JSON.stringify({
         model: POOL.verifier,

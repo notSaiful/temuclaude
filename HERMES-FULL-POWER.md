@@ -1,6 +1,6 @@
-# Timuclaude — Hermes Agent Full Power Analysis
+# Temuclaude — Hermes Agent Full Power Analysis
 
-## How to Exploit Every Hermes Capability for Timuclaude
+## How to Exploit Every Hermes Capability for Temuclaude
 
 ---
 
@@ -20,7 +20,7 @@ This is the most popular open-source AI agent platform in the world. We're build
 
 ---
 
-## 2. HERMES CAPABILITIES FOR TIMUCLAUDE
+## 2. HERMES CAPABILITIES FOR TEMUCLAUDE
 
 ### A. Subagent Delegation (delegate_task) — OUR FUSION PANEL
 
@@ -30,7 +30,7 @@ Hermes can spawn up to 3 concurrent subagents (configurable, no hard ceiling). E
 - Own terminal session
 - Only final summary enters parent context
 
-**For Timuclaude:** This IS our Fusion panel. Instead of calling 3 models through an API, we delegate to 3 subagents — each using a different Ollama Cloud model. Each generates independently. Hermes (parent) receives all 3 summaries and synthesizes.
+**For Temuclaude:** This IS our Fusion panel. Instead of calling 3 models through an API, we delegate to 3 subagents — each using a different Ollama Cloud model. Each generates independently. Hermes (parent) receives all 3 summaries and synthesizes.
 
 ```python
 delegate_task(tasks=[
@@ -52,7 +52,7 @@ Durable task board in SQLite. Multiple named agents collaborate:
 - Dispatcher (auto-spawns workers, reclaims stale claims)
 - Failure limit (auto-block after N consecutive failures)
 
-**For Timuclaude:** This is our production orchestration system. Instead of ad-hoc delegation, we use Kanban for complex multi-step tasks:
+**For Temuclaude:** This is our production orchestration system. Instead of ad-hoc delegation, we use Kanban for complex multi-step tasks:
 1. Create task: "Solve this benchmark problem"
 2. Dispatcher assigns to best model profile (GLM-5.2 profile, DeepSeek profile, etc.)
 3. Worker solves, marks done
@@ -73,8 +73,8 @@ Hermes Agent Self-Evolution repository (NousResearch/hermes-agent-self-evolution
 - **No GPU needed** — operates via API calls, $2-10 per optimization run
 - MIT licensed
 
-**For Timuclaude:** This IS the OPRO layer I planned — but already built and tested by Nous Research. We use it to:
-1. Evolve our timuclaude-orchestration skill — optimize the prompts that tell Hermes how to orchestrate
+**For Temuclaude:** This IS the OPRO layer I planned — but already built and tested by Nous Research. We use it to:
+1. Evolve our temuclaude-orchestration skill — optimize the prompts that tell Hermes how to orchestrate
 2. Evolve model-specific prompts — find the best prompt for each model per task type
 3. Evolve verifier prompts — optimize how Nemotron judges responses
 4. Evolve synthesis prompts — optimize how GLM-5.2 combines panel outputs
@@ -84,7 +84,7 @@ Hermes Agent Self-Evolution repository (NousResearch/hermes-agent-self-evolution
 git clone https://github.com/NousResearch/hermes-agent-self-evolution.git
 export HERMES_AGENT_REPO=~/.hermes/hermes-agent
 python -m evolution.skills.evolve_skill \
-    --skill timuclaude-orchestration \
+    --skill temuclaude-orchestration \
     --iterations 10 \
     --eval-source sessiondb  # uses real session history
 ```
@@ -101,13 +101,13 @@ python -m evolution.skills.evolve_skill \
 - Auto-loaded per task type
 - Searchable via /skills
 
-**For Timuclaude:** Before each query, Hermes searches for relevant skills:
+**For Temuclaude:** Before each query, Hermes searches for relevant skills:
 - Coding → loads test-driven-development, systematic-debugging, codebase-inspection
 - Research → loads arxiv, blogwatcher, web-search
 - Math → loads reasoning-focused skills
 - Writing → loads humanizer, frontend-design
 
-**The 3-layer skill lifecycle for Timuclaude:**
+**The 3-layer skill lifecycle for Temuclaude:**
 1. **Create** — Hermes creates new skills from successful orchestration patterns
 2. **Maintain** — Curator prunes unused/bad skills
 3. **Evolve** — GEPA optimizes skill prompts against benchmarks
@@ -122,7 +122,7 @@ This is the Voyager pattern (skill library that compounds) — but already built
 - USER.md (user profile, ~1,375 chars)
 - Skills (reusable procedures)
 
-**For Timuclaude:** Memory stores:
+**For Temuclaude:** Memory stores:
 - Which models work best for which task types (from real usage data)
 - Which orchestration strategies produce the best results
 - Which skills improve benchmark scores
@@ -132,7 +132,7 @@ This is the Voyager pattern (skill library that compounds) — but already built
 
 Full-text search over past conversations. No LLM calls needed — pure SQLite FTS5.
 
-**For Timuclaude:** When facing a new query, search past sessions for similar queries:
+**For Temuclaude:** When facing a new query, search past sessions for similar queries:
 - "What strategy worked last time we had a coding problem like this?"
 - "Which model combination produced the best result on a similar math problem?"
 - "What skills were loaded when we got the best score?"
@@ -143,25 +143,25 @@ This is ground-truth data from real usage — not synthetic training data.
 
 Scheduled tasks that run automatically:
 - Daily: benchmark new models on Ollama Cloud, update routing
-- Weekly: run GEPA evolution on timuclaude-orchestration skill
+- Weekly: run GEPA evolution on temuclaude-orchestration skill
 - Weekly: analyze session logs, update memory with best patterns
 - Monthly: full benchmark suite, compare against frontier scores
 
 ### H. Profiles — OUR MODEL-SPECIFIC CONFIGURATIONS
 
 Each model gets its own Hermes profile:
-- `timuclaude-glm` — GLM-5.2 config + skills + memory
-- `timuclaude-deepseek` — DeepSeek V4 Pro config + skills + memory
-- `timuclaude-kimi` — Kimi K2.6 config + skills + memory
-- `timuclaude-minimax` — MiniMax M3 config + skills + memory
-- `timuclaude-nemotron` — Nemotron 3 Ultra config + skills + memory
-- `timuclaude-orchestrator` — Hermes config that delegates to the above
+- `temuclaude-glm` — GLM-5.2 config + skills + memory
+- `temuclaude-deepseek` — DeepSeek V4 Pro config + skills + memory
+- `temuclaude-kimi` — Kimi K2.6 config + skills + memory
+- `temuclaude-minimax` — MiniMax M3 config + skills + memory
+- `temuclaude-nemotron` — Nemotron 3 Ultra config + skills + memory
+- `temuclaude-orchestrator` — Hermes config that delegates to the above
 
-Profiles are shareable as Git repos (since v0.14). We can distribute Timuclaude as a set of profiles.
+Profiles are shareable as Git repos (since v0.14). We can distribute Temuclaude as a set of profiles.
 
 ### I. MCP Client — OUR TOOL EXPANSION
 
-Native MCP client support. We already installed 12+ MCP servers. For Timuclaude:
+Native MCP client support. We already installed 12+ MCP servers. For Temuclaude:
 - filesystem — file access
 - puppeteer / chrome-devtools — browser automation for web verification
 - context7 — documentation lookup
@@ -171,12 +171,12 @@ Native MCP client support. We already installed 12+ MCP servers. For Timuclaude:
 
 ### J. OpenAI-Compatible Proxy — OUR PRODUCTION API
 
-Since v0.14, Hermes has an OpenAI-compatible proxy server. Any tool that talks to OpenAI can talk to Hermes. This IS our production API — users point their app at Timuclaude instead of OpenAI.
+Since v0.14, Hermes has an OpenAI-compatible proxy server. Any tool that talks to OpenAI can talk to Hermes. This IS our production API — users point their app at Temuclaude instead of OpenAI.
 
 ### K. Persistent Goals (/goal) — OUR BENCHMARK OPTIMIZATION
 
 Standing goals that Hermes works on across turns:
-- "Optimize Timuclaude to beat Fable 5 on Terminal-Bench"
+- "Optimize Temuclaude to beat Fable 5 on Terminal-Bench"
 - "Find the best model combination for GPQA Diamond"
 - "Evolve the orchestration skill to improve SWE-Bench scores"
 
@@ -184,7 +184,7 @@ Hermes works on these autonomously, across sessions.
 
 ### L. Context Files (.hermes.md / AGENTS.md) — PROJECT-SPECIFIC INSTRUCTIONS
 
-For Timuclaude, we create a `.hermes.md` in the project directory:
+For Temuclaude, we create a `.hermes.md` in the project directory:
 - Project conventions
 - Model configurations
 - Benchmark targets
@@ -193,7 +193,7 @@ For Timuclaude, we create a `.hermes.md` in the project directory:
 
 ---
 
-## 3. THE COMPLETE TIMUCLAUDE STACK (HERMES-POWERED)
+## 3. THE COMPLETE TEMUCLAUDE STACK (HERMES-POWERED)
 
 ```
 User Query
@@ -294,7 +294,7 @@ Plus:
 
 ## 6. KEY INSIGHT
 
-**Timuclaude is not just "models + routing." Timuclaude is "Hermes Agent + 5 Ollama Cloud models + LiteLLM + 8 orchestration strategies + 90K skills + self-evolution + Kanban + session search + cron automation."**
+**Temuclaude is not just "models + routing." Temuclaude is "Hermes Agent + 5 Ollama Cloud models + LiteLLM + 8 orchestration strategies + 90K skills + self-evolution + Kanban + session search + cron automation."**
 
 No competitor has this stack. Not Fugu. Not Maestro. Not Fusion. Not Model Council. Not OpenRouter.
 

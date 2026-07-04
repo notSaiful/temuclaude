@@ -1,5 +1,5 @@
 """
-Timuclaude Pareto Efficiency Tracker
+Temuclaude Pareto Efficiency Tracker
 Tracks the trade-off between token savings and accuracy loss.
 
 Based on:

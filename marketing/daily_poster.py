@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Timuclaude Daily Poster — posts 2 tweets per day at optimal times.
+Temuclaude Daily Poster — posts 2 tweets per day at optimal times.
 Run via cron: 0 7,12 * * * (7 AM and 12 PM ET)
 
 This script:
@@ -94,7 +94,7 @@ def clean_tweet(text):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="Daily Timuclaude poster")
+    parser = argparse.ArgumentParser(description="Daily Temuclaude poster")
     parser.add_argument("--slot", required=True, choices=["morning", "midday", "afternoon"])
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()

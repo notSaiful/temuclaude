@@ -1,4 +1,4 @@
-# Timuclaude Research Swarm — Status Tracker
+# Temuclaude Research Swarm — Status Tracker
 
 ## Last Updated: 2026-07-03 11:35 IST
 ## Swarm Status: FULLY AUTONOMOUS — 8 CRON JOBS RUNNING 24/7
@@ -27,10 +27,10 @@
 | **TOTAL** | **2,509** | **ALL DONE** |
 
 ### Master Documents
-- ~/timuclaude/research/MASTER-BREAKTHROUGHS-2026-07-03.md (27 techniques, 3 tiers)
-- ~/timuclaude/research/findings/ (6 deep research reports)
-- ~/timuclaude/research/CHANGELOG.md (auto-integration log)
-- ~/timuclaude/research/TRACKER.md (this file)
+- ~/temuclaude/research/MASTER-BREAKTHROUGHS-2026-07-03.md (27 techniques, 3 tiers)
+- ~/temuclaude/research/findings/ (6 deep research reports)
+- ~/temuclaude/research/CHANGELOG.md (auto-integration log)
+- ~/temuclaude/research/TRACKER.md (this file)
 
 ### Skills Created
 - effective-planning-and-execution — Frameworks for planning, organizing, staffing, directing, controlling
@@ -43,4 +43,4 @@
 ### Auto-Integration Status
 - First run: tonight 1am IST (July 4)
 - Rules: Tier 1 only, all tests must pass, revert on failure
-- Log: ~/timuclaude/research/CHANGELOG.md
+- Log: ~/temuclaude/research/CHANGELOG.md

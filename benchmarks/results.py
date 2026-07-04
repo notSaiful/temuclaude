@@ -1,5 +1,5 @@
 """
-Timuclaude Benchmark Results Reporter
+Temuclaude Benchmark Results Reporter
 Loads, displays, and compares benchmark results.
 """
 import json
@@ -45,19 +45,19 @@ def print_report(results: dict) -> str:
     return report
 
 
-def compare_results(baseline: dict, timuclaude: dict) -> str:
+def compare_results(baseline: dict, temuclaude: dict) -> str:
     """Compare two benchmark runs. Returns the comparison as string."""
     lines = []
     lines.append("=" * 60)
     lines.append("BENCHMARK COMPARISON")
     lines.append("=" * 60)
     lines.append(f"Baseline:   {baseline.get('model_name', 'unknown'):20} {baseline['accuracy']:5.1%} ({baseline['correct']}/{baseline['total_questions']})")
-    lines.append(f"Timuclaude:  {timuclaude.get('model_name', 'unknown'):20} {timuclaude['accuracy']:5.1%} ({timuclaude['correct']}/{timuclaude['total_questions']})")
+    lines.append(f"Temuclaude:  {temuclaude.get('model_name', 'unknown'):20} {temuclaude['accuracy']:5.1%} ({temuclaude['correct']}/{temuclaude['total_questions']})")
     lines.append("")
     
-    diff = timuclaude["accuracy"] - baseline["accuracy"]
+    diff = temuclaude["accuracy"] - baseline["accuracy"]
     if diff > 0:
-        lines.append(f"Improvement: +{diff:.1%} ← Timuclaude wins")
+        lines.append(f"Improvement: +{diff:.1%} ← Temuclaude wins")
     elif diff < 0:
         lines.append(f"Improvement: {diff:.1%} ← Baseline wins")
     else:
@@ -67,12 +67,12 @@ def compare_results(baseline: dict, timuclaude: dict) -> str:
     
     # Per-category comparison
     base_cats = baseline.get("by_category", {})
-    tc_cats = timuclaude.get("by_category", {})
+    tc_cats = temuclaude.get("by_category", {})
     all_cats = sorted(set(base_cats.keys()) | set(tc_cats.keys()))
     
     if all_cats:
         lines.append("By category:")
-        lines.append(f"  {'Category':20} {'Baseline':>10} {'Timuclaude':>10} {'Diff':>8}")
+        lines.append(f"  {'Category':20} {'Baseline':>10} {'Temuclaude':>10} {'Diff':>8}")
         lines.append(f"  {'-'*20} {'-'*10} {'-'*10} {'-'*8}")
         
         for cat in all_cats:
@@ -84,15 +84,15 @@ def compare_results(baseline: dict, timuclaude: dict) -> str:
     
     # Latency comparison
     lines.append("")
-    lines.append(f"Latency: baseline={baseline['avg_latency_ms']}ms, timuclaude={timuclaude['avg_latency_ms']}ms")
+    lines.append(f"Latency: baseline={baseline['avg_latency_ms']}ms, temuclaude={temuclaude['avg_latency_ms']}ms")
     
     report = "\n".join(lines)
     print(report)
     return report
 
 
-def compare_files(baseline_path: str, timuclaude_path: str) -> str:
+def compare_files(baseline_path: str, temuclaude_path: str) -> str:
     """Load two result files and compare them."""
     baseline = load_results(baseline_path)
-    timuclaude = load_results(timuclaude_path)
-    return compare_results(baseline, timuclaude)
+    temuclaude = load_results(temuclaude_path)
+    return compare_results(baseline, temuclaude)

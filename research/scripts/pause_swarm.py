@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Pause ALL timuclaude research swarm cron jobs.
+Pause ALL temuclaude research swarm cron jobs.
 Dynamically fetches current job list — always accurate, no hardcoded IDs.
 
 Usage: python3 scripts/pause_swarm.py
@@ -10,7 +10,7 @@ import subprocess
 import json
 import sys
 
-# Jobs to EXCLUDE from pausing (non-timuclaude jobs)
+# Jobs to EXCLUDE from pausing (non-temuclaude jobs)
 EXCLUDE_NAMES = {"Agentive Weekly Plan"}
 
 def get_all_jobs():
@@ -57,7 +57,7 @@ if is_json:
     elif isinstance(jobs_output, list):
         job_list = jobs_output
     
-    # Filter: only pause timuclaude research jobs
+    # Filter: only pause temuclaude research jobs
     to_pause = []
     for job in job_list:
         if isinstance(job, dict):
@@ -68,7 +68,7 @@ if is_json:
 else:
     # Parse text output — look for job IDs
     print("WARNING: Could not parse JSON. Using fallback method.")
-    # Known timuclaude job IDs as fallback
+    # Known temuclaude job IDs as fallback
     to_pause = [
         ("aa2649e8061c", "RANK 1 Dynamic Deep Research"),
         ("ba16699034a9", "RANK 2 Dynamic Competitive Intelligence"),

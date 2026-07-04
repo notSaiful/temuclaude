@@ -15,7 +15,7 @@ The most premium AI company (maker of Claude) achieves their polished feel throu
 - Linear: CSS animations only (NO WebGL)
 - Cula: Framer + video (NO WebGL)
 
-**Budget recommendation for Timuclaude:**
+**Budget recommendation for Temuclaude:**
 - Phase 1 (MVP): GSAP + SVG orchestration diagram + CSS animations — $5-10K, 2-3 weeks
 - Phase 2 (Enhancement): Add Spline 3D hero element + 3D icons — +$3-8K, +1-2 weeks
 - Phase 3 (Full 3D): R3F custom orchestration with particle data flow — +$15-30K, +4-6 weeks
@@ -92,7 +92,7 @@ The most premium AI company (maker of Claude) achieves their polished feel throu
 7. Reference sites (3-5 examples with specific likes)
 8. Deliverables & timeline
 
-## Impact on Timuclaude Plan
+## Impact on Temuclaude Plan
 
 These findings reinforce our existing approach:
 

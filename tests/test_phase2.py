@@ -1,5 +1,5 @@
 """
-Timuclaude Phase 2 Test Suite
+Temuclaude Phase 2 Test Suite
 Tests: Fusion, Self-Consistency, Code Verification, Dynamic Aggregator, Hard Tier
 """
 import sys
@@ -9,7 +9,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 from src.fusion import fuse, get_panel, get_aggregator, build_fusion_prompt
 from src.consistency import self_consistency, extract_answer, majority_vote
 from src.verifier import verify_with_code, extract_code
@@ -206,7 +206,7 @@ def test_code_verification() -> bool:
     """Test that verify_with_code generates and executes code."""
     print("\n=== CODE VERIFICATION TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     try:
@@ -248,7 +248,7 @@ def test_fusion_live() -> bool:
     """Test that Fusion actually calls multiple models and synthesizes."""
     print("\n=== FUSION LIVE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     try:
@@ -291,7 +291,7 @@ def test_hard_tier() -> bool:
     """Test that the hard tier uses Fusion for complex queries."""
     print("\n=== HARD TIER TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     # Use a hard math question (over 30 words for math = hard tier)
@@ -331,7 +331,7 @@ def test_hard_tier() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 2 TEST SUITE")
+    print("TEMUCLAUDE — PHASE 2 TEST SUITE")
     print("=" * 60)
 
     results = []

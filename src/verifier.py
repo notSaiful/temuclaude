@@ -1,5 +1,5 @@
 """
-Timuclaude Code Execution Verifier
+Temuclaude Code Execution Verifier
 Generates Python code to solve a problem, executes it, and returns the verified answer.
 
 For math and coding questions, code execution provides GROUND TRUTH —
@@ -394,7 +394,7 @@ async def generate_with_budget_forcing(
     This forces the model to reason longer, improving accuracy on hard problems.
     """
     messages = [
-        {"role": "system", "content": "You are Timuclaude. Think step by step. Show your reasoning. At the end, write 'Answer: X'."},
+        {"role": "system", "content": "You are Temuclaude. Think step by step. Show your reasoning. At the end, write 'Answer: X'."},
         {"role": "user", "content": question},
     ]
     

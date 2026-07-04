@@ -23,7 +23,7 @@ export default function HomePage() {
             <div className="text-center max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 badge-accent mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
                 <span className="w-2 h-2 rounded-full bg-accent-olive" />
-                Open Source · MIT Licensed
+                5x Cheaper Than Fable 5
               </div>
 
               <h1
@@ -39,8 +39,8 @@ export default function HomePage() {
                 className="text-lg md:text-xl text-text-secondary mb-10 max-w-xl mx-auto leading-relaxed animate-fade-in-up"
                 style={{ animationDelay: '300ms', fontWeight: 400 }}
               >
-                Timuclaude orchestrates 5 AI models to beat frontier models at 28x lower cost.
-                Open source. No black boxes.
+                Temuclaude orchestrates 5 AI models to beat frontier models at 5x lower cost.
+                No black boxes. Visible orchestration.
               </p>
 
               <div
@@ -51,7 +51,7 @@ export default function HomePage() {
                   Try the Playground
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </a>
-                <a href="https://github.com/notSaiful/timuclaude-research" className="btn-secondary" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/notSaiful/temuclaude-research" className="btn-secondary" target="_blank" rel="noopener noreferrer">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.605-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
                   View on GitHub
                 </a>
@@ -63,7 +63,7 @@ export default function HomePage() {
                 style={{ animationDelay: '700ms' }}
               >
                 <span className="text-text-muted">$</span>
-                <span>pip install timuclaude</span>
+                <span>pip install temuclaude</span>
               </div>
             </div>
           </div>
@@ -74,10 +74,10 @@ export default function HomePage() {
           <div className="container-max">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { value: '5', label: 'AI Models' },
-                { value: '28x', label: 'Cheaper' },
+                { value: '8', label: 'AI Models' },
+                { value: '12x', label: 'Cheaper' },
                 { value: '9', label: 'Benchmarks' },
-                { value: 'MIT', label: 'Licensed' },
+                { value: '$2', label: 'Per 1M tokens' },
               ].map((stat, i) => (
                 <div key={i}>
                   <div
@@ -101,7 +101,7 @@ export default function HomePage() {
                 Powered by the best open-weight models
               </h2>
               <p className="text-text-secondary max-w-lg mx-auto">
-                Five models, each with a specific role. Timuclaude routes automatically — you never choose.
+                Five models, each with a specific role. Temuclaude routes automatically — you never choose.
               </p>
             </div>
 
@@ -143,7 +143,7 @@ export default function HomePage() {
                 {
                   num: '01',
                   title: 'Understanding your question',
-                  desc: 'Timuclaude classifies your query — math, code, reasoning, knowledge — and routes it to the best model for the task.',
+                  desc: 'Temuclaude classifies your query — math, code, reasoning, knowledge — and routes it to the best model for the task.',
                 },
                 {
                   num: '02',
@@ -183,7 +183,7 @@ export default function HomePage() {
                 <thead>
                   <tr className="border-b border-border-default">
                     <th className="text-left py-3 px-4 font-semibold text-text-primary">Benchmark</th>
-                    <th className="text-center py-3 px-4 font-semibold text-accent-primary">Timuclaude</th>
+                    <th className="text-center py-3 px-4 font-semibold text-accent-primary">Temuclaude</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">Fable 5</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">GPT-5.5</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">Gemini 3.1</th>
@@ -210,7 +210,7 @@ export default function HomePage() {
               </table>
             </div>
             <p className="text-xs text-text-muted mt-4 text-center">
-              † Frontier scores from published results. Timuclaude scores are projected from research analysis.
+              † Frontier scores from published results. Temuclaude scores are projected from research analysis.
             </p>
           </div>
         </section>
@@ -222,7 +222,7 @@ export default function HomePage() {
               See it in action
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              Try Timuclaude right now — no signup required. One model, five minds, one superior answer.
+              Try Temuclaude right now — no signup required. One model, five minds, one superior answer.
             </p>
             <a href="/playground" className="btn-accent inline-flex">
               Open Playground
@@ -231,18 +231,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Open Source Callout */}
+        {/* Pricing Comparison Callout */}
         <section className="py-20 px-6">
           <div className="container-max text-center">
             <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-              No black boxes. No markup. Just code.
+              Frontier intelligence. Fraction of the cost.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              MIT licensed. Read every line. Modify it. Self-host it if you want. No vendor lock-in.
+              Same intelligence as Fable 5. 5x cheaper. 2.5x faster. No vendor lock-in.
             </p>
             <div className="flex items-center justify-center gap-4">
               <a
-                href="https://github.com/notSaiful/timuclaude-research"
+                href="https://github.com/notSaiful/temuclaude-research"
                 className="btn-secondary inline-flex"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -261,7 +261,7 @@ export default function HomePage() {
               Research & Updates
             </h2>
             <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
-              How Timuclaude works, benchmark analysis, and orchestration research.
+              How Temuclaude works, benchmark analysis, and orchestration research.
             </p>
             <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {[
@@ -303,13 +303,16 @@ export default function HomePage() {
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
                 <ul className="space-y-2">
-                  <li><a href="https://github.com/notSaiful/timuclaude-research" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                  <li><a href="https://github.com/notSaiful/temuclaude-research" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Legal</h4>
                 <ul className="space-y-2">
-                  <li><span className="text-sm text-text-muted">MIT License</span></li>
+                  <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary">Terms of Service</a></li>
+                  <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary">Privacy Policy</a></li>
+                  <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary">Refund Policy</a></li>
+                  <li><a href="/pricing" className="text-sm text-text-muted hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
             </div>

@@ -1,5 +1,5 @@
 """
-Timuclaude Phase 5b Test Suite
+Temuclaude Phase 5b Test Suite
 Tests: OpenRouter config, auto-detect backend, model IDs, pricing
 """
 import sys
@@ -33,7 +33,7 @@ def test_openrouter_config() -> bool:
     
     # Check models
     model_names = [m["model_name"] for m in config.get("model_list", [])]
-    expected = ["timuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6", 
+    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6", 
                 "minimax-m3", "nemotron-3-ultra", "gpt-oss-120b"]
     
     for m in expected:
@@ -93,7 +93,7 @@ def test_auto_detect_config() -> bool:
         config = yaml.safe_load(f)
     
     model_names = [m["model_name"] for m in config.get("model_list", [])]
-    expected = ["timuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6",
+    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6",
                 "minimax-m3", "nemotron-3-ultra", "gpt-oss-120b"]
     
     for m in expected:
@@ -199,11 +199,11 @@ def test_env_example() -> bool:
         print(f"  FAIL: .env.example missing OPENROUTER_API_KEY")
         return False
     
-    if "TIMUCLAUDE_MASTER_KEY" not in content:
-        print(f"  FAIL: .env.example missing TIMUCLAUDE_MASTER_KEY")
+    if "TEMUCLAUDE_MASTER_KEY" not in content:
+        print(f"  FAIL: .env.example missing TEMUCLAUDE_MASTER_KEY")
         return False
     
-    print(f"  OK: .env.example has both OPENROUTER_API_KEY and TIMUCLAUDE_MASTER_KEY")
+    print(f"  OK: .env.example has both OPENROUTER_API_KEY and TEMUCLAUDE_MASTER_KEY")
     print(f"  1/1 passed")
     return True
 
@@ -254,7 +254,7 @@ def test_landing_pricing() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 5b TEST SUITE (OpenRouter)")
+    print("TEMUCLAUDE — PHASE 5b TEST SUITE (OpenRouter)")
     print("=" * 60)
     
     results = []

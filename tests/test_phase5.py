@@ -1,5 +1,5 @@
 """
-Timuclaude Phase 5 Test Suite
+Temuclaude Phase 5 Test Suite
 Tests: Cache, start script, Dockerfile, landing page, fly.toml
 """
 import sys
@@ -159,7 +159,7 @@ def test_start_script() -> bool:
     
     # Check key elements (auto-detect, both backends)
     checks = {
-        "TIMUCLAUDE_MASTER_KEY": "TIMUCLAUDE_MASTER_KEY" in content,
+        "TEMUCLAUDE_MASTER_KEY": "TEMUCLAUDE_MASTER_KEY" in content,
         "OPENROUTER_API_KEY": "OPENROUTER_API_KEY" in content,
         "Ollama check": "11434" in content,
         "litellm": "litellm" in content,
@@ -236,7 +236,7 @@ def test_fly_config() -> bool:
         content = f.read()
     
     checks = {
-        "app name": "timuclaude" in content,
+        "app name": "temuclaude" in content,
         "region": "primary_region" in content,
         "dockerfile": "Dockerfile" in content or "dockerfile" in content,
         "port 4000": "4000" in content,
@@ -271,7 +271,7 @@ def test_landing_page() -> bool:
     
     checks = {
         "title": "<title>" in content,
-        "Timuclaude": "Timuclaude" in content,
+        "Temuclaude": "Temuclaude" in content,
         "benchmark": "benchmark" in content.lower() or "Benchmark" in content,
         "pricing": "pricing" in content.lower() or "Pricing" in content,
         "API": "API" in content,
@@ -320,7 +320,7 @@ def test_dockerignore() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 5 TEST SUITE")
+    print("TEMUCLAUDE — PHASE 5 TEST SUITE")
     print("=" * 60)
     
     results = []

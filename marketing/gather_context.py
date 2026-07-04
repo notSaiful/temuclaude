@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Timuclaude Context Gatherer — collects real project data for agent-generated tweets.
+Temuclaude Context Gatherer — collects real project data for agent-generated tweets.
 Run this before crafting a post. Outputs structured context the agent uses.
 
 Usage:
@@ -195,7 +195,7 @@ def gather_all():
 def print_human_readable(data):
     """Print context in human-readable format for the agent."""
     print("=" * 60)
-    print("TIMUCLAUDE CONTEXT REPORT")
+    print("TEMUCLAUDE CONTEXT REPORT")
     print("=" * 60)
 
     print(f"\n📅 TIME: {data['time']['day_of_week']} {data['time']['time']} {data['time']['timezone']}")
@@ -250,7 +250,7 @@ def print_human_readable(data):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Gather context for Timuclaude posts")
+    parser = argparse.ArgumentParser(description="Gather context for Temuclaude posts")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 

@@ -1,10 +1,10 @@
 """
-Timuclaude Query Log Analyzer
+Temuclaude Query Log Analyzer
 Analyzes past query logs to find patterns: which task types have lowest success,
 which models perform best per task type.
 
 This is the data-driven self-improvement foundation — it tells us WHERE
-Timuclaude is weak and WHICH model is best for each task.
+Temuclaude is weak and WHICH model is best for each task.
 """
 import json
 import os
@@ -169,7 +169,7 @@ def print_report(analysis: dict) -> str:
     """Print a human-readable analysis report. Returns the report as string."""
     lines = []
     lines.append("=" * 60)
-    lines.append("TIMUCLAUDE — QUERY LOG ANALYSIS REPORT")
+    lines.append("TEMUCLAUDE — QUERY LOG ANALYSIS REPORT")
     lines.append("=" * 60)
     lines.append(f"Total queries: {analysis['total_queries']}")
     lines.append(f"Overall success rate: {analysis['success_rate']:.1%}")

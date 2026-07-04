@@ -1,4 +1,4 @@
-# TIMUCLAUDE — COMPLETE WEBSITE & PLAYGROUND PLAN (FINAL)
+# TEMUCLAUDE — COMPLETE WEBSITE & PLAYGROUND PLAN (FINAL)
 ## All Research Synthesized — Zero Gaps
 
 ---
@@ -81,7 +81,7 @@ Code: JetBrains Mono 13px, bg #1A1816, text #E8E4DC
 
 ## PART 3: LOGO
 
-"The Conductor" — 5 small circles (models) connected to 1 central hub (Timuclaude).
+"The Conductor" — 5 small circles (models) connected to 1 central hub (Temuclaude).
 Solid #D97757 or #1A1816. No gradients. Works at 16px to billboard.
 Animated version: nodes pulse, connections draw in, data pulses flow.
 
@@ -235,7 +235,7 @@ async function sendMessage(text: string) {
 │ Recent:    │  └─────────────────────────────────┘ │
 │ - Math Q   │                                       │
 │ - Code Q   │  ┌─────────────────────────────────┐ │
-│            │  │ Timuclaude: 180                  │ │
+│            │  │ Temuclaude: 180                  │ │
 │ Examples:  │  │                                  │ │
 │ - 9.9 vs   │  │ 🤖 1 model • 1.2s • $0.0002      │ │
 │   9.11     │  │ [▼ Show how this was built]      │ │
@@ -296,10 +296,10 @@ async function sendMessage(text: string) {
 
 ### Chat Interface
 ```html
-<main aria-label="Timuclaude Playground">
+<main aria-label="Temuclaude Playground">
   <section aria-label="Conversation history">
     <article aria-label="Your message"><!-- user msg --></article>
-    <article aria-label="Timuclaude response" role="status" aria-live="polite" aria-atomic="false">
+    <article aria-label="Temuclaude response" role="status" aria-live="polite" aria-atomic="false">
       <!-- streaming response, announced as it arrives -->
     </article>
   </section>
@@ -444,16 +444,16 @@ SVG progress ring with color coding:
 
 ### Meta Tags
 ```html
-<title>Timuclaude — Open-Source LLM Orchestration | Beat Frontier Models</title>
-<meta name="description" content="One question. Many minds. One superior answer. Timuclaude orchestrates multiple AI models to beat frontier models at 28x lower cost. Free with Ollama." />
-<link rel="canonical" href="https://timuclaude.com/" />
+<title>Temuclaude — Open-Source LLM Orchestration | Beat Frontier Models</title>
+<meta name="description" content="One question. Many minds. One superior answer. Temuclaude orchestrates multiple AI models to beat frontier models at 28x lower cost. Free with Ollama." />
+<link rel="canonical" href="https://temuclaude.com/" />
 ```
 
 ### Open Graph (1200×630 image)
 ```html
-<meta property="og:title" content="Timuclaude — Open-Source LLM Orchestration" />
+<meta property="og:title" content="Temuclaude — Open-Source LLM Orchestration" />
 <meta property="og:description" content="One question. Many minds. One superior answer. 28x cheaper than frontier models." />
-<meta property="og:image" content="https://timuclaude.com/og-image.png" />
+<meta property="og:image" content="https://temuclaude.com/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 ```
@@ -461,15 +461,15 @@ SVG progress ring with color coding:
 ### Twitter Card
 ```html
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Timuclaude — Open-Source LLM Orchestration" />
-<meta name="twitter:image" content="https://timuclaude.com/og-image.png" />
+<meta name="twitter:title" content="Temuclaude — Open-Source LLM Orchestration" />
+<meta name="twitter:image" content="https://temuclaude.com/og-image.png" />
 ```
 
 ### Structured Data
 ```json
 {
   "@type": "SoftwareApplication",
-  "name": "Timuclaude",
+  "name": "Temuclaude",
   "applicationCategory": "DeveloperApplication",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
 }

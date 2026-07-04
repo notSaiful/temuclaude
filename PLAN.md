@@ -1,4 +1,4 @@
-# Timuclaude — Frontier Intelligence at Wholesale Prices
+# Temuclaude — Frontier Intelligence at Wholesale Prices
 
 ## Architecture & Implementation Plan
 
@@ -14,7 +14,7 @@ Frontier model subscriptions cost $200-500/month. Small businesses can't afford 
 
 ## 2. The Solution
 
-Timuclaude orchestrates multiple cheap open-source models — each with different strengths — using proven research methods to achieve frontier-level performance at ~5-15% of the cost.
+Temuclaude orchestrates multiple cheap open-source models — each with different strengths — using proven research methods to achieve frontier-level performance at ~5-15% of the cost.
 
 The name: **Timu** (cheap wholesale) + **Claude** (frontier intelligence). Cheap Claude.
 
@@ -69,7 +69,7 @@ Open-source router that decides between strong/expensive and weak/cheap models. 
 
 Based on benchmark research, here's what each model is best at:
 
-| Model | Strengths | Context | Role in Timuclaude |
+| Model | Strengths | Context | Role in Temuclaude |
 |-------|-----------|---------|---------------------|
 | **GLM-5.2** | Tool use, coding, fast classification, Chinese | 128K+ | Router + Aggregator (fast, versatile) |
 | **DeepSeek R1** | Deep reasoning, math, competitive coding | 128K | Reasoning specialist (hard problems) |
@@ -249,7 +249,7 @@ Simple → Medium → Hard → (if still stuck) return best available + flag for
 6. Load test: latency, cost, quality at scale
 7. Deploy (Fly.io or Vercel — you already use both)
 
-**Deliverable:** Timuclaude as a service. Users point their app at it instead of OpenAI.
+**Deliverable:** Temuclaude as a service. Users point their app at it instead of OpenAI.
 
 ---
 
@@ -308,7 +308,7 @@ Monthly cost for 10,000 queries: ~$50-150 (vs $500-1,500 for GPT-4o).
 3. **Flexibility:** Swap models anytime — no vendor lock-in
 4. **Transparency:** Open-source models, open orchestration logic
 5. **Self-improving:** Log disagreements, tune routing, add models over time
-6. **Branding:** "Timuclaude" — the name sells itself
+6. **Branding:** "Temuclaude" — the name sells itself
 
 ---
 

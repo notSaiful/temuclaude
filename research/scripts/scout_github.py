@@ -55,7 +55,7 @@ def search_github(query, sort="updated", per_page=10):
     url = f"{GITHUB_API}?{params}"
     headers = {
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Timuclaude-Research/1.0",
+        "User-Agent": "Temuclaude-Research/1.0",
     }
     # Use GitHub token if available for higher rate limits (60/hour → 5000/hour)
     github_token = os.environ.get("GITHUB_TOKEN", "")

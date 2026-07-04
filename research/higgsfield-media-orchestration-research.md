@@ -1,7 +1,7 @@
 # Higgsfield Supercomputer & Media Generation Orchestration — Deep Research Report
 
 **Date:** July 3, 2026
-**Purpose:** Competitive intelligence for the timuclaude project (LLM orchestration system expanding into media generation)
+**Purpose:** Competitive intelligence for the temuclaude project (LLM orchestration system expanding into media generation)
 **Methods:** Firecrawl search + scrape, Puppeteer browser automation, NVIDIA/Sacra/fal.ai/Higgsfield primary sources
 
 ---
@@ -234,9 +234,9 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
 
 **Key finding: Higgsfield's Supercomputer is essentially the ONLY commercial product that does true multi-model agentic orchestration for media generation at scale.** fal.ai provides infrastructure for developers to build orchestration, but doesn't offer it as an end-user product. Everyone else is single-model or single-ecosystem.
 
-### 3.5 How timuclaude's Approach Differs
+### 3.5 How temuclaude's Approach Differs
 
-| Dimension | Higgsfield | fal.ai | Replicate | timuclaude (potential) |
+| Dimension | Higgsfield | fal.ai | Replicate | temuclaude (potential) |
 |-----------|-----------|--------|-----------|----------------------|
 | Core concept | Agentic chat → finished assets | Inference API for developers | Model hosting API | LLM orchestration → media |
 | Multi-model routing | Yes (Orchestrator, auto mode) | No (developer builds it) | No | **Yes (adaptive routing — existing skill)** |
@@ -251,7 +251,7 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
 | Camera control | Yes (1,296 lenses) | No | No | No (but can route to models that have it) |
 | Character consistency | Yes (Soul ID) | No | No | Could orchestrate (use any identity model) |
 
-**timuclaude's unique advantage:** Higgsfield does *routing* (pick the right model) but NOT *ensembling* (combine multiple model outputs for better-than-any-single results). timuclaude's existing skills (fusion, self-consistency, self-QA, adaptive routing, GEPA prompt evolution) are precisely the techniques Higgsfield DOESN'T use. This is the gap.
+**temuclaude's unique advantage:** Higgsfield does *routing* (pick the right model) but NOT *ensembling* (combine multiple model outputs for better-than-any-single results). temuclaude's existing skills (fusion, self-consistency, self-QA, adaptive routing, GEPA prompt evolution) are precisely the techniques Higgsfield DOESN'T use. This is the gap.
 
 ---
 
@@ -317,7 +317,7 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
 - Or: extract style embedding (CLIP/IP-Adapter) from reference, apply to generation
 
 ### 4.7 Multi-Model Fusion (Combine Outputs)
-**This is timuclaude's potential killer feature — Higgsfield doesn't do this.**
+**This is temuclaude's potential killer feature — Higgsfield doesn't do this.**
 
 **Techniques:**
 - **Adaptive Feature Aggregation (AFA)** (arXiv 2405.17082): Ensemble multiple diffusion models by adaptively aggregating their features during the denoising process. Different models excel at different aspects (text rendering, faces, composition) — AFA combines strengths.
@@ -394,7 +394,7 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
   - Better composition (LLM adds framing/composition keywords)
   - Better style matching (LLM injects appropriate style descriptors)
   - Fewer wasted generations (LLM gets it right first time more often)
-- **GEPA prompt evolution** (timuclaude's existing skill) could push this further — iteratively evolve prompts based on output quality feedback, not just one-shot enhancement
+- **GEPA prompt evolution** (temuclaude's existing skill) could push this further — iteratively evolve prompts based on output quality feedback, not just one-shot enhancement
 
 ---
 
@@ -425,7 +425,7 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
 - **IFRNet** — fast and accurate
 - **AMT** (Animation Motion Transfer) — good for animation
 
-**Use case for timuclaude:** Generate at 24fps (cheaper), interpolate to 60fps for smooth playback. Or generate short clips, interpolate to extend duration.
+**Use case for temuclaude:** Generate at 24fps (cheaper), interpolate to 60fps for smooth playback. Or generate short clips, interpolate to extend duration.
 
 ### 6.4 From 512×512 to 4K Quality Pipeline
 1. **Generate** at 512×512 or 1024×1024 with cheap model (Flux Schnell: ~$0.003)
@@ -507,13 +507,13 @@ Higgsfield's pitch: "the best output rarely comes from one engine." They positio
 | **ComfyUI** | Open-source tool | Ultimate flexibility, any model, node-based | Requires technical skill, no hosting, no agent |
 | **MindStudio** | Agent platform | "Remy" PM agent, moving toward media | Unclear media capabilities, early stage |
 
-### 8.2 Where the Gap Is — What timuclaude Can Exploit
+### 8.2 Where the Gap Is — What temuclaude Can Exploit
 
 **THE GAP: Nobody does true multi-model ENSEMBLING for media generation.**
 
 Higgsfield does **routing** (pick one model per step). fal.ai provides **infrastructure** (you build the pipeline). Everyone else is **single-model**.
 
-timuclaude can exploit:
+temuclaude can exploit:
 
 1. **Ensembling + Fusion (existing skill):** Generate with multiple models, fuse at feature level (AFA) or selection level (best-of-N + LLM judge). No commercial platform does this. Research shows it works (AFA paper, eDiff-I).
 
@@ -525,13 +525,13 @@ timuclaude can exploit:
 
 5. **Adaptive routing with cost optimization (existing skill):** Cascade from cheap to expensive based on quality threshold. Higgsfield routes but doesn't cascade with quality gates.
 
-6. **Developer-facing orchestration API:** Higgsfield is end-user (marketers). fal.ai is infrastructure. Nobody provides an orchestration API that developers can call to get "best possible media" without managing models. timuclaude can be the **orchestration layer for media** that fal.ai is for inference.
+6. **Developer-facing orchestration API:** Higgsfield is end-user (marketers). fal.ai is infrastructure. Nobody provides an orchestration API that developers can call to get "best possible media" without managing models. temuclaude can be the **orchestration layer for media** that fal.ai is for inference.
 
-7. **Model-agnostic:** Higgsfield has proprietary models (SOUL, DoP) which creates lock-in but also dependency. timuclaude can route to ANY model (fal.ai, Replicate, direct APIs) — more flexible.
+7. **Model-agnostic:** Higgsfield has proprietary models (SOUL, DoP) which creates lock-in but also dependency. temuclaude can route to ANY model (fal.ai, Replicate, direct APIs) — more flexible.
 
 ### 8.3 What Orchestration + Multi-Model Can Do That Single-Model Platforms Can't
 
-| Capability | Single-Model | Orchestration (timuclaude) |
+| Capability | Single-Model | Orchestration (temuclaude) |
 |-----------|-------------|---------------------------|
 | Best quality per task | Limited to one model's strengths | Pick best model per subtask |
 | Cost optimization | Fixed cost per generation | Cascade: cheap first, expensive only if needed |
@@ -547,12 +547,12 @@ timuclaude can exploit:
 
 ---
 
-## SUMMARY & RECOMMENDATIONS FOR TIMUCLAUDE
+## SUMMARY & RECOMMENDATIONS FOR TEMUCLAUDE
 
 ### What Higgsfield Supercomputer Actually Is
 Higgsfield Supercomputer is an **agentic chat interface** that orchestrates multiple frontier media models (Veo, Kling, Seedance, Sora 2, Flux, Nano Banana, GPT Image + proprietary SOUL 2/DoP) via an "Orchestrator" that routes each job step to the best-fit model. It's positioned as "the first agentic marketing agency" — you brief in plain language, it plans, picks models, generates, assembles, and delivers finished assets. Revenue: ~$400-500M annualized, 22M users, $1.3B valuation (raising at $5B). Built on NVIDIA Blackwell infrastructure.
 
-### What Higgsfield Does NOT Do (timuclaude's Opportunity)
+### What Higgsfield Does NOT Do (temuclaude's Opportunity)
 1. **No ensembling/fusion** — routes to ONE model per step, never combines multiple model outputs
 2. **No self-QA** — doesn't verify output quality against the prompt before returning
 3. **No best-of-N** — generates once per model, doesn't generate multiple and pick best
@@ -561,7 +561,7 @@ Higgsfield Supercomputer is an **agentic chat interface** that orchestrates mult
 6. **No model-agnostic routing** — tied to their hosted models only
 7. **No cost-cascading with quality gates** — routes, but doesn't escalate based on quality checks
 
-### timuclaude's Winning Strategy
+### temuclaude's Winning Strategy
 **Position as the "orchestration intelligence layer" for media generation** — not a hosting platform (that's fal.ai), not an end-user product (that's Higgsfield), but the **brains** that any developer can plug in to get frontier-quality media at 10-20% of cost by:
 
 1. **Adaptive routing:** Cascade cheap→expensive with quality gates (existing skill)
@@ -572,7 +572,7 @@ Higgsfield Supercomputer is an **agentic chat interface** that orchestrates mult
 6. **Post-processing pipeline:** Auto-upscale (Real-ESRGAN), face restore (CodeFormer), frame interpolate (RIFE)
 7. **Model-agnostic:** Route to fal.ai, Replicate, direct APIs — any model, any provider
 
-**The pitch:** "Higgsfield charges $59/mo and locks you into their models. timuclaude gives you better quality at lower cost by intelligently orchestrating ANY model — with ensembling, self-QA, and prompt evolution that no other platform has."
+**The pitch:** "Higgsfield charges $59/mo and locks you into their models. temuclaude gives you better quality at lower cost by intelligently orchestrating ANY model — with ensembling, self-QA, and prompt evolution that no other platform has."
 
 ---
 

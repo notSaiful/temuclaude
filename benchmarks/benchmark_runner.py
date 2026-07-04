@@ -1,5 +1,5 @@
 """
-Timuclaude Benchmark Runner
+Temuclaude Benchmark Runner
 Runs a model on a dataset, scores each response, tracks results.
 
 Universal: works with any Q&A dataset in {id, question, answer, category} format.
@@ -65,7 +65,7 @@ async def run_benchmark(
         try:
             # Call the model
             messages = [
-                {"role": "system", "content": "You are Timuclaude, a helpful AI assistant. Answer the following question. At the end, write 'Answer: ' followed by your final answer."},
+                {"role": "system", "content": "You are Temuclaude, a helpful AI assistant. Answer the following question. At the end, write 'Answer: ' followed by your final answer."},
                 {"role": "user", "content": question},
             ]
             

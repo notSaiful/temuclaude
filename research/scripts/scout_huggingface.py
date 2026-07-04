@@ -24,7 +24,7 @@ HF_API = "https://huggingface.co/api"
 def fetch_json(url, timeout=30):
     try:
         req = urllib.request.Request(url, headers={
-            "User-Agent": "Timuclaude-Research/1.0",
+            "User-Agent": "Temuclaude-Research/1.0",
             "Accept": "application/json",
         })
         with urllib.request.urlopen(req, timeout=timeout, context=_ssl_ctx) as resp:

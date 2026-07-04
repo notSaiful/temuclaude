@@ -1,5 +1,5 @@
 """
-Timuclaude In-Memory Response Cache
+Temuclaude In-Memory Response Cache
 Caches identical requests to save API calls.
 LRU eviction with TTL.
 

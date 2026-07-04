@@ -1,4 +1,4 @@
-# Timuclaude — Competitive Landscape Analysis
+# Temuclaude — Competitive Landscape Analysis
 
 ## All Known Fable 5 Killers / Alternatives / Competitors
 
@@ -17,7 +17,7 @@
 **Price:** $200/month (Perplexity Max only)
 **Platform:** Web only
 
-**Key insight for Timuclaude:** This is the SAME pattern as OpenRouter's Fusion Router — panel + judge + structured analysis. But Perplexity charges $200/mo and only uses 3 closed models. We can do the same with 5 open models on Ollama Cloud at $20-100/mo.
+**Key insight for Temuclaude:** This is the SAME pattern as OpenRouter's Fusion Router — panel + judge + structured analysis. But Perplexity charges $200/mo and only uses 3 closed models. We can do the same with 5 open models on Ollama Cloud at $20-100/mo.
 
 **What we take from it:** The "convergence/divergence/unique insights" framing is powerful for users. We should present our output the same way — show where models agreed (high confidence) and where they disagreed (flag for user review).
 
@@ -185,7 +185,7 @@
 
 **What it is:** Open-source library + proxy. Unified API to 100+ LLM providers. Routing, fallbacks, cost tracking, admin UI.
 
-**Key features for Timuclaude:**
+**Key features for Temuclaude:**
 - Adaptive Router: LEARNS which model is best per request type (bandit algorithm)
 - Auto Router: embedding-based semantic routing
 - Fallbacks + retry + cooldowns
@@ -208,7 +208,7 @@
 
 ## COMPETITIVE MATRIX
 
-| Feature | Timuclaude | Fugu | Maestro | Fusion | Model Council | Auto Router |
+| Feature | Temuclaude | Fugu | Maestro | Fusion | Model Council | Auto Router |
 |---------|-----------|------|---------|--------|---------------|-------------|
 | Multi-model panel | ✅ 5 models | ✅ pool | ❌ 1+escalate | ✅ up to 8 | ✅ 3 | ❌ 1 |
 | Structured analysis | ✅ | ❌ | ❌ | ✅ best | ✅ | ❌ |
@@ -238,9 +238,9 @@ Against Model Council: We have 5 open models (they use 3 closed), skills, tool v
 
 Against Auto Router: We have multi-model panel, structured analysis, skills, verification, self-consistency, MCTS, OPRO, Adaptive Router. They only route to 1 model.
 
-## THE TIMUCLAUDE ADVANTAGE STACK
+## THE TEMUCLAUDE ADVANTAGE STACK
 
-No single competitor has ALL of these. Timuclaude is the only system that combines:
+No single competitor has ALL of these. Temuclaude is the only system that combines:
 
 1. Multi-model panel (like Fusion/Model Council) — 5 models in parallel
 2. Structured analysis (like Fusion) — consensus/contradictions/insights/blind_spots
@@ -256,6 +256,6 @@ No single competitor has ALL of these. Timuclaude is the only system that combin
 12. Open source (like Maestro) — no vendor lock-in
 13. Cost transparency (like Maestro) — show users what they saved
 
-**Timuclaude = Fusion + Fugu + Maestro + skills + MCTS + self-consistency + OPRO + Hermes + flat cost**
+**Temuclaude = Fusion + Fugu + Maestro + skills + MCTS + self-consistency + OPRO + Hermes + flat cost**
 
 Nobody else has this combination. This is our moat.

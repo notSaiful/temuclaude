@@ -1,5 +1,5 @@
 """
-Timuclaude Phase 4 Test Suite
+Temuclaude Phase 4 Test Suite
 Tests: Dataset loading, judges, benchmark runner, results reporter
 """
 import sys
@@ -16,7 +16,7 @@ from benchmarks.datasets import load_custom_json, create_sample_dataset, load_da
 from benchmarks.judges import extract_judgment, exact_match_judge, llm_judge, JUDGE_PROMPT
 from benchmarks.benchmark_runner import run_benchmark, save_results
 from benchmarks.results import load_results, print_report, compare_results, compare_files
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 
 
 # ============================================================
@@ -122,7 +122,7 @@ def test_benchmark_runner_live() -> bool:
     """Test that the benchmark runner works with a live model (small sample)."""
     print("\n=== BENCHMARK RUNNER LIVE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     loop = asyncio.new_event_loop()
     
     # Use 3 sample questions (math, fast models)
@@ -216,10 +216,10 @@ def test_results_reporter() -> bool:
     
     # Compare two results
     fake_baseline = {**fake_results, "model_name": "baseline"}
-    fake_timuclaude = {**fake_results, "model_name": "timuclaude", "correct": 3, "accuracy": 1.0}
+    fake_temuclaude = {**fake_results, "model_name": "temuclaude", "correct": 3, "accuracy": 1.0}
     
     with redirect_stdout(captured):
-        compare_results(fake_baseline, fake_timuclaude)
+        compare_results(fake_baseline, fake_temuclaude)
     comparison = captured.getvalue()
     assert "COMPARISON" in comparison.upper() or "Improvement" in comparison
     print(f"  OK: comparison generated")
@@ -250,7 +250,7 @@ def test_save_load_results() -> bool:
     }
     
     # Save
-    temp_path = os.path.join(tempfile.gettempdir(), "timuclaude_test_results.json")
+    temp_path = os.path.join(tempfile.gettempdir(), "temuclaude_test_results.json")
     save_results(fake_results, temp_path)
     assert os.path.isfile(temp_path), "File should exist after save"
     print(f"  OK: results saved")
@@ -273,7 +273,7 @@ def test_save_load_results() -> bool:
 # ============================================================
 if __name__ == "__main__":
     print("=" * 60)
-    print("TIMUCLAUDE — PHASE 4 TEST SUITE")
+    print("TEMUCLAUDE — PHASE 4 TEST SUITE")
     print("=" * 60)
     
     results = []

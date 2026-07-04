@@ -1,4 +1,4 @@
-# TIMUCLAUDE — 3D WEBSITE DESIGN RESEARCH
+# TEMUCLAUDE — 3D WEBSITE DESIGN RESEARCH
 ## Learnings from Awwwards, Landing.love, and Live Site Analysis
 
 ---
@@ -63,7 +63,7 @@ Many "3D websites" actually use **pre-rendered video** for their 3D effects, not
 - **Spline**: Uses REAL WebGL (3 canvases) because it's a 3D tool — but this is heavy
 - **TRIONN**: 3 WebGL canvases + 6 videos — very heavy, slow to load
 
-### What This Means for Timuclaude
+### What This Means for Temuclaude
 Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse score and scare away our target audience. We should use:
 1. **SVG animation** for the orchestration diagram (infinitely scalable, <10KB)
 2. **CSS 3D transforms** for card hover effects (GPU accelerated, 0KB)
@@ -79,37 +79,37 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 - "Press and drag to orbit" — user controls the 3D scene
 - 3D object rotates/responds to mouse
 - Creates immediate engagement ("play" instinct)
-- **For Timuclaude**: Our orchestration diagram could be interactive — drag to rotate the node network
+- **For Temuclaude**: Our orchestration diagram could be interactive — drag to rotate the node network
 
 ### Pattern 2: Video-Driven 3D (Cula approach)
 - Pre-rendered 3D animation as video
 - Looks 3D but plays as video (better performance)
 - Used for product showcases and feature explanations
-- **For Timuclaude**: Could create a pre-rendered animation of orchestration flow
+- **For Temuclaude**: Could create a pre-rendered animation of orchestration flow
 
 ### Pattern 3: 3D Abstract Shapes (Together AI approach)
 - Floating 3D shapes (spheres, discs, hexagons)
 - Translucent materials with soft shadows
 - Conveys "advanced technology" without being literal
-- **For Timuclaude**: Warm clay-colored abstract shapes could work in the hero
+- **For Temuclaude**: Warm clay-colored abstract shapes could work in the hero
 
 ### Pattern 4: Scroll-Triggered 3D Transformation
 - 3D scene changes as user scrolls
 - Camera moves through 3D space
 - Story unfolds with scroll progress
-- **For Timuclaude**: Could show orchestration flow as user scrolls (query → classify → route → fuse → verify → answer)
+- **For Temuclaude**: Could show orchestration flow as user scrolls (query → classify → route → fuse → verify → answer)
 
 ### Pattern 5: Dark Immersive (TRIONN approach)
 - Very dark background (#040508)
 - 3D scenes with glowing elements
 - Sound toggle for full immersion
-- **Not for Timuclaude**: We're warm light, not dark immersive
+- **Not for Temuclaude**: We're warm light, not dark immersive
 
 ### Pattern 6: Clean Light + Subtle 3D (Cula approach)
 - Light/white background
 - 3D effects through video or subtle CSS transforms
 - Focus on content, 3D as enhancement
-- **Best fit for Timuclaude**: Warm ivory + subtle 3D elements
+- **Best fit for Temuclaude**: Warm ivory + subtle 3D elements
 
 ---
 
@@ -127,7 +127,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 9. **Sound design**: TRIONN has ambient sound toggle — immersive but optional
 10. **Infinite scroll galleries**: Horizontal scrolling galleries with momentum
 
-### For Timuclaude (selected micro-interactions)
+### For Temuclaude (selected micro-interactions)
 1. **3D card tilt**: Benchmark cards tilt slightly on hover (CSS perspective + mouse position)
 2. **Scroll-triggered reveals**: Sections fade in + slide up (Framer Motion)
 3. **Animated counter**: Stats count up from 0 when they enter viewport
@@ -142,7 +142,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 
 ### What You Need to Build Award-Winning 3D Websites
 
-**Level 1: Basic (What We Need for Timuclaude)**
+**Level 1: Basic (What We Need for Temuclaude)**
 - React/Next.js — we have this
 - CSS animations and transitions — we have this
 - CSS 3D transforms (perspective, rotateX/Y/Z) — easy to learn
@@ -155,7 +155,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 - Lottie (After Effects → JSON animation) — if we have an animator
 - Spline (no-code 3D design tool) — visual editor, export to React
 
-**Level 3: Advanced (Not Needed for Timuclaude)**
+**Level 3: Advanced (Not Needed for Temuclaude)**
 - Three.js / React Three Fiber — for real WebGL 3D scenes
 - GLSL shaders — for custom visual effects
 - Blender — for creating 3D models
@@ -170,7 +170,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 6. **Storytelling**: The best 3D websites tell a story — the 3D guides the user through a narrative.
 7. **Subtlety wins**: A subtle 3D card tilt is more elegant than a full-screen WebGL scene. Less is more.
 
-### For Timuclaude Specifically
+### For Temuclaude Specifically
 - Our "3D" is the orchestration diagram — an SVG animation showing nodes connecting
 - Our "depth" is CSS 3D transforms on cards and buttons
 - Our "motion" is Framer Motion scroll-triggered reveals
@@ -184,7 +184,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 
 ### The Hero Animation (Our Key Visual)
 
-**Concept**: An animated SVG showing 5 model nodes connecting to a central Timuclaude hub, with data "pulses" flowing along the connections.
+**Concept**: An animated SVG showing 5 model nodes connecting to a central Temuclaude hub, with data "pulses" flowing along the connections.
 
 **Technical Implementation**:
 ```svg
@@ -196,7 +196,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
   <circle cx="550" cy="100" r="20" class="node node-4" />
   <circle cx="700" cy="200" r="20" class="node node-5" />
   
-  <!-- Central hub (Timuclaude) -->
+  <!-- Central hub (Temuclaude) -->
   <circle cx="400" cy="250" r="35" class="hub" />
   
   <!-- Connection lines (animated draw-in) -->
@@ -272,7 +272,7 @@ Developers care about performance. A 10MB WebGL scene will hurt our Lighthouse s
 7. **Spline is the easiest path to real 3D** — visual editor, export to React, no GLSL coding
 8. **Performance is design** — developers will judge us on Lighthouse score, not on 3D spectacle
 
-### What Timuclaude Should Do
+### What Temuclaude Should Do
 1. **Hero**: Animated SVG orchestration diagram (nodes connecting, data flowing) — < 5KB
 2. **Cards**: CSS 3D transforms for subtle tilt on hover — 0KB additional
 3. **Sections**: Framer Motion scroll-triggered reveals — 30KB library

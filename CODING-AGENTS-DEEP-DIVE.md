@@ -14,7 +14,7 @@ Claude Code runs a **3-phase agentic loop**:
 
 The loop adapts dynamically. A question might only need context gathering. A bug fix cycles all three repeatedly. Claude chains dozens of actions and course-corrects based on what it learns.
 
-**Key insight for Timuclaude:** This is EXACTLY our Build-and-Debug strategy. But Claude Code uses ONE model. We use 5 models in a Fusion panel + tool verification + self-consistency. Same loop, more firepower.
+**Key insight for Temuclaude:** This is EXACTLY our Build-and-Debug strategy. But Claude Code uses ONE model. We use 5 models in a Fusion panel + tool verification + self-consistency. Same loop, more firepower.
 
 ### Tools (5 categories):
 | Category | What Claude Can Do |
@@ -99,7 +99,7 @@ The loop adapts dynamically. A question might only need context gathering. A bug
 - MIT licensed
 
 ### Specialized Agents (maps to orchestration strategies):
-| Agent | Role | Timuclaude Equivalent |
+| Agent | Role | Temuclaude Equivalent |
 |-------|------|----------------------|
 | Code | Default — implements and edits code | Direct routing + build-and-debug |
 | Plan | Designs architecture, writes plans before code | Ouroboros spec-first pattern |
@@ -283,7 +283,7 @@ The agent engineering platform. Most popular LLM framework. MIT licensed.
 
 ---
 
-## 7. CROSS-CUTTING INSIGHTS FOR TIMUCLAUDE
+## 7. CROSS-CUTTING INSIGHTS FOR TEMUCLAUDE
 
 ### Patterns That ALL Top Agents Share:
 1. **Agentic loop** — gather context → take action → verify results
@@ -313,7 +313,7 @@ The agent engineering platform. Most popular LLM framework. MIT licensed.
 ### Patterns Where OTHERS ARE SUPERIOR (gaps to close):
 | Pattern | Who Has It | Hermes Status | Action |
 |---------|-----------|---------------|--------|
-| Live Canvas (visual workspace) | OpenClaw | ❌ | Consider for Timuclaude dashboard |
+| Live Canvas (visual workspace) | OpenClaw | ❌ | Consider for Temuclaude dashboard |
 | Voice Wake words | OpenClaw | STT/TTS but no wake | Add wake word support |
 | Supply-chain hardening (pinned deps) | Pi | Standard pip | Add dependency pinning |
 | Inline autocomplete (ghost text) | Kilo Code | ❌ | Future feature |
@@ -324,33 +324,33 @@ The agent engineering platform. Most popular LLM framework. MIT licensed.
 
 ---
 
-## 8. THE TIMUCLAUDE INTEGRATION STRATEGY
+## 8. THE TEMUCLAUDE INTEGRATION STRATEGY
 
-### How Timuclaude Powers All Coding Agents:
+### How Temuclaude Powers All Coding Agents:
 
-Timuclaude exposes an **OpenAI-compatible API** via LiteLLM proxy. Any coding agent that supports custom model endpoints can point at Timuclaude:
+Temuclaude exposes an **OpenAI-compatible API** via LiteLLM proxy. Any coding agent that supports custom model endpoints can point at Temuclaude:
 
 ```bash
 # Claude Code
-ANTHROPIC_BASE_URL=http://timuclaude:8080 ANTHROPIC_API_KEY=unused claude
+ANTHROPIC_BASE_URL=http://temuclaude:8080 ANTHROPIC_API_KEY=unused claude
 
 # Kilo Code
-kilo --model timuclaude-auto --base-url http://timuclaude:8080/v1
+kilo --model temuclaude-auto --base-url http://temuclaude:8080/v1
 
 # OpenClaw (model config)
-openclaw config set model timuclaude-auto
-openclaw config set api_base http://timuclaude:8080/v1
+openclaw config set model temuclaude-auto
+openclaw config set api_base http://temuclaude:8080/v1
 
 # Pi
-PI_MODEL=timuclaude-auto PI_API_BASE=http://timuclaude:8080/v1 pi
+PI_MODEL=temuclaude-auto PI_API_BASE=http://temuclaude:8080/v1 pi
 
 # Any OpenAI-compatible tool
-OPENAI_API_KEY=unused OPENAI_BASE_URL=http://timuclaude:8080/v1 [any tool]
+OPENAI_API_KEY=unused OPENAI_BASE_URL=http://temuclaude:8080/v1 [any tool]
 ```
 
-**They send one query. Timuclaude orchestrates 5+ models, verifies, synthesizes, returns one answer.**
+**They send one query. Temuclaude orchestrates 5+ models, verifies, synthesizes, returns one answer.**
 
-### What Timuclaude Adds That No Coding Agent Has:
+### What Temuclaude Adds That No Coding Agent Has:
 - Multi-model Fusion panel (5 models in parallel)
 - Structured analysis (consensus/contradictions/insights/blind_spots)
 - Self-consistency voting (+10-20% on math)
@@ -364,4 +364,4 @@ OPENAI_API_KEY=unused OPENAI_BASE_URL=http://timuclaude:8080/v1 [any tool]
 - Session search for past successful strategies
 - $20-100/mo flat cost (vs per-query everywhere else)
 
-**Timuclaude is not a coding agent. Timuclaude is the multi-model brain that powers coding agents.**
+**Temuclaude is not a coding agent. Temuclaude is the multi-model brain that powers coding agents.**

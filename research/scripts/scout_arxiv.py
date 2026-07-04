@@ -67,7 +67,7 @@ def search_arxiv(query, max_results=10):
     })
     url = f"{ARXIV_API}?{params}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Timuclaude-Research/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "Temuclaude-Research/1.0"})
         with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx) as resp:
             xml_data = resp.read().decode("utf-8")
     except Exception as e:

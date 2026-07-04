@@ -1,1 +1,4 @@
 .vercel
+.env
+timuclaude-db.json
+*.db

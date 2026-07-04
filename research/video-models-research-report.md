@@ -1,7 +1,7 @@
 # Video Generation Models — Comprehensive API Research Report
 
 **Research Date:** July 3, 2026  
-**Purpose:** Models for the timuclaude LLM orchestration system — finding API-accessible and self-hostable video models that can compete with frontier models (Sora 2, Veo 3, Runway Gen-4, Kling 2.5) individually, and beat them through orchestration.
+**Purpose:** Models for the temuclaude LLM orchestration system — finding API-accessible and self-hostable video models that can compete with frontier models (Sora 2, Veo 3, Runway Gen-4, Kling 2.5) individually, and beat them through orchestration.
 
 ---
 
@@ -504,7 +504,7 @@ Replicate charges per-second of GPU compute time. Typical costs:
 
 ---
 
-## 9. ORCHESTRATION STRATEGY FOR TIMUCLAUDE
+## 9. ORCHESTRATION STRATEGY FOR TEMUCLAUDE
 
 ### Recommended Multi-Model Orchestration Approach
 

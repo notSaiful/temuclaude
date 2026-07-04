@@ -17,7 +17,7 @@
   - Qwen2.5-Math-7B: 58.8% → 90.0% on MATH benchmark (+31.2%)
   - Phi3-mini-3.8B: 41.4% → 86.4% on MATH (+45%)
   - Surpasses o1-preview by +4.5% on MATH, +0.9% on AIME
-- INTEGRATION: HIGH PRIORITY — MCTS + PPM is the architecture Timuclaude already planned
+- INTEGRATION: HIGH PRIORITY — MCTS + PPM is the architecture Temuclaude already planned
 
 ### RAP (Reasoning via Planning) — arXiv:2305.14992
 - LLM serves as both world model AND reasoning agent; MCTS explores reasoning tree
@@ -72,7 +72,7 @@ Key: Use code execution to verify intermediate math steps
 - Z3 SMT solver for ground-truth verification of logical reasoning
 - Z3-verified labels critical for training consistency-aware PRMs
 
-### PRM Integration for Timuclaude:
+### PRM Integration for Temuclaude:
 - Option A (Simple): LLM-as-verifier scores each step 0-1, add to self-QA gate
 - Option B (Advanced): Train small PRM (1.5B) on OmegaPRM-style auto-generated data via DPO
 - Option C (Hybrid): Code execution for math/code steps + LLM verifier for text reasoning
@@ -140,7 +140,7 @@ Key: Use code execution to verify intermediate math steps
 
 ## 5. VERIFICATION & SELF-CHECKING
 
-### Multi-Layer Verification Strategy for Timuclaude:
+### Multi-Layer Verification Strategy for Temuclaude:
 - Layer 1: Code execution (already implemented) — execute generated code, check output
 - Layer 2: Step-level PRM verification — score each reasoning step 0-1, flag low-scoring steps
 - Layer 3: Cross-model verification — Model A generates, Model B verifies (different families)
@@ -177,7 +177,7 @@ Key: Use code execution to verify intermediate math steps
 
 ---
 
-## PRIORITY RECOMMENDATIONS FOR TIMUCLAUDE
+## PRIORITY RECOMMENDATIONS FOR TEMUCLAUDE
 
 ### Tier 1: Immediate High-Impact (Low Effort)
 1. PRM-Weighted Self-Consistency — replace majority vote with PRM-weighted vote (~50 LOC, +10-18% math)

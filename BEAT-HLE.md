@@ -187,4 +187,4 @@ The Mismanaged Geniuses Hypothesis applies here too. Our models have the knowled
 
 **9 out of 9. We beat frontier on every benchmark.**
 
-Bismillah. We build Timuclaude.
+Bismillah. We build Temuclaude.

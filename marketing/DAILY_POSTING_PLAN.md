@@ -1,4 +1,4 @@
-# TIMUCLAUDE — DAILY POSTING PLAN
+# TEMUCLAUDE — DAILY POSTING PLAN
 ## Based on X/Twitter Algorithm Research (2025-2026)
 
 ---
@@ -36,7 +36,7 @@ FIX: Get X Premium ASAP. It's the single highest-ROI investment.
 ### 7. VIDEO GETS 10x ENGAGEMENT
 Native video gets ~10x the engagement of text-only posts. 4 out of 5 user sessions include video.
 
-FIX: Prioritize video content — screen recordings of Timuclaude in action.
+FIX: Prioritize video content — screen recordings of Temuclaude in action.
 
 ---
 
@@ -138,7 +138,7 @@ Key insight: A single good reply that starts a conversation is worth 75 likes. 1
 
 1. SLOW DOWN: Stop posting for today. We've posted 6 tweets already. Any more risks a shadowban.
 2. GET X PREMIUM: $8/month. Single highest-ROI investment. Goes from <100 to 1,550+ impressions per post.
-3. SET BIO: "Building Timuclaude — open-source LLM orchestration that beats frontier models. Multi-model fusion. Free with Ollama."
+3. SET BIO: "Building Temuclaude — open-source LLM orchestration that beats frontier models. Multi-model fusion. Free with Ollama."
 4. START REPLYING: Tomorrow, spend 30 minutes replying to 10-15 AI/tech accounts with genuine, valuable replies.
 5. STOP PUTTING LINKS IN TWEETS: Post content first, link in reply.
 6. USE LONG-FORM: Instead of 7-tweet threads, use single long-form posts.
@@ -155,7 +155,7 @@ Based on research, these content types perform best for AI/tech:
 2. CONTRARIAN TAKES WITH REASONING: Real opinions with explained thinking. NOT rage-bait — algorithm throttles negative/combative content.
 3. BUILD-IN-PUBLIC: Real experiments, failures, milestones. "I tested 3 AI models, here's what happened" >> "5 tips for AI."
 4. BOOKMARKABLE CONTENT: Frameworks, step-by-step processes, resource lists, cheat sheets. These get 10x the algorithm weight of likes.
-5. VIDEO DEMOS: 10x engagement of text-only. Screen recordings of Timuclaude in action.
+5. VIDEO DEMOS: 10x engagement of text-only. Screen recordings of Temuclaude in action.
 6. LONG-FORM ANALYSIS: Single posts, NOT threads. 40-60% more impressions since Jan 2026.
 
 ---

@@ -1,7 +1,7 @@
 # Text-to-Image API Models — Comprehensive Research Report
 
 **Date:** July 3, 2026
-**Purpose:** Find the best, cheapest, highest-quality text-to-image models available via API for the timuclaude LLM orchestration system.
+**Purpose:** Find the best, cheapest, highest-quality text-to-image models available via API for the temuclaude LLM orchestration system.
 
 ---
 
@@ -408,7 +408,7 @@ Replicate charges per-second of GPU compute. Key text-to-image models:
 
 ---
 
-## RECOMMENDATIONS FOR THE TIMUCLAUDE ORCHESTRATION SYSTEM
+## RECOMMENDATIONS FOR THE TEMUCLAUDE ORCHESTRATION SYSTEM
 
 ### Tier 1: Production Default (Best Quality-Per-Dollar)
 **Use these for 80% of image generation requests:**

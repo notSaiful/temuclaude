@@ -1,5 +1,5 @@
 """
-Timuclaude Multi-Agent Debate Module
+Temuclaude Multi-Agent Debate Module
 Selective debate: only triggers when self-QA fails after retry.
 
 Based on:
@@ -11,7 +11,7 @@ Based on:
 Key design decisions:
 1. Only trigger after self-QA fails (not default path)
 2. Limit to 2-3 rounds to control cost
-3. Use timuclaude's model diversity as anti-echo-chamber advantage
+3. Use temuclaude's model diversity as anti-echo-chamber advantage
 4. Final answer via weighted consensus, not unanimous agreement
 """
 import asyncio

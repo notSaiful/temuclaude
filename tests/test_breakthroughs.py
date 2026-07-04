@@ -1,5 +1,5 @@
 """
-Timuclaude — Breakthrough Verification Test Suite
+Temuclaude — Breakthrough Verification Test Suite
 Tests that each implemented research breakthrough ACTUALLY works.
 Run: python tests/test_breakthroughs.py
 """
@@ -24,7 +24,7 @@ from src.fusion import (
     fuse, get_panel, get_aggregator, build_fusion_prompt,
     build_cross_review_prompt, DEFAULT_MOA_LAYERS, DEFAULT_PANEL_SIZE
 )
-from src.orchestrator import Timuclaude
+from src.orchestrator import Temuclaude
 
 
 # ============================================================
@@ -205,10 +205,10 @@ def test_self_moa() -> bool:
     """Test Self-MoA mode function exists and is callable."""
     print("\n=== SELF-MoA MODE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     
     # Function should exist
-    assert hasattr(tc, "should_use_self_moA"), "Timuclaude should have should_use_self_moA method"
+    assert hasattr(tc, "should_use_self_moA"), "Temuclaude should have should_use_self_moA method"
     
     # Test that Self-MoA returns True for trivial/medium, False for hard
     assert tc.should_use_self_moA("math", "trivial") == True, "Self-MoA should be True for trivial"
@@ -227,7 +227,7 @@ def test_atts_adaptive_compute() -> bool:
     """Test that adaptive token budgets are correct per tier."""
     print("\n=== ATTS ADAPTIVE COMPUTE TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     
     # Test token budgets
     trivial_budget = tc.get_adaptive_token_budget("trivial")
@@ -262,7 +262,7 @@ def test_unified_routing() -> bool:
     """Test that the orchestrator uses adaptive tokens and PRM in complete()."""
     print("\n=== UNIFIED ROUTING + CASCADING TESTS ===")
     
-    tc = Timuclaude()
+    tc = Temuclaude()
     
     # Verify the methods exist
     assert hasattr(tc, "get_adaptive_token_budget"), "Should have adaptive token budget method"
@@ -293,7 +293,7 @@ def test_unified_routing() -> bool:
 # ============================================================
 def main():
     print("=" * 60)
-    print("TIMUCLAUDE — BREAKTHROUGH VERIFICATION TEST SUITE")
+    print("TEMUCLAUDE — BREAKTHROUGH VERIFICATION TEST SUITE")
     print("Verifies that each implemented research breakthrough ACTUALLY works")
     print("=" * 60)
     

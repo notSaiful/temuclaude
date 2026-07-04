@@ -16,26 +16,26 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://timuclaude.com'),
-  title: 'Timuclaude — Open-Source LLM Orchestration | Beat Frontier Models',
-  description: 'One question. Many minds. One superior answer. Timuclaude orchestrates 5 AI models to beat frontier models at 28x lower cost. Try it free in the playground. Open source. MIT licensed.',
-  keywords: ['LLM orchestration', 'multi-model AI', 'AI playground', 'model comparison', 'open source AI'],
+  metadataBase: new URL('https://temuclaude.com'),
+  title: 'Temuclaude — Open-Source LLM Orchestration | Beat Frontier Models',
+  description: 'One question. Many minds. One superior answer. Temuclaude orchestrates 5 AI models to beat frontier models at 5x lower cost. Try it free in the playground.',
+  keywords: ['LLM orchestration', 'multi-model AI', 'AI playground', 'model comparison', 'frontier AI'],
   authors: [{ name: 'Mohammad Saiful Haque' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'Timuclaude — Open-Source LLM Orchestration',
+    title: 'Temuclaude — Open-Source LLM Orchestration',
     description: 'One question. Many minds. One superior answer. 28x cheaper than frontier models.',
     type: 'website',
-    url: 'https://timuclaude.com',
-    siteName: 'Timuclaude',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Timuclaude playground interface' }],
+    url: 'https://temuclaude.com',
+    siteName: 'Temuclaude',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Temuclaude playground interface' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Timuclaude — Open-Source LLM Orchestration',
+    title: 'Temuclaude — Open-Source LLM Orchestration',
     description: 'One question. Many minds. One superior answer. 28x cheaper than frontier models.',
     images: ['/og-image.png'],
-    site: '@timuclaude',
+    site: '@temuclaude',
   },
   robots: { index: true, follow: true },
 };
@@ -43,12 +43,12 @@ export const metadata: Metadata = {
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Timuclaude',
+  name: 'Temuclaude',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   description: 'Multi-model AI orchestration platform that beats frontier models at 28x lower cost.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  url: 'https://timuclaude.com',
+  url: 'https://temuclaude.com',
 };
 
 export default function RootLayout({

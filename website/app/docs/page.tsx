@@ -4,7 +4,7 @@ const sections = [
   { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
   { title: 'Features', items: ['10-Layer Orchestration', 'Web Search', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'USVA 4-Rubric QA', 'Reflexion Memory', 'Skills Auto-Loading', 'Adaptive Routing', 'Self-MoA'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
-  { title: 'Self-Hosting', items: ['Docker', 'Fly.io', 'Environment Variables'] },
+  { title: 'API Reference', items: ['Authentication', 'Rate Limits', 'Streaming', 'Error Codes'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data'] },
 ];
 
@@ -59,23 +59,23 @@ export default function DocsPage() {
             </nav>
 
             <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Documentation</h1>
-            <p className="text-text-secondary mb-12">Everything you need to use Timuclaude — the open-source model that beats frontier AI at 20x lower cost.</p>
+            <p className="text-text-secondary mb-12">Everything you need to use Temuclaude — the AI model that beats frontier AI at 5x lower cost.</p>
 
             {/* === OVERVIEW === */}
 
             <section id="quickstart" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Quickstart</h2>
-              <p className="text-text-secondary mb-4">Get started with Timuclaude in under 5 minutes.</p>
+              <p className="text-text-secondary mb-4">Get started with Temuclaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
               <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — ask anything, get a superior answer. No signup, no setup.</p>
               <p className="text-sm text-text-secondary mb-2">Option 2 — Install locally:</p>
-              <CodeBlock lang="bash" code={`pip install timuclaude\ntimuclaude --start`} />
-              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as self-hosting.</Callout>
+              <CodeBlock lang="bash" code={`pip install temuclaude\ntemuclaude --start`} />
+              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API.</Callout>
             </section>
 
             <section id="architecture" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Architecture</h2>
-              <p className="text-text-secondary mb-4">Timuclaude is one model that orchestrates 5 AI models behind the scenes. When you ask a question, it:</p>
+              <p className="text-text-secondary mb-4">Temuclaude is one model that orchestrates 5 AI models behind the scenes. When you ask a question, it:</p>
               <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li><strong className="text-text-primary">Classifies</strong> your query (math, coding, reasoning, knowledge, creative)</li>
                 <li><strong className="text-text-primary">Estimates difficulty</strong> (trivial, medium, hard)</li>
@@ -88,12 +88,12 @@ export default function DocsPage() {
                 </li>
                 <li><strong className="text-text-primary">Returns</strong> one clean answer — orchestration is invisible</li>
               </ol>
-              <Callout type="note">All of this happens server-side. The user never picks models, modes, or parameters. They just ask Timuclaude.</Callout>
+              <Callout type="note">All of this happens server-side. The user never picks models, modes, or parameters. They just ask Temuclaude.</Callout>
             </section>
 
             <section id="model-pool" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Model Pool</h2>
-              <p className="text-text-secondary mb-4">Timuclaude uses 5 models, each with a specific role:</p>
+              <p className="text-text-secondary mb-4">Temuclaude uses 5 models, each with a specific role:</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
@@ -118,7 +118,7 @@ export default function DocsPage() {
 
             <section id="10-layer-orchestration" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Orchestration</h2>
-              <p className="text-text-secondary mb-4">Timuclaude's breakthrough stack combines 10 proven techniques from published AI research. Each technique is independently validated:</p>
+              <p className="text-text-secondary mb-4">Temuclaude's breakthrough stack combines 10 proven techniques from published AI research. Each technique is independently validated:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li><strong className="text-text-primary">Adaptive Routing</strong> — ATTS framework, difficulty estimation (28% token savings)</li>
                 <li><strong className="text-text-primary">Web Search</strong> — DuckDuckGo integration for knowledge questions (free, unlimited, +10-25% on HLE)</li>
@@ -136,7 +136,7 @@ export default function DocsPage() {
 
             <section id="web-search" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Web Search</h2>
-              <p className="text-text-secondary mb-4">For knowledge and reasoning questions, Timuclaude searches the web before generating an answer:</p>
+              <p className="text-text-secondary mb-4">For knowledge and reasoning questions, Temuclaude searches the web before generating an answer:</p>
               <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li>Query classified as knowledge/reasoning/creative</li>
                 <li>DuckDuckGo searched (free, unlimited, no API key)</li>
@@ -144,12 +144,12 @@ export default function DocsPage() {
                 <li>Search context appended to the user's question</li>
                 <li>All 3 fusion models receive the search context</li>
               </ol>
-              <Callout type="tip">Web search is proven to add +10-25% on knowledge-intensive benchmarks like HLE. Neither Fable 5 nor Fugu Ultra use web search. This is a pure advantage for Timuclaude.</Callout>
+              <Callout type="tip">Web search is proven to add +10-25% on knowledge-intensive benchmarks like HLE. Neither Fable 5 nor Fugu Ultra use web search. This is a pure advantage for Temuclaude.</Callout>
             </section>
 
             <section id="moa-3-layer-fusion" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">MoA 3-Layer Fusion</h2>
-              <p className="text-text-secondary mb-4">For hard queries, Timuclaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
+              <p className="text-text-secondary mb-4">For hard queries, Temuclaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
               <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
   GLM-5.2 → response A
   DeepSeek V4 Pro → response B
@@ -168,7 +168,7 @@ Layer 3: Aggregation
 
             <section id="self-consistency" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-Consistency</h2>
-              <p className="text-text-secondary mb-4">For math and reasoning questions, Timuclaude runs the fusion pipeline multiple times and votes:</p>
+              <p className="text-text-secondary mb-4">For math and reasoning questions, Temuclaude runs the fusion pipeline multiple times and votes:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math questions: 3 samples (adaptive N based on difficulty)</li>
                 <li>Reasoning: 2 samples</li>
@@ -180,31 +180,31 @@ Layer 3: Aggregation
 
             <section id="code-verification" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Code Verification</h2>
-              <p className="text-text-secondary mb-4">For math and coding questions, Timuclaude extracts code from the answer and verifies it:</p>
+              <p className="text-text-secondary mb-4">For math and coding questions, Temuclaude extracts code from the answer and verifies it:</p>
               <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li>Extract code blocks from the answer</li>
                 <li>Send to Nemotron for code review (PASS/FAIL)</li>
                 <li>If FAIL → trigger Reflexion: generate feedback, retry with feedback</li>
                 <li>If PASS → answer is verified</li>
               </ol>
-              <Callout type="note">Code execution is ground truth — no hallucination in computation. This is why Timuclaude beats Fable 5 on Terminal-Bench (92-97% vs 85%).</Callout>
+              <Callout type="note">Code execution is ground truth — no hallucination in computation. This is why Temuclaude beats Fable 5 on Terminal-Bench (92-97% vs 85%).</Callout>
             </section>
 
             <section id="usva-4-rubric-qa" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">USVA 4-Rubric QA</h2>
-              <p className="text-text-secondary mb-4">Instead of a single 0-10 score, Timuclaude's QA gate evaluates answers on 4 dimensions:</p>
+              <p className="text-text-secondary mb-4">Instead of a single 0-10 score, Temuclaude's QA gate evaluates answers on 4 dimensions:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li><strong className="text-text-primary">LC</strong> — Logical Coherence (does the reasoning make sense?)</li>
                 <li><strong className="text-text-primary">FC</strong> — Factual Correctness (are the facts right?)</li>
                 <li><strong className="text-text-primary">CM</strong> — Completeness (is the answer complete?)</li>
                 <li><strong className="text-text-primary">GA</strong> — Goal Alignment (does it answer what was asked?)</li>
               </ul>
-              <p className="text-sm text-text-secondary mb-4">Score v ∈ [0, 1]. If v &lt; 0.80, Timuclaude retries with Reflexion feedback — up to 2 times.</p>
+              <p className="text-sm text-text-secondary mb-4">Score v ∈ [0, 1]. If v &lt; 0.80, Temuclaude retries with Reflexion feedback — up to 2 times.</p>
             </section>
 
             <section id="reflexion-memory" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reflexion Memory</h2>
-              <p className="text-text-secondary mb-4">When the QA gate fails or code verification fails, Timuclaude doesn't just retry blindly. It generates a verbal reflection:</p>
+              <p className="text-text-secondary mb-4">When the QA gate fails or code verification fails, Temuclaude doesn't just retry blindly. It generates a verbal reflection:</p>
               <CodeBlock lang="text" code={`1. QA gate fails (score < 0.80)
 2. Nemotron generates reflection:
    "The answer has a logical error in step 3.
@@ -218,7 +218,7 @@ Layer 3: Aggregation
 
             <section id="skills-auto-loading" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Skills Auto-Loading</h2>
-              <p className="text-text-secondary mb-4">Timuclaude automatically loads domain-specific skills based on the query type:</p>
+              <p className="text-text-secondary mb-4">Temuclaude automatically loads domain-specific skills based on the query type:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math questions → reasoning patterns, proof techniques</li>
                 <li>Coding questions → test-driven development, codebase inspection, debugging patterns</li>
@@ -231,7 +231,7 @@ Layer 3: Aggregation
 
             <section id="adaptive-routing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Adaptive Routing</h2>
-              <p className="text-text-secondary mb-4">Timuclaude uses the ATTS (Adaptive Test-Time Scaling) framework to estimate query difficulty:</p>
+              <p className="text-text-secondary mb-4">Temuclaude uses the ATTS (Adaptive Test-Time Scaling) framework to estimate query difficulty:</p>
               <CodeBlock lang="text" code={`Difficulty estimation:
   Word count → 0-5 points
   Task type (math/reasoning/coding) → +2 points
@@ -247,7 +247,7 @@ Routing:
 
             <section id="self-moa" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-MoA</h2>
-              <p className="text-text-secondary mb-4">When one model clearly dominates a task type, Timuclaude samples it N times instead of running the full 3-model panel:</p>
+              <p className="text-text-secondary mb-4">When one model clearly dominates a task type, Temuclaude samples it N times instead of running the full 3-model panel:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math → DeepSeek V4 Pro × 3 (instead of 3 different models)</li>
                 <li>Knowledge → GLM-5.2 × 3</li>
@@ -260,7 +260,7 @@ Routing:
 
             <section id="methodology" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Methodology</h2>
-              <p className="text-text-secondary mb-4">Timuclaude's benchmark scores are projected from:</p>
+              <p className="text-text-secondary mb-4">Temuclaude's benchmark scores are projected from:</p>
               <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li>Individual model scores from ArtificialAnalysis Intelligence Index v4.1</li>
                 <li>Proven improvement numbers from published research papers</li>
@@ -273,18 +273,18 @@ Routing:
             <section id="reproducibility" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reproducibility</h2>
               <p className="text-text-secondary mb-4">Full benchmark scripts are available on GitHub. Run them yourself:</p>
-              <CodeBlock lang="bash" code={`# Clone the repo\ngit clone https://github.com/notSaiful/timuclaude-research.git\ncd timuclaude-research\n\n# Install dependencies\npip install -r requirements.txt\n\n# Run Timuclaude on HLE benchmark\npython benchmarks/run_timuclaude.py --dataset hle --sample 100\n\n# Run Timuclaude on GPQA Diamond\npython benchmarks/run_timuclaude.py --dataset gpqa --sample 100\n\n# Compare against single model baseline\npython benchmarks/run_baseline.py --model glm-5.2 --dataset hle --sample 100`} />
-              <p className="text-sm text-text-secondary"><a href="https://github.com/notSaiful/timuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">View full results on GitHub →</a></p>
+              <CodeBlock lang="bash" code={`# Clone the repo\ngit clone https://github.com/notSaiful/temuclaude-research.git\ncd temuclaude-research\n\n# Install dependencies\npip install -r requirements.txt\n\n# Run Temuclaude on HLE benchmark\npython benchmarks/run_temuclaude.py --dataset hle --sample 100\n\n# Run Temuclaude on GPQA Diamond\npython benchmarks/run_temuclaude.py --dataset gpqa --sample 100\n\n# Compare against single model baseline\npython benchmarks/run_baseline.py --model glm-5.2 --dataset hle --sample 100`} />
+              <p className="text-sm text-text-secondary"><a href="https://github.com/notSaiful/temuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">View full results on GitHub →</a></p>
             </section>
 
             <section id="projected-scores" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Projected Scores</h2>
-              <p className="text-text-secondary mb-4">Timuclaude vs frontier models across 9 benchmarks:</p>
+              <p className="text-text-secondary mb-4">Temuclaude vs frontier models across 9 benchmarks:</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Benchmark</th>
-                    <th className="text-center py-2 px-3 font-semibold text-accent-primary">Timuclaude</th>
+                    <th className="text-center py-2 px-3 font-semibold text-accent-primary">Temuclaude</th>
                     <th className="text-center py-2 px-3 font-semibold text-text-muted">Fable 5</th>
                     <th className="text-center py-2 px-3 font-semibold text-text-muted">GPT-5.5</th>
                   </tr></thead>
@@ -308,20 +308,20 @@ Routing:
 
             <section id="docker" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Docker</h2>
-              <p className="text-text-secondary mb-4">Run Timuclaude with Docker:</p>
-              <CodeBlock lang="bash" code={`# Build the image\ndocker build -t timuclaude .\n\n# Run on port 8000\ndocker run -p 8000:8000 -e OPENROUTER_API_KEY=your-key timuclaude\n\n# Or with Ollama backend\ndocker run -p 8000:8000 -e OLLAMA_API_BASE=http://host.docker.internal:11434 timuclaude`} />
+              <p className="text-text-secondary mb-4">Run Temuclaude with Docker:</p>
+              <CodeBlock lang="bash" code={`# Build the image\ndocker build -t temuclaude .\n\n# Run on port 8000\ndocker run -p 8000:8000 -e OPENROUTER_API_KEY=your-key temuclaude\n\n# Or with Ollama backend\ndocker run -p 8000:8000 -e OLLAMA_API_BASE=http://host.docker.internal:11434 temuclaude`} />
             </section>
 
             <section id="fly.io" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Fly.io</h2>
               <p className="text-text-secondary mb-4">Deploy to Fly.io (Mumbai region for lowest latency to India):</p>
-              <CodeBlock lang="bash" code={`# Install flyctl\ncurl -L https://fly.io/install.sh | sh\n\n# Login and create app\nfly auth login\nfly launch --image timuclaude\n\n# Deploy\nfly deploy\n\n# Set secrets\nfly secrets set OPENROUTER_API_KEY=your-key`} />
-              <Callout type="tip">Fly.io's Mumbai region gives ~20ms latency to India. Perfect for Timuclaude's target audience.</Callout>
+              <CodeBlock lang="bash" code={`# Install flyctl\ncurl -L https://fly.io/install.sh | sh\n\n# Login and create app\nfly auth login\nfly launch --image temuclaude\n\n# Deploy\nfly deploy\n\n# Set secrets\nfly secrets set OPENROUTER_API_KEY=your-key`} />
+              <Callout type="tip">Fly.io's Mumbai region gives ~20ms latency to India. Perfect for Temuclaude's target audience.</Callout>
             </section>
 
             <section id="environment-variables" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Environment Variables</h2>
-              <p className="text-text-secondary mb-4">Timuclaude needs these environment variables:</p>
+              <p className="text-text-secondary mb-4">Temuclaude needs these environment variables:</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
@@ -331,8 +331,8 @@ Routing:
                   </tr></thead>
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">OPENROUTER_API_KEY</td><td className="py-2 px-3 text-text-secondary">Yes</td><td className="py-2 px-3 text-text-secondary">OpenRouter API key for model access</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TIMUCLAUDE_API_URL</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">URL of Python orchestrator (if self-hosting)</td></tr>
-                    <tr><td className="py-2 px-3 font-mono text-text-primary">TIMUCLAUDE_MASTER_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Master key for API authentication</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_API_URL</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">URL of Python orchestrator (if self-hosting)</td></tr>
+                    <tr><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MASTER_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Master key for API authentication</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -342,13 +342,13 @@ Routing:
 
             <section id="rest-api" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">REST API</h2>
-              <p className="text-text-secondary mb-4">Timuclaude exposes a single endpoint:</p>
+              <p className="text-text-secondary mb-4">Temuclaude exposes a single endpoint:</p>
               <CodeBlock lang="bash" code={`POST /api/chat\n\nRequest:\n{\n  "messages": [\n    {"role": "user", "content": "What is 9.9 vs 9.11?"}\n  ]\n}\n\nResponse: SSE stream\n  data: {"chunk": "9.9"}\n  data: {"chunk": " is"}\n  data: {"chunk": " larger"}\n  ...\n  data: {"orchestration": {...}}\n  data: [DONE]`} />
             </section>
 
             <section id="streaming" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Streaming</h2>
-              <p className="text-text-secondary mb-4">Timuclaude uses Server-Sent Events (SSE) for streaming responses:</p>
+              <p className="text-text-secondary mb-4">Temuclaude uses Server-Sent Events (SSE) for streaming responses:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li><strong className="text-text-primary">POST</strong> request with messages array</li>
                 <li><strong className="text-text-primary">SSE response</strong> — chunks stream as <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">data: {"{chunk}"}</code></li>
@@ -362,10 +362,10 @@ Routing:
               <h2 className="text-xl font-semibold text-text-primary mb-3">Orchestration Data</h2>
               <p className="text-text-secondary mb-4">The final SSE event contains orchestration metadata:</p>
               <CodeBlock lang="json" code={`{\n  "orchestration": {\n    "taskType": "math",\n    "tier": "hard",\n    "models": [\n      {"name": "glm-5.2", "response": "...", "latency": 3.2, "correct": true},\n      {"name": "deepseek-v4-pro", "response": "...", "latency": 8.3, "correct": true},\n      {"name": "minimax-m3", "response": "...", "latency": 13.9, "correct": true}\n    ],\n    "aggregator": "glm-5.2",\n    "consensus": 3,\n    "qaScore": 8,\n    "codeVerified": true,\n    "totalLatency": "48.2",\n    "cost": "$0.015",\n    "techniques": ["moa-3-layer", "cross-review", "structured-aggregation", "self-consistency", "prm-weighted-voting", "code-verification", "usva-4-rubric-qa"]\n  }\n}`} />
-              <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which of the 10 layers were activated for this query. This is how Timuclaude is transparent — no black boxes.</Callout>
+              <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which of the 10 layers were activated for this query. This is how Temuclaude is transparent — no black boxes.</Callout>
             </section>
 
-            <p className="text-sm text-text-muted mt-12 mb-6"><a href="https://github.com/notSaiful/timuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Edit this page on GitHub →</a></p>
+            <p className="text-sm text-text-muted mt-12 mb-6"><a href="https://github.com/notSaiful/temuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Edit this page on GitHub →</a></p>
           </div>
         </main>
       </div>

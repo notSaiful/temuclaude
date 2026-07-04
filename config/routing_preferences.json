@@ -403,80 +403,410 @@
       "latency_ms": 3731,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:01:50.461429+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:01:50.462166+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:01:54.417280+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 2464,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:02:48.356304+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3507,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:02:49.803609+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 1444,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:02:53.182862+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3377,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:02:57.133879+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3554,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:06:03.884052+00:00",
+      "query_preview": "Calculate the derivative of f(x) = 3x^4 - 2x^3 + 5x^2 - 7x + 1 and evaluate it at x = 2. Show your work and give the final numerical answer.",
+      "query_length": 140,
+      "query_words": 31,
+      "task_type": "math",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6",
+        "deepseek-v4-pro",
+        "deepseek-v4-pro+consistency_prm(n=10)"
+      ],
+      "strategy": "fusion_3L_MoA(3layers)+prm_consistency(n=10)+usva_qa_passed",
+      "latency_ms": 172550,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:06:13.162511+00:00",
+      "query_preview": "Write a Python function to reverse a string",
+      "query_length": 43,
+      "query_words": 8,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 6800,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:14:42.502776+00:00",
+      "query_preview": "What is the capital of France?",
+      "query_length": 30,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 1126,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:14:51.425646+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:14:51.426414+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:14:53.694412+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 1259,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:15:35.284057+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 1961,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:15:36.980008+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 1691,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:15:38.461168+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 1479,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:15:40.204139+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 1343,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:27:38.595587+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:27:38.596483+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-04T03:27:47.287158+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 2346,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 5,
-      "successes": 5,
+      "count": 8,
+      "successes": 8,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 2500,
+      "total_latency": 4000,
       "models": {
-        "gpt-oss-120b": 5
+        "gpt-oss-120b": 8
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 5,
-      "successes": 5,
+      "count": 8,
+      "successes": 8,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 75000,
+      "total_latency": 120000,
       "models": {
-        "deepseek-v4-pro": 5,
-        "glm-5.2": 5,
-        "kimi-k2.6": 5
+        "deepseek-v4-pro": 8,
+        "glm-5.2": 8,
+        "kimi-k2.6": 8
       },
       "best_model": "deepseek-v4-pro"
     },
     "knowledge_trivial": {
-      "count": 4,
-      "successes": 4,
+      "count": 10,
+      "successes": 10,
       "failures": 0,
-      "avg_latency": 1507.75,
-      "total_latency": 6031,
+      "avg_latency": 1636.1,
+      "total_latency": 16361,
       "models": {
-        "gpt-oss-120b": 4
+        "gpt-oss-120b": 10
       },
       "best_model": "gpt-oss-120b"
     },
     "math_medium": {
-      "count": 4,
-      "successes": 4,
+      "count": 8,
+      "successes": 8,
       "failures": 0,
-      "avg_latency": 2150.75,
-      "total_latency": 8603,
+      "avg_latency": 2371.0,
+      "total_latency": 18968,
       "models": {
-        "deepseek-v4-pro": 4
+        "deepseek-v4-pro": 8
       },
       "best_model": "deepseek-v4-pro"
     },
     "coding_medium": {
-      "count": 4,
-      "successes": 4,
+      "count": 7,
+      "successes": 7,
       "failures": 0,
-      "avg_latency": 2754.25,
-      "total_latency": 11017,
+      "avg_latency": 3239.0,
+      "total_latency": 22673,
       "models": {
-        "deepseek-v4-pro": 4
+        "deepseek-v4-pro": 7
       },
       "best_model": "deepseek-v4-pro"
     },
     "math_hard": {
-      "count": 2,
-      "successes": 2,
+      "count": 3,
+      "successes": 3,
       "failures": 0,
-      "avg_latency": 153960.0,
-      "total_latency": 307920,
+      "avg_latency": 160156.66666666666,
+      "total_latency": 480470,
       "models": {
-        "deepseek-v4-pro": 8,
-        "glm-5.2": 2,
-        "kimi-k2.6": 2
+        "deepseek-v4-pro": 11,
+        "glm-5.2": 3,
+        "kimi-k2.6": 3
       },
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 24,
-  "last_updated": "2026-07-03T19:00:40.830487+00:00"
+  "total_records": 44,
+  "last_updated": "2026-07-04T03:27:47.287205+00:00"
 }

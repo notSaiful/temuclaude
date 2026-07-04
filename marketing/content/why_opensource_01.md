@@ -1,7 +1,7 @@
 # WHY OPEN SOURCE — Post 1
 
 ## Tweet
-Why is Timuclaude open-source?
+Why is Temuclaude open-source?
 
 Because AI infrastructure shouldn't be locked behind API keys and credit cards.
 
@@ -9,7 +9,7 @@ Because a student in India shouldn't need OpenAI credits to access world-class A
 
 Because the future of AI should be built by the community, not controlled by 3 companies.
 
-Timuclaude runs on Ollama. Free. Unlimited. Local.
+Temuclaude runs on Ollama. Free. Unlimited. Local.
 
 No API keys. No cloud. No bills.
 

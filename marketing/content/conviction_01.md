@@ -13,7 +13,7 @@ Every model has different strengths. Different weaknesses. Different blind spots
 
 Fusion doesn't pick a winner. It makes them all winners.
 
-Timuclaude is proof: 3 models working together beat any 1 model alone.
+Temuclaude is proof: 3 models working together beat any 1 model alone.
 
 The future isn't one model. It's orchestration.
 
