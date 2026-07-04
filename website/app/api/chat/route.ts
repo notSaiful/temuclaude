@@ -15,9 +15,12 @@ const POOL = {
   multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal, cheaper than Flash, image+video
   specialist: 'google/gemini-3-flash-preview', // IQ 50 — #1 Legal, #2 Health, multimodal
   vision: 'minimax/minimax-m3',            // IQ 44 — best vision + creative + generation
-  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — beats Fable 5 on hard queries (used for hardest 5%)
+  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — beats Fable 5 on hard queries (used for hardest 2%)
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free', // Free — QA gate + verification
 };
+
+// System prompt to force English responses
+const ENGLISH_SYSTEM = { role: 'system', content: 'You are Temuclaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' };
 
 type ModelResult = { name: string; content: string; latency: number; ok: boolean };
 type OrchestrationData = {
@@ -332,6 +335,8 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
 async function callModel(model: string, messages: any[]): Promise<ModelResult> {
   const start = Date.now();
   try {
+    // Prepend English system prompt to ensure English responses
+    const messagesWithSystem = [ENGLISH_SYSTEM, ...messages];
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
       headers: {
@@ -341,7 +346,7 @@ async function callModel(model: string, messages: any[]): Promise<ModelResult> {
         'X-Title': 'Temuclaude',
       },
       body: JSON.stringify({
-        model, messages: messages.map(m => ({ role: m.role, content: m.content })),
+        model, messages: messagesWithSystem.map(m => ({ role: m.role, content: m.content })),
         stream: false, max_tokens: 2000,
       }),
       signal: AbortSignal.timeout(50000),
