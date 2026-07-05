@@ -733,6 +733,358 @@
       "latency_ms": 2346,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:51:53.159774+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 3376,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:52:35.463333+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3668,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:52:38.860343+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 3393,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:52:42.190415+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3325,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:52:45.670462+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3140,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T10:53:19.767219+00:00",
+      "query_preview": "Write a Python function to reverse a string",
+      "query_length": 43,
+      "query_words": 8,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 6569,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:04:38.045868+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 3979,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:05:20.388383+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 4079,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:05:24.225858+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 3836,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:05:27.269249+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3042,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:05:31.003818+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3385,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:05:56.702242+00:00",
+      "query_preview": "Write a Python function to reverse a string",
+      "query_length": 43,
+      "query_words": 8,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 5442,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:07:27.567264+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 4025,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:08:10.010615+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3408,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:08:14.416653+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 4404,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:08:17.707993+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3287,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:08:21.309563+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3278,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:10:52.057012+00:00",
+      "query_preview": "",
+      "query_length": 0,
+      "query_words": 0,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 4058,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:11:33.743553+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3555,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:11:37.743149+00:00",
+      "query_preview": "What is the capital of Japan?",
+      "query_length": 29,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap+skills+adaptive_tokens",
+      "latency_ms": 3997,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:11:41.572932+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3828,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-05T11:11:45.816626+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3941,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
@@ -761,35 +1113,35 @@
       "best_model": "deepseek-v4-pro"
     },
     "knowledge_trivial": {
-      "count": 10,
-      "successes": 10,
+      "count": 18,
+      "successes": 18,
       "failures": 0,
-      "avg_latency": 1636.1,
-      "total_latency": 16361,
+      "avg_latency": 2634.9444444444443,
+      "total_latency": 47429,
       "models": {
-        "gpt-oss-120b": 10
+        "gpt-oss-120b": 18
       },
       "best_model": "gpt-oss-120b"
     },
     "math_medium": {
-      "count": 8,
-      "successes": 8,
+      "count": 16,
+      "successes": 16,
       "failures": 0,
-      "avg_latency": 2371.0,
-      "total_latency": 18968,
+      "avg_latency": 2963.875,
+      "total_latency": 47422,
       "models": {
-        "deepseek-v4-pro": 8
+        "deepseek-v4-pro": 16
       },
       "best_model": "deepseek-v4-pro"
     },
     "coding_medium": {
-      "count": 7,
-      "successes": 7,
+      "count": 13,
+      "successes": 13,
       "failures": 0,
-      "avg_latency": 3239.0,
-      "total_latency": 22673,
+      "avg_latency": 3705.076923076923,
+      "total_latency": 48166,
       "models": {
-        "deepseek-v4-pro": 7
+        "deepseek-v4-pro": 13
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -807,6 +1159,6 @@
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 44,
-  "last_updated": "2026-07-04T03:27:47.287205+00:00"
+  "total_records": 66,
+  "last_updated": "2026-07-05T11:11:45.816645+00:00"
 }

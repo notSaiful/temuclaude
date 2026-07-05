@@ -251,12 +251,277 @@ def get_preference_dataset() -> list:
             "tier": tier,
             "model": rec.get("model", ""),
             "preference": preference,
+            "success": True,  # All records in dataset are successful
             "latency_ms": rec.get("latency_ms", 0),
         })
     
     return dataset
 
 
+# ============================================================
+# ROUTE-LLM STYLE PREFERENCE-DATA TRAINED ROUTER
+# ============================================================
+
+def extract_features(query: str) -> dict:
+    """Extract features from a query for routing classification.
+    
+    Returns a dict of features that can be used to train a classifier.
+    """
+    words = query.lower().split()
+    query_length = len(query)
+    word_count = len(words)
+    
+    # Keyword features (1 if present, 0 otherwise)
+    math_keywords = ["calculate", "solve", "equation", "prove", "integral", "derivative",
+                     "matrix", "theorem", "algebra", "geometry", "probability", "statistics",
+                     "sum", "product", "factor", "prime", "polynomial", "function", "limit",
+                     "series", "differential", "vector", "tensor", "topology", "math"]
+    coding_keywords = ["code", "function", "debug", "python", "javascript", "java", "react",
+                       "typescript", "rust", "golang", "sql", "algorithm", "compile",
+                       "error:", "bug", "docker", "kubernetes", "api", "rest", "graphql"]
+    reasoning_keywords = ["compare", "analyze", "evaluate", "why", "how", "explain",
+                          "trade-off", "tradeoff", "consequence", "implication",
+                          "difference between", "analyze", "evaluate"]
+    knowledge_keywords = ["what is", "who is", "when did", "where is", "history of",
+                          "define", "definition", "meaning of", "capital of",
+                          "largest", "smallest", "tallest"]
+    creative_keywords = ["write a poem", "write a story", "write an essay", "write a blog",
+                         "write a script", "compose", "screenplay", "generate a",
+                         "create a story", "write a song", "write a letter"]
+    agentic_keywords = ["deploy", "setup", "install", "configure", "run", "execute",
+                        "build a", "automate", "pipeline", "workflow"]
+    
+    features = {
+        "query_length": query_length,
+        "word_count": word_count,
+        "has_math_expr": 1 if any(c in query for c in "+-*/^=") and any(c.isdigit() for c in query) else 0,
+        "starts_with_what_is": 1 if query.lower().startswith("what is ") else 0,
+        "starts_with_how": 1 if query.lower().startswith("how ") else 0,
+        "starts_with_why": 1 if query.lower().startswith("why ") else 0,
+    }
+    
+    # Add keyword features
+    for kw in math_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    for kw in coding_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    for kw in reasoning_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    for kw in knowledge_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    for kw in creative_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    for kw in agentic_keywords:
+        features[f"kw_{kw.replace(' ', '_').replace('-', '_')}"] = 1 if kw in query.lower() else 0
+    
+    return features
+
+
+def train_router_model(preference_data: list) -> dict:
+    """Train a simple routing model from preference data.
+    
+    This implements the RouteLLM pattern: learn which queries need strong models
+    vs which can use cheap models based on historical performance data.
+    
+    Uses a simple linear model with gradient descent (no external dependencies).
+    
+    Returns:
+        Dict with model weights and metadata
+    """
+    if not preference_data or len(preference_data) < 10:
+        return {"trained": False, "reason": "insufficient_data", "min_samples": 10}
+    
+    # Build feature matrix and labels
+    # Label: 1 = needs strong model (hard tier success), 0 = weak model suffices (trivial/medium success)
+    X = []  # feature vectors
+    y = []  # labels
+    
+    for rec in preference_data:
+        query = rec.get("query", "")
+        tier = rec.get("tier", "")
+        success = rec.get("success", False)
+        
+        if not success:
+            continue  # Skip failures
+        
+        features = extract_features(query)
+        
+        # Convert features to vector (sorted keys for consistency)
+        feature_keys = sorted(features.keys())
+        feature_vector = [features[k] for k in feature_keys]
+        
+        # Label: 1 if hard tier (needs strong model), 0 if trivial/medium
+        label = 1 if tier == "hard" else 0
+        
+        X.append(feature_vector)
+        y.append(label)
+    
+    if len(X) < 5:
+        return {"trained": False, "reason": "insuccessful_samples", "successful_count": len(X)}
+    
+    # Simple gradient descent for logistic regression
+    import random
+    random.seed(42)
+    
+    n_features = len(X[0])
+    weights = [random.uniform(-0.1, 0.1) for _ in range(n_features)]
+    bias = 0.0
+    
+    learning_rate = 0.01
+    epochs = 1000
+    
+    for epoch in range(epochs):
+        # Forward pass
+        predictions = []
+        for i, x in enumerate(X):
+            z = sum(w * xi for w, xi in zip(weights, x)) + bias
+            # Sigmoid
+            pred = 1 / (1 + pow(2.71828, -z))
+            predictions.append(pred)
+        
+        # Compute gradients
+        dw = [0.0] * n_features
+        db = 0.0
+        
+        for i, x in enumerate(X):
+            error = predictions[i] - y[i]
+            for j in range(n_features):
+                dw[j] += error * x[j]
+            db += error
+        
+        # Update weights
+        for j in range(n_features):
+            weights[j] -= learning_rate * dw[j] / len(X)
+        bias -= learning_rate * db / len(X)
+    
+    # Evaluate training accuracy
+    correct = 0
+    for i, x in enumerate(X):
+        z = sum(w * xi for w, xi in zip(weights, x)) + bias
+        pred = 1 / (1 + pow(2.71828, -z))
+        pred_label = 1 if pred >= 0.5 else 0
+        if pred_label == y[i]:
+            correct += 1
+    
+    accuracy = correct / len(X)
+    
+    # Feature importance (absolute weight values)
+    feature_keys = sorted(extract_features("").keys())
+    feature_importance = {k: abs(w) for k, w in zip(feature_keys, weights)}
+    # Sort by importance
+    feature_importance = dict(sorted(feature_importance.items(), key=lambda x: x[1], reverse=True))
+    
+    return {
+        "trained": True,
+        "weights": weights,
+        "bias": bias,
+        "feature_keys": feature_keys,
+        "accuracy": accuracy,
+        "training_samples": len(X),
+        "feature_importance": feature_importance,
+        "model_type": "logistic_regression",
+    }
+
+
+def predict_strong_model_needed(query: str, trained_model: dict) -> tuple:
+    """Predict whether a query needs a strong model (hard tier) or weak model (trivial/medium).
+    
+    Returns:
+        (needs_strong: bool, confidence: float 0-1)
+    """
+    if not trained_model.get("trained", False):
+        return (False, 0.5)  # Default to weak model if not trained
+    
+    features = extract_features(query)
+    feature_keys = trained_model["feature_keys"]
+    weights = trained_model["weights"]
+    bias = trained_model["bias"]
+    
+    feature_vector = [features.get(k, 0) for k in feature_keys]
+    
+    z = sum(w * xi for w, xi in zip(weights, feature_vector)) + bias
+    prob = 1 / (1 + pow(2.71828, -z))
+    
+    needs_strong = prob >= 0.5
+    confidence = prob if needs_strong else (1 - prob)
+    
+    return (needs_strong, confidence)
+
+
+def get_trained_router() -> dict:
+    """Load or train the router model from preference data."""
+    prefs = load_preferences()
+    dataset = get_preference_dataset()
+    
+    # Try to load cached model
+    model_cache_path = os.path.join(
+        os.path.dirname(PREFS_FILE), "trained_router.json"
+    )
+    
+    if os.path.isfile(model_cache_path):
+        try:
+            with open(model_cache_path) as f:
+                cached = json.load(f)
+            # Check if we have new data since last training
+            if cached.get("training_samples") == len(dataset):
+                return cached
+        except (json.JSONDecodeError, IOError):
+            pass
+    
+    # Train new model
+    model = train_router_model(dataset)
+    
+    if model.get("trained", False):
+        # Cache the model
+        os.makedirs(os.path.dirname(model_cache_path), exist_ok=True)
+        with open(model_cache_path, "w") as f:
+            json.dump(model, f, indent=2)
+    
+    return model
+
+
+def route_with_trained_model(query: str, task_type: str, tier: str) -> tuple:
+    """Route a query using the trained preference-data router.
+    
+    Returns:
+        (model: str, confidence: float, used_trained_router: bool)
+    """
+    # For trivial tier, always use cheap model (no need for router)
+    if tier == "trivial":
+        return ("gpt-oss-120b", 1.0, False)
+    
+    # Get trained router
+    trained_model = get_trained_router()
+    
+    if not trained_model.get("trained", False):
+        # Fall back to default routing
+        return (None, 0.0, False)
+    
+    # Predict if strong model needed
+    needs_strong, confidence = predict_strong_model_needed(query, trained_model)
+    
+    if needs_strong:
+        # Strong model needed - use task-specific specialist
+        from .models import TASK_MODEL_MAP
+        model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
+    else:
+        # Weak model suffices - use cheap model
+        model = "gpt-oss-120b"
+    
+    return (model, confidence, True)
+
+
 if __name__ == "__main__":
     recs = get_routing_recommendations()
     print(json.dumps(recs, indent=2))
+    
+    # Test trained router
+    print("\n=== TRAINED ROUTER ===")
+    model = get_trained_router()
+    print(f"Trained: {model.get('trained')}")
+    if model.get("trained"):
+        print(f"Accuracy: {model.get('accuracy', 0):.2%}")
+        print(f"Training samples: {model.get('training_samples', 0)}")
+        print(f"Top 10 features:")
+        for k, v in list(model.get("feature_importance", {}).items())[:10]:
+            print(f"  {k}: {v:.4f}")

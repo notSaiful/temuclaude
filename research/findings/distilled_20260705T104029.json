@@ -1,0 +1,76 @@
+{
+  "distilled_at": "20260705T104029",
+  "total_raw_files": 2,
+  "total_findings": 2,
+  "new_findings": 2,
+  "already_distilled": 0,
+  "by_type": {
+    "arxiv_paper": 2
+  },
+  "top_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02513v1",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "abstract": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods often following a localize-first, unlearn-second paradigm that targets specific model parameters. However, existing benchmarks evaluate unlearning solely at the output level, leaving open the question of whether unlearning truly erases knowledge from a model's",
+      "authors": [],
+      "published": "2026-07-02T17:59:52Z",
+      "relevance_score": 27,
+      "matched_keywords": [
+        "benchmark",
+        "state-of-the-art",
+        "sota",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02513v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02513v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02517v1",
+      "title": "WorldDirector: Building Controllable World Simulators with Persistent Dynamic Memory",
+      "abstract": "We present WorldDirector, a highly controllable video world model framework designed for persistent dynamic object memory and unrestricted viewpoint exploration. Unlike existing world models that entangle physical dynamics with pixel rendering and rely on continuous visual observation to sustain motion, our framework explicitly decouples semantic motion orchestration from visual generation. By leveraging an LLM to coordinate 3D trajectories with camera movements and subsequently employing these ",
+      "authors": [],
+      "published": "2026-07-02T17:59:59Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "url": "http://arxiv.org/abs/2607.02517v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02517v1"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02513v1",
+      "title": "LACUNA: A Testbed for Evaluating Localization Precision for LLM Unlearning",
+      "abstract": "LLMs memorize sensitive training data, including personally identifiable information (PII), creating a pressing need for reliable post hoc removal methods. Unlearning has emerged as a promising solution, with state-of-the-art(SOTA) methods often following a localize-first, unlearn-second paradigm that targets specific model parameters. However, existing benchmarks evaluate unlearning solely at the output level, leaving open the question of whether unlearning truly erases knowledge from a model's",
+      "authors": [],
+      "published": "2026-07-02T17:59:52Z",
+      "relevance_score": 27,
+      "matched_keywords": [
+        "benchmark",
+        "state-of-the-art",
+        "sota",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02513v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02513v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02517v1",
+      "title": "WorldDirector: Building Controllable World Simulators with Persistent Dynamic Memory",
+      "abstract": "We present WorldDirector, a highly controllable video world model framework designed for persistent dynamic object memory and unrestricted viewpoint exploration. Unlike existing world models that entangle physical dynamics with pixel rendering and rely on continuous visual observation to sustain motion, our framework explicitly decouples semantic motion orchestration from visual generation. By leveraging an LLM to coordinate 3D trajectories with camera movements and subsequently employing these ",
+      "authors": [],
+      "published": "2026-07-02T17:59:59Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "orchestration"
+      ],
+      "url": "http://arxiv.org/abs/2607.02517v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02517v1"
+    }
+  ]
+}

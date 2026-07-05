@@ -1,0 +1,261 @@
+{
+  "marketing_strategy": {
+    "priority_score": 145,
+    "research_needed": "maximum",
+    "reason": "Zero marketing done. No users, no community, no attention.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement"
+  },
+  "mcts_full": {
+    "priority_score": 125,
+    "research_needed": "maximum",
+    "reason": "THE breakthrough (rStar-Math: 58.8%\u219290%). Need implementation details for our model pool.",
+    "blocked_by": "need_code_analysis",
+    "action": "research_and_implement"
+  },
+  "prm_training": {
+    "priority_score": 115,
+    "research_needed": "maximum",
+    "reason": "PRM-weighted voting implemented but no TRAINED PRM. Need auto-data-generation (OmegaPRM).",
+    "blocked_by": "need_training_methodology",
+    "action": "research_and_implement"
+  },
+  "dspy_integration": {
+    "priority_score": 115,
+    "research_needed": "maximum",
+    "reason": "DSPy/MIPROv2 gives 10-50% gains, enables self-improvement. Not integrated.",
+    "blocked_by": "need_framework_understanding",
+    "action": "research_and_implement"
+  },
+  "step_level_code_verification": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "We verify final answers but not intermediate steps. rStar-Math pattern.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement"
+  },
+  "preference_data_router": {
+    "priority_score": 95,
+    "research_needed": "high",
+    "reason": "RouteLLM gives 2x cost reduction with preference-data-trained routing.",
+    "blocked_by": "need_data_collection_method",
+    "action": "research_and_implement"
+  },
+  "pareto_efficiency_tracking": {
+    "priority_score": 50,
+    "research_needed": "low",
+    "reason": "Track token_savings vs accuracy_loss. Auto-tune thresholds.",
+    "blocked_by": null,
+    "action": "implement_now"
+  },
+  "full_mcts_ppm": {
+    "priority_score": 20,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_prm_training",
+    "blocked_by": "needs_prm_training",
+    "action": "track_for_future"
+  },
+  "hermes_self_evolution": {
+    "priority_score": 14,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_dspy_framework",
+    "blocked_by": "needs_dspy_framework",
+    "action": "track_for_future"
+  },
+  "miprov2": {
+    "priority_score": 11,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_dspy_framework",
+    "blocked_by": "needs_dspy_framework",
+    "action": "track_for_future"
+  },
+  "collaborative_parallel_thinking": {
+    "priority_score": 11,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_mcts_first",
+    "blocked_by": "needs_mcts_first",
+    "action": "track_for_future"
+  },
+  "layer_4_compression": {
+    "priority_score": 8,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_context_module",
+    "blocked_by": "needs_context_module",
+    "action": "track_for_future"
+  },
+  "teacher_student_distillation": {
+    "priority_score": 8,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_dspy",
+    "blocked_by": "needs_dspy",
+    "action": "track_for_future"
+  },
+  "vstar_dpo_verifier": {
+    "priority_score": 8,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_training_pipeline",
+    "blocked_by": "needs_training_pipeline",
+    "action": "track_for_future"
+  },
+  "speculative_tool_execution": {
+    "priority_score": 5,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_async_architecture",
+    "blocked_by": "needs_async_architecture",
+    "action": "track_for_future"
+  },
+  "fork_agents_cache": {
+    "priority_score": 5,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_parallel_refactor",
+    "blocked_by": "needs_parallel_refactor",
+    "action": "track_for_future"
+  },
+  "model_weight_merging": {
+    "priority_score": 5,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_self_hosted_vllm",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "track_for_future"
+  },
+  "token_level_speculative_decoding": {
+    "priority_score": 5,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_self_hosted_vllm",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "track_for_future"
+  },
+  "prm_weighted_voting": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "adaptive_sample_count": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "usva_4_rubric": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "reflexion_memory": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "moa_3layer": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "self_moa": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "atts_adaptive_compute": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "unified_routing_cascading": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "tree_of_thoughts": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "selective_debate": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "skill_curator": {
+    "priority_score": 1,
+    "research_needed": "minimal",
+    "reason": "Status: implemented",
+    "action": "monitor"
+  },
+  "management_science": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "planning_theory": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "quality_control": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "coding_agent_architecture": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "military_planning": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "self_managing_systems": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "meta_cognition": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "organizing_principles": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "directing_principles": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "controlling_principles": {
+    "priority_score": 0,
+    "research_needed": "none",
+    "reason": "Saturated \u2014 2500+ lines of research already done",
+    "action": "stop_researching"
+  },
+  "honcho_user_modeling": {
+    "priority_score": -1,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_honcho_integration",
+    "blocked_by": "needs_honcho_integration",
+    "action": "track_for_future"
+  }
+}

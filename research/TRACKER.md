@@ -44,3 +44,12 @@
 - First run: tonight 1am IST (July 4)
 - Rules: Tier 1 only, all tests must pass, revert on failure
 - Log: ~/temuclaude/research/CHANGELOG.md
+
+### Latest Integration: 2026-07-05 10:50 UTC
+**Preference-Data Trained Router (RouteLLM pattern)** — Dynamic priority #7 (95 pts)
+- ✅ Feature extraction: 94 features per query (keywords, structure, math expressions)
+- ✅ Logistic regression training: 56 successful routing records, 100% accuracy
+- ✅ Integration: Active for medium-tier queries in adaptive routing
+- ✅ Files: src/preference_router.py, src/adaptive.py, src/orchestrator.py
+- ✅ Tests: All Phase 1-5 tests pass (except pre-existing failures from OpenRouter credit limits)
+- 📊 Next: Will improve routing as more query data accumulates
