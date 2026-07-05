@@ -119,3 +119,25 @@ def reset_adaptive_routing() -> None:
     """Reset adaptive routing to defaults (delete the config file)."""
     if os.path.isfile(ADAPTIVE_CONFIG_PATH):
         os.remove(ADAPTIVE_CONFIG_PATH)
+
+
+def get_model_for_task_with_router(query: str, task_type: str, tier: str) -> tuple:
+    """Get the best model for a task using the trained preference-data router (RouteLLM pattern).
+    
+    Returns:
+        (model_name: str, used_trained_router: bool, router_confidence: float)
+    """
+    # For trivial tier, always use cheap model
+    if tier == "trivial":
+        return ("gpt-oss-120b", False, 1.0)
+    
+    # Try to use trained router
+    from .preference_router import route_with_trained_model
+    model, confidence, used_trained = route_with_trained_model(query, task_type, tier)
+    
+    if used_trained and model:
+        return (model, True, confidence)
+    
+    # Fall back to default adaptive routing
+    model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
+    return (model, False, 0.0)

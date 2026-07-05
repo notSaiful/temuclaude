@@ -1,0 +1,13 @@
+{
+  "new_raw": [],
+  "new_findings": [],
+  "research_requests": [],
+  "research_complete": [],
+  "implementation_queue": [],
+  "implementation_complete": [],
+  "implementation_failed": [
+    "/Users/saiful/temuclaude/research/findings/deep_research_unknown_20260705T104348.md"
+  ],
+  "priority_updates": [],
+  "last_updated": "2026-07-05T10:43:51.992595+00:00"
+}
