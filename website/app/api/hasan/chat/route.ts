@@ -21,7 +21,6 @@ async function readJson(filePath: string): Promise<any> {
 async function gatherContext(): Promise<string> {
   let context = '';
 
-  // Read daemon statuses
   try {
     const files = await fs.readdir(STATE_DIR);
     const hbFiles = files.filter(f => f.endsWith('_heartbeat.json'));
@@ -34,19 +33,16 @@ async function gatherContext(): Promise<string> {
     }
   } catch {}
 
-  // Read queue
   const queue = await readJson(path.join(RESEARCH_DIR, 'queue.json'));
   if (queue) {
     context += `\nQueue: ${queue.new_findings?.length || 0} findings, ${queue.implementation_queue?.length || 0} to implement, ${queue.implementation_failed?.length || 0} failed\n`;
   }
 
-  // Read SWOT
   try {
     const swot = await fs.readFile(path.join(RESEARCH_DIR, 'swot_reports', 'CURRENT_SWOT.md'), 'utf-8');
     context += `\nSWOT summary:\n${swot.substring(0, 500)}\n`;
   } catch {}
 
-  // Read recent activity
   try {
     const activityFile = path.join(STATE_DIR, 'coordinator_daemon.log');
     const log = await fs.readFile(activityFile, 'utf-8');
@@ -54,7 +50,6 @@ async function gatherContext(): Promise<string> {
     context += `\nRecent coordinator activity:\n${lines.join('\n')}\n`;
   } catch {}
 
-  // Read shared memory events
   const events = await readJson(path.join(RESEARCH_DIR, 'shared_state', 'events.json'));
   if (events?.events) {
     const recent = events.events.slice(-5);
@@ -67,6 +62,218 @@ async function gatherContext(): Promise<string> {
   return context;
 }
 
+// ============================================================
+// OLLAMA MODEL CONFIG
+// ============================================================
+// All 4 Ollama cloud models on the Max plan.
+// We round-robin across them to balance load and maximize weekly usage.
+// The cloud API works directly (no local daemon needed) so Hasan
+// can answer even when Ggs's device is off.
+
+const OLLAMA_CLOUD_URL = process.env.OLLAMA_CLOUD_URL || 'https://ollama.com:443';
+const OLLAMA_CLOUD_KEY = process.env.OLLAMA_CLOUD_KEY || '';
+const OLLAMA_LOCAL_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+
+// Models on the Max plan — cloud model names (no :cloud suffix for direct API)
+// glm-5.2 is PRIMARY (Ggs's choice — fastest, most reliable on the Max plan).
+// Others are fallbacks in case glm-5.2 is rate-limited or fails.
+const OLLAMA_MODELS = [
+  'glm-5.2',           // PRIMARY — 756B params, 1M context, fast, reliable
+  'deepseek-v4-pro',   // FALLBACK 1 — 1M context, strong reasoning
+  'kimi-k2.6',         // FALLBACK 2 — 1T params, vision capable
+  'gpt-oss:120b',      // FALLBACK 3 — 116.8B params, 131k context
+];
+
+// Track which model to use next (round-robin for fallbacks, primary always first)
+let modelRotationIndex = 0;
+
+// Track model failures to skip broken models temporarily
+const modelFailures: Record<string, number> = {};
+const FAILURE_COOLDOWN_MS = 60000; // Skip a failed model for 60s
+
+// Always try primary (glm-5.2) first. Only rotate to others if primary is in cooldown.
+function getNextModel(): string {
+  const now = Date.now();
+  const primary = OLLAMA_MODELS[0]; // glm-5.2
+
+  // If primary is not in cooldown, use it
+  const lastFail = modelFailures[primary] || 0;
+  if (now - lastFail > FAILURE_COOLDOWN_MS) {
+    return primary;
+  }
+
+  // Primary in cooldown — rotate through fallbacks
+  for (let i = 1; i < OLLAMA_MODELS.length; i++) {
+    const idx = (modelRotationIndex + i) % OLLAMA_MODELS.length;
+    if (idx === 0) continue; // Skip primary (in cooldown)
+    const model = OLLAMA_MODELS[idx];
+    const fail = modelFailures[model] || 0;
+    if (now - fail > FAILURE_COOLDOWN_MS) {
+      modelRotationIndex = (idx + 1) % OLLAMA_MODELS.length;
+      return model;
+    }
+  }
+
+  // All in cooldown — return primary anyway
+  return primary;
+}
+
+function markModelFailed(model: string) {
+  modelFailures[model] = Date.now();
+}
+
+interface OllamaResult {
+  response: string;
+  model: string;
+  source: string;
+}
+
+// Call Ollama cloud API directly — works anywhere, no local daemon needed
+async function callOllamaCloud(
+  model: string,
+  systemPrompt: string,
+  message: string,
+): Promise<OllamaResult | null> {
+  if (!OLLAMA_CLOUD_KEY) return null;
+
+  try {
+    const res = await fetch(`${OLLAMA_CLOUD_URL}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OLLAMA_CLOUD_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
+        ],
+        stream: false,
+        options: { num_predict: 800, temperature: 0.3 },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    let content = data?.message?.content || '';
+    // Some models put the response in "thinking" when content is empty
+    if (!content && data?.message?.thinking) {
+      content = data.message.thinking;
+    }
+    if (!content) return null;
+
+    return { response: content, model, source: 'ollama-cloud' };
+  } catch {
+    return null;
+  }
+}
+
+// Call local Ollama daemon (only works when device is on)
+async function callOllamaLocal(
+  model: string,
+  systemPrompt: string,
+  message: string,
+): Promise<OllamaResult | null> {
+  try {
+    const res = await fetch(`${OLLAMA_LOCAL_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: `${model}:cloud`,  // Local daemon needs :cloud suffix
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
+        ],
+        stream: false,
+        options: { num_predict: 800, temperature: 0.3 },
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    let content = data?.message?.content || '';
+    if (!content && data?.message?.thinking) {
+      content = data.message.thinking;
+    }
+    if (!content) return null;
+
+    return { response: content, model, source: 'ollama-local' };
+  } catch {
+    return null;
+  }
+}
+
+// Try a model on both cloud and local, cloud first (cloud is always available)
+async function tryOllamaModel(
+  model: string,
+  systemPrompt: string,
+  message: string,
+): Promise<OllamaResult | null> {
+  // Cloud API first (works even when device is off)
+  const cloud = await callOllamaCloud(model, systemPrompt, message);
+  if (cloud) return cloud;
+
+  // Fall back to local daemon
+  const local = await callOllamaLocal(model, systemPrompt, message);
+  if (local) return local;
+
+  return null;
+}
+
+// OpenRouter fallback (cloud, free models)
+async function callOpenRouter(
+  systemPrompt: string,
+  message: string,
+): Promise<OllamaResult | null> {
+  const key = process.env.OPENROUTER_API_KEY || '';
+  if (!key) return null;
+
+  const orModels = [
+    'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'google/gemma-4-31b-it:free',
+    'tencent/hy3:free',
+  ];
+
+  for (const orModel of orModels) {
+    try {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: orModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message },
+          ],
+          max_tokens: 800,
+          temperature: 0.3,
+        }),
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const content = data?.choices?.[0]?.message?.content || '';
+        if (content) {
+          return { response: content, model: orModel, source: 'openrouter' };
+        }
+      }
+    } catch {
+      // Try next model
+    }
+  }
+
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
@@ -75,13 +282,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Message required' }, { status: 400 });
     }
 
-    // Gather current system context
     const systemContext = await gatherContext();
 
-    // Check if Ollama is available
-    const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-
-    // Build the system prompt with Hasan's identity
     const systemPrompt = `You are Hasan, an autonomous AI system named after Hasan ibn Ali (RA), grandson of Prophet Muhammad ﷺ.
 
 You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve Temuclaude — the most intelligent, most affordable AI that beats frontier models at 50x lower cost.
@@ -113,63 +315,40 @@ ${systemContext}
 
 Respond concisely (3-5 sentences max unless asked for detail). Be honest about problems. Suggest next actions when asked.`;
 
-    // Try Ollama first (free)
-    try {
-      const ollamaResponse = await fetch(`${ollamaUrl}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'glm-5.2:cloud',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          stream: false,
-          options: { num_predict: 500, temperature: 0.3 },
-        }),
-      });
+    // ============================================================
+    // STRATEGY: Try all 4 Ollama models in round-robin rotation.
+    // This balances load across models and maximizes weekly usage
+    // on the Max plan. Each request uses the next model in rotation.
+    // Cloud API is tried first (works even when device is off),
+    // then local daemon as backup.
+    // If all Ollama models fail, fall back to OpenRouter free models.
+    // ============================================================
 
-      if (ollamaResponse.ok) {
-        const data = await ollamaResponse.json();
-        const response = data?.message?.content || data?.response || '';
-        if (response) {
-          return NextResponse.json({ response, model: 'ollama/glm-5.2', cost: 0 });
-        }
+    // Try up to 3 different Ollama models in rotation (in case one is rate-limited)
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const model = getNextModel();
+      const result = await tryOllamaModel(model, systemPrompt, message);
+      if (result) {
+        return NextResponse.json({
+          response: result.response,
+          model: `${result.source}/${result.model}`,
+          cost: 0,
+        });
       }
-    } catch (e) {
-      // Ollama not available, try OpenRouter
+      markModelFailed(model);
     }
 
-    // Fallback to OpenRouter
-    const openrouterKey = process.env.OPENROUTER_API_KEY || '';
-    if (openrouterKey) {
-      const orResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openrouterKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'openai/gpt-oss-120b:free',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          max_tokens: 500,
-          temperature: 0.3,
-        }),
+    // OpenRouter fallback (cloud, always available, free models)
+    const orResult = await callOpenRouter(systemPrompt, message);
+    if (orResult) {
+      return NextResponse.json({
+        response: orResult.response,
+        model: `${orResult.source}/${orResult.model}`,
+        cost: 0,
       });
-
-      if (orResponse.ok) {
-        const data = await orResponse.json();
-        const response = data?.choices?.[0]?.message?.content || '';
-        if (response) {
-          return NextResponse.json({ response, model: 'openrouter/gpt-oss-120b:free', cost: 0 });
-        }
-      }
     }
 
-    // If both fail, return context-based response
+    // All LLMs failed — return context-based offline response
     return NextResponse.json({
       response: `I'm currently offline (no LLM available). Here's what I can tell you from my system state:\n\n${systemContext.substring(0, 500)}\n\nPlease activate my daemons or check Ollama/OpenRouter connectivity.`,
       model: 'offline',
