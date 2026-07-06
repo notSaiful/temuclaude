@@ -48,15 +48,21 @@ class IndustryRadarDaemon(DaemonBase):
                     break
                 if s.get("action") != "research_task":
                     continue
-                task = json.dumps({
+                task_data = {
                     "id": f"radar_{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}_{s.get('source', '')}",
                     "source": "industry_radar",
                     "title": s.get("title", ""),
                     "url": s.get("url", ""),
                     "score": s.get("score", 0),
                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                })
-                qm.push("new_findings", [task])
+                }
+                # Write to file so research_daemon can open it
+                findings_dir = TEMUCLAUDE / "research" / "findings"
+                findings_dir.mkdir(exist_ok=True)
+                finding_file = findings_dir / f"radar_{task_data['id'].split('_')[1]}_{s.get('source', 'unknown')[:20]}.json"
+                with open(finding_file, 'w') as f:
+                    json.dump(task_data, f, indent=2)
+                qm.push("new_findings", [str(finding_file)])
                 tasks += 1
         except Exception as e:
             self.logger.exception(f"Task creation failed: {e}")
