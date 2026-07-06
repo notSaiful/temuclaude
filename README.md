@@ -1,10 +1,10 @@
 # Temuclaude
 
-> One question. Many minds. One superior answer. Frontier-level intelligence at 12x lower cost.
+> One question. Many minds. One superior answer. Frontier-level intelligence at 25x lower cost.
 
 ## What is Temuclaude?
 
-Temuclaude is an AI orchestration platform that routes your queries to 8 AI models simultaneously, fuses their responses, verifies with code, and quality-checks with self-QA. The result: answers that beat frontier models (Fable 5, GPT-5.5, Gemini 3.1 Pro) at 12x lower cost.
+Temuclaude is an AI orchestration platform that routes your queries to 8 AI models simultaneously, fuses their responses, verifies with code, and quality-checks with self-QA. The result: answers that beat frontier models (Fable 5, GPT-5.5, Gemini 3.1 Pro) at 25x lower cost.
 
 ## Live Demo
 
@@ -32,21 +32,23 @@ Temuclaude is an AI orchestration platform that routes your queries to 8 AI mode
 
 | Plan | Price | Queries | API |
 |------|-------|---------|-----|
-| Free | $0 | 50/day | No |
-| Pro | $29/mo | 5,000/mo | Yes |
-| Pay-as-you-go | $2/$10 per 1M tokens | — | Yes |
-| Enterprise | $499/mo | 200,000/mo | Yes (SSO, SLA) |
+| Free | $0 | 100/day | No |
+| Developer | $15/mo | 50,000/mo | Yes |
+| Pro | $49/mo | 500,000/mo | Yes |
+| Pay-as-you-go | $0.50/$2.00 per 1M tokens | — | Yes |
+| Enterprise | $499/mo | Unlimited | Yes (SSO, SLA) |
 
 ## vs Frontier Models
 
 | Model | Input $/1M | Output $/1M | vs Temuclaude |
 |-------|-----------|------------|-------------|
-| Claude Fable 5 | $10.00 | $50.00 | 12x more expensive |
-| GPT-5.5 | $5.00 | $30.00 | 7x more expensive |
-| Fugu Ultra | $5.00 | $30.00 | 7x more expensive |
-| Opus 4.8 | $5.00 | $25.00 | 6x more expensive |
-| Gemini 3.1 Pro | $2.00 | $12.00 | 3x more expensive |
-| **Temuclaude** | **$2.00** | **$10.00** | **—** |
+| Claude Fable 5 | $10.00 | $50.00 | 25x more expensive |
+| GPT-5.5 | $5.00 | $30.00 | 15x more expensive |
+| Claude Opus 4.8 | $5.00 | $25.00 | 12.5x more expensive |
+| Claude Sonnet 5 | $3.00 | $15.00 | 7.5x more expensive |
+| Gemini 3.1 Pro | Free | $12.00 | 6x more expensive (output) |
+| GLM-5.2 | $1.40 | $4.40 | 2.2x more expensive |
+| **Temuclaude** | **$0.50** | **$2.00** | **—** |
 
 ## Architecture
 

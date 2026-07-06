@@ -39,10 +39,8 @@ async function getDaemonStatus(): Promise<any[]> {
   const results = [];
   for (const name of daemons) {
     let pid = null;
-    let alive = false;
     try {
       pid = parseInt(await fs.readFile(path.join(STATE_DIR, `${name}.pid`), 'utf-8'));
-      alive = true; // If PID file exists, assume alive (can't send signals in edge)
     } catch {}
 
     const heartbeat = await readHeartbeat(name);
@@ -78,7 +76,6 @@ async function getSharedMemory(): Promise<any> {
 }
 
 async function getUnlimitedMemoryStats(): Promise<any> {
-  // Read SQLite stats via a simple file check — the actual count comes from the DB
   const dbPath = path.join(RESEARCH_DIR, 'memory_store', 'swarm_memory.db');
   let exists = false;
   let size = 0;
@@ -141,16 +138,16 @@ async function getRecentLogActivity(): Promise<any[]> {
       if (!file.endsWith('.log')) continue;
       try {
         const content = await fs.readFile(path.join(STATE_DIR, file), 'utf-8');
-        const lines = content.trim().split('\n').slice(-3);
+        const lines = content.trim().split('\n').slice(-5);
         for (const line of lines) {
-          if (line.includes('INFO') || line.includes('ERROR')) {
+          if (line.includes('INFO') || line.includes('ERROR') || line.includes('WARNING')) {
             const match = line.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*\| (\w+).*\| (\w+).*\| (.*)/);
             if (match) {
               activities.push({
                 time: match[1],
                 daemon: match[2],
                 level: match[3],
-                message: match[4].substring(0, 120),
+                message: match[4].substring(0, 150),
               });
             }
           }
@@ -158,22 +155,8 @@ async function getRecentLogActivity(): Promise<any[]> {
       } catch {}
     }
   } catch {}
-  // Sort by time descending, take latest 20
   activities.sort((a, b) => b.time.localeCompare(a.time));
-  return activities.slice(0, 20);
-}
-
-async function getTestCount(): Promise<number> {
-  try {
-    const content = await fs.readFile(path.join(TEMUCLAUDE_DIR, 'tests'), 'utf-8');
-  } catch {}
-  // Count test files
-  try {
-    const files = await fs.readdir(path.join(TEMUCLAUDE_DIR, 'tests'));
-    return files.filter(f => f.startsWith('test_') && f.endsWith('.py')).length;
-  } catch {
-    return 0;
-  }
+  return activities.slice(0, 30);
 }
 
 async function getSourceCount(): Promise<number> {
@@ -185,11 +168,26 @@ async function getSourceCount(): Promise<number> {
   }
 }
 
+async function getHasanIdentity(): Promise<any> {
+  try {
+    const content = await fs.readFile(path.join(RESEARCH_DIR, 'hasan_identity.py'), 'utf-8');
+    const purposeMatch = content.match(/"purpose":\s*"([^"]+)"/);
+    const goalMatch = content.match(/"ultimate_goal":\s*"([^"]+)"/);
+    return {
+      verified: true,
+      purpose: purposeMatch?.[1]?.substring(0, 100) || '',
+      goal: goalMatch?.[1]?.substring(0, 100) || '',
+    };
+  } catch {
+    return { verified: false, purpose: '', goal: '' };
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const [
       daemons, queue, sharedMemory, memoryStats,
-      swot, radar, cost, ummah, activity, testCount, sourceCount
+      swot, radar, cost, ummah, activity, sourceCount, identity
     ] = await Promise.all([
       getDaemonStatus(),
       getQueueStatus(),
@@ -200,8 +198,8 @@ export async function GET(req: NextRequest) {
       getCostInfo(),
       getUmmahFund(),
       getRecentLogActivity(),
-      getTestCount(),
       getSourceCount(),
+      getHasanIdentity(),
     ]);
 
     const aliveCount = daemons.filter(d => d.alive).length;
@@ -209,12 +207,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       timestamp: new Date().toISOString(),
       system: 'hasan',
-      status: aliveCount === 23 ? 'all_systems_nominal' : 'partial',
-      daemons: {
-        total: daemons.length,
-        alive: aliveCount,
-        list: daemons,
-      },
+      status: aliveCount === 23 ? 'all_systems_nominal' : aliveCount > 0 ? 'partial' : 'deactivated',
+      daemons: { total: daemons.length, alive: aliveCount, list: daemons },
       queue: {
         newRaw: queue.new_raw?.length || 0,
         newFindings: queue.new_findings?.length || 0,
@@ -228,12 +222,27 @@ export async function GET(req: NextRequest) {
       cost,
       ummah,
       activity,
-      stats: {
-        testFiles: testCount,
-        sourceModules: sourceCount,
-      },
+      identity,
+      stats: { sourceModules: sourceCount },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message, system: 'hasan' }, { status: 500 });
+    // If running on Vercel (no local files), return deactivated state
+    return NextResponse.json({
+      timestamp: new Date().toISOString(),
+      system: 'hasan',
+      status: 'deactivated',
+      daemons: { total: 23, alive: 0, list: [] },
+      queue: { newRaw: 0, newFindings: 0, implementationQueue: 0, implementationFailed: 0 },
+      sharedMemory: { daemons: 0, recentEvents: [], knowledgeFacts: 0 },
+      unlimitedMemory: { exists: false, sizeMB: '0' },
+      swot: null,
+      radar: null,
+      cost: { remainingCredits: 0, burnRatePerDay: 0, throttleLevel: 'green', totalSpent24h: 0, totalTokens24h: 0 },
+      ummah: { totalDistributed: 0, entries: 0 },
+      activity: [],
+      identity: { verified: false, purpose: '', goal: '' },
+      stats: { sourceModules: 0 },
+      error: error.message,
+    });
   }
 }

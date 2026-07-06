@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
           allowed: false,
           remaining: 0,
           plan: user.plan,
-          message: `You've reached your free tier limit of ${limits.perDay} queries/day. Upgrade to Pro for 5,000 queries/month.`,
+          message: `You've reached your free tier limit of ${limits.perDay} queries/day. Upgrade to Developer for 50,000 queries/month.`,
           upgradeUrl: '/pricing',
         });
       }

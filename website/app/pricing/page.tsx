@@ -6,14 +6,16 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is Temuclaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. Temuclaude orchestrates 8 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better, at 7x lower cost.' },
-  { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 50 queries/day, no signup required. Upgrade when you need more.' },
+  { q: 'How is Temuclaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. Temuclaude orchestrates 8 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better, at 15x lower cost.' },
+  { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 100 queries/day, no signup required. Upgrade when you need more.' },
   { q: 'Which models does Temuclaude use?', a: '8 models: GLM-5.2, DeepSeek V4 Pro, Hy3 Preview, MiMo-V2.5, Gemini 3 Flash, MiniMax M3, Claude Sonnet 5, and Nemotron 3 Ultra. We route to the best model automatically — you never have to choose.' },
   { q: 'How does the orchestration work?', a: 'Temuclaude classifies your query, routes it to the best model(s), fuses multiple answers, verifies math with code execution, and quality-checks with a self-QA gate. You see the whole process in the playground.' },
   { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored.' },
-  { q: 'What about enterprise?', a: 'Enterprise includes SSO, SLA, self-hosted deployment, dedicated support, and 200K queries/month.' },
+  { q: 'What about enterprise?', a: 'Enterprise includes SSO, SLA 99.9%, dedicated support, custom models, and unlimited queries.' },
   { q: 'Can I cancel anytime?', a: 'Yes. No contracts. Cancel anytime from your dashboard or contact us.' },
-  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users can pay per token: $2/M input, $10/M output. Contact us to set up metered billing.' },
+  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users can pay per token: $0.50/M input, $2.00/M output. Cached input is just $0.05/M. Contact us to set up metered billing.' },
+  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to free models, 30% to ultra-cheap models ($0.05-0.14/M), and only 10% to premium models. Our orchestration layer fuses multiple cheap models to match frontier quality. You get frontier-level answers at a fraction of the cost.' },
+  { q: 'Does Temuclaude support the Ummah?', a: 'Yes. 25% of all profit goes to verified Muslim charities — Palestine food relief, community kitchens, orphan feeding, medical clinics, and Islamic schools. Every query you make helps feed children and build infrastructure for the Ummah.' },
 ];
 
 export default function PricingPage() {
@@ -79,7 +81,7 @@ export default function PricingPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3 text-center" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Pricing</h1>
           <p className="text-text-secondary text-center mb-10 max-w-xl mx-auto">
-            Frontier-level intelligence at 1/5th the cost. Free to try in the playground.
+            Frontier-level intelligence at 1/10th the cost. Every query feeds a child in Palestine.
           </p>
 
           {/* Price comparison banner */}
@@ -89,10 +91,19 @@ export default function PricingPage() {
               <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
                 <div><span className="text-text-muted">Fable 5</span> <strong className="text-text-primary">$10 / $50</strong></div>
                 <div><span className="text-text-muted">GPT-5.5</span> <strong className="text-text-primary">$5 / $30</strong></div>
-                <div><span className="text-text-muted">Fugu Ultra</span> <strong className="text-text-primary">$5 / $30</strong></div>
-                <div><span className="text-text-muted">Gemini 3.1 Pro</span> <strong className="text-text-primary">$2 / $12</strong></div>
-                <div><span className="text-accent-primary font-bold">Temuclaude $2 / $10</span></div>
+                <div><span className="text-text-muted">Opus 4.8</span> <strong className="text-text-primary">$5 / $25</strong></div>
+                <div><span className="text-text-muted">Sonnet 5</span> <strong className="text-text-primary">$3 / $15</strong></div>
+                <div><span className="text-text-muted">GLM-5.2</span> <strong className="text-text-primary">$1.40 / $4.40</strong></div>
+                <div><span className="text-accent-primary font-bold">Temuclaude $0.50 / $2.00</span></div>
               </div>
+            </div>
+          </div>
+
+          {/* Ummah Fund banner */}
+          <div className="card max-w-3xl mx-auto mb-12" style={{ background: '#788C5D', color: '#fff' }}>
+            <div className="text-center">
+              <p className="text-sm opacity-90 mb-1">25% of all profit goes to the Ummah Fund</p>
+              <p className="text-xs opacity-75">Palestine food relief · Muslim community kitchens · Orphan feeding · Medical clinics · Islamic schools</p>
             </div>
           </div>
 
@@ -127,8 +138,8 @@ export default function PricingPage() {
             </div>
           )}
 
-          {/* Pricing tiers */}
-          <StaggerReveal className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-20">
+          {/* Pricing tiers — 4 plans */}
+          <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-20">
             {planList.map((tier, i) => (
               <StaggerItem key={i}>
                 <div className={`card h-full ${tier.featured ? 'border-accent-primary border-2' : ''}`}>
@@ -169,20 +180,20 @@ export default function PricingPage() {
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$2</div>
+                <div className="text-2xl font-bold text-text-primary">$0.50</div>
                 <div className="text-sm text-text-muted">per 1M input tokens</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$10</div>
+                <div className="text-2xl font-bold text-text-primary">$2.00</div>
                 <div className="text-sm text-text-muted">per 1M output tokens</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$0.20</div>
+                <div className="text-2xl font-bold text-text-primary">$0.05</div>
                 <div className="text-sm text-text-muted">per 1M cached input</div>
               </div>
             </div>
             <p className="text-center text-sm text-text-secondary mt-4">
-              5x cheaper than Fable 5 ($10/$50). 3x cheaper than GPT-5.5 ($5/$30).
+              25x cheaper than Fable 5 ($10/$50). 15x cheaper than GPT-5.5 ($5/$30). 7.5x cheaper than Claude Sonnet 5 ($3/$15).
             </p>
           </div>
 

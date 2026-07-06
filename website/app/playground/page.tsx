@@ -316,7 +316,7 @@ export default function PlaygroundPage() {
               {/* Free tier counter */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-text-muted">
-                  {freeQueriesUsed < 50 ? `${50 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
+                  {freeQueriesUsed < 100 ? `${100 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
                 </span>
                 {freeQueriesUsed >= 30 && freeQueriesUsed < 50 && (
                   <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
