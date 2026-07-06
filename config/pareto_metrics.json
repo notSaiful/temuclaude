@@ -1,15 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-06T06:27:10.052680+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-06T06:28:47.264225+00:00",
       "tier": "trivial",
       "tokens_used": 500,
@@ -899,14 +890,23 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:05:42.156138+00:00",
+      "tier": "medium",
+      "tokens_used": 117,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "coding",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
     }
   ],
-  "total_queries": 222,
-  "total_tokens_used": 477150,
-  "total_tokens_baseline": 1818624,
+  "total_queries": 223,
+  "total_tokens_used": 477267,
+  "total_tokens_baseline": 1826816,
   "correct": 74,
   "incorrect": 37,
-  "unknown": 111,
+  "unknown": 112,
   "tier_stats": {
     "trivial": {
       "count": 82,
@@ -915,9 +915,9 @@
       "correct": 37
     },
     "medium": {
-      "count": 100,
-      "tokens": 154259,
-      "baseline": 819200,
+      "count": 101,
+      "tokens": 154376,
+      "baseline": 827392,
       "correct": 37
     },
     "hard": {
@@ -927,5 +927,5 @@
       "correct": 0
     }
   },
-  "last_updated": "2026-07-06T21:04:03.161804+00:00"
+  "last_updated": "2026-07-06T21:05:42.156232+00:00"
 }

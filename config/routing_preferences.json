@@ -2599,6 +2599,22 @@
       "latency_ms": 15000,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:05:42.158822+00:00",
+      "query_preview": "Write a Python function to reverse a string",
+      "query_length": 43,
+      "query_words": 8,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 7267,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
@@ -2649,13 +2665,13 @@
       "best_model": "deepseek-v4-pro"
     },
     "coding_medium": {
-      "count": 22,
-      "successes": 20,
+      "count": 23,
+      "successes": 21,
       "failures": 2,
-      "avg_latency": 4679.772727272727,
-      "total_latency": 102955,
+      "avg_latency": 4792.260869565217,
+      "total_latency": 110222,
       "models": {
-        "deepseek-v4-pro": 22
+        "deepseek-v4-pro": 23
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -2673,6 +2689,6 @@
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 157,
-  "last_updated": "2026-07-06T21:04:03.164108+00:00"
+  "total_records": 158,
+  "last_updated": "2026-07-06T21:05:42.158869+00:00"
 }
