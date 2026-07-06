@@ -1,0 +1,18 @@
+[
+  {
+    "topic": "competitive_intelligence",
+    "boost": 50
+  },
+  {
+    "topic": "competitive_intelligence",
+    "boost": 50
+  },
+  {
+    "topic": "model_pool_resilience",
+    "boost": 40
+  },
+  {
+    "topic": "rate_limit_handling",
+    "boost": 30
+  }
+]

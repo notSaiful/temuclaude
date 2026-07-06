@@ -1,0 +1,10 @@
+{
+  "level": "red",
+  "timestamp": "2026-07-06T18:09:38.873071+00:00",
+  "reason": "CRITICAL: Only $0.00 credits remaining",
+  "actions": [
+    "pause_research",
+    "pause_marketing",
+    "keep_critical_only"
+  ]
+}

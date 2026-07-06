@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.environ.get("RESEARCH_DIR", "/Users/saiful/te
 
 from daemon_base import DaemonBase
 from prompt_evolver import evolve_prompt
-from unlimited_memory import remember, recall
+from unlimited_memory import remember, recall, recall_one
 
 class SuperIntelligenceDaemon(DaemonBase):
     def __init__(self):

@@ -1,0 +1,126 @@
+{
+  "timestamp": "2026-07-06T17:41:48.638745+00:00",
+  "total_signals": 55,
+  "top_signals": [
+    {
+      "title": "nullpointexception-i/agent-sphere",
+      "source": "github_trending",
+      "score": 45,
+      "url": "https://github.com/nullpointexception-i/agent-sphere"
+    },
+    {
+      "title": "benchflow-ai/awesome-evals",
+      "source": "github_trending",
+      "score": 40,
+      "url": "https://github.com/benchflow-ai/awesome-evals"
+    },
+    {
+      "title": "vllm v0.24.0",
+      "source": "vllm_releases",
+      "score": 40,
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.24.0"
+    },
+    {
+      "title": "vllm v0.23.0",
+      "source": "vllm_releases",
+      "score": 40,
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.23.0"
+    },
+    {
+      "title": "vllm v0.22.1",
+      "source": "vllm_releases",
+      "score": 40,
+      "url": "https://github.com/vllm-project/vllm/releases/tag/v0.22.1"
+    },
+    {
+      "title": "litellm v1.92.0-rc.1",
+      "source": "litellm_releases",
+      "score": 40,
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.92.0-rc.1"
+    },
+    {
+      "title": "litellm v1.91.0",
+      "source": "litellm_releases",
+      "score": 40,
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.91.0"
+    },
+    {
+      "title": "litellm v1.92.0-dev.2",
+      "source": "litellm_releases",
+      "score": 40,
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.92.0-dev.2"
+    },
+    {
+      "title": "myccarl/ai-shortVideo-pipeline",
+      "source": "github_trending",
+      "score": 30,
+      "url": "https://github.com/myccarl/ai-shortVideo-pipeline"
+    },
+    {
+      "title": "Real-time map of Great Britain's rail network",
+      "source": "hackernews",
+      "score": 20,
+      "url": "https://www.map.signalbox.io"
+    },
+    {
+      "title": "duckbugio/flock",
+      "source": "github_trending",
+      "score": 20,
+      "url": "https://github.com/duckbugio/flock"
+    },
+    {
+      "title": "OfficeCLI: Office suite for AI agents to read and edit Microsoft Office files",
+      "source": "hackernews",
+      "score": 16.0,
+      "url": "https://github.com/iOfficeAI/OfficeCLI"
+    },
+    {
+      "title": "DietrichGebert/ponytail",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/DietrichGebert/ponytail"
+    },
+    {
+      "title": "omnigent-ai/omnigent",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/omnigent-ai/omnigent"
+    },
+    {
+      "title": "cobusgreyling/loop-engineering",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/cobusgreyling/loop-engineering"
+    },
+    {
+      "title": "tigicion/dao-code",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/tigicion/dao-code"
+    },
+    {
+      "title": "superloglabs/superlog",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/superloglabs/superlog"
+    },
+    {
+      "title": "uzairansaruzi/hermex",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/uzairansaruzi/hermex"
+    },
+    {
+      "title": "agentic-in/inferoa",
+      "source": "github_trending",
+      "score": 15,
+      "url": "https://github.com/agentic-in/inferoa"
+    },
+    {
+      "title": "AMD Ryzen AI Halo \u2013 $4k AI Dev Kit",
+      "source": "hackernews",
+      "score": 11.5,
+      "url": "https://www.lttlabs.com/articles/2026/07/06/amd-ryzen-ai-halo"
+    }
+  ]
+}

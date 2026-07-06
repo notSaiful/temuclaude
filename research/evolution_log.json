@@ -1,0 +1,1514 @@
+[
+  {
+    "timestamp": "2026-07-06T17:40:45.775447+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:41:15.783792+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:41:45.790683+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:42:15.797094+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:42:45.805053+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:43:15.809397+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:43:27.003943+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:43:45.816166+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:44:15.820321+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:44:45.828308+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:45:15.837661+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:45:45.845839+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:46:15.850387+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:46:45.858035+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:47:15.866235+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:47:45.871332+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:48:15.877984+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:48:45.886328+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:49:15.895498+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:49:45.904813+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:50:15.914616+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:50:45.923603+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:51:15.933966+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:51:45.943727+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:52:15.952277+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:52:45.960851+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:53:15.965978+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:53:45.977060+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:54:15.984634+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:54:45.990181+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:55:15.993662+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:55:46.001988+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:56:16.011320+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:56:46.017245+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:57:16.028404+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:57:46.044560+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:58:16.052997+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:58:46.062023+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:59:16.072982+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T17:59:46.084347+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:00:16.093935+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:00:46.103674+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:01:16.112786+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:01:46.118215+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:02:16.129247+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:02:46.138898+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:03:16.145341+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:03:46.155320+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:04:16.162151+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:04:46.171055+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:05:16.180447+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:05:46.188633+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:06:16.199276+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:06:46.210258+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:07:16.220612+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:07:46.227275+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:08:16.233874+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:08:46.238909+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:09:16.245402+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:09:46.259221+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:10:16.275030+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:10:46.284631+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-06T18:11:16.291394+00:00",
+    "prompts_evolved": 3,
+    "results": {
+      "code_generation": {
+        "original": "Generate clean, tested Python code for the following task: {task}",
+        "mutations": 4,
+        "best": "Generate clean, tested Python code for the following task: {task}",
+        "improved": false
+      },
+      "research_summary": {
+        "original": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "mutations": 4,
+        "best": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+        "improved": false
+      },
+      "tweet_generation": {
+        "original": "Write a punchy tweet under 280 chars about: {topic}",
+        "mutations": 4,
+        "best": "Write a punchy tweet under 280 chars about: {topic}",
+        "improved": false
+      }
+    }
+  }
+]
