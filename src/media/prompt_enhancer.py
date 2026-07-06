@@ -270,7 +270,11 @@ async def enhance_prompts_for_pool(
     task_type: str,
     call_llm_func=None,
 ) -> dict:
-    """Enhance the prompt for each model in the pool.
+    """Enhance the prompt for each model in the pool — using a SINGLE LLM call.
+
+    Efficiency fix: Instead of N LLM calls (one per model), we make 1 LLM call
+    to enhance the prompt with task-type hints, then append per-model strength
+    hints without LLM calls. This is 5x cheaper for a 5-model pool.
 
     Args:
         original_prompt: User's original prompt
@@ -283,30 +287,70 @@ async def enhance_prompts_for_pool(
     """
     enhanced_prompts = {}
 
-    # For draft tier (single model), just enhance once
-    if len(model_pool) == 1:
-        model_id = model_pool[0]["id"]
-        enhanced = await enhance_prompt(original_prompt, model_id, task_type, call_llm_func)
-        enhanced_prompts[model_id] = enhanced
-        return enhanced_prompts
+    # Step 1: Single LLM call to enhance the prompt with task-type hints
+    task_hint = get_task_hint(task_type)
 
-    # For multi-model pools, enhance in parallel
-    import asyncio
+    if call_llm_func and task_hint:
+        try:
+            enhancement_request = f"""Enhance this image/video generation prompt to be more effective. Add details that match the task type.
 
-    tasks = []
-    model_ids = []
+Original prompt: {original_prompt}
+Task type: {task_type}
+Task guidance: {task_hint}
+
+Return ONLY the enhanced prompt, no preamble. Max 3 sentences.
+
+Enhanced prompt:"""
+
+            messages = [
+                {"role": "system", "content": "You are a prompt engineering expert. You enhance generation prompts to be more effective. Return ONLY the enhanced prompt, nothing else."},
+                {"role": "user", "content": enhancement_request},
+            ]
+
+            base_enhanced = await call_llm_func(
+                "z-ai/glm-5.2",  # cheapest model
+                messages,
+                max_tokens=500,
+                temperature=0.7,
+            )
+
+            # Clean up
+            base_enhanced = base_enhanced.strip()
+            preambles = [
+                "Enhanced prompt:", "Here is the enhanced prompt:",
+                "Rewritten prompt:", "Here is the rewritten prompt:",
+            ]
+            for preamble in preambles:
+                if base_enhanced.startswith(preamble):
+                    base_enhanced = base_enhanced[len(preamble):].strip()
+                    break
+
+            if base_enhanced.startswith('"') and base_enhanced.endswith('"'):
+                base_enhanced = base_enhanced[1:-1].strip()
+
+            if len(base_enhanced) < 10:
+                base_enhanced = original_prompt
+
+            if len(base_enhanced) > 2000:
+                base_enhanced = base_enhanced[:2000]
+
+        except Exception as e:
+            logger.warning(f"Batch prompt enhancement failed: {e}")
+            base_enhanced = f"{original_prompt} {task_hint}"
+    else:
+        # Fallback: manually add task hint
+        base_enhanced = f"{original_prompt} {task_hint}".strip() if task_hint else original_prompt
+
+    # Step 2: For each model, append per-model strength hint (NO LLM call needed)
     for model_config in model_pool:
         model_id = model_config["id"]
-        model_ids.append(model_id)
-        tasks.append(enhance_prompt(original_prompt, model_id, task_type, call_llm_func))
+        strength_hint = get_strength_hint(model_id)
 
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-
-    for model_id, result in zip(model_ids, results):
-        if isinstance(result, Exception):
-            logger.warning(f"Prompt enhancement failed for {model_id}: {result}")
-            enhanced_prompts[model_id] = original_prompt  # fallback to original
+        if strength_hint:
+            enhanced_prompts[model_id] = f"{base_enhanced} {strength_hint}"
         else:
-            enhanced_prompts[model_id] = result
+            enhanced_prompts[model_id] = base_enhanced
+
+    return enhanced_prompts
 
     return enhanced_prompts

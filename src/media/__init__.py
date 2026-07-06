@@ -42,6 +42,12 @@ from .memory import MediaMemoryBank, get_memory_bank
 from .media_cache import MediaCache, get_media_cache
 from .prompt_enhancer import enhance_prompt, enhance_prompts_for_pool
 from .providers.base import MediaProviderManager, AIMLProvider, FalProvider
+from .cascading_generator import CascadingMediaGenerator
+
+# TTS
+from .tts_orchestrator import TTSOrchestrator, TTSGenerator, TTSJudge, TTSQualityGate
+from .tts_provider import TTSProvider, TTSProviderManager
+from .tts_intent import classify_tts_task, determine_tts_tier, get_default_voice
 
 __all__ = [
     # Main orchestrator
@@ -86,4 +92,15 @@ __all__ = [
     "enhance_prompts_for_pool",
     "QUALITY_THRESHOLDS",
     "MAX_REFINE_ITERATIONS",
+    # TTS
+    "TTSOrchestrator",
+    "TTSGenerator",
+    "TTSJudge",
+    "TTSQualityGate",
+    "TTSProvider",
+    "TTSProviderManager",
+    "classify_tts_task",
+    "determine_tts_tier",
+    "get_default_voice",
+    "CascadingMediaGenerator",
 ]

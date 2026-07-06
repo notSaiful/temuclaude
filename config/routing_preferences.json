@@ -1617,30 +1617,228 @@
       "latency_ms": 15000,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T13:47:43.919256+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T13:47:43.920211+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T13:49:21.340580+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 4190,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T13:49:30.196971+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 4056,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T13:49:35.953934+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 5368,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:03:10.352439+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:03:10.353292+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:04:25.550981+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 4784,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:04:32.314690+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3302,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:04:37.781022+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 5095,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:06:48.786536+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T14:06:48.787521+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 18,
-      "successes": 18,
+      "count": 21,
+      "successes": 21,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 9000,
+      "total_latency": 10500,
       "models": {
-        "gpt-oss-120b": 18
+        "gpt-oss-120b": 21
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 18,
-      "successes": 18,
+      "count": 21,
+      "successes": 21,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 270000,
+      "total_latency": 315000,
       "models": {
-        "deepseek-v4-pro": 18,
-        "glm-5.2": 18,
-        "kimi-k2.6": 18
+        "deepseek-v4-pro": 21,
+        "glm-5.2": 21,
+        "kimi-k2.6": 21
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -1656,24 +1854,24 @@
       "best_model": "gpt-oss-120b"
     },
     "math_medium": {
-      "count": 20,
-      "successes": 16,
+      "count": 24,
+      "successes": 20,
       "failures": 4,
-      "avg_latency": 3212.8,
-      "total_latency": 64256,
+      "avg_latency": 3487.2083333333335,
+      "total_latency": 83693,
       "models": {
-        "deepseek-v4-pro": 20
+        "deepseek-v4-pro": 24
       },
       "best_model": "deepseek-v4-pro"
     },
     "coding_medium": {
-      "count": 15,
-      "successes": 13,
+      "count": 17,
+      "successes": 15,
       "failures": 2,
-      "avg_latency": 3789.2,
-      "total_latency": 56838,
+      "avg_latency": 3776.235294117647,
+      "total_latency": 64196,
       "models": {
-        "deepseek-v4-pro": 15
+        "deepseek-v4-pro": 17
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -1691,6 +1889,6 @@
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 98,
-  "last_updated": "2026-07-06T06:33:03.591197+00:00"
+  "total_records": 110,
+  "last_updated": "2026-07-06T14:06:48.787534+00:00"
 }

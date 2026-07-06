@@ -167,7 +167,9 @@ def get_all_daemon_statuses() -> Dict[str, Optional[Dict]]:
     daemons = [
         "scout_daemon", "distiller_daemon", 
         "research_daemon_1", "research_daemon_2", "research_daemon_3",
-        "integrator_daemon", "coordinator_daemon"
+        "integrator_daemon", "coordinator_daemon",
+        "cyber_daemon",  # Added 2026-07-06
+        "efficiency_daemon",  # Added 2026-07-06
     ]
     return {name: get_daemon_status(name) for name in daemons}
 

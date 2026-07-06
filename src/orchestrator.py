@@ -41,7 +41,6 @@ if __package__:
     from .verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3
     from .ui_ux import LoopEngine, IntentClassifier
     from .cache import get_cache
-    from .shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from .models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
 else:
     # When run directly as: python src/orchestrator.py
@@ -73,7 +72,6 @@ else:
 
     from src.ui_ux import LoopEngine, IntentClassifier
     from src.cache import get_cache
-    from src.shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from src.models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
 
 

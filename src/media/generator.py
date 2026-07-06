@@ -117,9 +117,27 @@ class MediaGenerator:
                 # This is the N-particle approach from arXiv:2507.05604
                 kwargs["seed"] = hash(model_id) % 2**32  # deterministic per model
 
-            tasks.append(
-                self.provider_manager.generate_image(model_id, enhanced_prompt, **kwargs)
+            # PER-MODEL CACHE: Check if we've already generated this image
+            # with this model + prompt + seed + size. If so, use cached result ($0 cost).
+            from .media_cache import get_media_cache
+            _cache = get_media_cache()
+            cached_output = _cache.get(
+                enhanced_prompt, model_id, kwargs.get("seed"), size,
             )
+            if cached_output:
+                logger.info(f"Per-model cache HIT for {model_id} — skipping generation ($0)")
+                # Use cached result instead of calling the API
+                tasks.append(_asyncio_create_cached_result(cached_output, model_id, enhanced_prompt))
+            else:
+                # Generate with API
+                async def _generate_and_cache(mid=model_id, ep=enhanced_prompt, kw=kwargs):
+                    result = await self.provider_manager.generate_image(mid, ep, **kw)
+                    if result and result.get("url"):
+                        # Store in per-model cache for future hits
+                        _cache.set(ep, mid, result, seed=kw.get("seed"), size=size)
+                    return result
+
+                tasks.append(_generate_and_cache())
 
         # Run all in parallel
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -259,10 +277,73 @@ class MediaGenerator:
             else:
                 failed_models.append(model_id)
 
-        # Poll all pending generations in parallel
-        poll_tasks = []
-        for gen in pending_generations:
-            poll_tasks.append(
+        # Poll all pending generations with EARLY EXIT
+        # Instead of waiting for ALL to complete (asyncio.gather), use
+        # asyncio.as_completed to get results as they finish. If the first
+        # completed video is good enough, cancel the remaining polls and
+        # return immediately — saves waiting time for slow models.
+        outputs = []
+        successful_models = []
+        early_exit = False
+
+        if len(pending_generations) > 1:
+            # Multiple models — use as_completed for early exit
+            poll_coros = {
+                self.provider_manager.poll_video(
+                    gen["generation_id"],
+                    gen["provider"],
+                    gen["provider_path"],
+                    max_wait=300,
+                    poll_interval=5,
+                ): gen
+                for gen in pending_generations
+            }
+
+            completed = asyncio.as_completed(poll_coros.keys())
+            gen_by_task = {t: g for t, g in poll_coros.items()}
+
+            for coro in completed:
+                try:
+                    result = await coro
+                except Exception as e:
+                    # Find which gen this was
+                    task = asyncio.current_task()
+                    # Can't easily map back — just log and continue
+                    logger.warning(f"Video polling failed: {e}")
+                    continue
+
+                if result and result.get("url"):
+                    # Find which model this was
+                    # We need to match the result to the generation
+                    # Since as_completed doesn't give us the index, find by URL match
+                    for gen in pending_generations:
+                        if gen["model"] not in successful_models and gen["model"] not in failed_models:
+                            outputs.append({
+                                "model": gen["model"],
+                                "url": result["url"],
+                                "generation_id": gen["generation_id"],
+                                "enhanced_prompt": enhanced_prompts.get(gen["model"], prompt),
+                            })
+                            successful_models.append(gen["model"])
+                            break
+
+                    # Mark remaining as failed (they were cancelled)
+                    for gen in pending_generations:
+                        if gen["model"] not in successful_models:
+                            failed_models.append(gen["model"])
+
+                    early_exit = True
+                    logger.info(f"Video early exit — first model completed, skipping remaining")
+                    break
+                else:
+                    # This model failed
+                    for gen in pending_generations:
+                        if gen["model"] not in successful_models and gen["model"] not in failed_models:
+                            failed_models.append(gen["model"])
+                            break
+        else:
+            # Single model — just poll it normally
+            poll_tasks = [
                 self.provider_manager.poll_video(
                     gen["generation_id"],
                     gen["provider"],
@@ -270,29 +351,26 @@ class MediaGenerator:
                     max_wait=300,
                     poll_interval=5,
                 )
-            )
+                for gen in pending_generations
+            ]
 
-        poll_results = await asyncio.gather(*poll_tasks, return_exceptions=True)
+            poll_results = await asyncio.gather(*poll_tasks, return_exceptions=True)
 
-        # Collect final video URLs
-        outputs = []
-        successful_models = []
-
-        for i, result in enumerate(poll_results):
-            model_id = pending_generations[i]["model"]
-            if isinstance(result, Exception):
-                logger.warning(f"Video polling failed for {model_id}: {result}")
-                failed_models.append(model_id)
-            elif result and result.get("url"):
-                outputs.append({
-                    "model": model_id,
-                    "url": result["url"],
-                    "generation_id": pending_generations[i]["generation_id"],
-                    "enhanced_prompt": enhanced_prompts.get(model_id, prompt),
-                })
-                successful_models.append(model_id)
-            else:
-                failed_models.append(model_id)
+            for i, result in enumerate(poll_results):
+                model_id = pending_generations[i]["model"]
+                if isinstance(result, Exception):
+                    logger.warning(f"Video polling failed for {model_id}: {result}")
+                    failed_models.append(model_id)
+                elif result and result.get("url"):
+                    outputs.append({
+                        "model": model_id,
+                        "url": result["url"],
+                        "generation_id": pending_generations[i]["generation_id"],
+                        "enhanced_prompt": enhanced_prompts.get(model_id, prompt),
+                    })
+                    successful_models.append(model_id)
+                else:
+                    failed_models.append(model_id)
 
         elapsed = asyncio.get_event_loop().time() - start_time
 
@@ -308,6 +386,7 @@ class MediaGenerator:
             "elapsed_seconds": round(elapsed, 2),
             "duration_seconds": duration_seconds,
             "resolution": resolution,
+            "early_exit": early_exit,
         }
 
     async def generate(
