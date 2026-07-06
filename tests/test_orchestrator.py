@@ -8,6 +8,8 @@ import os
 import asyncio
 import time
 
+import pytest
+
 # Add parent dir to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -15,11 +17,15 @@ from src.orchestrator import Temuclaude
 from src.models import MODEL_POOL, CHEAP_MODELS, TASK_MODEL_MAP, FUSION_PANEL, AGGREGATOR_MAP
 from src.logger import QueryLogger
 
+# Skip API-dependent tests when no backend is available
+_HAS_API = bool(os.environ.get("OPENROUTER_API_KEY")) or os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
+skip_no_api = pytest.mark.skipif(not _HAS_API, reason="No API key or Ollama running")
+
 
 # ============================================================
 # TEST 1: Task Classifier
 # ============================================================
-def test_classifier() -> bool:
+def test_classifier():
     """Test that the task classifier correctly categorizes queries."""
     tc = Temuclaude()
     loop = asyncio.new_event_loop()
@@ -71,17 +77,13 @@ def test_classifier() -> bool:
 
     loop.close()
 
-    print(f"\n=== CLASSIFIER TESTS: {passed}/{passed + failed} passed ===")
-    for query, expected, got in failures:
-        print(f"  FAIL: expected={expected}, got={got} | '{query[:60]}'")
-
-    return failed == 0
+    assert failed == 0, f"Classifier failures: {failures}"
 
 
 # ============================================================
 # TEST 2: Tier Determination
 # ============================================================
-def test_tier_determination() -> bool:
+def test_tier_determination():
     """Test that the routing tier is correctly determined."""
     tc = Temuclaude()
 
@@ -121,7 +123,7 @@ def test_tier_determination() -> bool:
 # ============================================================
 # TEST 3: Model Pool Configuration
 # ============================================================
-def test_model_pool() -> bool:
+def test_model_pool():
     """Verify all models in the pool have correct configuration."""
     required_fields = ["ollama_tag", "role", "strengths", "cost_tier", "routing_weight"]
     required_models = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"]
@@ -184,7 +186,8 @@ def test_model_pool() -> bool:
 # ============================================================
 # TEST 4: All Ollama Cloud Models Respond
 # ============================================================
-def test_all_models_respond() -> bool:
+@skip_no_api
+def test_all_models_respond():
     """Test that every model in the pool can actually respond to a query."""
     tc = Temuclaude()
     loop = asyncio.new_event_loop()
@@ -235,7 +238,8 @@ def test_all_models_respond() -> bool:
 # ============================================================
 # TEST 5: Error Handling — Model Failure
 # ============================================================
-def test_error_handling() -> bool:
+@skip_no_api
+def test_error_handling():
     """Test that the orchestrator handles model failures gracefully."""
     tc = Temuclaude()
     loop = asyncio.new_event_loop()
@@ -335,7 +339,8 @@ def test_error_handling() -> bool:
 # ============================================================
 # TEST 6: End-to-End Query
 # ============================================================
-def test_end_to_end() -> bool:
+@skip_no_api
+def test_end_to_end():
     """Test a complete end-to-end query through the orchestrator."""
     tc = Temuclaude()
     loop = asyncio.new_event_loop()
@@ -385,7 +390,7 @@ def test_end_to_end() -> bool:
 # ============================================================
 # TEST 7: Logger
 # ============================================================
-def test_logger() -> bool:
+def test_logger():
     """Test that the query logger works correctly."""
     logger = QueryLogger(log_dir="/tmp/temuclaude_test_logs")
 
@@ -421,7 +426,7 @@ def test_logger() -> bool:
 # ============================================================
 # TEST 8: CLI Entry Point
 # ============================================================
-def test_cli() -> bool:
+def test_cli():
     """Test that the CLI entry point works."""
     import subprocess
 
@@ -455,7 +460,7 @@ def test_cli() -> bool:
 # ============================================================
 # TEST 9: Concurrent Logger Writes
 # ============================================================
-def test_concurrent_logger() -> bool:
+def test_concurrent_logger():
     """Test that the logger handles concurrent writes safely."""
     import threading
 

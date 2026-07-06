@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -16,6 +17,113 @@ async function readJson(filePath: string): Promise<any> {
   } catch {
     return null;
   }
+}
+
+// Read live git history so Hasan always knows the latest changes — past and future.
+// This runs at request time, so any commit we make is immediately visible to Hasan.
+async function gatherGitContext(): Promise<string> {
+  let context = '';
+
+  try {
+    // Last 15 commits — what was recently done
+    const log = execSync('git log --oneline -15', {
+      cwd: TEMUCLAUDE_DIR,
+      encoding: 'utf-8',
+      timeout: 3000,
+    }).trim();
+    context += `\nRECENT GIT COMMITS (latest changes we made):\n${log}\n`;
+  } catch {}
+
+  try {
+    // Uncommitted changes — what's being worked on right now
+    const status = execSync('git status --short', {
+      cwd: TEMUCLAUDE_DIR,
+      encoding: 'utf-8',
+      timeout: 3000,
+    }).trim();
+    if (status) {
+      context += `\nUNCOMMITTED CHANGES (in progress right now):\n${status.substring(0, 800)}\n`;
+    }
+  } catch {}
+
+  try {
+    // Files changed in last 7 days — what's been actively worked on
+    const recentFiles = execSync(
+      "git log --since='7 days ago' --name-only --oneline --pretty=format: | sort -u | grep -v '^$' | head -30",
+      { cwd: TEMUCLAUDE_DIR, encoding: 'utf-8', timeout: 3000 }
+    ).trim();
+    if (recentFiles) {
+      context += `\nFILES CHANGED IN LAST 7 DAYS:\n${recentFiles}\n`;
+    }
+  } catch {}
+
+  try {
+    // Current branch
+    const branch = execSync('git branch --show-current', {
+      cwd: TEMUCLAUDE_DIR,
+      encoding: 'utf-8',
+      timeout: 2000,
+    }).trim();
+    context += `\nCurrent branch: ${branch}\n`;
+  } catch {}
+
+  try {
+    // Total stats
+    const stats = execSync('git log --oneline | wc -l', {
+      cwd: TEMUCLAUDE_DIR,
+      encoding: 'utf-8',
+      timeout: 2000,
+    }).trim();
+    context += `Total commits: ${stats}\n`;
+  } catch {}
+
+  return context;
+}
+
+// Scan project structure at runtime so Hasan knows what files exist
+async function gatherProjectStructure(): Promise<string> {
+  let context = '';
+
+  try {
+    // List key directories
+    const dirs = ['src', 'website/app', 'website/lib', 'tests', 'research', 'staging', 'benchmarks'];
+    for (const dir of dirs) {
+      try {
+        const files = await fs.readdir(path.join(TEMUCLAUDE_DIR, dir));
+        const py = files.filter(f => f.endsWith('.py')).length;
+        const ts = files.filter(f => f.endsWith('.ts') || f.endsWith('.tsx')).length;
+        const total = files.length;
+        if (total > 0) {
+          context += `${dir}/: ${total} files`;
+          if (py) context += ` (${py} Python)`;
+          if (ts) context += ` (${ts} TypeScript)`;
+          context += '\n';
+        }
+      } catch {}
+    }
+
+    // Check for staging contents — what Hasan is experimenting with
+    try {
+      const stagingFiles = await fs.readdir(path.join(TEMUCLAUDE_DIR, 'staging'));
+      if (stagingFiles.length > 0) {
+        context += `\nSTAGING AREA (your experiments):\n${stagingFiles.join(', ')}\n`;
+      } else {
+        context += '\nStaging area: empty (no experiments yet)\n';
+      }
+    } catch {}
+
+    // Check deployment queue
+    const deploy = await readJson(path.join(RESEARCH_DIR, 'deployment', 'deployment_queue.json'));
+    if (deploy) {
+      const pending = (deploy.pending_findings || []).filter((f: any) => f.status === 'pending_approval').length;
+      const staging = (deploy.pending_findings || []).filter((f: any) => f.status === 'in_staging').length;
+      const approved = (deploy.approved_deployments || []).length;
+      const agents = deploy.agent_scaling?.current_research_agents || 3;
+      context += `\nDeployment: ${pending} pending approval, ${staging} in staging, ${approved} approved, ${agents} research agents\n`;
+    }
+  } catch {}
+
+  return context;
 }
 
 async function gatherContext(): Promise<string> {
@@ -283,14 +391,16 @@ export async function POST(req: NextRequest) {
     }
 
     const systemContext = await gatherContext();
+    const gitContext = await gatherGitContext();
+    const projectStructure = await gatherProjectStructure();
 
-    // Load full project context so Hasan knows everything built so far
+    // Load project context (static overview — architecture, pricing, etc.)
     let projectContext = '';
     try {
       const ctxFile = path.join(RESEARCH_DIR, 'project_context.json');
       const ctxData = JSON.parse(await fs.readFile(ctxFile, 'utf-8'));
       projectContext = `
-PROJECT CONTEXT (everything built so far):
+PROJECT OVERVIEW:
 - Project: ${ctxData.project_name} — ${ctxData.tagline}
 - Creator: ${ctxData.creator}
 - Purpose: ${ctxData.purpose}
@@ -302,8 +412,6 @@ PROJECT CONTEXT (everything built so far):
 - Key metrics: ${JSON.stringify(ctxData.key_metrics)}
 - Competitors: ${ctxData.competitors.join(', ')}
 - Differentiators: ${ctxData.differentiators.join('; ')}
-- Recent phases: ${ctxData.changelog.map((c: any) => c.phase + ': ' + c.what).join('; ')}
-- Hasan rules: ${JSON.stringify(ctxData.rules_for_hasan)}
 `;
     } catch {}
 
@@ -350,7 +458,17 @@ You are speaking directly to Ggs. Be warm, direct, concise. Answer his questions
 
 Current system context:
 ${systemContext}
+
 ${projectContext}
+
+LIVE CODEBASE STATE (read from git at runtime — always current):
+${gitContext}
+
+PROJECT STRUCTURE:
+${projectStructure}
+
+You have full awareness of every change made to the codebase — past and future.
+Any commit Ggs or you make will appear in the git log above on the next request.
 
 Respond concisely (3-5 sentences max unless asked for detail). Be honest about problems. Suggest next actions when asked.`;
 
