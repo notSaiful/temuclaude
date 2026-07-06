@@ -1,4 +1,4 @@
-// Setup script: Create Razorpay plans for Pro and Enterprise
+// Setup script: Create Razorpay plans for Developer, Pro, and Enterprise
 // GET /api/setup-plans — creates plans in Razorpay, returns plan IDs to add to .env
 
 import { NextResponse } from 'next/server';
@@ -12,13 +12,24 @@ export async function GET() {
   try {
     const results: any = {};
 
+    // Create Developer plan
+    const devPlan = await createPlan({
+      name: 'Temuclaude Developer',
+      amountINR: PLANS.developer.priceINR,
+      period: 'monthly',
+      interval: 1,
+      description: '50,000 queries/month, API access, all models',
+    });
+    results.developer = { id: devPlan.id, amount: devPlan.item.amount };
+    console.log('Developer plan created:', devPlan.id);
+
     // Create Pro plan
     const proPlan = await createPlan({
       name: 'Temuclaude Pro',
       amountINR: PLANS.pro.priceINR,
       period: 'monthly',
       interval: 1,
-      description: '5,000 queries/month, API access, all models',
+      description: '500,000 queries/month, priority routing, API access',
     });
     results.pro = { id: proPlan.id, amount: proPlan.item.amount };
     console.log('Pro plan created:', proPlan.id);
@@ -29,7 +40,7 @@ export async function GET() {
       amountINR: PLANS.enterprise.priceINR,
       period: 'monthly',
       interval: 1,
-      description: '200,000 queries/month, SSO, SLA, dedicated support',
+      description: 'Unlimited queries, SSO, SLA, dedicated support',
     });
     results.enterprise = { id: entPlan.id, amount: entPlan.item.amount };
     console.log('Enterprise plan created:', entPlan.id);
@@ -39,6 +50,7 @@ export async function GET() {
       message: 'Add these plan IDs to your .env file',
       plans: results,
       envVars: {
+        RAZORPAY_PLAN_DEVELOPER_ID: results.developer.id,
         RAZORPAY_PLAN_PRO_ID: results.pro.id,
         RAZORPAY_PLAN_ENTERPRISE_ID: results.enterprise.id,
       },

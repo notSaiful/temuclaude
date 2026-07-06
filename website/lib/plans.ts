@@ -1,7 +1,9 @@
 // Central pricing configuration — single source of truth
-// All amounts in INR paise (Razorpay requirement) and USD cents
+// All amounts in INR paise (Razorpay requirement) and USD
+// Updated July 7, 2026 — based on verified competitor pricing research
+// See PRICING-RESEARCH-REPORT.md for full analysis
 
-export type PlanId = 'free' | 'pro' | 'enterprise';
+export type PlanId = 'free' | 'developer' | 'pro' | 'enterprise';
 
 export interface Plan {
   id: PlanId;
@@ -30,79 +32,106 @@ export const PLANS: Record<PlanId, Plan> = {
     period: 'forever',
     description: 'Try Temuclaude in the playground. No signup required.',
     features: [
-      '50 queries/day',
+      '100 queries/day',
       'Full 10-layer orchestration',
-      'All 5 models',
+      'All 8 models',
       'Visible orchestration panel',
       'Community support',
     ],
     cta: 'Start Free',
     featured: false,
-    queriesPerMonth: 1500, // 50/day * 30
+    queriesPerMonth: 3000, // 100/day * 30
     apiAccess: false,
     support: 'Community',
+  },
+  developer: {
+    id: 'developer',
+    name: 'Developer',
+    priceUSD: 15,
+    priceINR: 1250, // ~₹1,040
+    priceLabel: '$15',
+    period: '/month',
+    description: 'For indie developers, researchers, and startups.',
+    features: [
+      '50,000 queries/month',
+      'API access',
+      'All 8 models, full orchestration',
+      'Email support (48h)',
+      'Usage dashboard',
+      '100 requests/min',
+    ],
+    cta: 'Get Developer',
+    featured: true,
+    queriesPerMonth: 50000,
+    apiAccess: true,
+    support: 'Email (48h)',
+    razorpayPlanId: undefined,
   },
   pro: {
     id: 'pro',
     name: 'Pro',
-    priceUSD: 29,
-    priceINR: 2900, // ~₹2,400 (approx, will adjust based on exchange rate)
-    priceLabel: '$29',
+    priceUSD: 49,
+    priceINR: 4100, // ~₹3,410
+    priceLabel: '$49',
     period: '/month',
-    description: 'For developers, researchers, and startups.',
+    description: 'For power users and small teams who need more.',
     features: [
-      '5,000 queries/month',
+      '500,000 queries/month',
       'API access',
-      'All 5 models, full orchestration',
-      'Priority routing',
-      'Email support (48h)',
-      'Usage dashboard',
+      'Priority routing + faster latency',
+      'Email support (24h)',
+      'Usage dashboard + analytics',
+      '1,000 requests/min',
     ],
     cta: 'Get Pro',
-    featured: true,
-    queriesPerMonth: 5000,
+    featured: false,
+    queriesPerMonth: 500000,
     apiAccess: true,
-    support: 'Email (48h)',
-    razorpayPlanId: undefined, // set server-side, not needed on client
+    support: 'Email (24h) + Dashboard',
+    razorpayPlanId: undefined,
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
     priceUSD: 499,
-    priceINR: 49900, // ~₹41,500
+    priceINR: 41500, // ~₹34,500
     priceLabel: '$499',
     period: '/month',
-    description: 'For teams and organizations.',
+    description: 'For teams and organizations at scale.',
     features: [
-      '200,000 queries/month',
+      'Unlimited queries',
       'SSO/SAML',
       'SLA 99.9% guarantee',
       'Dedicated support + Slack',
       '10 seats included',
-      'Custom integrations',
+      'Custom integrations + models',
+      '10,000 requests/min',
     ],
     cta: 'Contact Sales',
     featured: false,
-    queriesPerMonth: 200000,
+    queriesPerMonth: -1, // unlimited
     apiAccess: true,
-    support: 'Dedicated + Slack',
-    razorpayPlanId: undefined, // set server-side, not needed on client
+    support: 'Dedicated + Slack + SLA',
+    razorpayPlanId: undefined,
   },
 };
 
 // Pay-as-you-go token pricing (per 1M tokens)
+// Positioned between ultra-cheap ($0.14 DeepSeek) and mid-tier ($1.40 GLM-5.2)
+// 10-25x cheaper than frontier, 78% gross margin
 export const PAYG_PRICING = {
-  inputPerMillion: 2.00,  // $2 per 1M input tokens
-  outputPerMillion: 10.00, // $10 per 1M output tokens
-  cachedInputPerMillion: 0.20, // $0.20 per 1M cached input tokens
+  inputPerMillion: 0.50,   // $0.50 per 1M input tokens
+  outputPerMillion: 2.00,  // $2.00 per 1M output tokens
+  cachedInputPerMillion: 0.05, // $0.05 per 1M cached input tokens (90% discount)
   currency: 'USD',
 };
 
 // Query limits per plan (per day for free, per month for paid)
 export const QUERY_LIMITS = {
-  free: { perDay: 50, perMonth: 1500 },
-  pro: { perDay: Infinity, perMonth: 5000 },
-  enterprise: { perDay: Infinity, perMonth: 200000 },
+  free: { perDay: 100, perMonth: 3000 },
+  developer: { perDay: Infinity, perMonth: 50000 },
+  pro: { perDay: Infinity, perMonth: 500000 },
+  enterprise: { perDay: Infinity, perMonth: -1 }, // unlimited
 };
 
 // Get plan by ID
