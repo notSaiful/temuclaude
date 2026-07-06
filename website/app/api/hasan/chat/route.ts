@@ -284,6 +284,29 @@ export async function POST(req: NextRequest) {
 
     const systemContext = await gatherContext();
 
+    // Load full project context so Hasan knows everything built so far
+    let projectContext = '';
+    try {
+      const ctxFile = path.join(RESEARCH_DIR, 'project_context.json');
+      const ctxData = JSON.parse(await fs.readFile(ctxFile, 'utf-8'));
+      projectContext = `
+PROJECT CONTEXT (everything built so far):
+- Project: ${ctxData.project_name} — ${ctxData.tagline}
+- Creator: ${ctxData.creator}
+- Purpose: ${ctxData.purpose}
+- What: ${ctxData.what_it_is}
+- Architecture: 3-tier routing + ${ctxData.architecture.fusion_stack.length}-layer fusion stack
+- Model pool: ${ctxData.architecture.model_pool}
+- Pricing: ${JSON.stringify(ctxData.pricing)}
+- Tech: ${JSON.stringify(ctxData.tech_stack)}
+- Key metrics: ${JSON.stringify(ctxData.key_metrics)}
+- Competitors: ${ctxData.competitors.join(', ')}
+- Differentiators: ${ctxData.differentiators.join('; ')}
+- Recent phases: ${ctxData.changelog.map((c: any) => c.phase + ': ' + c.what).join('; ')}
+- Hasan rules: ${JSON.stringify(ctxData.rules_for_hasan)}
+`;
+    } catch {}
+
     const systemPrompt = `You are Hasan, an autonomous AI system named after Hasan ibn Ali (RA), grandson of Prophet Muhammad ﷺ.
 
 You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve Temuclaude — the most intelligent, most affordable AI that beats frontier models at 50x lower cost.
@@ -306,15 +329,15 @@ Your moral principles:
 - Care for the weak — affordable for students in developing countries
 - Halal in all dealings — no haram content or partnerships
 
-STAGING & DEPLOYMENT RULES (CRITICAL):
-- You work ONLY in /staging/ — never touch the main codebase (/src, /website/app, /website/lib, /tests).
-- All experiments, improvements, and new code go to /staging/. You need NO permission for staging work.
+STAGING & DEPLOYMENT RULES (CODEBASE ONLY):
+- You work ONLY in /staging/ for codebase changes — never touch the main codebase (/src, /website/app, /website/lib, /tests).
+- All code experiments and improvements go to /staging/. You need NO permission for staging work.
 - Findings are tracked in research/deployment/deployment_queue.json.
 - Once per week (you decide the timing based on importance), mark findings as "pending_approval" and notify Ggs.
 - Ggs reviews and approves/rejects each finding via the interface.
 - Only approved findings merge into the main codebase.
-- The ONLY thing you need Ggs's permission for is deploying changes to the main codebase.
-- Everything else — research, staging experiments, agent scaling, monitoring — you do autonomously.
+- The ONLY thing you need Ggs's permission for is deploying code changes to the main codebase.
+- EVERYTHING ELSE runs autonomously without permission: marketing, research, agent scaling, monitoring, daemon management, SWOT analysis, competitive intelligence, social media, growth, revenue tracking, Ummah fund. These must run successfully 24/7 without asking.
 
 AGENT SCALING:
 - You can add or remove research agents (1-8) based on news, time of day, and Temuclaude's progress.
@@ -327,6 +350,7 @@ You are speaking directly to Ggs. Be warm, direct, concise. Answer his questions
 
 Current system context:
 ${systemContext}
+${projectContext}
 
 Respond concisely (3-5 sentences max unless asked for detail). Be honest about problems. Suggest next actions when asked.`;
 

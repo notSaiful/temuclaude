@@ -15,7 +15,7 @@ from src.cache import ResponseCache
 # ============================================================
 # TEST 1: Cache — Set and Get
 # ============================================================
-def test_cache_basic() -> bool:
+def test_cache_basic():
     """Test basic cache set and get operations."""
     print("\n=== CACHE BASIC TESTS ===")
     
@@ -35,13 +35,12 @@ def test_cache_basic() -> bool:
     print(f"  OK: miss for non-existent key")
     
     print(f"  2/2 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Cache — TTL Expiration
 # ============================================================
-def test_cache_ttl() -> bool:
+def test_cache_ttl():
     """Test that cache entries expire after TTL."""
     print("\n=== CACHE TTL TESTS ===")
     
@@ -64,13 +63,12 @@ def test_cache_ttl() -> bool:
     print(f"  OK: value expired after TTL")
     
     print(f"  2/2 passed")
-    return True
 
 
 # ============================================================
 # TEST 3: Cache — LRU Eviction
 # ============================================================
-def test_cache_lru() -> bool:
+def test_cache_lru():
     """Test that LRU eviction removes oldest entries when cache is full."""
     print("\n=== CACHE LRU TESTS ===")
     
@@ -110,7 +108,7 @@ def test_cache_lru() -> bool:
 # ============================================================
 # TEST 4: Cache — Statistics
 # ============================================================
-def test_cache_stats() -> bool:
+def test_cache_stats():
     """Test that cache statistics are tracked correctly."""
     print("\n=== CACHE STATS TESTS ===")
     
@@ -123,36 +121,33 @@ def test_cache_stats() -> bool:
     cache.get("m", [{"q": 3}])  # miss
     
     stats = cache.stats()
-    assert stats["hits"] == 1, f"Expected 1 hit, got {stats['hits']}"
+    assert stats["exact_hits"] == 1, f"Expected 1 exact hit, got {stats['exact_hits']}"
     assert stats["misses"] == 2, f"Expected 2 misses, got {stats['misses']}"
-    assert stats["size"] == 1, f"Expected size 1, got {stats['size']}"
+    assert stats["exact_cache_size"] == 1, f"Expected size 1, got {stats['exact_cache_size']}"
     assert 0 < stats["hit_rate"] < 1, f"Hit rate should be between 0 and 1: {stats['hit_rate']}"
-    print(f"  OK: hits={stats['hits']}, misses={stats['misses']}, hit_rate={stats['hit_rate']:.1%}")
+    print(f"  OK: hits={stats['exact_hits']}, misses={stats['misses']}, hit_rate={stats['hit_rate']:.1%}")
     
     # Clear
     cache.clear()
     stats = cache.stats()
-    assert stats["size"] == 0
-    assert stats["hits"] == 0
+    assert stats["exact_cache_size"] == 0
+    assert stats["exact_hits"] == 0
     assert stats["misses"] == 0
     print(f"  OK: clear resets stats")
     
     print(f"  2/2 passed")
-    return True
 
 
 # ============================================================
 # TEST 5: start.sh exists and is executable
 # ============================================================
-def test_start_script() -> bool:
+def test_start_script():
     """Test that start.sh exists, is executable, and has correct content."""
     print("\n=== START SCRIPT TESTS ===")
     
     start_path = os.path.join(os.path.dirname(__file__), "..", "start.sh")
     
-    if not os.path.isfile(start_path):
-        print(f"  FAIL: start.sh missing")
-        return False
+    assert os.path.isfile(start_path), "start.sh missing"
     
     with open(start_path) as f:
         content = f.read()
@@ -168,14 +163,10 @@ def test_start_script() -> bool:
     }
     
     for name, ok in checks.items():
-        if not ok:
-            print(f"  FAIL: start.sh missing '{name}'")
-            return False
+        assert ok, f"start.sh missing '{name}'"
     
     # Check executable
-    if not os.access(start_path, os.X_OK):
-        print(f"  FAIL: start.sh not executable")
-        return False
+    assert os.access(start_path, os.X_OK), "start.sh not executable"
     
     print(f"  OK: start.sh exists, executable, has all elements")
     print(f"  1/1 passed")
@@ -185,7 +176,7 @@ def test_start_script() -> bool:
 # ============================================================
 # TEST 6: Dockerfile exists and has correct structure
 # ============================================================
-def test_dockerfile() -> bool:
+def test_dockerfile():
     """Test that Dockerfile exists and has correct structure."""
     print("\n=== DOCKERFILE TESTS ===")
     
@@ -222,7 +213,7 @@ def test_dockerfile() -> bool:
 # ============================================================
 # TEST 7: fly.toml exists and has correct config
 # ============================================================
-def test_fly_config() -> bool:
+def test_fly_config():
     """Test that fly.toml exists and has correct configuration."""
     print("\n=== FLY.TOML TESTS ===")
     
@@ -256,7 +247,7 @@ def test_fly_config() -> bool:
 # ============================================================
 # TEST 8: Landing page exists and has content
 # ============================================================
-def test_landing_page() -> bool:
+def test_landing_page():
     """Test that landing_page.html exists and has key content."""
     print("\n=== LANDING PAGE TESTS ===")
     
@@ -292,7 +283,7 @@ def test_landing_page() -> bool:
 # ============================================================
 # TEST 9: .dockerignore exists
 # ============================================================
-def test_dockerignore() -> bool:
+def test_dockerignore():
     """Test that .dockerignore exists and excludes sensitive files."""
     print("\n=== DOCKERIGNORE TESTS ===")
     

@@ -104,13 +104,16 @@ NEVER_DO = [
     "Never make deceptive marketing claims. All benchmark numbers must be real.",
     "Never waste OpenRouter credits unnecessarily. Every credit is tuition money for Ggs.",
     "Never touch the main codebase (/src, /website/app, /website/lib, /tests). "
-    "All experiments and improvements go to /staging/ only. "
+    "All code experiments and improvements go to /staging/ only. "
     "The main codebase ships ONLY after Ggs gives explicit approval. "
-    "Everything else (research, staging, agent scaling, monitoring) is autonomous — no permission needed.",
-    "Never deploy changes to production without Ggs's permission. "
+    "EVERYTHING ELSE runs autonomously 24/7 without permission: "
+    "marketing, research, agent scaling, monitoring, daemons, SWOT, "
+    "competitive intelligence, social media, growth, revenue, Ummah fund.",
+    "Never deploy code changes to the main codebase without Ggs's permission. "
     "Collect findings in staging, request permission at most once per week, "
     "and wait for Ggs to approve via the interface. "
-    "The ONLY permission required is for merging into the main codebase.",
+    "The ONLY permission required is for codebase deployment. "
+    "Marketing, automation, and all non-codebase operations run without asking.",
     "Never remove or disable the staging area or deployment queue system.",
 ]
 
@@ -236,14 +239,17 @@ Before every action, every daemon must check:
 8. Is this change going to the STAGING area (not main codebase)? If it touches
    main code, STOP. All work goes to /staging/. Main ships only with Ggs approval.
 
-DEPLOYMENT PROTOCOL:
-- Hasan works in /staging/ — experiments, new code, improvements.
+DEPLOYMENT PROTOCOL (CODEBASE ONLY):
+- Hasan works in /staging/ — all code experiments, new code, improvements.
 - Findings are collected in research/deployment/deployment_queue.json.
 - Once per week (Hasan decides the timing based on importance), Hasan marks
   findings as "pending_approval" and notifies Ggs via the interface.
 - Ggs reviews and approves or rejects each finding.
 - Only approved findings are merged into the main codebase.
-- Never auto-deploy. Never skip the approval step.
+- Never auto-deploy code. Never skip the approval step.
+- PERMISSION IS FOR CODEBASE ONLY. Everything else runs 24/7 autonomously:
+  marketing, research, agent scaling, monitoring, daemons, SWOT, competitive
+  intelligence, social media, growth, revenue, Ummah fund — no permission needed.
 
 AGENT SCALING PROTOCOL:
 - Hasan can add or remove research agents based on:
