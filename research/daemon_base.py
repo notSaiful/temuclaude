@@ -11,6 +11,7 @@ import time
 import signal
 import logging
 import atexit
+import threading
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
@@ -30,6 +31,8 @@ class DaemonBase(ABC):
         self.heartbeat_file = DAEMON_STATE_DIR / f"{name}_heartbeat.json"
         self.log_file = DAEMON_STATE_DIR / f"{name}.log"
         self.running = False
+        self._idle = False
+        self._heartbeat_extra = {}
         self.logger = self._setup_logger()
         
         # Register signal handlers
@@ -113,40 +116,62 @@ class DaemonBase(ABC):
         """Run one iteration. Return True to continue, False to stop."""
         pass
     
+    def _heartbeat_loop(self):
+        """Background heartbeat thread — updates every 30s while running."""
+        while self.running:
+            try:
+                status = "sleeping" if self._idle else "running"
+                self.write_heartbeat(status, self._heartbeat_extra or {})
+            except Exception:
+                pass
+            time.sleep(30)
+
     def run(self, interval: float = 60.0):
-        """Main daemon loop."""
+        """Main daemon loop with background heartbeat thread."""
         if self.is_already_running():
             self.logger.error(f"{self.name} already running (PID file exists)")
             sys.exit(1)
-        
+
         self.write_pid()
         self.running = True
+        self._idle = False
+        self._heartbeat_extra = {}
         self.logger.info(f"{self.name} started (PID: {os.getpid()})")
-        
+
+        # Start background heartbeat thread
+        hb_thread = threading.Thread(target=self._heartbeat_loop, daemon=True)
+        hb_thread.start()
+
         while self.running:
             try:
                 start = time.time()
-                self.write_heartbeat("running", {"cycle_start": start})
-                
+                self._idle = False
+                self._heartbeat_extra = {"cycle_start": start}
+
                 should_continue = self.run_once()
-                
+
                 elapsed = time.time() - start
-                self.write_heartbeat("sleeping", {"cycle_duration": elapsed})
-                
+                self._idle = True
+                self._heartbeat_extra = {
+                    "cycle_duration": round(elapsed, 2),
+                    "last_run": datetime.now(timezone.utc).isoformat(),
+                }
+
                 if not should_continue:
                     self.logger.info("run_once returned False, stopping")
                     break
-                
+
                 # Sleep for remaining interval
                 sleep_time = max(0, interval - elapsed)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
-                    
+
             except Exception as e:
                 self.logger.exception(f"Error in main loop: {e}")
-                self.write_heartbeat("error", {"error": str(e)})
+                self._heartbeat_extra = {"error": str(e)}
+                self._idle = True
                 time.sleep(30)  # Back off on error
-        
+
         self.cleanup()
 
 
@@ -165,11 +190,15 @@ def get_daemon_status(name: str) -> Optional[Dict]:
 def get_all_daemon_statuses() -> Dict[str, Optional[Dict]]:
     """Get status of all known daemons."""
     daemons = [
-        "scout_daemon", "distiller_daemon", 
+        "scout_daemon", "distiller_daemon",
         "research_daemon_1", "research_daemon_2", "research_daemon_3",
         "integrator_daemon", "coordinator_daemon",
-        "cyber_daemon",  # Added 2026-07-06
-        "efficiency_daemon",  # Added 2026-07-06
+        "cyber_daemon", "efficiency_daemon", "media_daemon",
+        "marketing_daemon", "feedback_daemon", "meta_auditor_daemon",
+        "swot_daemon", "website_daemon", "industry_radar_daemon",
+        "model_optimizer_daemon", "cost_efficiency_daemon",
+        "revenue_daemon", "growth_daemon", "competitive_dominance_daemon",
+        "self_expansion_daemon", "super_intelligence_daemon",
     ]
     return {name: get_daemon_status(name) for name in daemons}
 

@@ -28,8 +28,48 @@ DAEMON_SCRIPTS = {
     "research_daemon_2": "research/research_daemon.py",
     "research_daemon_3": "research/research_daemon.py",
     "integrator_daemon": "research/integrator_daemon.py",
-    "cyber_daemon": "research/cyber_daemon.py",  # Added 2026-07-06
-    "efficiency_daemon": "research/efficiency_daemon.py",  # Added 2026-07-06
+    "cyber_daemon": "research/cyber_daemon.py",
+    "efficiency_daemon": "research/efficiency_daemon.py",
+    "media_daemon": "research/media_daemon.py",
+    "marketing_daemon": "research/marketing_daemon.py",
+    "feedback_daemon": "research/feedback_daemon.py",
+    "meta_auditor_daemon": "research/meta_auditor_daemon.py",
+    "swot_daemon": "research/swot_daemon.py",
+    "website_daemon": "research/website_daemon.py",
+    "industry_radar_daemon": "research/industry_radar_daemon.py",
+    "model_optimizer_daemon": "research/model_optimizer_daemon.py",
+    "cost_efficiency_daemon": "research/cost_efficiency_daemon.py",
+    "revenue_daemon": "research/revenue_daemon.py",
+    "growth_daemon": "research/growth_daemon.py",
+    "competitive_dominance_daemon": "research/competitive_dominance_daemon.py",
+    "self_expansion_daemon": "research/self_expansion_daemon.py",
+    "super_intelligence_daemon": "research/super_intelligence_daemon.py",
+}
+
+# Per-daemon stale thresholds (seconds) — each daemon has different expected cycle duration
+DAEMON_STALE_THRESHOLD = {
+    "scout_daemon": 1800,        # 30 min (61 arXiv queries × 15s = 15+ min)
+    "distiller_daemon": 300,    # 5 min
+    "research_daemon_1": 900,   # 15 min
+    "research_daemon_2": 900,
+    "research_daemon_3": 900,
+    "integrator_daemon": 2400,  # 40 min (LLM code gen + tests)
+    "cyber_daemon": 900,
+    "efficiency_daemon": 900,
+    "media_daemon": 900,
+    "marketing_daemon": 7200,   # 2hr (generates content every 4h)
+    "feedback_daemon": 3600,    # 1hr
+    "meta_auditor_daemon": 3600, # 1hr (runs every 30min, but audit takes time)
+    "swot_daemon": 7200,        # 2hr (runs every 6h)
+    "website_daemon": 3600,     # 1hr (runs every 2h)
+    "industry_radar_daemon": 3600, # 1hr (runs every 2h)
+    "model_optimizer_daemon": 7200, # 2hr (runs every 3h)
+    "cost_efficiency_daemon": 3600, # 1hr (runs every 1h)
+    "revenue_daemon": 3600,     # 1hr
+    "growth_daemon": 7200,      # 2hr (runs every 2h)
+    "competitive_dominance_daemon": 7200, # 2hr (runs every 4h)
+    "self_expansion_daemon": 43200, # 12hr (runs every 12h)
+    "super_intelligence_daemon": 7200, # 2hr (runs every 6h)
 }
 PRIORITIES_FILE = Path("/Users/saiful/temuclaude/research/priorities.json")
 METRICS_FILE = Path("/Users/saiful/temuclaude/research/daemon_metrics.json")
@@ -59,22 +99,26 @@ class CoordinatorDaemon(DaemonBase):
         return True
     
     def _check_health(self):
-        """Check all daemons, restart dead ones."""
+        """Check all daemons, restart dead ones using per-daemon stale thresholds."""
         statuses = get_all_daemon_statuses()
         now = time.time()
         
         for name, status in statuses.items():
+            if name == "coordinator_daemon":
+                continue  # Don't monitor self
+            
+            threshold = DAEMON_STALE_THRESHOLD.get(name, 300)  # Default 5 min
+            
             if status is None:
                 self.logger.warning(f"{name}: NO HEARTBEAT - starting")
                 self._start_daemon(name)
                 continue
             
-            # Check if heartbeat is stale (>2 minutes)
             try:
                 hb_time = datetime.fromisoformat(status["timestamp"].replace('Z', '+00:00'))
                 age = now - hb_time.timestamp()
-                if age > 120:
-                    self.logger.warning(f"{name}: STALE heartbeat ({age:.0f}s) - restarting")
+                if age > threshold:
+                    self.logger.warning(f"{name}: STALE heartbeat ({age:.0f}s > {threshold}s) - restarting")
                     self._restart_daemon(name)
             except Exception:
                 self.logger.warning(f"{name}: Invalid heartbeat - restarting")
