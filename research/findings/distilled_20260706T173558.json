@@ -1,0 +1,1176 @@
+{
+  "distilled_at": "20260706T173558",
+  "total_raw_files": 3,
+  "total_findings": 26,
+  "new_findings": 26,
+  "already_distilled": 2,
+  "by_type": {
+    "arxiv_paper": 26
+  },
+  "top_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02514v1",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "abstract": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks across pull requests (PRs) and time its payload for the PR with the best natural cover. To study the resulting dynamics, we introduce Iterative VibeCoding, a setting for AI control, the study of safely deploying capable but potentially untrusted AI. In Iterativ",
+      "authors": [
+        "Josh Hills",
+        "Ida Caspary",
+        "Asa Cooper Stickland"
+      ],
+      "published": "2026-07-02T17:59:56Z",
+      "relevance_score": 42,
+      "matched_keywords": [
+        "ensemble",
+        "benchmark",
+        "state-of-the-art",
+        "coding agent",
+        "kimi",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02514v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02514v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02490v1",
+      "title": "Visually Grounded Self-Reflection for Vision-Language Models via Reinforcement Learning",
+      "abstract": "Large vision-language models can reason over multimodal inputs by generating textual chains of thought (CoT). A key capability exhibited in CoT reasoning is self-reflection: revisiting earlier decisions and correcting previous errors. However, existing LVLMs often fail to properly attend to visual inputs during reflection, limiting their ability to translate feedback into grounded corrections, especially for out-of-distribution images. To address this issue, we propose a novel reinforcement lear",
+      "authors": [
+        "Liyan Tang",
+        "Fangcong Yin",
+        "Greg Durrett"
+      ],
+      "published": "2026-07-02T17:53:15Z",
+      "relevance_score": 40,
+      "matched_keywords": [
+        "reasoning",
+        "reflection",
+        "benchmark",
+        "novel",
+        "experience replay",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02490v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02490v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02502v1",
+      "title": "DemoPSD: Disagreement-Modulated Policy Self-Distillation",
+      "abstract": "On-policy self-distillation (OPSD) has emerged as a practical method for training large language models (LLMs) to reason, where a single model acts as both the teacher and the student with different levels of information access. However, recent studies have found that the teacher's dense token-level supervision, conditioned on privileged information, can lead to overfitting to in-domain patterns, suppress exploration, and hurt cross-domain generalization, while also introducing a more fundamenta",
+      "authors": [
+        "Yunhe Li",
+        "Hao Shi",
+        "Wenhao Liu",
+        "Mengzhe Ruan",
+        "Hanxu Hou",
+        "Zhongxiang Dai",
+        "Shuang Qiu",
+        "Linqi Song"
+      ],
+      "published": "2026-07-02T17:58:29Z",
+      "relevance_score": 39,
+      "matched_keywords": [
+        "reasoning",
+        "benchmark",
+        "gpqa",
+        "novel",
+        "outperform",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02502v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02502v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02504v1",
+      "title": "Reasoning LLM Improves Speaker Recognition in Long-form TV Dramas",
+      "abstract": "Long-form TV dramas present a formidable challenge for comprehensive video understanding, where deciphering complex storyline often relies on \\textbf{speaker recognition}, the task of accurately attributing each spoken utterance to its respective character. In this paper, we advance this field through two primary contributions. (1) We introduce \\textbf{DramaSR-532K}, a large-scale benchmark comprising 532K annotated dialogue lines across more than 900 unique characters, necessitating the integra",
+      "authors": [
+        "Yuxuan Li",
+        "Lingxi Xie",
+        "Xinyue Huo",
+        "Jihao Qiu",
+        "Jiacheng Shao",
+        "Pengfei Chen",
+        "Jiannan Ge",
+        "Kaiwen Duan",
+        "Qi Tian"
+      ],
+      "published": "2026-07-02T17:58:52Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "reasoning",
+        "benchmark",
+        "outperform",
+        "tool-use",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02504v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02504v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02497v1",
+      "title": "Seek to Segment: Active Perception for Panoramic Referring Segmentation",
+      "abstract": "Existing referring segmentation models passively process static images captured from fixed perspectives, limiting their applicability in Embodied AI, where agents must perform active perception in the continuous 360$^\\circ$ environments. To bridge this gap, we introduce a novel task: Active Panoramic Referring Segmentation (APRS). In this setting, an agent is required to adjust its viewing direction ($\u0394\u03b8, \u0394\u03c6$) to explore the 360$^\\circ$ environment, seeking the object specified by a user instruc",
+      "authors": [
+        "Song Tang",
+        "Shuming Hu",
+        "Xincheng Shuai",
+        "Henghui Ding",
+        "Yu-Gang Jiang"
+      ],
+      "published": "2026-07-02T17:56:49Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "benchmark",
+        "state-of-the-art",
+        "novel",
+        "outperform",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02497v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02497v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02464v1",
+      "title": "Will Scaling Improve Social Simulation with LLMs?",
+      "abstract": "Large Language Model (LLM) social simulations are a promising research method, but they are not yet faithful enough to be adopted widely. In this work, we investigate whether the current scaling paradigm in language modeling is likely to close these gaps, or whether simulation fidelity is orthogonal to general capabilities and therefore deserving of more research attention. We use scaling laws to study the relationship between LLMs' compute scale, general capability benchmarks, and the fidelity ",
+      "authors": [
+        "Caleb Ziems",
+        "William Held",
+        "Su Doga Karaca",
+        "David Grusky",
+        "Tatsunori Hashimoto",
+        "Diyi Yang"
+      ],
+      "published": "2026-07-02T17:30:38Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "reasoning",
+        "mmlu",
+        "benchmark",
+        "qwen",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02464v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02464v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02516v1",
+      "title": "Alignment Is All You Need For X-to-4D Generation",
+      "abstract": "Generative diffusion models excel at synthesizing high-quality images, videos, and 3D content under multimodal control. However, arbitrary user-defined modality-to-4D (X-to-4D) generation remains challenging due to the high cost of constructing diverse datasets and the limited scalability of existing methods. This paper presents Align4D, a flexible framework that translates any-modal input into coherent video-3D pairs, using video to guide 4D motion and 3D data to shape 4D geometry. Align4D intr",
+      "authors": [
+        "Qiaowei Miao",
+        "Kehan Li",
+        "Yawei Luo",
+        "Yi Yang"
+      ],
+      "published": "2026-07-02T17:59:57Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "fusion",
+        "benchmark",
+        "state-of-the-art",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02516v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02516v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02467v1",
+      "title": "Human Capital, Not Model Benchmarks, Predicts Hybrid Intelligence in Forecasting",
+      "abstract": "Whether pairing people with AI helps or hurts is usually reported as a single average effect. Using a real-money prediction market (Polymarket) as an objective, externally resolved benchmark, this pilot shows that the value of human-AI collaboration depends on a specific, measurable form of human capital. Analyzed at the level of the individual forecaster, hybrid performance is trimodal: most people either deferred to the model (matching it) or used it to rubber-stamp a prior guess (performing w",
+      "authors": [
+        "Vivienne Ming"
+      ],
+      "published": "2026-07-02T17:34:37Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "reasoning",
+        "collaborative",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02467v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02467v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02515v1",
+      "title": "PointDiT: Pixel-Space Diffusion for Monocular Geometry Estimation",
+      "abstract": "State-of-the-art single-image 3D reconstruction methods often rely on complex hybrid architectures and loss functions, or compress geometry into latent spaces in order to leverage pre-trained latent diffusion models. In this work, we show that such architectural overhead and intricate loss formulations are unnecessary. We introduce a minimalist pixel-space Diffusion Transformer, built on a plain ViT, that operates directly on raw 3D point map patches and is conditioned on image tokens from a pre",
+      "authors": [
+        "Haofei Xu",
+        "Rundi Wu",
+        "Philipp Henzler",
+        "Nikolai Kalischek",
+        "Michael Oechsle",
+        "Fabian Manhardt",
+        "Marc Pollefeys",
+        "Andreas Geiger",
+        "Federico Tombari",
+        "Michael Niemeyer"
+      ],
+      "published": "2026-07-02T17:59:56Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "fusion",
+        "state-of-the-art",
+        "surpass"
+      ],
+      "url": "http://arxiv.org/abs/2607.02515v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02515v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02453v1",
+      "title": "Adoption and Ecosystem Health: A Longitudinal Analysis of Open-Source Multi-Agent Frameworks",
+      "abstract": "Since ChatGPT's launch in November 2022, open-source agentic frameworks have proliferated, making framework selection important for engineering teams while obscured by popularity signals such as GitHub stars. This paper analyzes 15 major open-source AI agent framework repositories from late 2022 to early 2026, using 808,042 stars, 73,997 pull requests, 86,241 commits, and 987,330 user profiles to assess ecosystem health across awareness, adoption, and retention. Three findings emerge. First, hea",
+      "authors": [
+        "Xi Zhang",
+        "Papi Menon",
+        "Vivian Chu",
+        "Koray Cosguner"
+      ],
+      "published": "2026-07-02T17:23:02Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "agent framework"
+      ],
+      "url": "http://arxiv.org/abs/2607.02453v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02453v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02509v1",
+      "title": "ReContext: Recursive Evidence Replay as LLM Harness for Long-Context Reasoning",
+      "abstract": "Understanding and reasoning over long contexts has become a key requirement for deploying large language models (LLMs) in realistic applications. Although recent LLMs support increasingly long context windows, they often fail to use relevant evidence that is already present in the input, revealing a gap between context access and effective context utilization. In this work, we propose Recursive Evidence Replay as LLM Harness for Long-Context Reasoning (RECONTEXT), a training-free inference metho",
+      "authors": [
+        "Yanjun Zhao",
+        "Ruizhong Qiu",
+        "Tianxin Wei",
+        "Yuanchen Bei",
+        "Zhining Liu",
+        "Lingjie Chen",
+        "Ismini Lourentzou",
+        "Hanghang Tong",
+        "Jingrui He"
+      ],
+      "published": "2026-07-02T17:59:26Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "reasoning",
+        "react",
+        "llama",
+        "qwen"
+      ],
+      "url": "http://arxiv.org/abs/2607.02509v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02509v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02448v1",
+      "title": "AgentsCAD: Automated Design for Manufacturing of FDM Parts via Multi-Agent LLM Reasoning and Geometric Feature Recognition",
+      "abstract": "Parts manufactured with Fused Deposition Modeling (FDM) often require Design for Additive Manufacturing (DFAM) modifications to ensure printability, structural integrity, and reduced post-processing. Current slicers identify defects such as steep overhangs but are unable to modify the underlying geometry. This work presents AgentsCAD, a multi-agent system that bridges raw boundary-representation (B-Rep) geometry and Large Language Model (LLM) reasoning to automate targeted DFM. The workflow begi",
+      "authors": [
+        "Emmanuel George",
+        "Christopher Keefe",
+        "Peter Pak",
+        "Amir Barati Farimani"
+      ],
+      "published": "2026-07-02T17:19:41Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent",
+        "agentic"
+      ],
+      "url": "http://arxiv.org/abs/2607.02448v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02448v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02307v1",
+      "title": "On the Role of Directionality in Structural Generalization",
+      "abstract": "Several SLOG test categories explicitly involve directional distinctions (modifier position shifts, argument extraction positions), yet AM-Parser, the previous SOTA, uses an AM algebra whose operations do not encode direction. We redesign the symbolic backend around CCG directed types (deterministic CKY + single linear decoder, 30K learnable parameters). Under the same BERT-base encoder, the system achieves 75.9$\\pm$6.4% LF exact match, surpassing AM-Parser (70.8$\\pm$4.3%). Per SLOG's own catego",
+      "authors": [
+        "Zichao Wei"
+      ],
+      "published": "2026-07-02T15:20:51Z",
+      "relevance_score": 21,
+      "matched_keywords": [
+        "sota",
+        "outperform",
+        "surpass"
+      ],
+      "url": "http://arxiv.org/abs/2607.02307v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02307v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02496v1",
+      "title": "Controllable Sim Agents with Behavior Latents",
+      "abstract": "Realistic traffic simulation requires agents that imitate logged behavior and can also be steered along interpretable axes. Such controllability enables engineers to isolate variables, reproduce specific edge cases, and test autonomous systems without real-world risk. We introduce Controllable Neural Variational Agents (CNeVA), a controllable simulated-agent framework that learns to infer a per-agent Gaussian behavior latent from per-channel discounted returns via a closed-form conjugate variati",
+      "authors": [
+        "Juanwu Lu",
+        "Junyu Zhu",
+        "Ziran Wang"
+      ],
+      "published": "2026-07-02T17:55:39Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "benchmark",
+        "agent framework",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02496v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02496v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02460v1",
+      "title": "Neuron-Aware Data Selection for Annotation-Free LLM Self-Distillation",
+      "abstract": "Post-training large language models (LLMs) without real-world interaction feedback or human-labeled supervision remains challenging, particularly in specialized domains where expert annotations are costly to obtain. Recent annotation-free self-evolution methods address this by using the model's own outputs as supervision signals, constructing a teacher via additional context and aggregating predictions across multiple rollouts through majority voting to produce pseudo-labels. However, these appr",
+      "authors": [
+        "Zhuowei Chen",
+        "Xiang Lorraine Li"
+      ],
+      "published": "2026-07-02T17:27:24Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "voting",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02460v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02460v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02494v1",
+      "title": "Towards Robustness against Typographic Attack with Training-free Concept Localization",
+      "abstract": "Models trained via Contrastive Language-Image Pretraining (CLIP) serve as the foundational vision encoders for most modern Large Vision Language Models (LVLMs). Despite their widespread adoption, CLIP models exhibit a critical yet underexplored failure mode: irrelevant text appearing within images confounds visual representations, biasing them toward lexical meaning rather than true visual semantics. This robustness issue, commonly described as a Typographic Attack (TA), exposes a vulnerability ",
+      "authors": [
+        "Bohan Liu",
+        "Wenqian Ye",
+        "Guangzhi Xiong",
+        "Zhenghao He",
+        "Sanchit Sinha",
+        "Aidong Zhang"
+      ],
+      "published": "2026-07-02T17:55:24Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "state-of-the-art",
+        "novel",
+        "outperform"
+      ],
+      "url": "http://arxiv.org/abs/2607.02494v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02494v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02484v1",
+      "title": "Combating Textual Noise and Redundancy: Entropy-Aware Dense Visual Token Pruning",
+      "abstract": "Visual token pruning is a crucial strategy for accelerating VLMs by compressing redundant image patches, yet existing methods often fail to preserve critical cues under dense instructions and fine-grained queries. In this paper, we investigate this failure and identify two underlying bottlenecks: the widespread dispersion of textual noise that corrupts dense cross-modal scoring, and the feature fragmentation inherent to standard token selection. To address these issues, we propose Entropy-Aware ",
+      "authors": [
+        "Xuehui Wang",
+        "Xuankun Yang",
+        "Wei Shen"
+      ],
+      "published": "2026-07-02T17:50:57Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "benchmark",
+        "sota",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02484v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02484v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02479v1",
+      "title": "EAGLE-360: Embodied Active Global-to-Local Exploration in 360$^\\circ$",
+      "abstract": "While Multimodal Large Language Models (MLLMs) have demonstrated exceptional capabilities in standard visual understanding, adapting them for active visual search in 360$^\\circ$ panoramic environments exposes fundamental limitations. Specifically, standard MLLMs struggle to effectively model inherent panoramic properties, such as severe polar distortion and continuous cylindrical topologies, which significantly degrades target detection accuracy. Consequently, existing panoramic search methods a",
+      "authors": [
+        "Jingtao Xu",
+        "Zizhuo Lin",
+        "Jianwen Sun",
+        "Yi Yang",
+        "Yawei Luo"
+      ],
+      "published": "2026-07-02T17:47:27Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "reasoning",
+        "state-of-the-art",
+        "novel"
+      ],
+      "url": "http://arxiv.org/abs/2607.02479v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02479v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02389v1",
+      "title": "Steerability via constraints: a substrate for scalable oversight of coding agents",
+      "abstract": "Coding agents are capable; human oversight is the bottleneck. Unconstrained agents introduce security risks, erode codebase scalability, and make human review increasingly costly. We argue that the same methods used for decades to manage large human engineering teams: access control, network policies, strict coding conventions enforced by tooling; transfer directly to coding agents, and are cheaper (in token) than recent agentic scaffolding. We sketch a start-to-end system on this principle, and",
+      "authors": [
+        "Thomas Winninger"
+      ],
+      "published": "2026-07-02T16:24:47Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "agentic",
+        "coding agent",
+        "gemma"
+      ],
+      "url": "http://arxiv.org/abs/2607.02389v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02389v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02507v1",
+      "title": "What LLM Agents Say When No One Is Watching: Social Structure and Latent Objective Emergence in Multi-Agent Debates",
+      "abstract": "LLM agents will increasingly act in socially structured settings where role, audience, and relational context can shape what is advantageous or costly to say. We study whether such social structure, without any explicit objective in the prompt, changes what an agent expresses publicly relative to an off-the-record (OTR) channel elicited under the same condition. We introduce a dual-channel debate framework in which agents produce public utterances that enter the shared history alongside OTR resp",
+      "authors": [
+        "Arman Ghaffarizadeh",
+        "Danyal Mohaddes",
+        "Aliakbar Izadkhah",
+        "Shahriar Noroozizadeh"
+      ],
+      "published": "2026-07-02T17:59:23Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "multi-agent",
+        "debate"
+      ],
+      "url": "http://arxiv.org/abs/2607.02507v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02507v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02275v1",
+      "title": "Cadence: Extreme Pipelining with Multiple Concurrent Proposers",
+      "abstract": "We present Cadence, a Byzantine fault-tolerant multi-proposer consensus protocol with arbitrarily low block intervals, optimal resilience, and optimal fast-path latency. Cadence divides time into equally spaced slots, one block per slot, each finalized in its own consensus instance. Blocks do not build directly on their predecessor, so instances run independently and none waits for an earlier block to finish or propagate; we call this extreme pipelining, decoupling the block interval from networ",
+      "authors": [
+        "Fatima Elsheimy",
+        "Mohammad Mussadiq Jalalzai",
+        "Tobias Klenze",
+        "Jovan Komatovic",
+        "Mike Setrin",
+        "Victor Shoup",
+        "Kushal Babel",
+        "Lioba Heimbach",
+        "Jason Milionis"
+      ],
+      "published": "2026-07-02T14:56:59Z",
+      "relevance_score": 14,
+      "matched_keywords": [
+        "consensus",
+        "react"
+      ],
+      "url": "http://arxiv.org/abs/2607.02275v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02275v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02503v1",
+      "title": "VT-WAM: Visual-Tactile World Action Model for Contact-Rich Manipulation",
+      "abstract": "Contact-rich manipulation requires policies to react to local deformation, pressure, slip, and friction, yet these cues are temporally sparse and often invisible in visual observations. Existing visual-tactile policies usually feed tactile observations directly into action prediction, but rarely model tactile deformation dynamics during action generation. In this paper, we introduce VT-WAM, a Visual-Tactile World Action Model that jointly learns future visual prediction, tactile deformation pred",
+      "authors": [
+        "Shuai Tian",
+        "Yupeng Zheng",
+        "Yuhang Zheng",
+        "Songen Gu",
+        "Yujie Zang",
+        "Yuxing Qin",
+        "Weize Li",
+        "Haoran Li",
+        "Wenchao Ding",
+        "Dongbin Zhao"
+      ],
+      "published": "2026-07-02T17:58:36Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "outperform",
+        "react"
+      ],
+      "url": "http://arxiv.org/abs/2607.02503v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02503v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02501v1",
+      "title": "Embodied.cpp: A Portable Inference Runtime of Embodied AI Models on Heterogeneous Robots",
+      "abstract": "Embodied AI models now span vision-language-action (VLA) models and world-action models (WAMs), but practical deployment remains fragmented across model-specific Python stacks, backend assumptions, and robot-side glue code, especially on heterogeneous edge devices. Existing inference runtimes are designed mainly for request-response serving and therefore do not satisfy the runtime contract of embodied deployment: multi-rate execution inside closed-loop control, latency-first batch-1 inference on",
+      "authors": [
+        "Ling Xu",
+        "Chuyu Han",
+        "Borui Li",
+        "Hao Wu",
+        "Shiqi Jiang",
+        "Ting Cao",
+        "Chuanyou Li",
+        "Sheng Zhong",
+        "Shuai Wang"
+      ],
+      "published": "2026-07-02T17:58:28Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02501v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02501v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02442v1",
+      "title": "HTTP REST API Structure Learning",
+      "abstract": "Application Programming Interfaces (APIs) are essential in software development, enabling web services, mobile apps, and microservices. However, their widespread use introduces significant security risks, highlighting the importance of API security. This paper presents HTTP REST API Learning (HRAL), a novel unsupervised anomaly detection approach that models the structure and behavior of API endpoints directly from network traffic, without relying on predefined rules or documentation. HRAL enabl",
+      "authors": [
+        "Ran Dubin",
+        "Amit Dvir"
+      ],
+      "published": "2026-07-02T17:10:58Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "novel",
+        "outperform"
+      ],
+      "url": "http://arxiv.org/abs/2607.02442v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02442v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02428v1",
+      "title": "Self-Auditing Residual Drifting for Pathology-Preserving Accelerated Knee MRI",
+      "abstract": "Accelerated magnetic resonance imaging reduces acquisition time, but reconstruction from undersampled k-space can blur diagnostically relevant structures or introduce failures that are not captured by global image metrics. We propose SA-RDM-DC, a Self-Auditing Residual generative Drifting Model with Data Consistency for accelerated knee MRI. The method adapts the newly proposed generative drifting paradigm to accelerated MRI by training a physics-conditioned drift field from the zero-filled reco",
+      "authors": [
+        "Qing Lyu",
+        "Jianxu Wang",
+        "Mohammad Kawas",
+        "Ge Wang",
+        "Christopher T. Whitlow"
+      ],
+      "published": "2026-07-02T16:59:03Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "url": "http://arxiv.org/abs/2607.02428v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02428v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02508v1",
+      "title": "From SRA to Self-Flow: Data Augmentation or Self-Supervision?",
+      "abstract": "Representation alignment has become an effective way to accelerate diffusion transformer training and improve generation quality. Recent self-alignment methods, such as SRA and Self-Flow, further remove the dependency on external pretrained encoders by constructing alignment within the diffusion model itself. However, the mechanism behind the improvement from SRA to Self-Flow, dual-time scheduling, remains under-examined: Self-Flow attributes its gain to interactions between tokens at different ",
+      "authors": [
+        "Dengyang Jiang",
+        "Mengmeng Wang",
+        "Harry Yang",
+        "Jingdong Wang"
+      ],
+      "published": "2026-07-02T17:59:25Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "url": "http://arxiv.org/abs/2607.02508v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02508v1"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02514v1",
+      "title": "Distributed Attacks in Persistent-State AI Control",
+      "abstract": "As AI coding agents become more autonomous, they increasingly ship code iteratively, with the codebase persisting across sessions. This persistence creates a new attack surface: a misaligned or prompt-injected agent can distribute attacks across pull requests (PRs) and time its payload for the PR with the best natural cover. To study the resulting dynamics, we introduce Iterative VibeCoding, a setting for AI control, the study of safely deploying capable but potentially untrusted AI. In Iterativ",
+      "authors": [
+        "Josh Hills",
+        "Ida Caspary",
+        "Asa Cooper Stickland"
+      ],
+      "published": "2026-07-02T17:59:56Z",
+      "relevance_score": 42,
+      "matched_keywords": [
+        "ensemble",
+        "benchmark",
+        "state-of-the-art",
+        "coding agent",
+        "kimi",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02514v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02514v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02490v1",
+      "title": "Visually Grounded Self-Reflection for Vision-Language Models via Reinforcement Learning",
+      "abstract": "Large vision-language models can reason over multimodal inputs by generating textual chains of thought (CoT). A key capability exhibited in CoT reasoning is self-reflection: revisiting earlier decisions and correcting previous errors. However, existing LVLMs often fail to properly attend to visual inputs during reflection, limiting their ability to translate feedback into grounded corrections, especially for out-of-distribution images. To address this issue, we propose a novel reinforcement lear",
+      "authors": [
+        "Liyan Tang",
+        "Fangcong Yin",
+        "Greg Durrett"
+      ],
+      "published": "2026-07-02T17:53:15Z",
+      "relevance_score": 40,
+      "matched_keywords": [
+        "reasoning",
+        "reflection",
+        "benchmark",
+        "novel",
+        "experience replay",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02490v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02490v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02502v1",
+      "title": "DemoPSD: Disagreement-Modulated Policy Self-Distillation",
+      "abstract": "On-policy self-distillation (OPSD) has emerged as a practical method for training large language models (LLMs) to reason, where a single model acts as both the teacher and the student with different levels of information access. However, recent studies have found that the teacher's dense token-level supervision, conditioned on privileged information, can lead to overfitting to in-domain patterns, suppress exploration, and hurt cross-domain generalization, while also introducing a more fundamenta",
+      "authors": [
+        "Yunhe Li",
+        "Hao Shi",
+        "Wenhao Liu",
+        "Mengzhe Ruan",
+        "Hanxu Hou",
+        "Zhongxiang Dai",
+        "Shuang Qiu",
+        "Linqi Song"
+      ],
+      "published": "2026-07-02T17:58:29Z",
+      "relevance_score": 39,
+      "matched_keywords": [
+        "reasoning",
+        "benchmark",
+        "gpqa",
+        "novel",
+        "outperform",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02502v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02502v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02504v1",
+      "title": "Reasoning LLM Improves Speaker Recognition in Long-form TV Dramas",
+      "abstract": "Long-form TV dramas present a formidable challenge for comprehensive video understanding, where deciphering complex storyline often relies on \\textbf{speaker recognition}, the task of accurately attributing each spoken utterance to its respective character. In this paper, we advance this field through two primary contributions. (1) We introduce \\textbf{DramaSR-532K}, a large-scale benchmark comprising 532K annotated dialogue lines across more than 900 unique characters, necessitating the integra",
+      "authors": [
+        "Yuxuan Li",
+        "Lingxi Xie",
+        "Xinyue Huo",
+        "Jihao Qiu",
+        "Jiacheng Shao",
+        "Pengfei Chen",
+        "Jiannan Ge",
+        "Kaiwen Duan",
+        "Qi Tian"
+      ],
+      "published": "2026-07-02T17:58:52Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "reasoning",
+        "benchmark",
+        "outperform",
+        "tool-use",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02504v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02504v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02497v1",
+      "title": "Seek to Segment: Active Perception for Panoramic Referring Segmentation",
+      "abstract": "Existing referring segmentation models passively process static images captured from fixed perspectives, limiting their applicability in Embodied AI, where agents must perform active perception in the continuous 360$^\\circ$ environments. To bridge this gap, we introduce a novel task: Active Panoramic Referring Segmentation (APRS). In this setting, an agent is required to adjust its viewing direction ($\u0394\u03b8, \u0394\u03c6$) to explore the 360$^\\circ$ environment, seeking the object specified by a user instruc",
+      "authors": [
+        "Song Tang",
+        "Shuming Hu",
+        "Xincheng Shuai",
+        "Henghui Ding",
+        "Yu-Gang Jiang"
+      ],
+      "published": "2026-07-02T17:56:49Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "benchmark",
+        "state-of-the-art",
+        "novel",
+        "outperform",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02497v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02497v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02464v1",
+      "title": "Will Scaling Improve Social Simulation with LLMs?",
+      "abstract": "Large Language Model (LLM) social simulations are a promising research method, but they are not yet faithful enough to be adopted widely. In this work, we investigate whether the current scaling paradigm in language modeling is likely to close these gaps, or whether simulation fidelity is orthogonal to general capabilities and therefore deserving of more research attention. We use scaling laws to study the relationship between LLMs' compute scale, general capability benchmarks, and the fidelity ",
+      "authors": [
+        "Caleb Ziems",
+        "William Held",
+        "Su Doga Karaca",
+        "David Grusky",
+        "Tatsunori Hashimoto",
+        "Diyi Yang"
+      ],
+      "published": "2026-07-02T17:30:38Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "reasoning",
+        "mmlu",
+        "benchmark",
+        "qwen",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02464v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02464v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02516v1",
+      "title": "Alignment Is All You Need For X-to-4D Generation",
+      "abstract": "Generative diffusion models excel at synthesizing high-quality images, videos, and 3D content under multimodal control. However, arbitrary user-defined modality-to-4D (X-to-4D) generation remains challenging due to the high cost of constructing diverse datasets and the limited scalability of existing methods. This paper presents Align4D, a flexible framework that translates any-modal input into coherent video-3D pairs, using video to guide 4D motion and 3D data to shape 4D geometry. Align4D intr",
+      "authors": [
+        "Qiaowei Miao",
+        "Kehan Li",
+        "Yawei Luo",
+        "Yi Yang"
+      ],
+      "published": "2026-07-02T17:59:57Z",
+      "relevance_score": 30,
+      "matched_keywords": [
+        "fusion",
+        "benchmark",
+        "state-of-the-art",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02516v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02516v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02467v1",
+      "title": "Human Capital, Not Model Benchmarks, Predicts Hybrid Intelligence in Forecasting",
+      "abstract": "Whether pairing people with AI helps or hurts is usually reported as a single average effect. Using a real-money prediction market (Polymarket) as an objective, externally resolved benchmark, this pilot shows that the value of human-AI collaboration depends on a specific, measurable form of human capital. Analyzed at the level of the individual forecaster, hybrid performance is trimodal: most people either deferred to the model (matching it) or used it to rubber-stamp a prior guess (performing w",
+      "authors": [
+        "Vivienne Ming"
+      ],
+      "published": "2026-07-02T17:34:37Z",
+      "relevance_score": 25,
+      "matched_keywords": [
+        "reasoning",
+        "collaborative",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02467v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02467v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02515v1",
+      "title": "PointDiT: Pixel-Space Diffusion for Monocular Geometry Estimation",
+      "abstract": "State-of-the-art single-image 3D reconstruction methods often rely on complex hybrid architectures and loss functions, or compress geometry into latent spaces in order to leverage pre-trained latent diffusion models. In this work, we show that such architectural overhead and intricate loss formulations are unnecessary. We introduce a minimalist pixel-space Diffusion Transformer, built on a plain ViT, that operates directly on raw 3D point map patches and is conditioned on image tokens from a pre",
+      "authors": [
+        "Haofei Xu",
+        "Rundi Wu",
+        "Philipp Henzler",
+        "Nikolai Kalischek",
+        "Michael Oechsle",
+        "Fabian Manhardt",
+        "Marc Pollefeys",
+        "Andreas Geiger",
+        "Federico Tombari",
+        "Michael Niemeyer"
+      ],
+      "published": "2026-07-02T17:59:56Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "fusion",
+        "state-of-the-art",
+        "surpass"
+      ],
+      "url": "http://arxiv.org/abs/2607.02515v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02515v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02453v1",
+      "title": "Adoption and Ecosystem Health: A Longitudinal Analysis of Open-Source Multi-Agent Frameworks",
+      "abstract": "Since ChatGPT's launch in November 2022, open-source agentic frameworks have proliferated, making framework selection important for engineering teams while obscured by popularity signals such as GitHub stars. This paper analyzes 15 major open-source AI agent framework repositories from late 2022 to early 2026, using 808,042 stars, 73,997 pull requests, 86,241 commits, and 987,330 user profiles to assess ecosystem health across awareness, adoption, and retention. Three findings emerge. First, hea",
+      "authors": [
+        "Xi Zhang",
+        "Papi Menon",
+        "Vivian Chu",
+        "Koray Cosguner"
+      ],
+      "published": "2026-07-02T17:23:02Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "agent framework"
+      ],
+      "url": "http://arxiv.org/abs/2607.02453v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02453v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02509v1",
+      "title": "ReContext: Recursive Evidence Replay as LLM Harness for Long-Context Reasoning",
+      "abstract": "Understanding and reasoning over long contexts has become a key requirement for deploying large language models (LLMs) in realistic applications. Although recent LLMs support increasingly long context windows, they often fail to use relevant evidence that is already present in the input, revealing a gap between context access and effective context utilization. In this work, we propose Recursive Evidence Replay as LLM Harness for Long-Context Reasoning (RECONTEXT), a training-free inference metho",
+      "authors": [
+        "Yanjun Zhao",
+        "Ruizhong Qiu",
+        "Tianxin Wei",
+        "Yuanchen Bei",
+        "Zhining Liu",
+        "Lingjie Chen",
+        "Ismini Lourentzou",
+        "Hanghang Tong",
+        "Jingrui He"
+      ],
+      "published": "2026-07-02T17:59:26Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "reasoning",
+        "react",
+        "llama",
+        "qwen"
+      ],
+      "url": "http://arxiv.org/abs/2607.02509v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02509v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02448v1",
+      "title": "AgentsCAD: Automated Design for Manufacturing of FDM Parts via Multi-Agent LLM Reasoning and Geometric Feature Recognition",
+      "abstract": "Parts manufactured with Fused Deposition Modeling (FDM) often require Design for Additive Manufacturing (DFAM) modifications to ensure printability, structural integrity, and reduced post-processing. Current slicers identify defects such as steep overhangs but are unable to modify the underlying geometry. This work presents AgentsCAD, a multi-agent system that bridges raw boundary-representation (B-Rep) geometry and Large Language Model (LLM) reasoning to automate targeted DFM. The workflow begi",
+      "authors": [
+        "Emmanuel George",
+        "Christopher Keefe",
+        "Peter Pak",
+        "Amir Barati Farimani"
+      ],
+      "published": "2026-07-02T17:19:41Z",
+      "relevance_score": 22,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent",
+        "agentic"
+      ],
+      "url": "http://arxiv.org/abs/2607.02448v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02448v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02307v1",
+      "title": "On the Role of Directionality in Structural Generalization",
+      "abstract": "Several SLOG test categories explicitly involve directional distinctions (modifier position shifts, argument extraction positions), yet AM-Parser, the previous SOTA, uses an AM algebra whose operations do not encode direction. We redesign the symbolic backend around CCG directed types (deterministic CKY + single linear decoder, 30K learnable parameters). Under the same BERT-base encoder, the system achieves 75.9$\\pm$6.4% LF exact match, surpassing AM-Parser (70.8$\\pm$4.3%). Per SLOG's own catego",
+      "authors": [
+        "Zichao Wei"
+      ],
+      "published": "2026-07-02T15:20:51Z",
+      "relevance_score": 21,
+      "matched_keywords": [
+        "sota",
+        "outperform",
+        "surpass"
+      ],
+      "url": "http://arxiv.org/abs/2607.02307v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02307v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02496v1",
+      "title": "Controllable Sim Agents with Behavior Latents",
+      "abstract": "Realistic traffic simulation requires agents that imitate logged behavior and can also be steered along interpretable axes. Such controllability enables engineers to isolate variables, reproduce specific edge cases, and test autonomous systems without real-world risk. We introduce Controllable Neural Variational Agents (CNeVA), a controllable simulated-agent framework that learns to infer a per-agent Gaussian behavior latent from per-channel discounted returns via a closed-form conjugate variati",
+      "authors": [
+        "Juanwu Lu",
+        "Junyu Zhu",
+        "Ziran Wang"
+      ],
+      "published": "2026-07-02T17:55:39Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "benchmark",
+        "agent framework",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02496v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02496v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02460v1",
+      "title": "Neuron-Aware Data Selection for Annotation-Free LLM Self-Distillation",
+      "abstract": "Post-training large language models (LLMs) without real-world interaction feedback or human-labeled supervision remains challenging, particularly in specialized domains where expert annotations are costly to obtain. Recent annotation-free self-evolution methods address this by using the model's own outputs as supervision signals, constructing a teacher via additional context and aggregating predictions across multiple rollouts through majority voting to produce pseudo-labels. However, these appr",
+      "authors": [
+        "Zhuowei Chen",
+        "Xiang Lorraine Li"
+      ],
+      "published": "2026-07-02T17:27:24Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "voting",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02460v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02460v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02494v1",
+      "title": "Towards Robustness against Typographic Attack with Training-free Concept Localization",
+      "abstract": "Models trained via Contrastive Language-Image Pretraining (CLIP) serve as the foundational vision encoders for most modern Large Vision Language Models (LVLMs). Despite their widespread adoption, CLIP models exhibit a critical yet underexplored failure mode: irrelevant text appearing within images confounds visual representations, biasing them toward lexical meaning rather than true visual semantics. This robustness issue, commonly described as a Typographic Attack (TA), exposes a vulnerability ",
+      "authors": [
+        "Bohan Liu",
+        "Wenqian Ye",
+        "Guangzhi Xiong",
+        "Zhenghao He",
+        "Sanchit Sinha",
+        "Aidong Zhang"
+      ],
+      "published": "2026-07-02T17:55:24Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "state-of-the-art",
+        "novel",
+        "outperform"
+      ],
+      "url": "http://arxiv.org/abs/2607.02494v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02494v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02484v1",
+      "title": "Combating Textual Noise and Redundancy: Entropy-Aware Dense Visual Token Pruning",
+      "abstract": "Visual token pruning is a crucial strategy for accelerating VLMs by compressing redundant image patches, yet existing methods often fail to preserve critical cues under dense instructions and fine-grained queries. In this paper, we investigate this failure and identify two underlying bottlenecks: the widespread dispersion of textual noise that corrupts dense cross-modal scoring, and the feature fragmentation inherent to standard token selection. To address these issues, we propose Entropy-Aware ",
+      "authors": [
+        "Xuehui Wang",
+        "Xuankun Yang",
+        "Wei Shen"
+      ],
+      "published": "2026-07-02T17:50:57Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "benchmark",
+        "sota",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02484v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02484v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02479v1",
+      "title": "EAGLE-360: Embodied Active Global-to-Local Exploration in 360$^\\circ$",
+      "abstract": "While Multimodal Large Language Models (MLLMs) have demonstrated exceptional capabilities in standard visual understanding, adapting them for active visual search in 360$^\\circ$ panoramic environments exposes fundamental limitations. Specifically, standard MLLMs struggle to effectively model inherent panoramic properties, such as severe polar distortion and continuous cylindrical topologies, which significantly degrades target detection accuracy. Consequently, existing panoramic search methods a",
+      "authors": [
+        "Jingtao Xu",
+        "Zizhuo Lin",
+        "Jianwen Sun",
+        "Yi Yang",
+        "Yawei Luo"
+      ],
+      "published": "2026-07-02T17:47:27Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "reasoning",
+        "state-of-the-art",
+        "novel"
+      ],
+      "url": "http://arxiv.org/abs/2607.02479v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02479v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02389v1",
+      "title": "Steerability via constraints: a substrate for scalable oversight of coding agents",
+      "abstract": "Coding agents are capable; human oversight is the bottleneck. Unconstrained agents introduce security risks, erode codebase scalability, and make human review increasingly costly. We argue that the same methods used for decades to manage large human engineering teams: access control, network policies, strict coding conventions enforced by tooling; transfer directly to coding agents, and are cheaper (in token) than recent agentic scaffolding. We sketch a start-to-end system on this principle, and",
+      "authors": [
+        "Thomas Winninger"
+      ],
+      "published": "2026-07-02T16:24:47Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "agentic",
+        "coding agent",
+        "gemma"
+      ],
+      "url": "http://arxiv.org/abs/2607.02389v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02389v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02507v1",
+      "title": "What LLM Agents Say When No One Is Watching: Social Structure and Latent Objective Emergence in Multi-Agent Debates",
+      "abstract": "LLM agents will increasingly act in socially structured settings where role, audience, and relational context can shape what is advantageous or costly to say. We study whether such social structure, without any explicit objective in the prompt, changes what an agent expresses publicly relative to an off-the-record (OTR) channel elicited under the same condition. We introduce a dual-channel debate framework in which agents produce public utterances that enter the shared history alongside OTR resp",
+      "authors": [
+        "Arman Ghaffarizadeh",
+        "Danyal Mohaddes",
+        "Aliakbar Izadkhah",
+        "Shahriar Noroozizadeh"
+      ],
+      "published": "2026-07-02T17:59:23Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "multi-agent",
+        "debate"
+      ],
+      "url": "http://arxiv.org/abs/2607.02507v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02507v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02275v1",
+      "title": "Cadence: Extreme Pipelining with Multiple Concurrent Proposers",
+      "abstract": "We present Cadence, a Byzantine fault-tolerant multi-proposer consensus protocol with arbitrarily low block intervals, optimal resilience, and optimal fast-path latency. Cadence divides time into equally spaced slots, one block per slot, each finalized in its own consensus instance. Blocks do not build directly on their predecessor, so instances run independently and none waits for an earlier block to finish or propagate; we call this extreme pipelining, decoupling the block interval from networ",
+      "authors": [
+        "Fatima Elsheimy",
+        "Mohammad Mussadiq Jalalzai",
+        "Tobias Klenze",
+        "Jovan Komatovic",
+        "Mike Setrin",
+        "Victor Shoup",
+        "Kushal Babel",
+        "Lioba Heimbach",
+        "Jason Milionis"
+      ],
+      "published": "2026-07-02T14:56:59Z",
+      "relevance_score": 14,
+      "matched_keywords": [
+        "consensus",
+        "react"
+      ],
+      "url": "http://arxiv.org/abs/2607.02275v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02275v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02503v1",
+      "title": "VT-WAM: Visual-Tactile World Action Model for Contact-Rich Manipulation",
+      "abstract": "Contact-rich manipulation requires policies to react to local deformation, pressure, slip, and friction, yet these cues are temporally sparse and often invisible in visual observations. Existing visual-tactile policies usually feed tactile observations directly into action prediction, but rarely model tactile deformation dynamics during action generation. In this paper, we introduce VT-WAM, a Visual-Tactile World Action Model that jointly learns future visual prediction, tactile deformation pred",
+      "authors": [
+        "Shuai Tian",
+        "Yupeng Zheng",
+        "Yuhang Zheng",
+        "Songen Gu",
+        "Yujie Zang",
+        "Yuxing Qin",
+        "Weize Li",
+        "Haoran Li",
+        "Wenchao Ding",
+        "Dongbin Zhao"
+      ],
+      "published": "2026-07-02T17:58:36Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "outperform",
+        "react"
+      ],
+      "url": "http://arxiv.org/abs/2607.02503v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02503v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02501v1",
+      "title": "Embodied.cpp: A Portable Inference Runtime of Embodied AI Models on Heterogeneous Robots",
+      "abstract": "Embodied AI models now span vision-language-action (VLA) models and world-action models (WAMs), but practical deployment remains fragmented across model-specific Python stacks, backend assumptions, and robot-side glue code, especially on heterogeneous edge devices. Existing inference runtimes are designed mainly for request-response serving and therefore do not satisfy the runtime contract of embodied deployment: multi-rate execution inside closed-loop control, latency-first batch-1 inference on",
+      "authors": [
+        "Ling Xu",
+        "Chuyu Han",
+        "Borui Li",
+        "Hao Wu",
+        "Shiqi Jiang",
+        "Ting Cao",
+        "Chuanyou Li",
+        "Sheng Zhong",
+        "Shuai Wang"
+      ],
+      "published": "2026-07-02T17:58:28Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.02501v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02501v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02442v1",
+      "title": "HTTP REST API Structure Learning",
+      "abstract": "Application Programming Interfaces (APIs) are essential in software development, enabling web services, mobile apps, and microservices. However, their widespread use introduces significant security risks, highlighting the importance of API security. This paper presents HTTP REST API Learning (HRAL), a novel unsupervised anomaly detection approach that models the structure and behavior of API endpoints directly from network traffic, without relying on predefined rules or documentation. HRAL enabl",
+      "authors": [
+        "Ran Dubin",
+        "Amit Dvir"
+      ],
+      "published": "2026-07-02T17:10:58Z",
+      "relevance_score": 13,
+      "matched_keywords": [
+        "novel",
+        "outperform"
+      ],
+      "url": "http://arxiv.org/abs/2607.02442v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02442v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02428v1",
+      "title": "Self-Auditing Residual Drifting for Pathology-Preserving Accelerated Knee MRI",
+      "abstract": "Accelerated magnetic resonance imaging reduces acquisition time, but reconstruction from undersampled k-space can blur diagnostically relevant structures or introduce failures that are not captured by global image metrics. We propose SA-RDM-DC, a Self-Auditing Residual generative Drifting Model with Data Consistency for accelerated knee MRI. The method adapts the newly proposed generative drifting paradigm to accelerated MRI by training a physics-conditioned drift field from the zero-filled reco",
+      "authors": [
+        "Qing Lyu",
+        "Jianxu Wang",
+        "Mohammad Kawas",
+        "Ge Wang",
+        "Christopher T. Whitlow"
+      ],
+      "published": "2026-07-02T16:59:03Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "url": "http://arxiv.org/abs/2607.02428v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02428v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.02508v1",
+      "title": "From SRA to Self-Flow: Data Augmentation or Self-Supervision?",
+      "abstract": "Representation alignment has become an effective way to accelerate diffusion transformer training and improve generation quality. Recent self-alignment methods, such as SRA and Self-Flow, further remove the dependency on external pretrained encoders by constructing alignment within the diffusion model itself. However, the mechanism behind the improvement from SRA to Self-Flow, dual-time scheduling, remains under-examined: Self-Flow attributes its gain to interactions between tokens at different ",
+      "authors": [
+        "Dengyang Jiang",
+        "Mengmeng Wang",
+        "Harry Yang",
+        "Jingdong Wang"
+      ],
+      "published": "2026-07-02T17:59:25Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "url": "http://arxiv.org/abs/2607.02508v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.02508v1"
+    }
+  ]
+}

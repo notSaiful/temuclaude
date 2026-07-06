@@ -1,18 +1,19 @@
 # Temuclaude Research Swarm — Status Tracker
 
-## Last Updated: 2026-07-06 19:33 UTC
-## Swarm Status: FULLY AUTONOMOUS — 9 DAEMONS RUNNING 24/7 (7 existing + cyber + efficiency)
+## Last Updated: 2026-07-06 19:40 UTC
+## Swarm Status: FULLY AUTONOMOUS — 10 DAEMONS RUNNING 24/7 (7 existing + cyber + efficiency + media)
 
-### Daemon Architecture (9 daemons, self-healing)
+### Daemon Architecture (10 daemons, self-healing)
 | Daemon | Schedule | Purpose | Status |
 |--------|----------|---------|--------|
-| Scout Daemon | Every 6h | arXiv (62 queries) + GitHub (62 queries) + HuggingFace — WITH CYBER + EFFICIENCY QUERIES | ACTIVE |
-| Distiller Daemon | Every 30s | Process raw findings — WITH CYBER + EFFICIENCY KEYWORDS | ACTIVE |
+| Scout Daemon | Every 6h | arXiv (82 queries) + GitHub (85 queries) + HuggingFace — WITH CYBER + EFFICIENCY + MEDIA | ACTIVE |
+| Distiller Daemon | Every 30s | Process raw findings — WITH CYBER + EFFICIENCY + MEDIA KEYWORDS | ACTIVE |
 | Research Daemon 1 | Every 5min | Deep research on top priorities (orchestration/reasoning) | ACTIVE |
 | Research Daemon 2 | Every 5min | Deep research on top priorities | ACTIVE |
 | Research Daemon 3 | Every 5min | Deep research on top priorities | ACTIVE |
 | Cyber Daemon | Every 5min | Cybersecurity research + Red-Blue loop + defense testing | ACTIVE |
-| **Efficiency Daemon** | **Every 5min** | **NEW: Lossless cost reduction research + QUALITY GUARDRAIL** | **ACTIVE** |
+| Efficiency Daemon | Every 5min | Lossless cost reduction research + QUALITY GUARDRAIL | ACTIVE |
+| **Media Daemon** | **Every 5min** | **NEW: Beat frontier image/video generation via orchestration** | **ACTIVE** |
 | Integrator Daemon | Every 2min | Read findings → write code → test → commit | ACTIVE |
 | Coordinator Daemon | Every 60s | Health monitoring, auto-restart dead daemons, priority updates | ACTIVE |
 
@@ -36,10 +37,10 @@
 ### Skills Created
 - effective-planning-and-execution — Frameworks for planning, organizing, staffing, directing, controlling
 
-### Total Breakthroughs: 27 (orchestration) + 24 (cyber) + 20 (efficiency) = 71 total
-- Tier 1: 12 orchestration + 9 efficiency (lossless/quality-preserving) = 21
-- Tier 2: 8 orchestration + 6 cyber + 6 efficiency = 20
-- Tier 3: 7 orchestration + 6 cyber + 5 efficiency = 18
+### Total Breakthroughs: 27 (orchestration) + 24 (cyber) + 20 (efficiency) + 24 (media) = 95 total
+- Tier 1: 12 orchestration + 9 efficiency + 12 media = 33
+- Tier 2: 8 orchestration + 6 cyber + 6 efficiency + 6 media = 26
+- Tier 3: 7 orchestration + 6 cyber + 5 efficiency + 6 media = 24
 
 ### CYBERSECURITY RESEARCH SWARM (Added 2026-07-06)
 **Master Document:** `~/temuclaude/research/MASTER-CYBERSECURITY-BREAKTHROUGHS-2026-07-06.md`
@@ -104,6 +105,46 @@ Key Efficiency Techniques (14 tracked in dynamic_priorities.py):
 Key Papers: 15 efficiency papers (arXiv, Apple, CVPR 2026, Modal)
 Key Repos: vLLM, RouteLLM, DSPy, Outlines, Awesome-LLM-Compression
 Quality Rule: Every technique classified LOSSLESS / PRESERVING / PARETO / REJECTED
+
+### MEDIA GENERATION RESEARCH SWARM (Added 2026-07-06)
+**Master Document:** `~/temuclaude/research/MASTER-MEDIA-GENERATION-BREAKTHROUGHS-2026-07-06.md`
+**Deep Research:** `~/temuclaude/research/findings/deep_research_media_generation_2026-07-06.md`
+
+MISSION: Always beat frontier image/video generation models via orchestration.
+No single model excels in all aspects — our ensemble captures all strengths.
+
+Frontier Models to Beat:
+- Image: GPT Image 2 (ELO 1340), Reve 2.0 (1281), FLUX.2 (1193), Midjourney V7
+- Video: Runway Gen-4.5 (1247), Sora 2, Veo 3.1, Seedance 2.0 (1225)
+
+Academic Foundation (3 Google DeepMind papers):
+- arXiv:2501.09732 — Inference-Time Scaling for Diffusion (best-of-N works)
+- arXiv:2507.05604 — Kernel Density Steering (N-particle ensemble)
+- arXiv:2604.06260 — S³ Stratified Scaling Search (verifier-guided denoising)
+
+Key Media Techniques (17 tracked in dynamic_priorities.py):
+- Model Pool Update — add FLUX.2, Sora 2, Veo 3.1, Runway Gen-4.5 (impact 10)
+- S³ Verifier-Guided Denoising — beyond best-of-N (impact 9)
+- FLUX.2 Multi-Reference — 6 refs, pose control, 4MP photoreal (impact 9)
+- Sora 2 Audio Video — synced dialogue + sound effects (impact 9)
+- Veo 3.1 Cinematic — matches Sora 2 (impact 8)
+- Runway Gen-4.5 — #1 motion quality (impact 8)
+- Image Editing Mode — instruction following (impact 8)
+- Video Temporal Consistency — flicker-free video (impact 8)
+- Multimodal Vision Judge — better best-of-N selection (impact 8)
+- Media Dynamic Routing — RouteLLM for media models (impact 8)
+- Diffusion Acceleration — consistency models, ParallelVLM (impact 7)
+- ControlNet for All — pose/depth/edge control (impact 7)
+- Pipeline Verify — verify 10-stage pipeline uses latest (impact 7)
+- Text-to-3D — emerging frontier (impact 6)
+- World Models — interactive video worlds (impact 6)
+- Unified Multimodal — Gemini Omni pattern (impact 7)
+- Long Video — minutes not seconds (impact 7)
+
+Existing Media Pipeline: src/media/ (13 files, 5911 LOC, 12 phases pass)
+Key Papers: 9 media generation papers (arXiv, CVPR 2026)
+Key Repos: FLUX.2, Sora 2, Veo, Runway, Grok Imagine, ComfyUI-FLUX2
+Benchmarks: Artificial Analysis (ELO), Arena, VBench
 
 ### Auto-Integration Status
 - First run: tonight 1am IST (July 4)

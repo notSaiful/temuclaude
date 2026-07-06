@@ -136,6 +136,22 @@ class IntegratorDaemon(DaemonBase):
                         continue
                     return False
                 
+                # Benchmark regression guard — verify quality didn't drop
+                self.logger.info("Running benchmark regression guard...")
+                bench_result = subprocess.run(
+                    [sys.executable, "/Users/saiful/temuclaude/research/scripts/benchmark_guard.py"],
+                    capture_output=True, text=True, timeout=600, cwd=TEMUCLAUDE_DIR
+                )
+                if bench_result.returncode != 0:
+                    self.logger.error(f"Benchmark regression — reverting. {bench_result.stdout[:300]}")
+                    subprocess.run(["git", "checkout", "."], cwd=TEMUCLAUDE_DIR)
+                    self._log_changelog(f"REVERTED: {finding_file} - Benchmark regression (attempt {attempt+1})")
+                    if attempt < max_attempts - 1:
+                        time.sleep(30)
+                        continue
+                    return False
+                self.logger.info("Benchmark guard passed — no regression")
+                
                 # Commit and push
                 subprocess.run(["git", "add", "-A"], cwd=TEMUCLAUDE_DIR)
                 commit_msg = f"auto-improve: {Path(finding_file).stem}"
