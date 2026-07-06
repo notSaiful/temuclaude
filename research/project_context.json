@@ -1,0 +1,117 @@
+{
+  "project_name": "Temuclaude",
+  "tagline": "One question. Many minds. One superior answer. Frontier-level intelligence at 25x lower cost.",
+  "creator": "Mohammad Saiful Haque (Ggs) — Nagpur, India. One developer, built with Hermes Agent.",
+  "purpose": "Prove that orchestrated free/cheap models beat any single frontier model at a fraction of the cost. Make frontier AI accessible to normal people in developing countries. Revenue serves the Ummah.",
+
+  "what_it_is": "AI orchestration platform that routes queries to 8 models simultaneously, fuses responses, verifies with code, quality-checks with self-QA. Result: answers that beat frontier models (Fable 5, GPT-5.5, Gemini 3.1 Pro) at 25x lower cost.",
+
+  "architecture": {
+    "routing": "3-tier: Trivial (60%) → cheapest model. Medium (25%) → specialist. Hard (13%) → 10-layer fusion stack. Frontier (2%) → Claude Sonnet 5.",
+    "fusion_stack": [
+      "Web search (knowledge augmentation, +10-25% on HLE)",
+      "MoA 3-layer (propose → cross-review → aggregate)",
+      "Self-consistency (N samples, PRM-weighted voting)",
+      "Code verification (sandboxed execution)",
+      "USVA 4-rubric QA gate",
+      "Reflexion (retry with feedback)",
+      "s1 budget forcing (extend short responses)",
+      "Step-level code verification (rStar-Math pattern)",
+      "Z3/SMT logical verification (ConsistPRM pattern)",
+      "Frontier fallback (Claude Sonnet 5 if QA < 0.75)"
+    ],
+    "model_pool": "8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (hard reasoning), Hy3 Preview (trivial router), MiMo-V2.5 (multimodal), Gemini 3 Flash (legal/health), MiniMax M3 (vision+creative), Claude Sonnet 5 (frontier fallback), Nemotron 3 Ultra (QA gate, free)"
+  },
+
+  "pricing": {
+    "free": "$0, 100 queries/day",
+    "developer": "$15/mo, 50,000 queries/mo",
+    "pro": "$49/mo, 500,000 queries/mo",
+    "pay_as_you_go": "$0.50/$2.00 per 1M tokens",
+    "enterprise": "$499/mo, unlimited + SSO + SLA"
+  },
+
+  "tech_stack": {
+    "frontend": "Next.js 15, React 19, Tailwind CSS, Framer Motion",
+    "backend": "Next.js API Routes (Node.js runtime)",
+    "database": "JSON file store (upgrading to Postgres)",
+    "payments": "Razorpay (subscriptions, pay-as-you-go)",
+    "ai_models": "OpenRouter (8-model pool) + Ollama (4 cloud models on Max plan)",
+    "hosting": "Vercel",
+    "ci_cd": "GitHub Actions",
+    "python_engine": "src/ — 29 modules, 315+ tests, 16 orchestration techniques"
+  },
+
+  "project_structure": {
+    "website/": "Next.js production app — API routes, pricing, playground, models, docs, benchmarks, legal pages, Hasan interface",
+    "src/": "Python orchestrator — core engine, 29 modules, fusion, routing, QA, cybersecurity",
+    "tests/": "Test suites — 315+ tests passing",
+    "benchmarks/": "Benchmark framework — HLE, MMLU, BEAT-FABLE",
+    "research/": "Research swarm — 23 daemons, findings, SWOT, radar, shared memory, Hasan identity",
+    "staging/": "Hasan's experimental workspace — all new code goes here, never in main codebase"
+  },
+
+  "changelog": [
+    {"phase": "Phase 1-5", "what": "Python orchestrator with 16 techniques, 84+ tests, 10-layer fusion stack"},
+    {"phase": "Phase 6", "what": "Website, 8-model pool, payments (Razorpay), legal pages, usage tracking, Vercel deploy, CI/CD"},
+    {"phase": "Cybersecurity", "what": "6-layer defense system, 274 tests passing"},
+    {"phase": "Research Swarm", "what": "23 autonomous daemons — scout, distiller, 3 researchers, integrator, coordinator, cyber, efficiency, media, marketing, feedback, meta-auditor, SWOT, website, industry radar, model optimizer, cost efficiency, revenue, growth, competitive dominance, self-expansion, super intelligence, halal compliance"},
+    {"phase": "Hasan Interface", "what": "JARVIS-style dashboard with daemon grid, live activity, SWOT, Ummah fund, cost tracking, chat with Hasan (Ollama cloud glm-5.2), moral compass API"},
+    {"phase": "Hasan Identity", "what": "Immutable constitution — 7 missions, 16 never-do rules, 7 principles. Every daemon verifies at startup."},
+    {"phase": "Hasan Chat Fix", "what": "Ollama cloud API direct (works when device off), glm-5.2 primary, load-balanced fallback, thinking-field fix"},
+    {"phase": "Staging + Deploy", "what": "Staging workspace, deployment approval system, agent scaling (1-8), weekly permission cycle, Deploy tab in UI"}
+  ],
+
+  "key_metrics": {
+    "source_modules": 29,
+    "tests": "315+",
+    "daemons": 23,
+    "orchestration_techniques": 16,
+    "model_pool_size": 8,
+    "cost_advantage": "25x cheaper than Claude Fable 5",
+    "git_commits": "100+"
+  },
+
+  "purpose_details": {
+    "why_built": "Ggs saw that frontier AI is too expensive for normal people. A student in India can't afford $20/month for GPT-5. Temuclaude proves that orchestrated free/cheap models can match or beat frontier models at 25x lower cost.",
+    "business_goal": "Transform into a multi-billion dollar company. Revenue is the MEANS, not the goal. 25% of profit flows to the Ummah Fund.",
+    "ummah_fund": "Palestine 40%, community kitchens 20%, orphans 15%, medical clinics 15%, Islamic schools 10%",
+    "halal": "No haram content, no interest/riba, no haram partnerships. Halal compliance checker is built into the system."
+  },
+
+  "competitors": ["GPT-5.5", "Gemini 3.1 Pro", "Claude Fable 5", "Claude Opus 4.8", "OpenRouter", "vLLM"],
+
+  "differentiators": [
+    "25x cheaper than frontier",
+    "6-layer cybersecurity (competitors have 0)",
+    "Self-improving 24/7 via 23 daemons (competitors don't)",
+    "Fully open-source",
+    "Halal-compliant",
+    "Ummah Fund (25% profit to charity)",
+    "Hasan autonomous system with moral compass"
+  ],
+
+  "hasan_system": {
+    "identity_file": "research/hasan_identity.py — IMMUTABLE constitution",
+    "interface": "website/app/hasan/page.tsx — dashboard with 4 tabs (Overview, Daemons, Chat, Deploy)",
+    "apis": [
+      "GET /api/hasan — system status, daemons, SWOT, queue, Ummah fund, cost, activity",
+      "POST /api/hasan/chat — chat with Hasan (Ollama cloud glm-5.2 primary, fallback chain)",
+      "GET /api/hasan/identity — moral compass verification",
+      "GET/POST /api/hasan/deploy — staging findings, approve/reject, agent scaling"
+    ],
+    "chat_models": "glm-5.2 (PRIMARY) → deepseek-v4-pro → kimi-k2.6 → gpt-oss:120b → OpenRouter free models",
+    "ollama_cloud_key": "eb9bdf... (Max plan, direct API, works when device off)",
+    "deployment_protocol": "Hasan works in /staging/. Once per week, marks findings as pending_approval. Ggs approves/rejects via Deploy tab. Only approved findings merge into main.",
+    "agent_scaling": "1-8 research agents. Hasan adjusts based on news, time, progress. Goal: maximize weekly Ollama usage."
+  },
+
+  "rules_for_hasan": {
+    "never_touch_main": "Never modify /src, /website/app, /website/lib, /tests. All work in /staging/.",
+    "only_permission_needed": "Deploying to main codebase. Everything else is autonomous.",
+    "weekly_permission_cycle": "Hasan decides when to request (max once/week) based on importance.",
+    "agent_scaling_autonomous": "Hasan adds/removes research agents without asking.",
+    "maximize_ollama_usage": "Use all 4 models on Max plan. No wasted weekly quota.",
+    "glm_5_2_primary": "Always try glm-5.2 first for chat. Others are fallbacks."
+  }
+}
