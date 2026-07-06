@@ -198,9 +198,10 @@ Route: POST /v1/chat/completions
 - Count input/output tokens per API key
 - Track in database
 - Enforce plan limits:
-  - Free: 50/day (playground only, no API access)
-  - Pro: 5,000/month
-  - Enterprise: 200,000/month
+  - Free: 100/day (playground only, no API access)
+  - Developer: 50,000/month
+  - Pro: 500,000/month
+  - Enterprise: Unlimited
   - PAYG: unlimited (billed per token)
 
 #### D. Rate Limiting
