@@ -36,4 +36,4 @@ website/.next/
 website/.vercel
 
 # Hermes
-hermes-backup/
+hermes-backup/website/.env.bak
