@@ -53,26 +53,35 @@ class SwotDaemon(DaemonBase):
         reverted = sum(1 for l in lines if "REVERTED:" in l)
         total = implemented + reverted
         return reverted / total if total > 0 else 0.0
-
     def _weaknesses_to_tasks(self, weaknesses: list) -> int:
+        """Convert HIGH/MEDIUM weaknesses to research tasks in queue.
+        Writes findings to files first, then pushes file paths (research_daemon expects file paths)."""
         tasks = 0
         try:
             sys.path.insert(0, str(TEMUCLAUDE / "research"))
             from queue import QueueManager
+            findings_dir = TEMUCLAUDE / "research" / "findings"
+            findings_dir.mkdir(exist_ok=True)
             qm = QueueManager()
             for w in weaknesses:
                 if w.get("severity") not in ("HIGH", "MEDIUM"):
                     continue
                 ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
-                task = json.dumps({
+                task_data = {
                     "id": f"swot_{ts}_{w.get('area', 'unknown')}",
                     "source": "swot_analysis",
                     "severity": w.get("severity"),
                     "action": w.get("action"),
                     "area": w.get("area"),
+                    "title": w.get("action", w.get("area", "unknown"))[:80],
                     "timestamp": datetime.now(timezone.utc).isoformat()
-                })
-                qm.push("new_findings", [task])
+                }
+                # Write to file so research_daemon can open it
+                finding_file = findings_dir / f"swot_{ts}_{w.get('area', 'unknown')}.json"
+                with open(finding_file, 'w') as f:
+                    json.dump(task_data, f, indent=2)
+                # Push the file PATH (not the JSON string) to the queue
+                qm.push("new_findings", [str(finding_file)])
                 tasks += 1
         except Exception as e:
             self.logger.exception(f"Failed to create tasks: {e}")
