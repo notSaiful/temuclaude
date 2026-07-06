@@ -82,8 +82,12 @@ class IntegratorDaemon(DaemonBase):
         return True
     
     def _implement_finding(self, finding_file: str) -> bool:
-        """Implement a finding with retry. Returns True on success."""
+        """Implement a finding in STAGING ONLY. Never touch the main codebase.
+        All code changes go to /staging/. Ggs reviews and deploys manually."""
         max_attempts = 2
+        
+        STAGING_DIR = TEMUCLAUDE_DIR / "staging"
+        STAGING_DIR.mkdir(parents=True, exist_ok=True)
         
         for attempt in range(max_attempts):
             try:
@@ -92,12 +96,23 @@ class IntegratorDaemon(DaemonBase):
                 
                 self.logger.info(f"Attempt {attempt+1}/{max_attempts}: {Path(finding_file).name}")
                 
+                # Copy the finding to staging for reference
+                staging_finding = STAGING_DIR / Path(finding_file).name
+                with open(staging_finding, 'w') as f:
+                    f.write(content)
+                
+                # Run auto-integrator in STAGING directory only
+                # Create a staging copy of src if it doesn't exist
+                staging_src = STAGING_DIR / "src"
+                if not staging_src.exists():
+                    subprocess.run(["cp", "-r", str(SRC_DIR), str(staging_src)], timeout=30)
+                
                 result = subprocess.run([
                     sys.executable,
                     "/Users/saiful/temuclaude/research/scripts/auto_integrator.py"
-                ], capture_output=True, text=True, timeout=1200, cwd=TEMUCLAUDE_DIR)  # 20 min
+                ], capture_output=True, text=True, timeout=1200, cwd=str(STAGING_DIR))  # Run in staging
                 
-                self.logger.info(f"Auto-integrator output: {result.stdout[:500]}")
+                self.logger.info(f"Auto-integrator output (in staging): {result.stdout[:500]}")
                 
                 if result.returncode != 0:
                     self.logger.error(f"Auto-integrator stderr: {result.stderr[:1000]}")
@@ -107,59 +122,28 @@ class IntegratorDaemon(DaemonBase):
                         continue
                     return False
                 
-                # Check if any changes were made
+                # Check if any changes were made IN STAGING (not main codebase)
                 git_status = subprocess.run(
                     ["git", "status", "--porcelain"],
-                    capture_output=True, text=True, cwd=TEMUCLAUDE_DIR
+                    capture_output=True, text=True, cwd=str(STAGING_DIR)
                 )
                 
                 if not git_status.stdout.strip():
-                    self.logger.info("No changes made by integrator")
+                    self.logger.info("No changes made by integrator in staging")
                     return True  # Not a failure, just nothing to do
                 
-                # Run tests
-                self.logger.info("Running tests...")
-                test_result = subprocess.run([
-                    sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short", "-x"
-                ], capture_output=True, text=True, timeout=600, cwd=TEMUCLAUDE_DIR)  # 10 min
+                self.logger.info(f"Changes made in staging: {git_status.stdout[:200]}")
                 
-                self.logger.info(f"Tests: {test_result.stdout[-1000:]}")
+                # Commit in STAGING only — never touch main codebase
+                subprocess.run(["git", "add", "-A"], cwd=str(STAGING_DIR))
+                commit_msg = f"staging: {Path(finding_file).stem}"
+                subprocess.run(["git", "commit", "-m", commit_msg], cwd=str(STAGING_DIR))
+                # Do NOT push — Ggs reviews staging and deploys manually
                 
-                if test_result.returncode != 0:
-                    self.logger.error(f"Tests failed:\n{test_result.stdout[-2000:]}")
-                    self.logger.error(f"Test stderr:\n{test_result.stderr[-1000:]}")
-                    subprocess.run(["git", "checkout", "."], cwd=TEMUCLAUDE_DIR)
-                    self._log_changelog(f"REVERTED: {finding_file} - Tests failed (attempt {attempt+1})")
-                    if attempt < max_attempts - 1:
-                        self.logger.info("Retrying in 30s...")
-                        time.sleep(30)
-                        continue
-                    return False
+                self._log_changelog(f"STAGED (not deployed): {finding_file} - waiting for Ggs approval")
+                self._update_tracker(finding_file, "staged")
                 
-                # Benchmark regression guard — verify quality didn't drop
-                self.logger.info("Running benchmark regression guard...")
-                bench_result = subprocess.run(
-                    [sys.executable, "/Users/saiful/temuclaude/research/scripts/benchmark_guard.py"],
-                    capture_output=True, text=True, timeout=600, cwd=TEMUCLAUDE_DIR
-                )
-                if bench_result.returncode != 0:
-                    self.logger.error(f"Benchmark regression — reverting. {bench_result.stdout[:300]}")
-                    subprocess.run(["git", "checkout", "."], cwd=TEMUCLAUDE_DIR)
-                    self._log_changelog(f"REVERTED: {finding_file} - Benchmark regression (attempt {attempt+1})")
-                    if attempt < max_attempts - 1:
-                        time.sleep(30)
-                        continue
-                    return False
-                self.logger.info("Benchmark guard passed — no regression")
-                
-                # Commit and push
-                subprocess.run(["git", "add", "-A"], cwd=TEMUCLAUDE_DIR)
-                commit_msg = f"auto-improve: {Path(finding_file).stem}"
-                subprocess.run(["git", "commit", "-m", commit_msg], cwd=TEMUCLAUDE_DIR)
-                subprocess.run(["git", "push"], cwd=TEMUCLAUDE_DIR)
-                
-                self._log_changelog(f"IMPLEMENTED: {finding_file} - {commit_msg}")
-                self._update_tracker(finding_file, "implemented")
+                self.logger.info(f"Finding staged in /staging/. Awaiting Ggs approval for deployment.")
                 
                 return True
                 
