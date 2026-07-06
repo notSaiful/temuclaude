@@ -1,0 +1,21 @@
+{
+  "events": [
+    {
+      "id": "evt_1783372750260_watchdog",
+      "timestamp": "2026-07-07T02:49:10.260363",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783373037769_watchdog",
+      "timestamp": "2026-07-07T02:53:57.769504",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
+    }
+  ],
+  "last_update": "2026-07-07T02:53:57.769510"
+}

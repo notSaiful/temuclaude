@@ -1,0 +1,18 @@
+{
+  "swarm": {
+    "alive_count": 0,
+    "daemons": []
+  },
+  "recent_events": [
+    {
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized"
+    }
+  ],
+  "knowledge_count": 2,
+  "knowledge_keys": [
+    "test_key",
+    "test"
+  ]
+}
