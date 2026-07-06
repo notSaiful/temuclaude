@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-07-06T20:59:33.772339+00:00",
+  "total_signals": 1,
+  "top_signals": [
+    {
+      "title": "A global workspace in language models",
+      "source": "hackernews",
+      "score": 12.5,
+      "url": "https://www.anthropic.com/research/global-workspace"
+    }
+  ]
+}
