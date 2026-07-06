@@ -35,6 +35,17 @@ class DaemonBase(ABC):
         self._heartbeat_extra = {}
         self.logger = self._setup_logger()
         
+        # Verify Hasan core identity at startup
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from hasan_identity import verify_integrity, IDENTITY, MISSION, NEVER_DO
+            if not verify_integrity():
+                self.logger.error("HASAN INTEGRITY CHECK FAILED — core identity tampered. Refusing to start.")
+                sys.exit(1)
+            self.logger.info(f"Hasan identity verified. Purpose: {IDENTITY['purpose'][:60]}...")
+        except ImportError:
+            pass  # Identity file not available yet — continue without it
+        
         # Register signal handlers
         signal.signal(signal.SIGTERM, self._signal_handler)
         signal.signal(signal.SIGINT, self._signal_handler)
