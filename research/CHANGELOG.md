@@ -28,3 +28,6 @@ REVERTED: /Users/saiful/temuclaude/research/findings/deep_research_unknown_20260
 
 ## 2026-07-06 20:59 UTC
 REVERTED: /Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260706T205843.md - Benchmark regression (attempt 1)
+
+## 2026-07-06 21:12 UTC
+REVERTED: /Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260706T210343.md - Tests failed (attempt 1)
