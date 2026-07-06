@@ -124,6 +124,8 @@ export default function HasanPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'daemons' | 'chat' | 'deploy'>('overview');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [deployData, setDeployData] = useState<any>(null);
+  const [powerState, setPowerState] = useState<'active' | 'deactivated'>('deactivated');
+  const [powerLoading, setPowerLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -152,8 +154,43 @@ export default function HasanPage() {
     };
     fetchDeploy();
     const deployInterval = setInterval(fetchDeploy, 10000);
-    return () => { clearInterval(interval); clearInterval(clock); clearInterval(deployInterval); };
+    // Fetch power state
+    const fetchPower = async () => {
+      try {
+        const res = await fetch('/api/hasan/power', { cache: 'no-store' });
+        if (res.ok) {
+          const d = await res.json();
+          setPowerState(d.status);
+        }
+      } catch {}
+    };
+    fetchPower();
+    const powerInterval = setInterval(fetchPower, 5000);
+    return () => { clearInterval(interval); clearInterval(clock); clearInterval(deployInterval); clearInterval(powerInterval); };
   }, [fetchData]);
+
+  // Toggle Hasan on/off
+  const togglePower = async () => {
+    setPowerLoading(true);
+    try {
+      const action = powerState === 'active' ? 'deactivate' : 'activate';
+      const res = await fetch('/api/hasan/power', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        setPowerState(action === 'activate' ? 'active' : 'deactivated');
+        // Immediate refresh
+        fetchData();
+      }
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setPowerLoading(false);
+    }
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -223,6 +260,19 @@ export default function HasanPage() {
           </div>
         </div>
         <div style={s.headerRight}>
+          {/* Power Toggle */}
+          <button
+            onClick={togglePower}
+            disabled={powerLoading}
+            style={{
+              ...s.powerBtn,
+              background: powerState === 'active' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
+              border: `1px solid ${powerState === 'active' ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`,
+              color: powerState === 'active' ? '#ef4444' : '#10b981',
+            }}
+          >
+            {powerLoading ? '...' : powerState === 'active' ? 'DEACTIVATE' : 'ACTIVATE'}
+          </button>
           <div style={s.clockBox}>
             <span style={s.clockTime}>{now.toLocaleTimeString('en-GB', { hour12: false })}</span>
             <span style={s.clockDate}>{now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -625,6 +675,7 @@ export default function HasanPage() {
 // ============================================================
 const s: Record<string, React.CSSProperties> = {
   page: { minHeight: '100vh', background: '#08080c', color: '#c8c8d4', fontFamily: "'IBM Plex Sans', sans-serif", position: 'relative', overflow: 'hidden' },
+  powerBtn: { fontSize: '11px', fontWeight: 700, letterSpacing: '1px', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', marginRight: '14px', transition: 'all 0.2s', fontFamily: "'JetBrains Mono', monospace" },
   bgLayer1: { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 20% 30%, rgba(59,130,246,0.08) 0%, transparent 50%)', pointerEvents: 'none' },
   bgLayer2: { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.06) 0%, transparent 50%)', pointerEvents: 'none' },
   grain: { position: 'absolute', inset: 0, opacity: 0.02, pointerEvents: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" },
