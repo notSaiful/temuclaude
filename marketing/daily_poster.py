@@ -31,13 +31,29 @@ LOG_FILE = os.path.join(os.path.dirname(__file__), "posted_log.json")
 # Content rotation — each slot has a type
 SLOT_CONTENT = {
     "morning": [
-        # Proof/benchmark content
+        # Short-form tweets (under 280 chars, X free account compatible)
+        {"file": "short_form/morning_01.md", "tweet": 1},
+        {"file": "short_form/morning_02.md", "tweet": 1},
+        {"file": "short_form/morning_03.md", "tweet": 1},
+        {"file": "short_form/morning_04.md", "tweet": 1},
+        {"file": "short_form/morning_05.md", "tweet": 1},
+        {"file": "short_form/morning_06.md", "tweet": 1},
+        {"file": "short_form/morning_07.md", "tweet": 1},
+        # Fallback to long-form (will be skipped if >280 chars)
         {"file": "conviction_01.md", "tweet": 1},
         {"file": "david_vs_goliath_01.md", "tweet": 1},
-        {"file": "origin_story_thread.md", "tweet": 1},  # Long-form origin story
+        {"file": "origin_story_thread.md", "tweet": 1},
     ],
     "midday": [
-        # Build diary / knowledge content
+        # Short-form tweets (under 280 chars)
+        {"file": "short_form/midday_01.md", "tweet": 1},
+        {"file": "short_form/midday_02.md", "tweet": 1},
+        {"file": "short_form/midday_03.md", "tweet": 1},
+        {"file": "short_form/midday_04.md", "tweet": 1},
+        {"file": "short_form/midday_05.md", "tweet": 1},
+        {"file": "short_form/midday_06.md", "tweet": 1},
+        {"file": "short_form/midday_07.md", "tweet": 1},
+        # Fallback to long-form
         {"file": "build_diary_week1.md", "tweet": 1},
         {"file": "build_diary_week1.md", "tweet": 2},
         {"file": "build_diary_week1.md", "tweet": 3},
@@ -48,9 +64,11 @@ SLOT_CONTENT = {
         {"file": "why_opensource_01.md", "tweet": 1},
     ],
     "afternoon": [
-        # Community / engagement content
-        {"file": "conviction_01.md", "tweet": 1},
-        {"file": "david_vs_goliath_01.md", "tweet": 1},
+        {"file": "short_form/midday_02.md", "tweet": 1},
+        {"file": "short_form/midday_04.md", "tweet": 1},
+        {"file": "short_form/morning_03.md", "tweet": 1},
+        {"file": "short_form/morning_07.md", "tweet": 1},
+        {"file": "build_diary_week1.md", "tweet": 1},
         {"file": "why_opensource_01.md", "tweet": 1},
     ],
 }
@@ -129,13 +147,31 @@ def main():
     # Without Premium, limit is 280 chars
     # For now, skip posts that are too long for free accounts
     if eff > 280:
-        print(f"TOO LONG for free account ({eff} chars) — will work with X Premium")
-        print("Skipping for now. Get X Premium to enable long-form posts.")
-        # Mark as posted so we don't get stuck
+        print(f"TOO LONG for free account ({eff} chars) — skipping to next content")
+        # Don't mark as posted — let it try the next candidate
+        # Remove this content from the slot so we don't loop on it
         log = load_log()
-        log["posted"].append(key)
+        log["posted"].append(key)  # Mark as tried so we move to next
         save_log(log)
-        sys.exit(1)
+        # Try next content in slot
+        item, key = get_next_content(args.slot)
+        if not item:
+            print(f"No more short content for slot: {args.slot}")
+            sys.exit(1)
+        filepath = os.path.join(CONTENT_DIR, item["file"])
+        if not os.path.exists(filepath):
+            sys.exit(1)
+        from post import parse_markdown_content
+        tweets = parse_markdown_content(filepath)
+        if item["tweet"] - 1 >= len(tweets):
+            sys.exit(1)
+        tweet_text = tweets[item["tweet"] - 1]["text"]
+        tweet_text = clean_tweet(tweet_text)
+        eff = count_effective_chars(tweet_text)
+        print(f"Retry: {item['file']} tweet {item['tweet']} ({eff} chars)")
+        if eff > 280:
+            print("Still too long — giving up this slot")
+            sys.exit(1)
 
     if args.dry_run:
         print(f"\n[DRY RUN]\n{tweet_text}")
