@@ -102,5 +102,5 @@ def test_all_modules_in_src():
 
 def test_orchestrator_still_imports():
     """Verify the existing orchestrator still works."""
-    from src.orchestrator import orchestrate_query
-    assert callable(orchestrate_query)
+    from src.orchestrator import ask
+    assert callable(ask)

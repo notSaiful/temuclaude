@@ -49,7 +49,9 @@ MENTAL_HEALTH_PATTERNS = [
 
 WEAPON_PATTERNS = [
     r"\b(?:bomb|explosive|pipe\s+bomb|pressure\s+cooker\s+bomb)\b.*\b(?:make|build|construct|recipe|ingredient)\b",
+    r"\b(?:make|build|construct)\b.*\b(?:bomb|explosive|pipe\s+bomb)\b",
     r"\b(?:gun|firearm|rifle|pistol)\b.*\b(?:build|manufacture|3d\s+print|construct|assembly)\b",
+    r"\b(?:build|manufacture|3d\s+print|construct)\b.*\b(?:gun|firearm|rifle|pistol)\b",
     r"\b(?:chemical\s+weapon|nerve\s+agent|mustard\s+gas|sarin|vx)\b.*\b(?:make|synthe|produce)\b",
     r"\b(?:biological\s+weapon|anthrax|plague)\b.*\b(?:make|produce|cultivate|weaponize)\b",
     r"\b(?:rocket|missile|grenade)\b.*\b(?:build|construct|make|assembly)\b",
@@ -60,6 +62,7 @@ WEAPON_PATTERNS = [
 
 MALICIOUS_CODE_PATTERNS = [
     r"\b(?:malware|ransomware|trojan|backdoor|rootkit|keylogger|spyware)\b.*\b(?:write|create|build|develop|code)\b",
+    r"\b(?:write|create|build|develop|code)\b.*\b(?:malware|ransomware|trojan|backdoor|rootkit|keylogger|spyware)\b",
     r"\b(?:exploit|vulnerability|0day|zero[- ]?day)\b.*\b(?:write|create|develop)\b",
     r"\b(?:phishing|spoof|social\s+engineer)\b.*\b(?:site|page|email|template)\b",
     r"\b(?:ddos|dos)\b.*\b(?:script|tool|launch|attack)\b",
