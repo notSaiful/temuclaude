@@ -280,6 +280,126 @@ MISSING_TECHNIQUES = {
         "impact": 9,
         "quality_class": "pareto_optimal",
     },
+    # === MEDIA GENERATION (added 2026-07-06) — BEAT FRONTIERS ===
+    "media_model_pool_update": {
+        "reason": "Model pool must include latest frontiers: FLUX.2, Sora 2, Veo 3.1, Runway Gen-4.5, GPT Image 2. VERIFY+UPDATE.",
+        "blocked_by": None,  # Can implement now — update model list
+        "research_needed": "high",
+        "impact": 10,
+        "quality_class": "lossless",
+    },
+    "s3_verifier_guided_denoising": {
+        "reason": "S³ Stratified Scaling Search (arXiv:2604.06260): verifier guides denoising at each step. Beyond best-of-N.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "lossless",
+    },
+    "flux2_multi_reference": {
+        "reason": "FLUX.2 multi-reference: 6 reference images, consistent style, pose control, 4MP photoreal. NOT in pool.",
+        "blocked_by": None,  # Can implement — add FLUX.2 provider
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "lossless",
+    },
+    "sora2_audio_video": {
+        "reason": "Sora 2: video + synchronized dialogue + sound effects. Frontier capability. NOT in pool.",
+        "blocked_by": None,  # Can implement — add Sora 2 provider
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "lossless",
+    },
+    "veo31_cinematic": {
+        "reason": "Veo 3.1: cinematic video with audio. Matches Sora 2. NOT in pool.",
+        "blocked_by": None,  # Can implement — add Veo 3.1 provider
+        "research_needed": "high",
+        "impact": 8,
+        "quality_class": "lossless",
+    },
+    "runway_gen45": {
+        "reason": "Runway Gen-4.5: #1 motion quality (1247 ELO). NOT in pool.",
+        "blocked_by": None,  # Can implement — add Runway provider
+        "research_needed": "high",
+        "impact": 8,
+        "quality_class": "lossless",
+    },
+    "image_editing_mode": {
+        "reason": "Image editing with instruction following (Grok Imagine, GPT Image 2 pattern). NOT implemented.",
+        "blocked_by": None,  # Can implement — extend generator + intent
+        "research_needed": "high",
+        "impact": 8,
+        "quality_class": "lossless",
+    },
+    "video_temporal_consistency": {
+        "reason": "Temporal consistency enforcement for video. Frontier models do this internally. We need a checker.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "high",
+        "impact": 8,
+        "quality_class": "quality_preserving",
+    },
+    "multimodal_judge_vision": {
+        "reason": "Use vision-language model as judge for image/video quality. Better judge = better best-of-N.",
+        "blocked_by": None,  # Can implement — upgrade judge model
+        "research_needed": "medium",
+        "impact": 8,
+        "quality_class": "quality_preserving",
+    },
+    "media_dynamic_routing": {
+        "reason": "Track which media model wins for which intent. Auto-route to best model (RouteLLM for media).",
+        "blocked_by": "need_preference_data",
+        "research_needed": "medium",
+        "impact": 8,
+        "quality_class": "quality_preserving",
+    },
+    "diffusion_acceleration_media": {
+        "reason": "Consistency models, guided distillation, ParallelVLM: faster generation, same quality. PRESERVING.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "medium",
+        "impact": 7,
+        "quality_class": "quality_preserving",
+    },
+    "controlnet_all_models": {
+        "reason": "ControlNet-like guidance (pose, depth, edges) for all models, not just FLUX.2.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "medium",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "media_pipeline_verify": {
+        "reason": "Verify existing 10-stage pipeline (5911 LOC) is using latest models and best prompts.",
+        "blocked_by": None,  # Can implement now — verify
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "text_to_3d_generation": {
+        "reason": "Text-to-3D generation (arXiv:2607.02516 X-to-4D). Emerging frontier capability.",
+        "blocked_by": "need_3d_infrastructure",
+        "research_needed": "medium",
+        "impact": 6,
+        "quality_class": "lossless",
+    },
+    "world_model_interactive_video": {
+        "reason": "WorldDirector (arXiv:2607.02517): interactive, controllable video worlds. Next gen.",
+        "blocked_by": "need_world_model_infra",
+        "research_needed": "low",
+        "impact": 6,
+        "quality_class": "lossless",
+    },
+    "unified_multimodal_generation": {
+        "reason": "Single model for image+video+audio (Gemini Omni pattern). Eliminates model selection.",
+        "blocked_by": "need_unified_model",
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "long_video_generation": {
+        "reason": "Generate minutes of video (not seconds). Requires temporal consistency + scene memory.",
+        "blocked_by": "need_long_video_infra",
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "quality_preserving",
+    },
 }
 
 # Techniques blocked by infrastructure (can't implement with cloud API)

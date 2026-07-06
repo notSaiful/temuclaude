@@ -1,40 +1,40 @@
 {
-  "timestamp": "2026-07-06T14:06:31.384861+00:00",
+  "timestamp": "2026-07-06T17:36:32.300191+00:00",
   "daemons": {
     "scout_daemon": {
       "alive": true,
       "status": "running",
-      "age_seconds": 119.90899801254272
+      "age_seconds": 29.7807879447937
     },
     "distiller_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.108697891235352
+      "age_seconds": 4.280544996261597
     },
     "research_daemon_1": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 18.873845100402832
+      "age_seconds": 19.58232593536377
     },
     "research_daemon_2": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 18.869084119796753
+      "age_seconds": 19.5887930393219
     },
     "research_daemon_3": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 18.872265100479126
+      "age_seconds": 19.59088706970215
     },
     "integrator_daemon": {
       "alive": true,
-      "status": "sleeping",
-      "age_seconds": 18.615389108657837
+      "status": "running",
+      "age_seconds": 19.081247091293335
     },
     "coordinator_daemon": {
       "alive": true,
       "status": "running",
-      "age_seconds": 0.01036691665649414
+      "age_seconds": 0.011955022811889648
     }
   },
   "queue": {
@@ -44,7 +44,7 @@
     "research_complete": 0,
     "implementation_queue": 0,
     "implementation_complete": 0,
-    "implementation_failed": 3,
+    "implementation_failed": 0,
     "priority_updates": 0,
     "last_updated": 0
   }

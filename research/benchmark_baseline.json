@@ -1,0 +1,14 @@
+{
+  "tests/test_beat_fable.py": {
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "pass_rate": 0
+  },
+  "tests/test_cost_reductions.py": {
+    "passed": 0,
+    "failed": 0,
+    "total": 0,
+    "pass_rate": 0
+  }
+}

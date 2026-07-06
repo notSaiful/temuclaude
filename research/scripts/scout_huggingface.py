@@ -79,6 +79,14 @@ def search_hf_papers():
         "cost reduction", "efficiency", "throughput", "speedup",
         "lossless", "Pareto", "token reduction", "context compression",
         "distillation", "model merging", "structured output",
+        # === MEDIA GENERATION (added 2026-07-06) ===
+        "text-to-image", "text-to-video", "diffusion model",
+        "image generation", "video generation", "FLUX", "Sora",
+        "Veo", "Runway", "Midjourney", "DALL-E", "Imagen",
+        "Stable Diffusion", "controlnet", "instructpix2pix",
+        "text-to-3d", "world model", "VBench", "ELO arena",
+        "consistency model", "flow matching", "rectified flow",
+        "multi-reference", "temporal consistency", "denoising",
     ]
     
     papers = []
@@ -127,6 +135,13 @@ def search_hf_models():
         ("model quantization AWQ", 10),
         ("efficient inference", 10),
         ("model merging", 10),
+        # === MEDIA GENERATION (added 2026-07-06) ===
+        ("text-to-image", 10),
+        ("text-to-video", 10),
+        ("FLUX 2", 10),
+        ("diffusion model", 10),
+        ("image generation", 10),
+        ("video generation", 10),
     ]
     
     models = []

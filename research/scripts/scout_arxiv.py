@@ -101,6 +101,27 @@ QUERIES = [
     "model weight merging TIES task arithmetic inference",
     "EAGLE Medusa speculative decoding token-level",
     "DSPy MIPROv2 prompt optimization efficiency gains",
+    # === MEDIA GENERATION (added 2026-07-06) ===
+    "text-to-image diffusion model frontier quality benchmark",
+    "text-to-video generation model temporal consistency",
+    "diffusion transformer DiT image generation quality",
+    "flow matching rectified flow image video generation",
+    "image generation prompt following instruction adherence",
+    "video generation motion control camera movement",
+    "diffusion model best-of-N verifier guided search",
+    "image editing instruction following InstructPix2Pix",
+    "multi-reference image generation style consistency",
+    "video generation synchronized audio dialogue sound",
+    "diffusion model acceleration consistency few-step",
+    "text-to-3D generation model 2026",
+    "world model interactive video generation persistent",
+    "multimodal generation unified image video audio",
+    "diffusion model quality evaluation benchmark VBench",
+    "controlnet controllable generation pose depth edge",
+    "long video generation temporal consistency frames",
+    "image generation ELO arena human preference",
+    "video generation ELO arena benchmark quality",
+    "frontier image video model release 2026",
 ]
 
 ARXIV_API = "https://export.arxiv.org/api/query"
