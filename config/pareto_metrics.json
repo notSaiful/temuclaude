@@ -1,159 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-06T13:49:35.952063+00:00",
-      "tier": "medium",
-      "tokens_used": 7,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
-      "timestamp": "2026-07-06T14:03:10.350201+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T14:03:10.350857+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T14:03:10.351357+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T14:03:26.189041+00:00",
-      "tier": "trivial",
-      "tokens_used": 6,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
-    },
-    {
-      "timestamp": "2026-07-06T14:04:25.549244+00:00",
-      "tier": "medium",
-      "tokens_used": 2,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
-      "timestamp": "2026-07-06T14:04:29.005530+00:00",
-      "tier": "trivial",
-      "tokens_used": 1,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
-    },
-    {
-      "timestamp": "2026-07-06T14:04:32.312636+00:00",
-      "tier": "medium",
-      "tokens_used": 6,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "coding",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
-    },
-    {
-      "timestamp": "2026-07-06T14:04:37.778862+00:00",
-      "tier": "medium",
-      "tokens_used": 1,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
-      "timestamp": "2026-07-06T14:06:48.784536+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T14:06:48.785293+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T14:06:48.785722+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T18:30:47.458261+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T18:30:47.458746+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T18:30:47.459200+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T18:31:04.411298+00:00",
-      "tier": "trivial",
-      "tokens_used": 9,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
-    },
-    {
-      "timestamp": "2026-07-06T18:31:55.634201+00:00",
-      "tier": "medium",
-      "tokens_used": 22,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
       "timestamp": "2026-07-06T18:31:59.368501+00:00",
       "tier": "trivial",
       "tokens_used": 1,
@@ -899,33 +746,186 @@
       "correct": null,
       "task_type": "knowledge",
       "strategy": "direct_frontier_deepseek_v4_pro+trivial"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:46.915189+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:46.916008+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:46.916433+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:55.738266+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:55.738763+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:36:55.739226+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:37:11.219023+00:00",
+      "tier": "trivial",
+      "tokens_used": 8,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "knowledge",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
+    },
+    {
+      "timestamp": "2026-07-06T21:37:15.945087+00:00",
+      "tier": "trivial",
+      "tokens_used": 19,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "knowledge",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
+    },
+    {
+      "timestamp": "2026-07-06T21:37:57.722494+00:00",
+      "tier": "medium",
+      "tokens_used": 2,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:01.038340+00:00",
+      "tier": "trivial",
+      "tokens_used": 1,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "knowledge",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:04.053617+00:00",
+      "tier": "medium",
+      "tokens_used": 6,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "coding",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:08.346793+00:00",
+      "tier": "medium",
+      "tokens_used": 1,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:16.338613+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:16.339966+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:16.341420+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T21:38:31.498274+00:00",
+      "tier": "hard",
+      "tokens_used": 119,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "fusion_3L_MoA(3layers)+code_verify+prm_consistency(n=10)+usva_qa_passed"
+    },
+    {
+      "timestamp": "2026-07-06T21:39:05.391458+00:00",
+      "tier": "medium",
+      "tokens_used": 124,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "coding",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
     }
   ],
-  "total_queries": 236,
-  "total_tokens_used": 515725,
-  "total_tokens_baseline": 1933312,
-  "correct": 80,
-  "incorrect": 40,
-  "unknown": 116,
+  "total_queries": 253,
+  "total_tokens_used": 554369,
+  "total_tokens_baseline": 2072576,
+  "correct": 86,
+  "incorrect": 43,
+  "unknown": 124,
   "tier_stats": {
     "trivial": {
-      "count": 88,
-      "tokens": 21141,
-      "baseline": 720896,
-      "correct": 40
+      "count": 94,
+      "tokens": 22669,
+      "baseline": 770048,
+      "correct": 43
     },
     "medium": {
-      "count": 105,
-      "tokens": 166686,
-      "baseline": 860160,
-      "correct": 40
+      "count": 112,
+      "tokens": 179107,
+      "baseline": 917504,
+      "correct": 43
     },
     "hard": {
-      "count": 43,
-      "tokens": 327898,
-      "baseline": 352256,
+      "count": 47,
+      "tokens": 352593,
+      "baseline": 385024,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-06T21:25:02.729016+00:00"
+  "last_updated": "2026-07-06T21:39:05.391545+00:00"
 }

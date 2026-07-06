@@ -2733,30 +2733,217 @@
       "latency_ms": 15000,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:36:46.917327+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:36:46.918578+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:36:55.740251+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:36:55.741488+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:37:57.725910+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 4998,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:38:04.057680+00:00",
+      "query_preview": "Write a one-line Python print statement",
+      "query_length": 39,
+      "query_words": 6,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 3013,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:38:08.348597+00:00",
+      "query_preview": "What is 3+4?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 3900,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:38:16.342682+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:38:16.344251+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:38:31.501440+00:00",
+      "query_preview": "Calculate the derivative of f(x) = 3x^4 - 2x^3 + 5x^2 - 7x + 1 and evaluate it at x = 2. Show your work and give the final numerical answer.",
+      "query_length": 140,
+      "query_words": 31,
+      "task_type": "math",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6",
+        "deepseek-v4-pro",
+        "deepseek-v4-pro+code",
+        "deepseek-v4-pro+consistency_prm(n=10)"
+      ],
+      "strategy": "fusion_3L_MoA(3layers)+code_verify+prm_consistency(n=10)+usva_qa_passed",
+      "latency_ms": 172799,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T21:39:05.392820+00:00",
+      "query_preview": "Write a Python function to reverse a string",
+      "query_length": 43,
+      "query_words": 8,
+      "task_type": "coding",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens",
+      "latency_ms": 30717,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 40,
-      "successes": 40,
+      "count": 43,
+      "successes": 43,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 20000,
+      "total_latency": 21500,
       "models": {
-        "gpt-oss-120b": 40
+        "gpt-oss-120b": 43
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 40,
-      "successes": 40,
+      "count": 43,
+      "successes": 43,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 600000,
+      "total_latency": 645000,
       "models": {
-        "deepseek-v4-pro": 40,
-        "glm-5.2": 40,
-        "kimi-k2.6": 40
+        "deepseek-v4-pro": 43,
+        "glm-5.2": 43,
+        "kimi-k2.6": 43
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -2772,41 +2959,41 @@
       "best_model": "gpt-oss-120b"
     },
     "math_medium": {
-      "count": 35,
-      "successes": 31,
+      "count": 37,
+      "successes": 33,
       "failures": 4,
-      "avg_latency": 3965.1428571428573,
-      "total_latency": 138780,
+      "avg_latency": 3991.2972972972975,
+      "total_latency": 147678,
       "models": {
-        "deepseek-v4-pro": 35
+        "deepseek-v4-pro": 37
       },
       "best_model": "deepseek-v4-pro"
     },
     "coding_medium": {
-      "count": 23,
-      "successes": 21,
+      "count": 25,
+      "successes": 23,
       "failures": 2,
-      "avg_latency": 4792.260869565217,
-      "total_latency": 110222,
+      "avg_latency": 5758.08,
+      "total_latency": 143952,
       "models": {
-        "deepseek-v4-pro": 23
+        "deepseek-v4-pro": 25
       },
       "best_model": "deepseek-v4-pro"
     },
     "math_hard": {
-      "count": 3,
-      "successes": 3,
+      "count": 4,
+      "successes": 4,
       "failures": 0,
-      "avg_latency": 160156.66666666666,
-      "total_latency": 480470,
+      "avg_latency": 163317.25,
+      "total_latency": 653269,
       "models": {
-        "deepseek-v4-pro": 11,
-        "glm-5.2": 3,
-        "kimi-k2.6": 3
+        "deepseek-v4-pro": 15,
+        "glm-5.2": 4,
+        "kimi-k2.6": 4
       },
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 165,
-  "last_updated": "2026-07-06T21:24:49.718425+00:00"
+  "total_records": 176,
+  "last_updated": "2026-07-06T21:39:05.392856+00:00"
 }
