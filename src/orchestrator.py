@@ -75,6 +75,81 @@ else:
     from src.models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
 
 
+import re as _re
+
+
+def _extract_key_facts(text: str) -> list:
+    """Extract key facts (numbers, dates, proper nouns) from text.
+
+    Returns a list of fact strings that should survive a rewrite.
+    """
+    facts = []
+
+    # Numbers (including decimals, percentages, currency, years)
+    facts.extend(_re.findall(r'\b\d+(?:\.\d+)?%?\b', text))
+
+    # Dates (various formats)
+    facts.extend(_re.findall(r'\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b', text))
+    facts.extend(_re.findall(
+        r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s*\d{0,4}\b',
+        text, _re.IGNORECASE))
+
+    # Proper nouns (capitalized words that aren't sentence starts)
+    caps = _re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', text)
+    non_entities = {
+        'The', 'This', 'That', 'These', 'Those', 'It', 'He', 'She', 'They',
+        'We', 'You', 'I', 'A', 'An', 'In', 'On', 'At', 'To', 'For', 'With',
+        'But', 'And', 'Or', 'So', 'If', 'When', 'While', 'Although', 'Because',
+        'However', 'Therefore', 'Thus', 'Moreover', 'Furthermore', 'Additionally',
+        'First', 'Second', 'Third', 'Finally', 'Next', 'Then', 'Also'}
+    for cap in caps:
+        if cap not in non_entities and len(cap) > 2:
+            facts.append(cap)
+
+    return facts
+
+
+def _facts_preserved(original: str, rewritten: str) -> bool:
+    """Check that key facts from the original survive in the rewritten version.
+
+    For small fact counts (<=5), ALL facts must be preserved.
+    For larger counts, allows up to 10% missing (legitimate shortenings).
+
+    Returns True if facts are preserved, False if too many were lost.
+    """
+    facts = _extract_key_facts(original)
+    if not facts:
+        return True  # No facts to preserve
+
+    rewritten_lower = rewritten.lower()
+    missing = 0
+
+    for fact in facts:
+        if _re.fullmatch(r'\d+(?:\.\d+)?%?', fact):
+            # Numbers must appear exactly
+            if fact not in rewritten:
+                missing += 1
+        else:
+            # Proper nouns — case-insensitive match
+            # For multi-word entities (e.g. "Albert Einstein"), accept if
+            # the full entity OR its last significant word appears (e.g. "Einstein")
+            fact_lower = fact.lower()
+            if fact_lower in rewritten_lower:
+                continue
+            words = fact_lower.split()
+            if len(words) > 1:
+                # Check if the last word (usually the distinctive part) survives
+                last_word = words[-1]
+                if len(last_word) > 2 and last_word in rewritten_lower:
+                    continue
+            missing += 1
+
+    # For <=5 facts, all must survive. For more, allow 10% tolerance.
+    if len(facts) <= 5:
+        return missing == 0
+    return missing <= len(facts) // 10
+
+
 class Temuclaude:
     """
     Temuclaude — one model, one endpoint, one response.
@@ -599,7 +674,22 @@ class Temuclaude:
             else:
                 answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
                 strategy = "direct_specialist+skills+adaptive+adaptive_tokens"
-            
+
+            # Lightweight self-QA for knowledge queries — catches factual errors
+            # on the tier that previously had zero verification.
+            if task_type == "knowledge":
+                qa_result = await self_qa_gate(
+                    query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
+                    threshold=8, max_retries=1, max_tokens=1500,
+                    use_usva=True, use_reflexion=True
+                )
+                if qa_result["accepted"]:
+                    answer = qa_result["final_answer"]
+                    strategy += "+medium_qa_passed"
+                elif qa_result["attempts"] > 1:
+                    answer = qa_result["final_answer"]
+                    strategy += "+medium_qa_retried"
+
             models_used = [model]
         else:
             # Hard tier: full orchestration with 3-layer MoA + adaptive compute
@@ -831,7 +921,11 @@ class Temuclaude:
         
         # Only use simplified version if it's valid and not an error
         if simplified and not simplified.startswith("[ERROR") and len(simplified.strip()) > 10:
-            return simplified
+            # Fact-preservation check: verify key entities survived the rewrite
+            if _facts_preserved(answer, simplified):
+                return simplified
+            # Facts were lost during simplification — return original answer
+            return answer
         
         # Simplification failed — return original answer (safety net)
         return answer
