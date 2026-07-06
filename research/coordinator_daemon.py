@@ -157,7 +157,23 @@ class CoordinatorDaemon(DaemonBase):
             self.logger.exception(f"Failed to start {name}: {e}")
     
     def _restart_daemon(self, name: str):
-        """Restart a daemon by killing and restarting."""
+        """Restart a daemon by killing and restarting. With exponential backoff."""
+        # Track restart count for circuit breaker
+        if not hasattr(self, '_restart_counts'):
+            self._restart_counts = {}
+        count = self._restart_counts.get(name, 0)
+        
+        # Circuit breaker: after 5 consecutive restarts, give up
+        if count >= 5:
+            self.logger.error(f"{name} restarted {count} times — circuit breaker tripped, giving up")
+            return
+        
+        self._restart_counts[name] = count + 1
+        backoff = min(60 * (2 ** count), 3600)  # 60s, 120s, 240s, 480s, 600s, cap at 1h
+        if count > 0:
+            self.logger.warning(f"{name} restart #{count+1}, backing off {backoff}s")
+            time.sleep(backoff)
+        
         # Kill existing
         pid_file = STATE_DIR / f"{name}.pid"
         if pid_file.exists():
@@ -189,7 +205,7 @@ class CoordinatorDaemon(DaemonBase):
             
             # Also generate human-readable report
             report = generate_priority_report()
-            report_file = Path("/Users/saiful/temuclaude/research/PRIORITY_REPORT.md")
+            report_file = Path(os.environ.get("TEMUCLAUDE_DIR", str(Path.home() / "temuclaude"))) / "research" / "PRIORITY_REPORT.md"
             with open(report_file, 'w') as f:
                 f.write(report)
             
