@@ -1,60 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-04T03:06:03.882295+00:00",
-      "tier": "hard",
-      "tokens_used": 69,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "fusion_3L_MoA(3layers)+prm_consistency(n=10)+usva_qa_passed"
-    },
-    {
-      "timestamp": "2026-07-04T03:06:13.161907+00:00",
-      "tier": "medium",
-      "tokens_used": 400,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "coding",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
-    },
-    {
-      "timestamp": "2026-07-04T03:14:42.501745+00:00",
-      "tier": "trivial",
-      "tokens_used": 8,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_cheap+skills+adaptive_tokens"
-    },
-    {
-      "timestamp": "2026-07-04T03:14:51.422244+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-04T03:14:51.423184+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-04T03:14:51.424134+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-04T03:14:53.693919+00:00",
       "tier": "trivial",
       "tokens_used": 8,
@@ -899,33 +845,87 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T18:30:47.458261+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T18:30:47.458746+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T18:30:47.459200+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-06T18:31:04.411298+00:00",
+      "tier": "trivial",
+      "tokens_used": 9,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "knowledge",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
+    },
+    {
+      "timestamp": "2026-07-06T18:31:55.634201+00:00",
+      "tier": "medium",
+      "tokens_used": 22,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-06T18:31:59.368501+00:00",
+      "tier": "trivial",
+      "tokens_used": 1,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "knowledge",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
     }
   ],
-  "total_queries": 148,
-  "total_tokens_used": 272288,
-  "total_tokens_baseline": 1212416,
-  "correct": 42,
-  "incorrect": 21,
-  "unknown": 85,
+  "total_queries": 154,
+  "total_tokens_used": 285108,
+  "total_tokens_baseline": 1261568,
+  "correct": 44,
+  "incorrect": 22,
+  "unknown": 88,
   "tier_stats": {
     "trivial": {
-      "count": 55,
-      "tokens": 11524,
-      "baseline": 450560,
-      "correct": 21
+      "count": 58,
+      "tokens": 12034,
+      "baseline": 475136,
+      "correct": 22
     },
     "medium": {
-      "count": 69,
-      "tokens": 88514,
-      "baseline": 565248,
-      "correct": 21
+      "count": 71,
+      "tokens": 92632,
+      "baseline": 581632,
+      "correct": 22
     },
     "hard": {
-      "count": 24,
-      "tokens": 172250,
-      "baseline": 196608,
+      "count": 25,
+      "tokens": 180442,
+      "baseline": 204800,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-06T14:06:48.785731+00:00"
+  "last_updated": "2026-07-06T18:31:59.368566+00:00"
 }

@@ -1815,30 +1815,80 @@
       "latency_ms": 15000,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T18:30:47.460081+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T18:30:47.460962+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-06T18:31:55.636552+00:00",
+      "query_preview": "What is 25 * 4?",
+      "query_length": 15,
+      "query_words": 5,
+      "task_type": "math",
+      "tier": "medium",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing",
+      "latency_ms": 4241,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 21,
-      "successes": 21,
+      "count": 22,
+      "successes": 22,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 10500,
+      "total_latency": 11000,
       "models": {
-        "gpt-oss-120b": 21
+        "gpt-oss-120b": 22
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 21,
-      "successes": 21,
+      "count": 22,
+      "successes": 22,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 315000,
+      "total_latency": 330000,
       "models": {
-        "deepseek-v4-pro": 21,
-        "glm-5.2": 21,
-        "kimi-k2.6": 21
+        "deepseek-v4-pro": 22,
+        "glm-5.2": 22,
+        "kimi-k2.6": 22
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -1854,13 +1904,13 @@
       "best_model": "gpt-oss-120b"
     },
     "math_medium": {
-      "count": 24,
-      "successes": 20,
+      "count": 25,
+      "successes": 21,
       "failures": 4,
-      "avg_latency": 3487.2083333333335,
-      "total_latency": 83693,
+      "avg_latency": 3517.36,
+      "total_latency": 87934,
       "models": {
-        "deepseek-v4-pro": 24
+        "deepseek-v4-pro": 25
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -1889,6 +1939,6 @@
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 110,
-  "last_updated": "2026-07-06T14:06:48.787534+00:00"
+  "total_records": 113,
+  "last_updated": "2026-07-06T18:31:55.636643+00:00"
 }
