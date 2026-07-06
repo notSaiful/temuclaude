@@ -82,65 +82,83 @@ class IntegratorDaemon(DaemonBase):
         return True
     
     def _implement_finding(self, finding_file: str) -> bool:
-        """Implement a finding. Returns True on success."""
-        try:
-            with open(finding_file) as f:
-                content = f.read()
-            
-            # For now, use the existing auto_integrator.py approach
-            # which gathers context and lets LLM decide what to implement
-            result = subprocess.run([
-                sys.executable, 
-                "/Users/saiful/temuclaude/research/scripts/auto_integrator.py"
-            ], capture_output=True, text=True, timeout=300, cwd=TEMUCLAUDE_DIR)
-            
-            self.logger.info(f"Auto-integrator output: {result.stdout[:500]}")
-            
-            if result.returncode != 0:
-                self.logger.error(f"Auto-integrator failed: {result.stderr[:500]}")
+        """Implement a finding with retry. Returns True on success."""
+        max_attempts = 2
+        
+        for attempt in range(max_attempts):
+            try:
+                with open(finding_file) as f:
+                    content = f.read()
+                
+                self.logger.info(f"Attempt {attempt+1}/{max_attempts}: {Path(finding_file).name}")
+                
+                result = subprocess.run([
+                    sys.executable,
+                    "/Users/saiful/temuclaude/research/scripts/auto_integrator.py"
+                ], capture_output=True, text=True, timeout=1200, cwd=TEMUCLAUDE_DIR)  # 20 min
+                
+                self.logger.info(f"Auto-integrator output: {result.stdout[:500]}")
+                
+                if result.returncode != 0:
+                    self.logger.error(f"Auto-integrator stderr: {result.stderr[:1000]}")
+                    if attempt < max_attempts - 1:
+                        self.logger.info("Retrying in 30s...")
+                        time.sleep(30)
+                        continue
+                    return False
+                
+                # Check if any changes were made
+                git_status = subprocess.run(
+                    ["git", "status", "--porcelain"],
+                    capture_output=True, text=True, cwd=TEMUCLAUDE_DIR
+                )
+                
+                if not git_status.stdout.strip():
+                    self.logger.info("No changes made by integrator")
+                    return True  # Not a failure, just nothing to do
+                
+                # Run tests
+                self.logger.info("Running tests...")
+                test_result = subprocess.run([
+                    sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short", "-x"
+                ], capture_output=True, text=True, timeout=600, cwd=TEMUCLAUDE_DIR)  # 10 min
+                
+                self.logger.info(f"Tests: {test_result.stdout[-1000:]}")
+                
+                if test_result.returncode != 0:
+                    self.logger.error(f"Tests failed:\n{test_result.stdout[-2000:]}")
+                    self.logger.error(f"Test stderr:\n{test_result.stderr[-1000:]}")
+                    subprocess.run(["git", "checkout", "."], cwd=TEMUCLAUDE_DIR)
+                    self._log_changelog(f"REVERTED: {finding_file} - Tests failed (attempt {attempt+1})")
+                    if attempt < max_attempts - 1:
+                        self.logger.info("Retrying in 30s...")
+                        time.sleep(30)
+                        continue
+                    return False
+                
+                # Commit and push
+                subprocess.run(["git", "add", "-A"], cwd=TEMUCLAUDE_DIR)
+                commit_msg = f"auto-improve: {Path(finding_file).stem}"
+                subprocess.run(["git", "commit", "-m", commit_msg], cwd=TEMUCLAUDE_DIR)
+                subprocess.run(["git", "push"], cwd=TEMUCLAUDE_DIR)
+                
+                self._log_changelog(f"IMPLEMENTED: {finding_file} - {commit_msg}")
+                self._update_tracker(finding_file, "implemented")
+                
+                return True
+                
+            except subprocess.TimeoutExpired:
+                self.logger.error(f"Implementation timed out (attempt {attempt+1})")
+                if attempt < max_attempts - 1:
+                    self.logger.info("Retrying in 60s...")
+                    time.sleep(60)
+                    continue
                 return False
-            
-            # Check if any changes were made
-            git_status = subprocess.run(
-                ["git", "status", "--porcelain"], 
-                capture_output=True, text=True, cwd=TEMUCLAUDE_DIR
-            )
-            
-            if not git_status.stdout.strip():
-                self.logger.info("No changes made by integrator")
-                return True  # Not a failure, just nothing to do
-            
-            # Run tests
-            self.logger.info("Running tests...")
-            test_result = subprocess.run([
-                sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short"
-            ], capture_output=True, text=True, timeout=180, cwd=TEMUCLAUDE_DIR)
-            
-            self.logger.info(f"Tests: {test_result.stdout[-1000:]}")
-            
-            if test_result.returncode != 0:
-                self.logger.error("Tests failed, reverting...")
-                subprocess.run(["git", "checkout", "."], cwd=TEMUCLAUDE_DIR)
-                self._log_changelog(f"REVERTED: {finding_file} - Tests failed")
+            except Exception as e:
+                self.logger.exception(f"Implementation error: {e}")
                 return False
-            
-            # Commit and push
-            subprocess.run(["git", "add", "-A"], cwd=TEMUCLAUDE_DIR)
-            commit_msg = f"auto-improve: {Path(finding_file).stem}"
-            subprocess.run(["git", "commit", "-m", commit_msg], cwd=TEMUCLAUDE_DIR)
-            subprocess.run(["git", "push"], cwd=TEMUCLAUDE_DIR)
-            
-            self._log_changelog(f"IMPLEMENTED: {finding_file} - {commit_msg}")
-            self._update_tracker(finding_file, "implemented")
-            
-            return True
-            
-        except subprocess.TimeoutExpired:
-            self.logger.error("Implementation timed out")
-            return False
-        except Exception as e:
-            self.logger.exception(f"Implementation error: {e}")
-            return False
+        
+        return False
     
     def _log_changelog(self, entry: str):
         """Append to CHANGELOG.md"""
