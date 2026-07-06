@@ -1,0 +1,17 @@
+You are the RANK 1 research agent for Temuclaude. Research this topic deeply: marketing_strategy
+
+Focus on:
+1. Latest papers, repos, implementations
+2. Concrete techniques we can implement
+3. Code examples, APIs, integration details
+4. Benchmarks, results, tradeoffs
+
+Output a deep research report as markdown to: /Users/saiful/temuclaude/research/findings/deep_research_marketing_strategy_20260705T184800.md
+
+Include:
+- Executive summary
+- Key techniques with implementation details
+- Code snippets / pseudo-code
+- Integration points for Temuclaude
+- Risk assessment
+- Priority: implement now / track for future / blocked

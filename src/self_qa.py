@@ -20,12 +20,16 @@ from typing import Callable, Awaitable, Optional
 DEFAULT_THRESHOLD = 8
 DEFAULT_MAX_RETRIES = 3
 
-# USVA 4-rubric scoring (from ATTS framework)
+# USVA 5-rubric scoring (extended from ATTS framework)
+# Original 4 rubrics: LC, FC, CM, GA
+# Added 5th rubric: CL (Clarity) — based on research arXiv:2407.19825, 2312.02065
+# Clarity rubric ensures responses are concise, simple, and accessible
 USVA_RUBRICS = {
     "LC": "Logical Coherence — Is the reasoning internally consistent and logical?",
     "FC": "Factual Correctness — Are the facts and claims accurate?",
     "CM": "Completeness — Does the answer address all parts of the question?",
     "GA": "Goal Alignment — Does the answer meet the user's actual goal?",
+    "CL": "Clarity — Is the answer clear, concise, and accessible? Short sentences, simple words, no unnecessary jargon, no filler?",
 }
 
 
@@ -61,35 +65,38 @@ def build_qa_prompt(question: str, answer: str) -> list:
 
 
 def build_usva_prompt(question: str, answer: str) -> list:
-    """Build the USVA 4-rubric evaluation prompt (ATTS pattern).
+    """Build the USVA 5-rubric evaluation prompt (extended ATTS pattern).
     
-    Instead of a single 0-10 score, the verifier scores on 4 rubrics:
+    Instead of a single 0-10 score, the verifier scores on 5 rubrics:
     - LC (Logical Coherence): 0.0-1.0
     - FC (Factual Correctness): 0.0-1.0
     - CM (Completeness): 0.0-1.0
     - GA (Goal Alignment): 0.0-1.0
+    - CL (Clarity): 0.0-1.0 — is the answer concise, simple, and accessible?
     
-    Overall score = average of 4 rubrics × 10. More granular than single score.
+    Overall score = average of 5 rubrics × 10. More granular than single score.
     """
     system_prompt = (
-        "You are a quality evaluator using the USVA 4-rubric framework. "
-        "Score the answer on 4 dimensions, each from 0.0 to 1.0:\n\n"
+        "You are a quality evaluator using the USVA 5-rubric framework. "
+        "Score the answer on 5 dimensions, each from 0.0 to 1.0:\n\n"
         f"LC (Logical Coherence): {USVA_RUBRICS['LC']}\n"
         f"FC (Factual Correctness): {USVA_RUBRICS['FC']}\n"
         f"CM (Completeness): {USVA_RUBRICS['CM']}\n"
-        f"GA (Goal Alignment): {USVA_RUBRICS['GA']}\n\n"
+        f"GA (Goal Alignment): {USVA_RUBRICS['GA']}\n"
+        f"CL (Clarity): {USVA_RUBRICS['CL']}\n\n"
         "Respond in EXACTLY this format:\n"
         "LC: X.X\n"
         "FC: X.X\n"
         "CM: X.X\n"
         "GA: X.X\n"
+        "CL: X.X\n"
         "Reason: Brief explanation of the weakest area\n"
     )
     
     user_prompt = (
         f"Question: {question}\n\n"
         f"Answer: {answer}\n\n"
-        f"Score on all 4 rubrics:"
+        f"Score on all 5 rubrics:"
     )
     
     return [
@@ -99,12 +106,12 @@ def build_usva_prompt(question: str, answer: str) -> list:
 
 
 def extract_usva_score(response: str) -> tuple:
-    """Extract USVA 4-rubric scores from verifier response.
+    """Extract USVA 5-rubric scores from verifier response.
     
     Returns (overall_score: float 0-10, weakest_area: str, reasoning: str).
     """
     scores = {}
-    for rubric in ["LC", "FC", "CM", "GA"]:
+    for rubric in ["LC", "FC", "CM", "GA", "CL"]:
         match = re.search(rf'{rubric}:\s*(\d+\.?\d*)', response)
         if match:
             scores[rubric] = float(match.group(1))
@@ -241,6 +248,7 @@ async def self_qa_gate(
     attempts = 0
     last_reasoning = ""
     reflections = []  # Reflexion memory (arXiv:2303.11366)
+    weakest_area = "unknown"  # Default; set by extract_usva_score when use_usva=True
     
     for attempt in range(max_retries + 1):
         attempts += 1
@@ -281,8 +289,17 @@ async def self_qa_gate(
                 reflection = f"Attempt {attempt + 1} scored {score:.1f}/10. Issue: {reasoning}"
                 reflections.append(reflection)
                 
+                # Clarity-specific feedback: if CL is the weakest rubric, add clarity guidance
+                clarity_hint = ""
+                if weakest_area == "CL":
+                    clarity_hint = (
+                        "\n\nIMPORTANT: Your answer was not clear or concise enough. "
+                        "Rewrite with shorter sentences, simpler words, and no filler. "
+                        "Lead with the answer. Remove unnecessary explanation."
+                    )
+                
                 retry_messages = build_reflexion_prompt(
-                    question, current_answer, score, reasoning, reflections
+                    question, current_answer, score, reasoning + clarity_hint, reflections
                 )
                 # Use the verifier model to generate improved answer with reflection context
                 current_answer = await call_model_func(verifier_model, retry_messages, max_tokens=max_tokens)
