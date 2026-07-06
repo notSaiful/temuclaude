@@ -25,7 +25,11 @@ except ImportError:
 
 
 GITHUB_API = "https://api.github.com"
-GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+
+
+def _get_token() -> str:
+    """Get GitHub token from environment (dynamic)."""
+    return os.environ.get("GITHUB_TOKEN", "")
 
 
 def _get_headers() -> Dict:
@@ -34,8 +38,9 @@ def _get_headers() -> Dict:
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "Temuclaude/1.0",
     }
-    if GITHUB_TOKEN:
-        headers["Authorization"] = f"token {GITHUB_TOKEN}"
+    token = _get_token()
+    if token:
+        headers["Authorization"] = f"token {token}"
     return headers
 
 

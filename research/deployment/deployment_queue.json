@@ -1,0 +1,24 @@
+{
+  "pending_findings": [],
+  "approved_deployments": [],
+  "rejected_deployments": [],
+  "last_permission_request": null,
+  "next_permission_eligible": null,
+  "staging_dir": "/Users/saiful/temuclaude/staging",
+  "rules": {
+    "never_touch_main": true,
+    "max_permission_frequency_days": 7,
+    "hasan_decides_timing": true,
+    "all_changes_in_staging": true,
+    "deploy_only_with_ggs_approval": true,
+    "only_permission_for_main_codebase": true
+  },
+  "agent_scaling": {
+    "current_research_agents": 3,
+    "min_agents": 1,
+    "max_agents": 8,
+    "last_scaled": null,
+    "scale_reason": "",
+    "history": []
+  }
+}

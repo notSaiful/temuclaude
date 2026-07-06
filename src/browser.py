@@ -32,7 +32,7 @@ def validate_url(url: str) -> bool:
     """Validate that a URL is well-formed."""
     try:
         parsed = urlparse(url)
-        return parsed.scheme in ("http", "https") and parsed.netloc
+        return bool(parsed.scheme in ("http", "https") and parsed.netloc)
     except Exception:
         return False
 

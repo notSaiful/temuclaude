@@ -121,8 +121,9 @@ export default function HasanPage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'daemons' | 'chat'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'daemons' | 'chat' | 'deploy'>('overview');
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [deployData, setDeployData] = useState<any>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -142,7 +143,16 @@ export default function HasanPage() {
     fetchData();
     const interval = setInterval(fetchData, 3000);
     const clock = setInterval(() => setNow(new Date()), 1000);
-    return () => { clearInterval(interval); clearInterval(clock); };
+    // Fetch deployment data less frequently
+    const fetchDeploy = async () => {
+      try {
+        const res = await fetch('/api/hasan/deploy', { cache: 'no-store' });
+        if (res.ok) setDeployData(await res.json());
+      } catch {}
+    };
+    fetchDeploy();
+    const deployInterval = setInterval(fetchDeploy, 10000);
+    return () => { clearInterval(interval); clearInterval(clock); clearInterval(deployInterval); };
   }, [fetchData]);
 
   useEffect(() => {
@@ -222,12 +232,13 @@ export default function HasanPage() {
 
       {/* Tab Navigation */}
       <nav style={s.tabs}>
-        {(['overview', 'daemons', 'chat'] as const).map(tab => (
+        {(['overview', 'daemons', 'chat', 'deploy'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{ ...s.tab, ...(activeTab === tab ? s.tabActive : {}) }}>
             {tab === 'overview' && 'Overview'}
             {tab === 'daemons' && `Daemons (${alive}/${total})`}
             {tab === 'chat' && 'Talk to Hasan'}
+            {tab === 'deploy' && `Deploy${deployData?.pending_count > 0 ? ` (${deployData.pending_count})` : ''}`}
           </button>
         ))}
       </nav>
@@ -237,6 +248,23 @@ export default function HasanPage() {
         {activeTab === 'overview' && (
           <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
             style={s.content}>
+            {/* Deployment Notification Banner */}
+            {deployData?.pending_count > 0 && (
+              <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                style={{ ...s.banner, borderColor: 'rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.05)', marginBottom: '12px' }}>
+                <div style={s.bannerLeft}>
+                  <h2 style={{ ...s.bannerTitle, color: '#f59e0b', fontSize: '16px' }}>
+                    {deployData.pending_count} IMPROVEMENT{deployData.pending_count > 1 ? 'S' : ''} PENDING APPROVAL
+                  </h2>
+                  <p style={s.bannerSub}>Hasan has staged improvements. Review and deploy in the Deploy tab.</p>
+                </div>
+                <button onClick={() => setActiveTab('deploy')}
+                  style={{ ...s.pill, cursor: 'pointer', border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.1)' }}>
+                  <span style={s.pillLabel}>REVIEW</span>
+                  <span style={{ ...s.pillValue, color: '#f59e0b', fontSize: '14px' }}>{deployData.pending_count} →</span>
+                </button>
+              </motion.div>
+            )}
             {/* Status Banner */}
             <div style={{ ...s.banner, borderColor: online ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)' }}>
               <div style={s.bannerLeft}>
@@ -445,9 +473,105 @@ export default function HasanPage() {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Daemon Detail Modal */}
+        {/* DEPLOY TAB */}
+        {activeTab === 'deploy' && (
+          <motion.div key="deploy" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            style={s.content}>
+            <div style={{ ...s.banner, borderColor: 'rgba(59,130,246,0.2)' }}>
+              <div style={s.bannerLeft}>
+                <h2 style={{ ...s.bannerTitle, color: '#3b82f6', fontSize: '18px' }}>DEPLOYMENT CENTER</h2>
+                <p style={s.bannerSub}>Hasan works in staging. Approve improvements to merge into main.</p>
+              </div>
+              <div style={s.bannerRight}>
+                <div style={s.pill}><span style={s.pillLabel}>PENDING</span><span style={{ ...s.pillValue, color: '#f59e0b' }}>{deployData?.pending_count || 0}</span></div>
+                <div style={s.pill}><span style={s.pillLabel}>STAGING</span><span style={{ ...s.pillValue, color: '#3b82f6' }}>{deployData?.staging_count || 0}</span></div>
+                <div style={s.pill}><span style={s.pillLabel}>APPROVED</span><span style={{ ...s.pillValue, color: '#10b981' }}>{deployData?.approved_count || 0}</span></div>
+                <div style={s.pill}><span style={s.pillLabel}>REJECTED</span><span style={{ ...s.pillValue, color: '#ef4444' }}>{deployData?.rejected_count || 0}</span></div>
+              </div>
+            </div>
+
+            {/* Agent Scaling */}
+            {deployData?.agent_scaling && (
+              <div style={{ ...s.card, marginBottom: '16px' }}>
+                <div style={s.cardHead}>
+                  <Icon name="robot" size={16} color="#9ca3af" />
+                  <span style={s.cardTitle}>Research Agents</span>
+                  <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#8b8b9b' }}>
+                    {deployData.agent_scaling.current_research_agents} active (min {deployData.agent_scaling.min || 1}, max {deployData.agent_scaling.max || 8})
+                  </span>
+                </div>
+                {deployData.agent_scaling.scale_reason && (
+                  <p style={{ fontSize: '11px', color: '#6b6b7b', marginTop: '4px' }}>
+                    Last: {deployData.agent_scaling.scale_reason} · {deployData.agent_scaling.last_scaled ? new Date(deployData.agent_scaling.last_scaled).toLocaleString() : 'N/A'}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Pending Approval */}
+            <div style={{ ...s.card, marginBottom: '16px' }}>
+              <div style={s.cardHead}>
+                <span style={s.cardTitle}>Pending Approval</span>
+                {deployData?.pending_count > 0 && (
+                  <button onClick={async () => { await fetch('/api/hasan/deploy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'approve_all' }) }); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '11px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer' }}>
+                    APPROVE ALL
+                  </button>
+                )}
+              </div>
+              {(deployData?.pending_findings || []).filter((f: any) => f.status === 'pending_approval').length === 0 ? (
+                <p style={s.empty}>No improvements pending. Hasan is working in staging.</p>
+              ) : (
+                (deployData?.pending_findings || []).filter((f: any) => f.status === 'pending_approval').map((f: any, i: number) => (
+                  <motion.div key={f.id || i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                    style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '10px', padding: '14px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#e8e8f0', margin: 0 }}>{f.title || 'Untitled'}</h4>
+                        {f.summary && <p style={{ fontSize: '12px', color: '#8b8b9b', marginTop: '6px' }}>{f.summary}</p>}
+                        {f.improvements && (
+                          <ul style={{ fontSize: '11px', color: '#6b6b7b', marginTop: '8px', paddingLeft: '16px' }}>
+                            {f.improvements.map((imp: string, j: number) => <li key={j}>{imp}</li>)}
+                          </ul>
+                        )}
+                        <p style={{ fontSize: '10px', color: '#6b6b7b', marginTop: '6px' }}>
+                          Requested: {f.requested_at ? new Date(f.requested_at).toLocaleString() : 'N/A'}
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '12px' }}>
+                        <button onClick={async () => { await fetch('/api/hasan/deploy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'approve', finding_id: f.id }) }); }}
+                          style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', fontSize: '11px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer' }}>
+                          APPROVE
+                        </button>
+                        <button onClick={async () => { await fetch('/api/hasan/deploy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reject', finding_id: f.id }) }); }}
+                          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', fontSize: '11px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer' }}>
+                          REJECT
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
+
+            {/* In Staging */}
+            <div style={{ ...s.card }}>
+              <div style={s.cardHead}><span style={s.cardTitle}>In Staging (not yet requested)</span></div>
+              {(deployData?.pending_findings || []).filter((f: any) => f.status === 'in_staging').length === 0 ? (
+                <p style={s.empty}>No items in staging.</p>
+              ) : (
+                (deployData?.pending_findings || []).filter((f: any) => f.status === 'in_staging').map((f: any, i: number) => (
+                  <div key={f.id || i} style={{ background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.1)', borderRadius: '10px', padding: '12px', marginBottom: '8px' }}>
+                    <h4 style={{ fontSize: '12px', color: '#e8e8f0', margin: 0 }}>{f.title || 'Untitled'}</h4>
+                    {f.summary && <p style={{ fontSize: '11px', color: '#8b8b9b', marginTop: '4px' }}>{f.summary}</p>}
+                  </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {selectedDaemon && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

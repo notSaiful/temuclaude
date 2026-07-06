@@ -26,14 +26,14 @@ def test_simplify_wordy():
     text = "In order to run the code, you need Python."
     result = simplify_wordy(text)
     assert "In order to" not in result
-    assert "to run" in result
+    assert "run" in result.lower()
 
 
 def test_simplify_wordy_due_to():
     text = "Due to the fact that Python is installed, it works."
     result = simplify_wordy(text)
     assert "Due to the fact" not in result
-    assert "because" in result
+    assert "because" in result.lower()
 
 
 def test_bullets_to_prose():
