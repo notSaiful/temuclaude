@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-07-06T18:09:32.059810+00:00",
+  "success_rate": 0.3333333333333333,
+  "total_attempts": 3,
+  "priority_adjustments": [
+    {
+      "topic": "implementation_quality",
+      "boost": 30,
+      "reason": "Low success rate"
+    }
+  ],
+  "recommendations": [
+    "Implementation success rate is 33% \u2014 below 50%. Boost research on failing topics."
+  ]
+}

@@ -4,49 +4,408 @@
     "research_needed": "maximum",
     "reason": "Zero marketing done. No users, no community, no attention.",
     "blocked_by": "need_research",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
   },
   "mcts_full": {
     "priority_score": 125,
     "research_needed": "maximum",
     "reason": "THE breakthrough (rStar-Math: 58.8%\u219290%). Need implementation details for our model pool.",
     "blocked_by": "need_code_analysis",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "cognitive_firewall": {
+    "priority_score": 125,
+    "research_needed": "maximum",
+    "reason": "4-gate zero-trust defense. Reduces attack success to 2%. NOT implemented.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "self_healing_guard": {
+    "priority_score": 125,
+    "research_needed": "maximum",
+    "reason": "Self-healing injection defense (Silmaril pattern). Retrains on new attacks in <1h. NOT implemented.",
+    "blocked_by": "need_architecture_design",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "red_blue_loop": {
+    "priority_score": 125,
+    "research_needed": "maximum",
+    "reason": "Self-attacking self-improving defense loop. THE architecture for unbeatable security.",
+    "blocked_by": "need_full_architecture",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "routellm_cascade": {
+    "priority_score": 125,
+    "research_needed": "high",
+    "reason": "RouteLLM cascade routing: 85% savings, 95% GPT-4 quality. Extend existing preference_router.py (526 LOC).",
+    "blocked_by": "need_preference_data_training",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
   },
   "prm_training": {
     "priority_score": 115,
     "research_needed": "maximum",
     "reason": "PRM-weighted voting implemented but no TRAINED PRM. Need auto-data-generation (OmegaPRM).",
     "blocked_by": "need_training_methodology",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
   },
   "dspy_integration": {
     "priority_score": 115,
     "research_needed": "maximum",
     "reason": "DSPy/MIPROv2 gives 10-50% gains, enables self-improvement. Not integrated.",
     "blocked_by": "need_framework_understanding",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "haloguard_classifier": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "Open-weights constitutional classifier, 90.9 F1 at 1/10 model size. NOT implemented.",
+    "blocked_by": "need_model_download",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "knnguard_guardrail": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "Training-free guardrail using kNN on activations. 2.7x faster. NOT implemented.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "owasp_llm_top10": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "OWASP LLM Top 10 (2025) compliance. 10 vulnerability classes, ZERO implemented.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "owasp_agentic_top10": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "OWASP Agentic Top 10 (2026) compliance. Agent-specific threats, ZERO implemented.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "speculative_decoding": {
+    "priority_score": 115,
+    "research_needed": "medium",
+    "reason": "2-3x speedup, LOSSLESS. Blocked by self-hosting OR provider-native support.",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "efficiency_continuous_improvement": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "DSPy+GEPA continuous Pareto improvement loop. 10-50% from prompt optimization. PRESERVING.",
+    "blocked_by": "needs_dspy_framework",
+    "action": "research_and_implement",
+    "quality_class": "pareto_optimal"
+  },
+  "s3_verifier_guided_denoising": {
+    "priority_score": 115,
+    "research_needed": "high",
+    "reason": "S\u00b3 Stratified Scaling Search (arXiv:2604.06260): verifier guides denoising at each step. Beyond best-of-N.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "media_model_pool_update": {
+    "priority_score": 110,
+    "research_needed": "high",
+    "reason": "Model pool must include latest frontiers: FLUX.2, Sora 2, Veo 3.1, Runway Gen-4.5, GPT Image 2. VERIFY+UPDATE.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
   },
   "step_level_code_verification": {
     "priority_score": 105,
     "research_needed": "high",
     "reason": "We verify final answers but not intermediate steps. rStar-Math pattern.",
     "blocked_by": "need_implementation_details",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "ai_infra_guard": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "4-layer red teaming framework. 1400+ vuln rules. Need to integrate for self-testing.",
+    "blocked_by": "need_framework_integration",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "function_call_defense": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "Function-calling jailbreak via SMT pattern. Must sanitize tool outputs + enforce schemas.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "lifecycle_defenses": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "8-stage lifecycle vulnerability defense. Only inference-time defense exists currently.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "supply_chain_defense": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "Model poisoning, backdoor, dependency attacks. Zero supply chain security implemented.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "video_temporal_consistency": {
+    "priority_score": 105,
+    "research_needed": "high",
+    "reason": "Temporal consistency enforcement for video. Frontier models do this internally. We need a checker.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "media_dynamic_routing": {
+    "priority_score": 105,
+    "research_needed": "medium",
+    "reason": "Track which media model wins for which intent. Auto-route to best model (RouteLLM for media).",
+    "blocked_by": "need_preference_data",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "semantic_caching": {
+    "priority_score": 100,
+    "research_needed": "high",
+    "reason": "Semantic cache: 20% hit rate, 100% savings on hit. QUALITY-PRESERVING (0.95+ threshold). NOT implemented.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "quality_preserving"
+  },
+  "prefix_caching": {
+    "priority_score": 100,
+    "research_needed": "high",
+    "reason": "KV cache reuse for shared prefixes. 90% input token savings. LOSSLESS. NOT implemented.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "flux2_multi_reference": {
+    "priority_score": 100,
+    "research_needed": "high",
+    "reason": "FLUX.2 multi-reference: 6 reference images, consistent style, pose control, 4MP photoreal. NOT in pool.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "sora2_audio_video": {
+    "priority_score": 100,
+    "research_needed": "high",
+    "reason": "Sora 2: video + synchronized dialogue + sound effects. Frontier capability. NOT in pool.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
   },
   "preference_data_router": {
     "priority_score": 95,
     "research_needed": "high",
     "reason": "RouteLLM gives 2x cost reduction with preference-data-trained routing.",
     "blocked_by": "need_data_collection_method",
-    "action": "research_and_implement"
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "antaeus_scanner": {
+    "priority_score": 95,
+    "research_needed": "high",
+    "reason": "Repository-level logic vulnerability detection. Finds bugs memory-safety scanners miss.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "backdoor_detection": {
+    "priority_score": 95,
+    "research_needed": "medium",
+    "reason": "Backdoor attacks (Pmeta-TLA, ReShift). No detection implemented.",
+    "blocked_by": "need_research",
+    "action": "research_and_implement",
+    "quality_class": "unknown"
+  },
+  "continuous_batching": {
+    "priority_score": 95,
+    "research_needed": "low",
+    "reason": "2-3x throughput via PagedAttention. LOSSLESS. Blocked by self-hosting.",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "awq_quantization": {
+    "priority_score": 95,
+    "research_needed": "low",
+    "reason": "AWQ 4-bit: 4x memory, 10-20% speed, <1% loss. PRESERVING. Blocked by self-hosting.",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "early_exit_adaptive": {
+    "priority_score": 95,
+    "research_needed": "medium",
+    "reason": "Apple Duo-LLM: 30-50% compute savings, <1% loss. PRESERVING. Blocked by self-hosting.",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "dflash_speculator_training": {
+    "priority_score": 95,
+    "research_needed": "low",
+    "reason": "Custom DFlash draft models: +5-20% over base spec decoding. LOSSLESS. Blocked by training.",
+    "blocked_by": "needs_training_pipeline",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "diffusion_acceleration_media": {
+    "priority_score": 95,
+    "research_needed": "medium",
+    "reason": "Consistency models, guided distillation, ParallelVLM: faster generation, same quality. PRESERVING.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "controlnet_all_models": {
+    "priority_score": 95,
+    "research_needed": "medium",
+    "reason": "ControlNet-like guidance (pose, depth, edges) for all models, not just FLUX.2.",
+    "blocked_by": "need_implementation_details",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "unified_multimodal_generation": {
+    "priority_score": 95,
+    "research_needed": "low",
+    "reason": "Single model for image+video+audio (Gemini Omni pattern). Eliminates model selection.",
+    "blocked_by": "need_unified_model",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "long_video_generation": {
+    "priority_score": 95,
+    "research_needed": "low",
+    "reason": "Generate minutes of video (not seconds). Requires temporal consistency + scene memory.",
+    "blocked_by": "need_long_video_infra",
+    "action": "research_and_implement",
+    "quality_class": "quality_preserving"
+  },
+  "adversarial_verifier_security": {
+    "priority_score": 90,
+    "research_needed": "low",
+    "reason": "Existing adversarial_verifier.py only checks code quality. EXTEND to security.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "unknown"
+  },
+  "provider_prompt_caching": {
+    "priority_score": 90,
+    "research_needed": "medium",
+    "reason": "Provider-native prompt caching (Anthropic/OpenAI): 90% input savings. LOSSLESS. NOT optimized.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "efficiency_pareto_monitoring": {
+    "priority_score": 90,
+    "research_needed": "low",
+    "reason": "Pareto tracker exists (266 LOC) but may not be actively monitoring production. Verify + extend.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "pareto_optimal"
+  },
+  "veo31_cinematic": {
+    "priority_score": 90,
+    "research_needed": "high",
+    "reason": "Veo 3.1: cinematic video with audio. Matches Sora 2. NOT in pool.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "runway_gen45": {
+    "priority_score": 90,
+    "research_needed": "high",
+    "reason": "Runway Gen-4.5: #1 motion quality (1247 ELO). NOT in pool.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "image_editing_mode": {
+    "priority_score": 90,
+    "research_needed": "high",
+    "reason": "Image editing with instruction following (Grok Imagine, GPT Image 2 pattern). NOT implemented.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "multimodal_judge_vision": {
+    "priority_score": 90,
+    "research_needed": "medium",
+    "reason": "Use vision-language model as judge for image/video quality. Better judge = better best-of-N.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "quality_preserving"
+  },
+  "model_weight_merging_eff": {
+    "priority_score": 85,
+    "research_needed": "low",
+    "reason": "TIES/Task Arithmetic: +1.62 mean gain, 80-100% success. LOSSLESS. Blocked by self-hosting.",
+    "blocked_by": "needs_self_hosted_vllm",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "text_to_3d_generation": {
+    "priority_score": 85,
+    "research_needed": "medium",
+    "reason": "Text-to-3D generation (arXiv:2607.02516 X-to-4D). Emerging frontier capability.",
+    "blocked_by": "need_3d_infrastructure",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "world_model_interactive_video": {
+    "priority_score": 85,
+    "research_needed": "low",
+    "reason": "WorldDirector (arXiv:2607.02517): interactive, controllable video worlds. Next gen.",
+    "blocked_by": "need_world_model_infra",
+    "action": "research_and_implement",
+    "quality_class": "lossless"
+  },
+  "structured_output": {
+    "priority_score": 80,
+    "research_needed": "medium",
+    "reason": "Constrained generation: 100% valid output, eliminates retries. LOSSLESS. NOT implemented.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
+  },
+  "media_pipeline_verify": {
+    "priority_score": 80,
+    "research_needed": "low",
+    "reason": "Verify existing 10-stage pipeline (5911 LOC) is using latest models and best prompts.",
+    "blocked_by": null,
+    "action": "implement_now",
+    "quality_class": "lossless"
   },
   "pareto_efficiency_tracking": {
     "priority_score": 50,
     "research_needed": "low",
     "reason": "Track token_savings vs accuracy_loss. Auto-tune thresholds.",
     "blocked_by": null,
-    "action": "implement_now"
+    "action": "implement_now",
+    "quality_class": "unknown"
   },
   "full_mcts_ppm": {
     "priority_score": 20,
@@ -55,11 +414,32 @@
     "blocked_by": "needs_prm_training",
     "action": "track_for_future"
   },
+  "autonomous_red_blue_ecosystem": {
+    "priority_score": 20,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_red_blue_infra",
+    "blocked_by": "needs_red_blue_infra",
+    "action": "track_for_future"
+  },
+  "harc_alignment": {
+    "priority_score": 17,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_fine_tuning_pipeline",
+    "blocked_by": "needs_fine_tuning_pipeline",
+    "action": "track_for_future"
+  },
   "hermes_self_evolution": {
     "priority_score": 14,
     "research_needed": "low",
     "reason": "Blocked by: needs_dspy_framework",
     "blocked_by": "needs_dspy_framework",
+    "action": "track_for_future"
+  },
+  "offensive_swarm": {
+    "priority_score": 14,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_offensive_agent_infra",
+    "blocked_by": "needs_offensive_agent_infra",
     "action": "track_for_future"
   },
   "miprov2": {
@@ -76,11 +456,18 @@
     "blocked_by": "needs_mcts_first",
     "action": "track_for_future"
   },
-  "layer_4_compression": {
-    "priority_score": 8,
+  "neurosymbolic_scanner": {
+    "priority_score": 11,
     "research_needed": "low",
-    "reason": "Blocked by: needs_context_module",
-    "blocked_by": "needs_context_module",
+    "reason": "Blocked by: needs_cpg_tooling",
+    "blocked_by": "needs_cpg_tooling",
+    "action": "track_for_future"
+  },
+  "context_lake": {
+    "priority_score": 11,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_database_setup",
+    "blocked_by": "needs_database_setup",
     "action": "track_for_future"
   },
   "teacher_student_distillation": {
@@ -88,6 +475,13 @@
     "research_needed": "low",
     "reason": "Blocked by: needs_dspy",
     "blocked_by": "needs_dspy",
+    "action": "track_for_future"
+  },
+  "layer_4_compression": {
+    "priority_score": 8,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_context_module",
+    "blocked_by": "needs_context_module",
     "action": "track_for_future"
   },
   "vstar_dpo_verifier": {
@@ -123,6 +517,13 @@
     "research_needed": "low",
     "reason": "Blocked by: needs_self_hosted_vllm",
     "blocked_by": "needs_self_hosted_vllm",
+    "action": "track_for_future"
+  },
+  "mobile_agent_security": {
+    "priority_score": 5,
+    "research_needed": "low",
+    "reason": "Blocked by: needs_mobile_infra",
+    "blocked_by": "needs_mobile_infra",
     "action": "track_for_future"
   },
   "prm_weighted_voting": {

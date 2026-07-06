@@ -1,11 +1,25 @@
 {
   "new_raw": [],
-  "new_findings": [],
+  "new_findings": [
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: cost optimization (competitor: OpenRouter)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.463920+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: streaming (competitor: OpenRouter)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.464062+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: PagedAttention (competitor: vLLM)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.464200+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: continuous batching (competitor: vLLM)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.464345+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: speculative decoding (competitor: vLLM)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.464489+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implement: AWQ (competitor: vLLM)\", \"area\": \"missing_feature\", \"timestamp\": \"2026-07-06T18:09:33.464638+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_implementation_quality\", \"source\": \"swot_analysis\", \"severity\": \"MEDIUM\", \"action\": \"Implementation fail rate 67% \\u2014 improve integrator\", \"area\": \"implementation_quality\", \"timestamp\": \"2026-07-06T18:09:33.464917+00:00\"}",
+    "{\"id\": \"swot_20260706T180933_inference_speed\", \"source\": \"swot_analysis\", \"severity\": \"MEDIUM\", \"action\": \"No self-hosted vLLM \\u2014 latency penalty\", \"area\": \"inference_speed\", \"timestamp\": \"2026-07-06T18:09:33.465077+00:00\"}"
+  ],
   "research_requests": [],
   "research_complete": [],
-  "implementation_queue": [],
+  "implementation_queue": [
+    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260706T180930.md"
+  ],
   "implementation_complete": [],
-  "implementation_failed": [],
+  "implementation_failed": [
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_routellm_cascade_20260706T180312.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260706T180314.md"
+  ],
   "priority_updates": [],
-  "last_updated": "2026-07-06T17:36:13.223245+00:00"
+  "last_updated": "2026-07-06T18:11:13.838055+00:00"
 }

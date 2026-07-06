@@ -45,7 +45,7 @@ def benchmark_model(model_id):
         if r["error"]:
             results.append({"id": bp["id"], "passed": False, "error": r["error"]})
             continue
-        passed = bp["expected_contains"].lower() in r["response"].lower()
+        passed = bp["expected_contains"].lower() in (r.get("response") or "").lower()
         results.append({"id": bp["id"], "passed": passed, "latency": r["latency"]})
         if passed: pass_count += 1
         total_latency += r["latency"]

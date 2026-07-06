@@ -1,0 +1,16 @@
+{
+  "throttle_level": "red",
+  "priority_multipliers": {
+    "marketing_daemon": 0.0,
+    "industry_radar_daemon": 0.0,
+    "swot_daemon": 0.0,
+    "website_daemon": 0.0,
+    "research_daemon_1": 0.0,
+    "research_daemon_2": 0.0,
+    "research_daemon_3": 0.0
+  },
+  "model_preferences": [
+    ":free",
+    "ollama/"
+  ]
+}

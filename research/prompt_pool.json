@@ -1,0 +1,5 @@
+{
+  "code_generation": "Generate clean, tested Python code for the following task: {task}",
+  "research_summary": "Summarize the key findings from this paper in 3 bullet points: {paper}",
+  "tweet_generation": "Write a punchy tweet under 280 chars about: {topic}"
+}
