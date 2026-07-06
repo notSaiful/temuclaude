@@ -8,6 +8,8 @@ import asyncio
 import json
 import time
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from src.self_qa import self_qa_gate, build_qa_prompt, extract_score
@@ -16,6 +18,9 @@ from src.analyzer import analyze_logs, print_report
 from src.adaptive import get_adaptive_routing, get_model_for_task, update_adaptive_routing, reset_adaptive_routing, ADAPTIVE_CONFIG_PATH
 from src.gepa import get_evolved_prompts, get_system_prompt, evolve_prompts
 from src.orchestrator import Temuclaude
+
+_SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
+skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
 
 
 # ============================================================
@@ -259,7 +264,8 @@ def test_gepa_prompt_loading() -> bool:
 # ============================================================
 # TEST 7: Self-QA Gate (live)
 # ============================================================
-def test_self_qa_gate_live() -> bool:
+@skip_no_api
+def test_self_qa_gate_live():
     """Test that Self-QA gate scores a good answer and accepts it."""
     print("\n=== SELF-QA GATE LIVE TESTS ===")
     
@@ -309,7 +315,8 @@ def test_self_qa_gate_live() -> bool:
 # ============================================================
 # TEST 8: Full Integration (live)
 # ============================================================
-def test_integration_live() -> bool:
+@skip_no_api
+def test_integration_live():
     """Test that a medium-tier query uses adaptive routing + skills."""
     print("\n=== INTEGRATION LIVE TESTS ===")
     

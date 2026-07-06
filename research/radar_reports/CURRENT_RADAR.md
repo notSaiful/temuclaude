@@ -1,5 +1,4 @@
 # Temuclaude Industry Radar
-> Updated: 2026-07-06T21:01:53.496508+00:00
-> Signals: 1
+> Updated: 2026-07-06T21:46:09.127852+00:00
+> Signals: 0
 
-1. [12.5] (hackernews) A global workspace in language models

@@ -18,8 +18,8 @@ from src.models import MODEL_POOL, CHEAP_MODELS, TASK_MODEL_MAP, FUSION_PANEL, A
 from src.logger import QueryLogger
 
 # Skip API-dependent tests when no backend is available
-_HAS_API = bool(os.environ.get("OPENROUTER_API_KEY")) or os.environ.get("OLLAMA_API_BASE", "http://localhost:11434")
-skip_no_api = pytest.mark.skipif(not _HAS_API, reason="No API key or Ollama running")
+_SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
+skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1 (default)")
 
 
 # ============================================================
@@ -426,6 +426,7 @@ def test_logger():
 # ============================================================
 # TEST 8: CLI Entry Point
 # ============================================================
+@skip_no_api
 def test_cli():
     """Test that the CLI entry point works."""
     import subprocess

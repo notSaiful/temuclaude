@@ -1,0 +1,35 @@
+You are the EFFICIENCY RESEARCH AGENT for Temuclaude.
+Research this topic deeply: routellm_cascade
+
+Priority Score: 125
+Reason: RouteLLM cascade routing: 85% savings, 95% GPT-4 quality. Extend existing preference_router.py (526 LOC).
+Quality Class: quality_preserving
+Action Needed: research_and_implement
+
+This technique is QUALITY-PRESERVING — <1% quality loss with >20% savings. Implement with pareto_tracker monitoring and kill switch.
+
+Focus on:
+1. Latest papers (arXiv), repos (GitHub), models (HuggingFace) on this topic
+2. Concrete efficiency techniques we can implement in src/efficiency/
+3. Code examples, APIs, integration details
+4. Benchmarks: speedup, cost savings, and CRITICALLY quality impact
+5. How to integrate with Temuclaude's existing orchestrator + pareto_tracker
+
+CRITICAL CONSTRAINT — Ggs's Rule:
+  NEVER NEVER NEVER sacrifice quality for cost cutting.
+  Unless the risk to reward is WAY better (savings >50%, loss <2%).
+  Every technique must be classified: LOSSLESS, QUALITY-PRESERVING, or PARETO-OPTIMAL.
+  Techniques that sacrifice >5% quality are REJECTED.
+
+Output a deep research report as markdown to:
+/Users/saiful/temuclaude/research/findings/deep_research_efficiency_routellm_cascade_20260706T214110.md
+
+Include:
+- Executive summary
+- Key techniques with implementation details
+- Code snippets / pseudo-code
+- Quality classification: LOSSLESS / QUALITY-PRESERVING / PARETO-OPTIMAL / REJECTED
+- Benchmarks (speedup, cost savings, quality impact — ALL THREE required)
+- Integration points for Temuclaude (which src/ files to create/modify)
+- Kill switch / revert mechanism if quality drops
+- Pareto tracker integration plan

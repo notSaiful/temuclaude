@@ -7,6 +7,8 @@ import os
 import asyncio
 import time
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from src.orchestrator import Temuclaude
@@ -14,6 +16,9 @@ from src.fusion import fuse, get_panel, get_aggregator, build_fusion_prompt
 from src.consistency import self_consistency, extract_answer, majority_vote
 from src.verifier import verify_with_code, extract_code
 from src.models import FUSION_PANEL, AGGREGATOR_MAP
+
+_SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
+skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
 
 
 # ============================================================
@@ -202,7 +207,8 @@ def test_fusion_prompt() -> bool:
 # ============================================================
 # TEST 7: Code Verification (live)
 # ============================================================
-def test_code_verification() -> bool:
+@skip_no_api
+def test_code_verification():
     """Test that verify_with_code generates and executes code."""
     print("\n=== CODE VERIFICATION TESTS ===")
     
@@ -244,7 +250,8 @@ def test_code_verification() -> bool:
 # ============================================================
 # TEST 8: Fusion (live)
 # ============================================================
-def test_fusion_live() -> bool:
+@skip_no_api
+def test_fusion_live():
     """Test that Fusion actually calls multiple models and synthesizes."""
     print("\n=== FUSION LIVE TESTS ===")
     
@@ -287,7 +294,8 @@ def test_fusion_live() -> bool:
 # ============================================================
 # TEST 9: Hard Tier Integration (live)
 # ============================================================
-def test_hard_tier() -> bool:
+@skip_no_api
+def test_hard_tier():
     """Test that the hard tier uses Fusion for complex queries."""
     print("\n=== HARD TIER TESTS ===")
     
