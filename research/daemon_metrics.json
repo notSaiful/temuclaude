@@ -1,40 +1,40 @@
 {
-  "timestamp": "2026-07-05T11:12:05.495005+00:00",
+  "timestamp": "2026-07-06T06:32:34.588057+00:00",
   "daemons": {
     "scout_daemon": {
-      "alive": true,
-      "status": "running",
-      "age_seconds": 59.93749403953552
+      "alive": false,
+      "status": "dead",
+      "age_seconds": null
     },
     "distiller_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 6.969313859939575
+      "age_seconds": 5.507190942764282
     },
     "research_daemon_1": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 59.97021794319153
+      "age_seconds": 99.97327017784119
     },
     "research_daemon_2": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 59.96940994262695
+      "age_seconds": 99.96659207344055
     },
     "research_daemon_3": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 59.9716579914093
+      "age_seconds": 99.97158575057983
     },
     "integrator_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 62.064069986343384
+      "age_seconds": 21.493767023086548
     },
     "coordinator_daemon": {
       "alive": true,
       "status": "running",
-      "age_seconds": 0.010820150375366211
+      "age_seconds": 0.01658487319946289
     }
   },
   "queue": {

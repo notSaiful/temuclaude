@@ -38,11 +38,14 @@ def get_system_prompt(task_type: str, default: Optional[str] = None) -> str:
     """
     Get the system prompt for a task type.
     Uses evolved prompt if available, otherwise uses default.
+    
+    Default is the clarity-aware prompt from skills_loader (research: arXiv:2407.19825).
     """
+    from .skills_loader import CLARITY_SYSTEM_PROMPT
     evolved = get_evolved_prompts()
     if task_type in evolved:
         return evolved[task_type]
-    return default or "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers."
+    return default or CLARITY_SYSTEM_PROMPT
 
 
 PROMPT_VARIATION_TEMPLATE = (
@@ -95,9 +98,9 @@ async def evolve_prompts(
         }
     
     # Step 2: Get current prompt for the weakest task type
+    from .skills_loader import CLARITY_SYSTEM_PROMPT
     evolved = get_evolved_prompts()
-    current_prompt = evolved.get(weakest_task, 
-        "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers.")
+    current_prompt = evolved.get(weakest_task, CLARITY_SYSTEM_PROMPT)
     
     task_success_rate = analysis["by_task_type"].get(weakest_task, {}).get("success_rate", 0.0)
     

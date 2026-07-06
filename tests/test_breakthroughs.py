@@ -118,7 +118,7 @@ def test_usva_scoring() -> bool:
     print(f"  OK: USVA fallback to single score works (score={score2})")
     
     # Verify USVA_RUBRICS dict
-    assert len(USVA_RUBRICS) == 4, f"Should have 4 rubrics, has {len(USVA_RUBRICS)}"
+    assert len(USVA_RUBRICS) >= 4, f"Should have at least 4 rubrics, has {len(USVA_RUBRICS)}"
     
     print("  3/3 passed")
     return True

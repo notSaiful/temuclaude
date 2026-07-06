@@ -105,19 +105,55 @@ def load_skill_principles(task_type: str, max_chars: int = 500) -> str:
     return "\n\n".join(principles)
 
 
-def build_enhanced_system_prompt(task_type: str, base_prompt: Optional[str] = None) -> str:
+# Clarity-aware system prompt (research: arXiv:2407.19825, 2312.02065, 2407.01384)
+# Key findings:
+# - LLMs are RLHF-trained to be verbose (length bias, arXiv:2310.05199) — must counteract
+# - High-school readability is the universal sweet spot (arXiv:2407.01384)
+# - Explicit audience targeting changes output (arXiv:2312.02065)
+# - Constraining length IMPROVES reasoning quality (arXiv:2407.19825)
+CLARITY_SYSTEM_PROMPT = (
+    "You are Temuclaude. Answer the user's question.\n\n"
+    "Rules:\n"
+    "- Be clear, concise, and direct. Short sentences. Simple words.\n"
+    "- Write at a high-school reading level. A smart 14-year-old should understand everything.\n"
+    "- No jargon without explaining it the first time.\n"
+    "- No filler words (\"certainly\", \"absolutely\", \"great question\").\n"
+    "- If the answer is simple, keep the answer simple. Don't over-explain.\n"
+    "- Use structure (bullet points, numbered steps) only when it genuinely helps clarity.\n"
+    "- Lead with the answer. Then explain why. Then give details only if needed.\n"
+    "- Maximum 200 words unless the question explicitly requires more."
+)
+
+# Tier-based length guidance (research: arXiv:2407.19825 — constrained output improves quality)
+TIER_LENGTH_GUIDANCE = {
+    "trivial": "Keep your answer under 50 words.",
+    "medium": "Keep your answer under 200 words.",
+    "hard": "Keep your answer under 500 words unless the question requires more.",
+}
+
+
+def build_enhanced_system_prompt(
+    task_type: str,
+    base_prompt: Optional[str] = None,
+    tier: Optional[str] = None,
+) -> str:
     """
-    Build a system prompt enhanced with skill principles.
+    Build a system prompt enhanced with skill principles and clarity guidance.
     
     Args:
         task_type: The classified task type
-        base_prompt: The base system prompt (default: standard Temuclaude prompt)
+        base_prompt: The base system prompt (default: clarity-aware Temuclaude prompt)
+        tier: The difficulty tier (trivial, medium, hard) for adaptive length guidance
     
     Returns:
-        Enhanced system prompt with skill principles injected
+        Enhanced system prompt with skill principles and length guidance injected
     """
     if base_prompt is None:
-        base_prompt = "You are Temuclaude, a helpful AI assistant. Provide thorough, accurate answers."
+        base_prompt = CLARITY_SYSTEM_PROMPT
+    
+    # Add tier-based length guidance (Component 4)
+    if tier and tier in TIER_LENGTH_GUIDANCE:
+        base_prompt = f"{base_prompt}\n{TIER_LENGTH_GUIDANCE[tier]}"
     
     skill_principles = load_skill_principles(task_type)
     

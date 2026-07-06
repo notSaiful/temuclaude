@@ -38,6 +38,11 @@ export default function PlaygroundPage() {
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  // Index of the assistant message currently being streamed — avoids
+  // creating a new message bubble on every chunk (the old code searched
+  // for an assistant with content === '' which never existed, so every
+  // chunk pushed a new message and the response repeated N times).
+  const streamingIdxRef = useRef<number>(-1);
 
   // Generate or retrieve anonymous identifier (stored in localStorage)
   const getIdentifier = useCallback(() => {
@@ -119,6 +124,14 @@ export default function PlaygroundPage() {
       let assistantContent = '';
       let orchestrationData: OrchestrationData | undefined;
 
+      // Insert the placeholder assistant bubble once; all chunks update it.
+      streamingIdxRef.current = -1;
+      setMessages((prev) => {
+        const placeholder: Message = { role: 'assistant', content: '' };
+        streamingIdxRef.current = prev.length;
+        return [...prev, placeholder];
+      });
+
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
@@ -133,14 +146,11 @@ export default function PlaygroundPage() {
                 const data = JSON.parse(line.slice(6));
                 if (data.chunk) {
                   assistantContent += data.chunk;
+                  const idx = streamingIdxRef.current;
                   setMessages((prev) => {
+                    if (idx < 0 || idx >= prev.length) return prev;
                     const updated = [...prev];
-                    const lastAssistant = updated.findIndex((m) => m.role === 'assistant' && m.content === '');
-                    if (lastAssistant >= 0) {
-                      updated[lastAssistant] = { role: 'assistant', content: assistantContent };
-                    } else {
-                      updated.push({ role: 'assistant', content: assistantContent });
-                    }
+                    updated[idx] = { role: 'assistant', content: assistantContent };
                     return updated;
                   });
                 }
@@ -153,17 +163,18 @@ export default function PlaygroundPage() {
         }
       }
 
+      // Attach orchestration metadata to the streamed assistant message.
       if (orchestrationData) {
+        const idx = streamingIdxRef.current;
         setMessages((prev) => {
+          if (idx < 0 || idx >= prev.length) return prev;
           const updated = [...prev];
-          const lastAssistant = updated.findIndex((m) => m.role === 'assistant');
-          if (lastAssistant >= 0) {
-            updated[lastAssistant] = { ...updated[lastAssistant], orchestration: orchestrationData };
-          }
+          updated[idx] = { ...updated[idx], orchestration: orchestrationData };
           return updated;
         });
       }
 
+      streamingIdxRef.current = -1;
       setStatus('ready');
     } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {

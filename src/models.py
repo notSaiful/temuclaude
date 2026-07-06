@@ -111,13 +111,79 @@ OPENROUTER_MODELS = {
     "kimi-k2.6": "moonshotai/kimi-k2.6",                # legacy — kept for compatibility
     "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",      # legacy — kept for compatibility
     "gpt-oss-120b": "openai/gpt-oss-120b",              # legacy — kept for compatibility
+    # Ultra-cheap MoE models for shepherding workers and medium tier
+    "deepseek-v4-flash": "deepseek/deepseek-v4-flash",  # $0.09/$0.18/M — shepherd worker
+    "qwen3-235b-moe": "qwen/qwen3-235b-a22b-2507",      # $0.09/$0.10/M — MoE reasoning
+    "qwen3-next-80b-moe": "qwen/qwen3-next-80b-a3b-instruct",  # $0.09/$0.78/M — MoE general
+    "gemma-4-26b-moe": "google/gemma-4-26b-a4b-it",     # $0.06/$0.30/M — MoE knowledge
 }
 
 # Free models on OpenRouter (no cost, rate limited)
+# These are used for the trivial tier — 60% of queries at $0 cost
 OPENROUTER_FREE_MODELS = {
     "gpt-oss-120b": "openai/gpt-oss-120b:free",
     "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b:free",
     "nemotron-3-super": "nvidia/nemotron-3-super-120b-a12b:free",
+}
+
+# Free model fallback order for trivial tier
+# Try each in order until one succeeds (rate limits may block some)
+FREE_MODEL_CHAIN = [
+    "openai/gpt-oss-120b:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+]
+
+# Ultra-cheap MoE models for medium tier (3-5x compute savings vs dense models)
+# MoE = Mixture of Experts: activates only a fraction of parameters per token
+ULTRA_CHEAP_MODELS = {
+    "qwen3-235b-moe": {
+        "ollama_tag": "qwen3-235b-a22b-2507",
+        "openrouter_id": "qwen/qwen3-235b-a22b-2507",
+        "role": "moe_reasoning",
+        "strengths": ["reasoning", "math", "coding"],
+        "active_params": "22B of 235B",
+        "context_length": 262_144,
+        "cost_tier": "ultra_cheap",
+        "input_cost_per_m": 0.09,  # $0.09/M input
+        "output_cost_per_m": 0.10,  # $0.10/M output
+        "routing_weight": 0.85,
+    },
+    "qwen3-next-80b-moe": {
+        "ollama_tag": "qwen3-next-80b-a3b-instruct",
+        "openrouter_id": "qwen/qwen3-next-80b-a3b-instruct",
+        "role": "moe_general",
+        "strengths": ["general", "reasoning", "coding"],
+        "active_params": "3B of 80B",
+        "context_length": 262_144,
+        "cost_tier": "ultra_cheap",
+        "input_cost_per_m": 0.09,
+        "output_cost_per_m": 0.78,
+        "routing_weight": 0.80,
+    },
+    "gemma-4-26b-moe": {
+        "ollama_tag": "gemma-4-26b-a4b-it",
+        "openrouter_id": "google/gemma-4-26b-a4b-it",
+        "role": "moe_knowledge",
+        "strengths": ["knowledge", "reasoning"],
+        "active_params": "4B of 26B",
+        "context_length": 262_144,
+        "cost_tier": "ultra_cheap",
+        "input_cost_per_m": 0.06,
+        "output_cost_per_m": 0.30,
+        "routing_weight": 0.75,
+    },
+    "deepseek-v4-flash": {
+        "ollama_tag": "deepseek-v4-flash:cloud",
+        "openrouter_id": "deepseek/deepseek-v4-flash",
+        "role": "fast_reasoning",
+        "strengths": ["reasoning", "math", "coding", "fast"],
+        "context_length": 1_000_000,
+        "cost_tier": "ultra_cheap",
+        "input_cost_per_m": 0.09,
+        "output_cost_per_m": 0.18,
+        "routing_weight": 0.88,
+    },
 }
 
 # API base URLs
@@ -125,15 +191,24 @@ OLLAMA_API_BASE = "http://localhost:11434"
 OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
 AIML_API_BASE = "https://api.aimlapi.com/v1"
 
-# ai/ml model IDs (emergency fallback — same provider/model format as OpenRouter)
+# ai/ml model IDs (fallback backend — same OpenAI-compatible API format)
+# EVALUATED July 6, 2026: kept ONLY verified models that add efficiency or
+# unique capability. All unverified-IQ models REMOVED for zero quality risk.
+# See AIML-MODEL-RESEARCH.md for full analysis.
 AIML_MODELS = {
-    "glm-5.2": "zhipu/glm-5.2",
-    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
-    "kimi-k2.6": "moonshot/kimi-k2-6",
-    "kimi-k2.7-code": "moonshot/kimi-k2-7-code",
-    "minimax-m3": "minimax/minimax-m3",
-    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
-    "gpt-oss-120b": "openai/gpt-oss-120b",
+    # === VERIFIED models — cheaper output on AIML than OpenRouter ===
+    # These provide real efficiency wins when AIML is used as fallback.
+    "glm-5.2": "zhipu/glm-5.2",                    # AIML output $1.82 vs OR $3.00
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro", # AIML output $0.565 vs OR $0.87
+    "deepseek-v4-flash": "deepseek/deepseek-v4-flash",  # same price, redundancy
+    "minimax-m3": "minimax/minimax-m3",            # AIML output $0.39 vs OR $1.20
+    "gpt-oss-120b": "openai/gpt-oss-120b",         # same model, redundancy
+
+    # === VERIFIED cheap fallback — unique to AIML ===
+    "nemotron-3-nano": "nvidia/nemotron-3-nano-30b-a3b",  # $0.065/M, MMLU 57.9 verified
+
+    # === UNIQUE capability — search-augmented (new effectiveness) ===
+    "sonar-pro": "perplexity/sonar-pro",           # built-in web search for time-sensitive queries
 }
 
 # Auto-detect: use OpenRouter if key is set, otherwise Ollama
