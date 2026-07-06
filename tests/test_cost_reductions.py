@@ -111,65 +111,26 @@ def test_free_model_routing():
 
 # ── Test 3: LLM Shepherding ─────────────────────────────────────────────
 def test_shepherding():
-    """Verify LLM shepherding logic is correct."""
-    print("\n══ Test 3: LLM Shepherding ══")
+    """Verify LLM shepherding is DISABLED — Option A: mathematical zero quality sacrifice."""
+    print("\n══ Test 3: Shepherding (DISABLED — Option A) ══")
     try:
-        from src.shepherding import (
-            should_shepherd, calculate_hint_tokens,
-            build_shepherd_messages, build_worker_messages,
-            combine_hint_and_completion, estimate_cost_savings,
-        )
+        from src.shepherding import should_shepherd
 
-        # Test should_shepherd decisions
-        assert should_shepherd("math", "medium", 0.5) == True, "Medium math should shepherd"
-        report_result("Medium math → shepherd", "PASS")
+        # Shepherding module still exists but is NOT used by the orchestrator.
+        # It's "probably zero loss" not "mathematically zero loss" — removed for Option A.
+        report_result("Shepherding module exists (not used by orchestrator)", "PASS")
 
-        assert should_shepherd("coding", "medium", 0.5) == True, "Medium coding should shepherd"
-        report_result("Medium coding → shepherd", "PASS")
-
-        assert should_shepherd("math", "trivial", 0.5) == False, "Trivial should NOT shepherd"
-        report_result("Trivial → no shepherd", "PASS")
-
-        assert should_shepherd("math", "hard", 0.5) == False, "Hard should NOT shepherd"
-        report_result("Hard → no shepherd (use full model)", "PASS")
-
-        # CRITICAL: reasoning is NOT shepherded (unverified in paper)
-        assert should_shepherd("reasoning", "medium", 0.5) == False, "Reasoning should NOT shepherd (unverified)"
-        report_result("Reasoning → no shepherd (paper-unverified, zero quality risk)", "PASS")
-
-        assert should_shepherd("creative", "medium", 0.5) == False, "Creative should NOT shepherd"
-        report_result("Creative → no shepherd (not verified)", "PASS")
-
-        # Test hint token calculation
-        hint = calculate_hint_tokens(4096)
-        assert 50 <= hint <= 500, f"Hint tokens {hint} out of range [50, 500]"
-        report_result(f"Hint tokens for 4096 budget: {hint}", "PASS")
-
-        # Test message building
-        messages = [
-            {"role": "system", "content": "You are helpful."},
-            {"role": "user", "content": "Solve: what is 15% of 240?"},
-        ]
-        shepherd_msgs = build_shepherd_messages(messages, 200)
-        assert "concise outline" in shepherd_msgs[0]["content"].lower(), "Hint instruction missing"
-        report_result("Shepherd messages built with hint instruction", "PASS")
-
-        worker_msgs = build_worker_messages(messages, "Calculate 10% = 24, 5% = 12, 15% = 36")
-        assert "HINT FROM SENIOR" in worker_msgs[-1]["content"], "Hint not injected"
-        report_result("Worker messages built with injected hint", "PASS")
-
-        # Test cost savings estimate
-        savings = estimate_cost_savings(
-            shepherd_cost_per_m=0.06,
-            worker_cost_per_m=0.0,  # free model
-            hint_tokens=200,
-            full_response_tokens=1000,
-        )
-        assert savings["savings_percent"] > 50, f"Expected >50% savings, got {savings['savings_percent']:.1f}%"
-        report_result(f"Shepherding with free worker: {savings['savings_percent']:.1f}% savings", "PASS")
+        # Verify shepherding is NOT imported by the orchestrator
+        import src.orchestrator as orch
+        orch_source = open(orch.__file__).read()
+        if "should_shepherd" not in orch_source:
+            report_result("Orchestrator does NOT import shepherding", "PASS")
+        else:
+            report_result("Orchestrator does NOT import shepherding", "FAIL",
+                        "should_shepherd still referenced in orchestrator")
 
     except Exception as e:
-        report_result("LLM shepherding", "FAIL", str(e))
+        report_result("Shepherding disabled", "FAIL", str(e))
 
 
 # ── Test 4: MoE Model Pool ──────────────────────────────────────────────
@@ -216,15 +177,15 @@ def test_orchestrator_integration():
         assert cache is not None, "Cache not accessible"
         report_result("Semantic cache accessible from orchestrator", "PASS")
 
-        # Verify shepherding is imported
-        from src.orchestrator import should_shepherd, calculate_hint_tokens
-        assert should_shepherd("math", "medium", 0.5) == True
-        report_result("Shepherding logic accessible from orchestrator", "PASS")
+        # Verify shepherding is NOT imported (Option A: removed for zero quality sacrifice)
+        import src.orchestrator as orch_mod
+        assert not hasattr(orch_mod, "should_shepherd"), "Orchestrator should NOT import shepherding"
+        report_result("Shepherding NOT in orchestrator (Option A)", "PASS")
 
-        # Verify free models are imported
+        # Verify free models are imported (for fallback reference)
         from src.orchestrator import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
         assert len(FREE_MODEL_CHAIN) >= 3
-        report_result("Free model chain accessible from orchestrator", "PASS")
+        report_result("Free model chain accessible for fallback", "PASS")
 
         reset_cache()
     except Exception as e:

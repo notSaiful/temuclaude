@@ -21,15 +21,10 @@ Sources:
 # --- Premium Swarm (best-of-5, 10% of requests) ---
 # Projected ELO: 1380-1487 (beats GPT Image 2's 1340)
 # Cost: $0.448/image
+# NOTE: This pool is also used for CASCADING — generate with cheapest first,
+# judge, only add more if quality is below threshold.
+# Sorted by cost ascending for efficient cascading.
 IMAGE_PREMIUM_POOL = [
-    {
-        "id": "openai/gpt-image-2",
-        "elo": 1340,
-        "cost_per_image": 0.211,
-        "provider": "aiml",
-        "role": "frontier — #1 globally, reasoning step, text rendering",
-        "strengths": ["overall_quality", "text_rendering", "prompt_adherence", "reasoning", "editing"],
-    },
     {
         "id": "reve/create-image",
         "elo": 1281,
@@ -37,22 +32,7 @@ IMAGE_PREMIUM_POOL = [
         "provider": "aiml",
         "role": "best value — ELO 1281 at 6.8x cheaper than GPT Image 2",
         "strengths": ["overall_quality", "value", "aesthetics"],
-    },
-    {
-        "id": "google/nano-banana-2",
-        "elo": 1255,
-        "cost_per_image": 0.067,
-        "provider": "aiml",
-        "role": "unique — 14 refs, extreme AR, grounding, 4K native",
-        "strengths": ["character_consistency", "extreme_ar", "grounding", "4k_resolution", "text_rendering"],
-    },
-    {
-        "id": "blackforestlabs/flux-2-max",
-        "elo": 1193,
-        "cost_per_image": 0.091,
-        "provider": "aiml",
-        "role": "photorealism specialist",
-        "strengths": ["photorealism", "lighting", "texture"],
+        "cascade_order": 1,  # generate first (cheapest)
     },
     {
         "id": "microsoft/mai-image-2.5",
@@ -61,12 +41,41 @@ IMAGE_PREMIUM_POOL = [
         "provider": "aiml",
         "role": "near-frontier at low cost",
         "strengths": ["overall_quality", "value"],
+        "cascade_order": 2,  # add if Reve not good enough
+    },
+    {
+        "id": "google/nano-banana-2",
+        "elo": 1255,
+        "cost_per_image": 0.067,
+        "provider": "aiml",
+        "role": "unique — 14 refs, extreme AR, grounding, 4K native",
+        "strengths": ["character_consistency", "extreme_ar", "grounding", "4k_resolution", "text_rendering"],
+        "cascade_order": 3,
+    },
+    {
+        "id": "blackforestlabs/flux-2-max",
+        "elo": 1193,
+        "cost_per_image": 0.091,
+        "provider": "aiml",
+        "role": "photorealism specialist",
+        "strengths": ["photorealism", "lighting", "texture"],
+        "cascade_order": 4,
+    },
+    {
+        "id": "openai/gpt-image-2",
+        "elo": 1340,
+        "cost_per_image": 0.211,
+        "provider": "aiml",
+        "role": "frontier — #1 globally, reasoning step, text rendering",
+        "strengths": ["overall_quality", "text_rendering", "prompt_adherence", "reasoning", "editing"],
+        "cascade_order": 5,  # only add if all others are below threshold
     },
 ]
 
 # --- Standard Swarm (best-of-3, 30% of requests) ---
 # Projected ELO: ~1300
 # Cost: $0.118/image
+# Sorted by cost ascending for cascading.
 IMAGE_STANDARD_POOL = [
     {
         "id": "reve/create-image",
@@ -75,14 +84,7 @@ IMAGE_STANDARD_POOL = [
         "provider": "aiml",
         "role": "best value quality",
         "strengths": ["overall_quality", "value"],
-    },
-    {
-        "id": "microsoft/mai-image-2.5",
-        "elo": 1272,
-        "cost_per_image": 0.048,
-        "provider": "aiml",
-        "role": "near-frontier",
-        "strengths": ["overall_quality", "value"],
+        "cascade_order": 1,
     },
     {
         "id": "blackforestlabs/flux-2-pro",
@@ -91,6 +93,16 @@ IMAGE_STANDARD_POOL = [
         "provider": "aiml",
         "role": "photorealism standard",
         "strengths": ["photorealism", "prompt_adherence"],
+        "cascade_order": 2,
+    },
+    {
+        "id": "microsoft/mai-image-2.5",
+        "elo": 1272,
+        "cost_per_image": 0.048,
+        "provider": "aiml",
+        "role": "near-frontier",
+        "strengths": ["overall_quality", "value"],
+        "cascade_order": 3,
     },
 ]
 
@@ -606,3 +618,44 @@ MAX_REFINE_ITERATIONS = 3
 
 # Cache TTL for image/video results (1 hour, same as LLM cache)
 MEDIA_CACHE_TTL_SECONDS = 3600
+
+# =============================================================================
+# EFFICIENCY CONFIGURATION — Cascading + Adaptive Judging
+# =============================================================================
+
+# CASCADING: Instead of running all N models blindly in parallel, generate with
+# the cheapest model first, judge it, and only add more models if the quality
+# is below threshold. This is the SAME approach our LLM orchestrator uses
+# (ATTS adaptive compute, shepherding, unified routing — arXiv:2410.10347).
+#
+# Cost savings with cascading:
+#   Premium: 60% of requests cost $0.031 (Reve alone) instead of $0.448
+#   Blended premium cost: $0.057/image (vs $0.448 blind) = 7.9x cheaper
+CASCADING_ENABLED = True
+
+# CASCADED QUALITY THRESHOLDS — when to stop adding more models
+# These are LOWER than the final quality gate thresholds, because we just need
+# "good enough" to stop the cascade. The quality gate runs AFTER.
+CASCADE_STOP_THRESHOLDS = {
+    "draft": 6.0,       # draft models only need 6/10 to stop cascade
+    "standard": 7.0,    # standard models need 7/10
+    "premium": 7.5,     # premium models need 7.5/10
+}
+
+# ADAPTIVE JUDGING: Don't use 3 judges for every tier.
+# Draft tier doesn't need judges at all (single model, just return it).
+# Standard tier uses 1 cheap judge.
+# Premium tier uses 3 judges for consensus.
+ADAPTIVE_JUDGING_ENABLED = True
+
+JUDGE_COUNT_BY_TIER = {
+    "draft": 0,       # no judge — just return the single output
+    "budget": 0,      # no judge — just return the cheapest output
+    "standard": 1,    # 1 judge (cheapest vision model)
+    "premium": 3,     # full 3-judge consensus
+}
+
+# BATCH JUDGE: Instead of separate LLM calls per output per judge, send ALL
+# outputs to each judge in a SINGLE call. This reduces judge calls from
+# N_outputs × N_judges to just N_judges (5x savings for premium).
+BATCH_JUDGE_ENABLED = True

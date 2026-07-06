@@ -28,6 +28,8 @@ DAEMON_SCRIPTS = {
     "research_daemon_2": "research/research_daemon.py",
     "research_daemon_3": "research/research_daemon.py",
     "integrator_daemon": "research/integrator_daemon.py",
+    "cyber_daemon": "research/cyber_daemon.py",  # Added 2026-07-06
+    "efficiency_daemon": "research/efficiency_daemon.py",  # Added 2026-07-06
 }
 PRIORITIES_FILE = Path("/Users/saiful/temuclaude/research/priorities.json")
 METRICS_FILE = Path("/Users/saiful/temuclaude/research/daemon_metrics.json")

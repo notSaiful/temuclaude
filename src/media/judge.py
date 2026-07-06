@@ -316,6 +316,7 @@ class MediaJudge:
         task_type: str,
         outputs: list,
         media_type: str = "image",
+        use_batch: bool = True,
     ) -> dict:
         """Judge all outputs and determine the winner.
 
@@ -324,6 +325,10 @@ class MediaJudge:
             task_type: Classified task type
             outputs: List of {model, url} dicts from generator
             media_type: "image" or "video"
+            use_batch: If True, use batch judging (1 LLM call per judge, all outputs at once)
+                       If False, use individual judging (1 LLM call per output per judge)
+
+        Batch judging is 5x cheaper: 3 LLM calls instead of 15 for 5 outputs × 3 judges.
 
         Returns:
             Dict with:
@@ -340,8 +345,13 @@ class MediaJudge:
                 "all_scores": {},
             }
 
-        # Judge all outputs in parallel
-        # Each output is judged by all 3 judges — but we can parallelize across outputs too
+        # Check if batch judging is enabled
+        from .models import BATCH_JUDGE_ENABLED
+        if use_batch and BATCH_JUDGE_ENABLED and self.call_llm_func:
+            return await self._judge_all_batch(prompt, task_type, outputs, media_type)
+
+        # Fallback: individual judging (original approach)
+        # Each output is judged by all judges — parallelized across outputs
         tasks = [
             self.judge_output(prompt, task_type, output, media_type)
             for output in outputs
@@ -377,3 +387,223 @@ class MediaJudge:
             "best_score": best_score,
             "all_scores": all_scores,
         }
+
+    async def _judge_all_batch(
+        self,
+        prompt: str,
+        task_type: str,
+        outputs: list,
+        media_type: str = "image",
+    ) -> dict:
+        """Batch judge all outputs — each judge scores ALL outputs in a single LLM call.
+
+        This reduces LLM calls from N_outputs × N_judges to just N_judges.
+        For 5 outputs × 3 judges: 15 calls → 3 calls (5x savings).
+
+        The judge receives all image URLs at once and returns scores for each.
+        """
+        # Build the batch judge prompt with all outputs
+        media_word = "video" if media_type == "video" else "image"
+
+        if media_type == "video":
+            system_prompt = """You are an expert video quality judge. You evaluate multiple AI-generated videos at once, scoring each on 6 dimensions (1-10).
+
+Dimensions: prompt_adherence, visual_quality, text_accuracy, artifact_free, motion_quality, audio_quality
+
+Return ONLY a JSON array where each element has a "model" field and the 6 score fields.
+Example: [{"model": "model-a", "prompt_adherence": 8, "visual_quality": 9, "text_accuracy": 10, "artifact_free": 7, "motion_quality": 8, "audio_quality": 9}, {"model": "model-b", ...}]"""
+        else:
+            system_prompt = """You are an expert image quality judge. You evaluate multiple AI-generated images at once, scoring each on 4 dimensions (1-10).
+
+Dimensions: prompt_adherence, visual_quality, text_accuracy, artifact_free
+
+Return ONLY a JSON array where each element has a "model" field and the 4 score fields.
+Example: [{"model": "model-a", "prompt_adherence": 8, "visual_quality": 9, "text_accuracy": 10, "artifact_free": 7}, {"model": "model-b", ...}]"""
+
+        # Build the list of outputs for the judge
+        output_list_text = "\n".join(
+            f"{i+1}. Model: {output.get('model', 'unknown')} — URL: {output.get('url', '')}"
+            for i, output in enumerate(outputs)
+        )
+
+        user_prompt = f"""Original prompt: {prompt}
+Task type: {task_type}
+
+Score EACH of these {len(outputs)} {media_word}s on all dimensions. Return a JSON array with one entry per {media_word}.
+
+{media_word.capitalize()}s to evaluate:
+{output_list_text}
+
+Return ONLY the JSON array, no preamble."""
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+
+        # Run each judge in parallel — but each judge gets ALL outputs at once
+        judge_tasks = []
+        for judge in self.judges:
+            judge_tasks.append(self._batch_judge_single(judge, messages, outputs, media_type))
+
+        batch_results = await asyncio.gather(*judge_tasks, return_exceptions=True)
+
+        # Process batch results
+        # Each batch_result is a dict: {model_id: {scores + overall}, ...}
+        # We need to merge across judges (consensus)
+
+        # Collect all model IDs
+        model_ids = [o.get("model", "unknown") for o in outputs]
+
+        # Build judged_outputs from batch results
+        judged_outputs = []
+        for model_id in model_ids:
+            judge_scores_for_model = []
+            total_weight = 0.0
+            weighted_sum = 0.0
+
+            for i, batch_result in enumerate(batch_results):
+                judge = self.judges[i]
+                if isinstance(batch_result, Exception):
+                    logger.warning(f"Batch judge {judge['id']} failed: {batch_result}")
+                    judge_scores_for_model.append({
+                        "judge": judge["id"],
+                        "overall": 5.0,
+                        "weight": judge.get("weight", 1.0),
+                        "error": str(batch_result),
+                    })
+                    weighted_sum += 5.0 * judge.get("weight", 1.0)
+                    total_weight += judge.get("weight", 1.0)
+                elif isinstance(batch_result, dict) and model_id in batch_result:
+                    scores = batch_result[model_id]
+                    judge_scores_for_model.append(scores)
+                    weighted_sum += scores.get("overall", 5.0) * scores.get("weight", 1.0)
+                    total_weight += scores.get("weight", 1.0)
+                else:
+                    judge_scores_for_model.append({
+                        "judge": judge["id"],
+                        "overall": 5.0,
+                        "weight": judge.get("weight", 1.0),
+                    })
+                    weighted_sum += 5.0 * judge.get("weight", 1.0)
+                    total_weight += judge.get("weight", 1.0)
+
+            consensus_score = weighted_sum / total_weight if total_weight > 0 else 5.0
+
+            # Find the URL for this model
+            url = next((o.get("url", "") for o in outputs if o.get("model") == model_id), "")
+
+            judged_outputs.append({
+                "model": model_id,
+                "url": url,
+                "judge_scores": judge_scores_for_model,
+                "consensus_score": round(consensus_score, 2),
+            })
+
+        # Sort by consensus score (descending)
+        judged_outputs.sort(key=lambda x: x.get("consensus_score", 0.0), reverse=True)
+
+        # Build summary
+        all_scores = {jo["model"]: jo.get("consensus_score", 0.0) for jo in judged_outputs}
+        winner = judged_outputs[0] if judged_outputs else None
+        best_score = winner.get("consensus_score", 0.0) if winner else 0.0
+
+        return {
+            "judged_outputs": judged_outputs,
+            "winner": winner,
+            "best_score": best_score,
+            "all_scores": all_scores,
+            "batch_judge_used": True,
+        }
+
+    async def _batch_judge_single(
+        self,
+        judge: dict,
+        messages: list,
+        outputs: list,
+        media_type: str = "image",
+    ) -> dict:
+        """Run a single judge on ALL outputs in one LLM call.
+
+        Returns:
+            Dict mapping model_id → {scores + overall + judge + weight}
+        """
+        try:
+            response = await self.call_llm_func(
+                judge.get("openrouter_id", judge["id"]),
+                messages,
+                max_tokens=2000,  # larger because we're scoring multiple outputs
+                temperature=0.0,
+            )
+
+            # Parse the JSON array from the response
+            import json
+            result = {}
+
+            try:
+                # Find JSON array in response
+                start = response.find("[")
+                end = response.rfind("]") + 1
+                if start >= 0 and end > start:
+                    json_str = response[start:end]
+                    scores_array = json.loads(json_str)
+
+                    for entry in scores_array:
+                        model_id = entry.get("model", "")
+                        if not model_id:
+                            continue
+
+                        # Extract scores
+                        scores = {}
+                        for dim in SCORING_DIMENSIONS:
+                            val = entry.get(dim, 5)
+                            try:
+                                scores[dim] = max(1, min(10, float(val)))
+                            except (ValueError, TypeError):
+                                scores[dim] = 5.0
+
+                        if media_type == "video":
+                            for dim in ["motion_quality", "audio_quality"]:
+                                val = entry.get(dim, 5)
+                                try:
+                                    scores[dim] = max(1, min(10, float(val)))
+                                except (ValueError, TypeError):
+                                    scores[dim] = 5.0
+
+                        scores["overall"] = calculate_overall_score(scores, media_type)
+                        scores["judge"] = judge["id"]
+                        scores["weight"] = judge.get("weight", 1.0)
+                        result[model_id] = scores
+
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.warning(f"Batch judge JSON parse failed for {judge['id']}: {e}")
+                # Fallback: assign neutral scores to all models
+                for output in outputs:
+                    model_id = output.get("model", "unknown")
+                    scores = {dim: 5.0 for dim in SCORING_DIMENSIONS}
+                    if media_type == "video":
+                        scores["motion_quality"] = 5.0
+                        scores["audio_quality"] = 5.0
+                    scores["overall"] = 5.0
+                    scores["judge"] = judge["id"]
+                    scores["weight"] = judge.get("weight", 1.0)
+                    result[model_id] = scores
+
+            return result
+
+        except Exception as e:
+            logger.warning(f"Batch judge {judge['id']} failed: {e}")
+            # Return neutral scores for all models
+            result = {}
+            for output in outputs:
+                model_id = output.get("model", "unknown")
+                scores = {dim: 5.0 for dim in SCORING_DIMENSIONS}
+                if media_type == "video":
+                    scores["motion_quality"] = 5.0
+                    scores["audio_quality"] = 5.0
+                scores["overall"] = 5.0
+                scores["judge"] = judge["id"]
+                scores["weight"] = judge.get("weight", 1.0)
+                scores["error"] = str(e)
+                result[model_id] = scores
+            return result

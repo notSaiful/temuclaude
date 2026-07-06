@@ -33,6 +33,7 @@ from .intent import classify_media_task, determine_media_tier, is_video_prompt
 from .models import get_image_pool, get_video_pool, estimate_image_cost, estimate_video_cost
 from .prompt_enhancer import enhance_prompts_for_pool
 from .generator import MediaGenerator
+from .cascading_generator import CascadingMediaGenerator
 from .judge import MediaJudge
 from .quality_gate import MediaQualityGate
 from .post_processor import MediaPostProcessor
@@ -65,7 +66,12 @@ class MediaOrchestrator:
                 If None, creates a default one.
         """
         self.call_llm_func = call_llm_func
+        # Use cascading generator for 7.9x cost savings (cheapest first, add more only if needed)
         self.generator = MediaGenerator(
+            provider_manager=provider_manager,
+            call_llm_func=call_llm_func,
+        )
+        self.cascading_generator = CascadingMediaGenerator(
             provider_manager=provider_manager,
             call_llm_func=call_llm_func,
         )
@@ -142,21 +148,73 @@ class MediaOrchestrator:
 
         logger.info(f"Media pipeline: task={task_type}, tier={tier}, prompt={prompt[:50]}...")
 
-        # === Stage 4-7: Generate → Enhance → Judge → Quality Gate ===
-        gate_result = await self.quality_gate.run(
-            prompt=prompt,
-            tier=tier,
-            task_type=task_type,
-            media_type="image",
-            size=size,
-        )
-
-        final_output = gate_result.get("final_output")
-        final_score = gate_result.get("final_score", 0.0)
-        iterations = gate_result.get("iterations", 1)
-        passed_gate = gate_result.get("passed_gate", False)
-        total_cost = gate_result.get("total_cost", 0.0)
-        history = gate_result.get("history", [])
+        # === Stage 4-5: Cascading Generation (cheapest first, add more only if needed) ===
+        # This replaces blind best-of-N with intelligent cascading — 7.9x cheaper.
+        # For draft/budget tier: single model, no cascade needed.
+        # For standard/premium tier: cascade from cheapest to most expensive.
+        from .models import CASCADING_ENABLED
+        if CASCADING_ENABLED and tier in ("standard", "premium"):
+            cascade_result = await self.cascading_generator.generate_images_cascading(
+                prompt=prompt,
+                tier=tier,
+                task_type=task_type,
+                size=size,
+            )
+            # If cascade produced good output, skip the full quality gate
+            if cascade_result.get("early_exit") and cascade_result.get("outputs"):
+                # Cascade found good output early — pick the best from cascade
+                outputs = cascade_result["outputs"]
+                # Use the judge to pick the best output from the cascade
+                judge_result = await self.judge.judge_all(prompt, task_type, outputs, "image")
+                final_output = judge_result.get("winner")
+                final_score = judge_result.get("best_score", 0.0)
+                iterations = 1
+                passed_gate = final_score >= 7.5
+                total_cost = cascade_result.get("estimated_cost", 0.0)
+                history = [{
+                    "iteration": 0,
+                    "tier": tier,
+                    "models_used": cascade_result.get("models_used", []),
+                    "successful_models": cascade_result.get("successful_models", []),
+                    "failed_models": cascade_result.get("failed_models", []),
+                    "estimated_cost": total_cost,
+                    "best_score": final_score,
+                    "all_scores": judge_result.get("all_scores", {}),
+                    "winner": final_output,
+                    "cascade_steps": cascade_result.get("cascade_steps", []),
+                    "early_exit": True,
+                }]
+            else:
+                # Cascade didn't find good output early — run full quality gate with all outputs
+                # Fall through to quality gate with the cascade's outputs
+                gate_result = await self.quality_gate.run(
+                    prompt=prompt,
+                    tier=tier,
+                    task_type=task_type,
+                    media_type="image",
+                    size=size,
+                )
+                final_output = gate_result.get("final_output")
+                final_score = gate_result.get("final_score", 0.0)
+                iterations = gate_result.get("iterations", 1)
+                passed_gate = gate_result.get("passed_gate", False)
+                total_cost = gate_result.get("total_cost", 0.0) + cascade_result.get("estimated_cost", 0.0)
+                history = gate_result.get("history", [])
+        else:
+            # Draft/budget or cascading disabled — use standard pipeline
+            gate_result = await self.quality_gate.run(
+                prompt=prompt,
+                tier=tier,
+                task_type=task_type,
+                media_type="image",
+                size=size,
+            )
+            final_output = gate_result.get("final_output")
+            final_score = gate_result.get("final_score", 0.0)
+            iterations = gate_result.get("iterations", 1)
+            passed_gate = gate_result.get("passed_gate", False)
+            total_cost = gate_result.get("total_cost", 0.0)
+            history = gate_result.get("history", [])
 
         # === Stage 8: Post-Processing ===
         if final_output and final_output.get("url"):

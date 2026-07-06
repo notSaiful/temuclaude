@@ -18,7 +18,7 @@ echo "┌─ DAEMONS ───────────────────�
 printf "│ %-20s │ %-8s │ %-6s │ %-10s │ %s │\n" "NAME" "PID" "ALIVE" "STATUS" "HEARTBEAT AGE"
 echo "├──────────────────────┼──────────┼────────┼────────────┼────────────────┤"
 
-daemons=("scout_daemon" "distiller_daemon" "research_daemon_1" "research_daemon_2" "research_daemon_3" "integrator_daemon" "coordinator_daemon")
+daemons=("scout_daemon" "distiller_daemon" "research_daemon_1" "research_daemon_2" "research_daemon_3" "integrator_daemon" "coordinator_daemon" "cyber_daemon" "efficiency_daemon")
 
 for name in "${daemons[@]}"; do
     pidfile="$STATE_DIR/$name.pid"

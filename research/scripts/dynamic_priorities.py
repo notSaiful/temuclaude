@@ -96,6 +96,190 @@ MISSING_TECHNIQUES = {
         "research_needed": "maximum",
         "impact": 10,
     },
+    # === CYBERSECURITY (added 2026-07-06) ===
+    "cognitive_firewall": {
+        "reason": "4-gate zero-trust defense. Reduces attack success to 2%. NOT implemented.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "maximum",
+        "impact": 10,
+    },
+    "self_healing_guard": {
+        "reason": "Self-healing injection defense (Silmaril pattern). Retrains on new attacks in <1h. NOT implemented.",
+        "blocked_by": "need_architecture_design",
+        "research_needed": "maximum",
+        "impact": 10,
+    },
+    "haloguard_classifier": {
+        "reason": "Open-weights constitutional classifier, 90.9 F1 at 1/10 model size. NOT implemented.",
+        "blocked_by": "need_model_download",
+        "research_needed": "high",
+        "impact": 9,
+    },
+    "knnguard_guardrail": {
+        "reason": "Training-free guardrail using kNN on activations. 2.7x faster. NOT implemented.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "high",
+        "impact": 9,
+    },
+    "owasp_llm_top10": {
+        "reason": "OWASP LLM Top 10 (2025) compliance. 10 vulnerability classes, ZERO implemented.",
+        "blocked_by": "need_research",
+        "research_needed": "high",
+        "impact": 9,
+    },
+    "owasp_agentic_top10": {
+        "reason": "OWASP Agentic Top 10 (2026) compliance. Agent-specific threats, ZERO implemented.",
+        "blocked_by": "need_research",
+        "research_needed": "high",
+        "impact": 9,
+    },
+    "ai_infra_guard": {
+        "reason": "4-layer red teaming framework. 1400+ vuln rules. Need to integrate for self-testing.",
+        "blocked_by": "need_framework_integration",
+        "research_needed": "high",
+        "impact": 8,
+    },
+    "red_blue_loop": {
+        "reason": "Self-attacking self-improving defense loop. THE architecture for unbeatable security.",
+        "blocked_by": "need_full_architecture",
+        "research_needed": "maximum",
+        "impact": 10,
+    },
+    "antaeus_scanner": {
+        "reason": "Repository-level logic vulnerability detection. Finds bugs memory-safety scanners miss.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "high",
+        "impact": 7,
+    },
+    "function_call_defense": {
+        "reason": "Function-calling jailbreak via SMT pattern. Must sanitize tool outputs + enforce schemas.",
+        "blocked_by": "need_implementation_details",
+        "research_needed": "high",
+        "impact": 8,
+    },
+    "lifecycle_defenses": {
+        "reason": "8-stage lifecycle vulnerability defense. Only inference-time defense exists currently.",
+        "blocked_by": "need_research",
+        "research_needed": "high",
+        "impact": 8,
+    },
+    "supply_chain_defense": {
+        "reason": "Model poisoning, backdoor, dependency attacks. Zero supply chain security implemented.",
+        "blocked_by": "need_research",
+        "research_needed": "high",
+        "impact": 8,
+    },
+    "backdoor_detection": {
+        "reason": "Backdoor attacks (Pmeta-TLA, ReShift). No detection implemented.",
+        "blocked_by": "need_research",
+        "research_needed": "medium",
+        "impact": 7,
+    },
+    "adversarial_verifier_security": {
+        "reason": "Existing adversarial_verifier.py only checks code quality. EXTEND to security.",
+        "blocked_by": None,  # Can implement now — extend existing file
+        "research_needed": "low",
+        "impact": 8,
+    },
+    # === EFFICIENCY (added 2026-07-06) — QUALITY GUARDRAIL ENFORCED ===
+    "semantic_caching": {
+        "reason": "Semantic cache: 20% hit rate, 100% savings on hit. QUALITY-PRESERVING (0.95+ threshold). NOT implemented.",
+        "blocked_by": None,  # Can implement now — embedding model + vector store
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "quality_preserving",
+    },
+    "prefix_caching": {
+        "reason": "KV cache reuse for shared prefixes. 90% input token savings. LOSSLESS. NOT implemented.",
+        "blocked_by": None,  # Can implement now — restructure prompt templates
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "lossless",
+    },
+    "routellm_cascade": {
+        "reason": "RouteLLM cascade routing: 85% savings, 95% GPT-4 quality. Extend existing preference_router.py (526 LOC).",
+        "blocked_by": "need_preference_data_training",
+        "research_needed": "high",
+        "impact": 10,
+        "quality_class": "quality_preserving",
+    },
+    "structured_output": {
+        "reason": "Constrained generation: 100% valid output, eliminates retries. LOSSLESS. NOT implemented.",
+        "blocked_by": None,  # Can implement now — provider-native JSON mode
+        "research_needed": "medium",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "provider_prompt_caching": {
+        "reason": "Provider-native prompt caching (Anthropic/OpenAI): 90% input savings. LOSSLESS. NOT optimized.",
+        "blocked_by": None,  # Can implement now — restructure prompts for caching
+        "research_needed": "medium",
+        "impact": 8,
+        "quality_class": "lossless",
+    },
+    "efficiency_pareto_monitoring": {
+        "reason": "Pareto tracker exists (266 LOC) but may not be actively monitoring production. Verify + extend.",
+        "blocked_by": None,  # Can implement now — verify existing tracker
+        "research_needed": "low",
+        "impact": 8,
+        "quality_class": "pareto_optimal",
+    },
+    "speculative_decoding": {
+        "reason": "2-3x speedup, LOSSLESS. Blocked by self-hosting OR provider-native support.",
+        "blocked_by": "needs_self_hosted_vllm",
+        "research_needed": "medium",
+        "impact": 9,
+        "quality_class": "lossless",
+    },
+    "continuous_batching": {
+        "reason": "2-3x throughput via PagedAttention. LOSSLESS. Blocked by self-hosting.",
+        "blocked_by": "needs_self_hosted_vllm",
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "awq_quantization": {
+        "reason": "AWQ 4-bit: 4x memory, 10-20% speed, <1% loss. PRESERVING. Blocked by self-hosting.",
+        "blocked_by": "needs_self_hosted_vllm",
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "quality_preserving",
+    },
+    "early_exit_adaptive": {
+        "reason": "Apple Duo-LLM: 30-50% compute savings, <1% loss. PRESERVING. Blocked by self-hosting.",
+        "blocked_by": "needs_self_hosted_vllm",
+        "research_needed": "medium",
+        "impact": 7,
+        "quality_class": "quality_preserving",
+    },
+    "teacher_student_distillation": {
+        "reason": "DSPy teacher-student: 50x cost reduction. PRESERVING with cascade fallback. Blocked by DSPy.",
+        "blocked_by": "needs_dspy_framework",
+        "research_needed": "medium",
+        "impact": 8,
+        "quality_class": "quality_preserving",
+    },
+    "dflash_speculator_training": {
+        "reason": "Custom DFlash draft models: +5-20% over base spec decoding. LOSSLESS. Blocked by training.",
+        "blocked_by": "needs_training_pipeline",
+        "research_needed": "low",
+        "impact": 7,
+        "quality_class": "lossless",
+    },
+    "model_weight_merging_eff": {
+        "reason": "TIES/Task Arithmetic: +1.62 mean gain, 80-100% success. LOSSLESS. Blocked by self-hosting.",
+        "blocked_by": "needs_self_hosted_vllm",
+        "research_needed": "low",
+        "impact": 6,
+        "quality_class": "lossless",
+    },
+    "efficiency_continuous_improvement": {
+        "reason": "DSPy+GEPA continuous Pareto improvement loop. 10-50% from prompt optimization. PRESERVING.",
+        "blocked_by": "needs_dspy_framework",
+        "research_needed": "high",
+        "impact": 9,
+        "quality_class": "pareto_optimal",
+    },
 }
 
 # Techniques blocked by infrastructure (can't implement with cloud API)
@@ -112,6 +296,13 @@ BLOCKED_TECHNIQUES = {
     "model_weight_merging": {"blocked_by": "needs_self_hosted_vllm", "impact": 5},
     "token_level_speculative_decoding": {"blocked_by": "needs_self_hosted_vllm", "impact": 5},
     "honcho_user_modeling": {"blocked_by": "needs_honcho_integration", "impact": 3},
+    # === CYBERSECURITY — BLOCKED BY TRAINING INFRA ===
+    "harc_alignment": {"blocked_by": "needs_fine_tuning_pipeline", "impact": 9},
+    "autonomous_red_blue_ecosystem": {"blocked_by": "needs_red_blue_infra", "impact": 10},
+    "offensive_swarm": {"blocked_by": "needs_offensive_agent_infra", "impact": 8},
+    "neurosymbolic_scanner": {"blocked_by": "needs_cpg_tooling", "impact": 7},
+    "mobile_agent_security": {"blocked_by": "needs_mobile_infra", "impact": 5},
+    "context_lake": {"blocked_by": "needs_database_setup", "impact": 7},
 }
 
 # Research areas that are saturated (no more research needed)
@@ -263,6 +454,7 @@ def calculate_dynamic_priorities() -> Dict[str, Dict]:
             "reason": info["reason"],
             "blocked_by": info["blocked_by"],
             "action": "research_and_implement" if info["blocked_by"] else "implement_now",
+            "quality_class": info.get("quality_class", "unknown"),
         }
     
     # --- BLOCKED TECHNIQUES (lower priority — need infrastructure first) ---

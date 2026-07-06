@@ -53,6 +53,54 @@ QUERIES = [
     "self-improving LLM automatic improvement meta-learning",
     # New models
     "open weight LLM model release benchmark evaluation",
+    # === CYBERSECURITY (added 2026-07-06) ===
+    # Jailbreak and prompt injection defense
+    "LLM jailbreak defense adversarial attack prevention",
+    "prompt injection defense large language model",
+    "cognitive firewall zero-trust LLM safety gate",
+    "constitutional classifier input safety guardrail",
+    "self-healing prompt injection defense continuous",
+    # Model defense
+    "adversarial robustness LLM fine-tuning alignment",
+    "harmfulness refusal coupling safety alignment HARC",
+    "backdoor attack detection model weights",
+    "model supply chain poisoning defense",
+    # Agent defense
+    "autonomous red team AI cybersecurity agent",
+    "agentic AI security tool-use attack prevention",
+    "MCP protocol security vulnerability exploitation",
+    "multi-agent cyber offense defense collaboration",
+    "AI agent red teaming framework open-source",
+    # Code defense
+    "LLM vulnerability detection code scanning repository",
+    "self-healing code patch generation LLM autonomous",
+    "logic vulnerability detection context-grounded reasoning",
+    "exploit chain construction autonomous AI",
+    # Infrastructure defense
+    "LLM runtime safety monitoring deployment security",
+    "AI model supply chain attack detection integrity",
+    # === EFFICIENCY (added 2026-07-06) ===
+    # Lossless speedup
+    "speculative decoding lossless LLM inference speedup",
+    "KV cache reuse prefix caching LLM efficiency",
+    "continuous batching paged attention vLLM throughput",
+    "MoE mixture experts sparse activation efficient inference",
+    "structured output constrained generation LLM efficiency",
+    "chunked prefill LLM inference optimization",
+    # Quality-preserving cost reduction
+    "cascade routing LLM cost reduction quality preserving",
+    "semantic caching LLM duplicate query detection",
+    "model quantization AWQ lossless quality preserving",
+    "early exit adaptive computation LLM efficiency",
+    "teacher student distillation LLM cost reduction",
+    "prompt caching provider API efficiency",
+    "context compression lossless token reduction",
+    "adaptive token budget LLM efficiency Pareto",
+    # Frontier efficiency
+    "DFlash draft model speculative decoding training",
+    "model weight merging TIES task arithmetic inference",
+    "EAGLE Medusa speculative decoding token-level",
+    "DSPy MIPROv2 prompt optimization efficiency gains",
 ]
 
 ARXIV_API = "https://export.arxiv.org/api/query"

@@ -44,30 +44,40 @@ echo ""
 echo "Starting daemons..."
 
 # 1. Scout Daemon (runs every 6h)
-echo "  1/7 Starting scout_daemon..."
+echo "  1/9 Starting scout_daemon... (arXiv + GitHub + HuggingFace, now with cyber + efficiency queries)"
 cd "$RESEARCH_DIR"
 nohup python3 scout_daemon.py > "$STATE_DIR/scout_daemon.log" 2>&1 &
 sleep 2
 
 # 2. Distiller Daemon (polls every 30s)
-echo "  2/7 Starting distiller_daemon..."
+echo "  2/9 Starting distiller_daemon... (now with cyber + efficiency keyword filtering)"
 nohup python3 distiller_daemon.py > "$STATE_DIR/distiller_daemon.log" 2>&1 &
 sleep 2
 
 # 3-5. Research Daemons (3 parallel)
 for i in 1 2 3; do
-    echo "  $((2+i))/7 Starting research_daemon_$i..."
+    echo "  $((2+i))/9 Starting research_daemon_$i... (orchestration/reasoning/efficiency)"
     nohup python3 research_daemon.py --id $i > "$STATE_DIR/research_daemon_$i.log" 2>&1 &
     sleep 1
 done
 
-# 6. Integrator Daemon (checks every 2min)
-echo "  6/7 Starting integrator_daemon..."
+# 6. Cyber Research Daemon (runs every 5min) — Added 2026-07-06
+echo "  6/9 Starting cyber_daemon... (cybersecurity research + Red-Blue loop)"
+nohup python3 cyber_daemon.py > "$STATE_DIR/cyber_daemon.log" 2>&1 &
+sleep 2
+
+# 7. Efficiency Research Daemon (runs every 5min) — Added 2026-07-06
+echo "  7/9 Starting efficiency_daemon... (lossless cost reduction + quality guardrail)"
+nohup python3 efficiency_daemon.py > "$STATE_DIR/efficiency_daemon.log" 2>&1 &
+sleep 2
+
+# 8. Integrator Daemon (checks every 2min)
+echo "  8/9 Starting integrator_daemon... (auto-implements findings)"
 nohup python3 integrator_daemon.py > "$STATE_DIR/integrator_daemon.log" 2>&1 &
 sleep 2
 
-# 7. Coordinator Daemon (checks every 60s)
-echo "  7/7 Starting coordinator_daemon..."
+# 9. Coordinator Daemon (checks every 60s)
+echo "  9/9 Starting coordinator_daemon... (self-healing, manages all 9 daemons)"
 nohup python3 coordinator_daemon.py > "$STATE_DIR/coordinator_daemon.log" 2>&1 &
 sleep 3
 
@@ -88,3 +98,10 @@ echo "Logs in: $STATE_DIR/"
 echo "Monitor with: $RESEARCH_DIR/scripts/status_swarm.sh"
 echo ""
 echo "Swarm is now running 24/7 continuous improvement loop!"
+echo "  - 7 orchestration/reasoning daemons (existing)"
+echo "  - 1 dedicated cybersecurity daemon (researches defenses 24/7)"
+echo "  - 1 dedicated efficiency daemon (researches lossless cost reduction 24/7)"
+echo "  - Scouts now search cyber + efficiency queries on arXiv/GitHub/HuggingFace"
+echo "  - Priority engine tracks 15+ cyber + 14 efficiency techniques"
+echo "  - Coordinator auto-restarts all 9 daemons (self-healing)"
+echo "  - QUALITY GUARDRAIL: efficiency techniques must be LOSSLESS or QUALITY-PRESERVING"

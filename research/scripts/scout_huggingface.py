@@ -65,6 +65,20 @@ def search_hf_papers():
         "prompt optim", "model merge", "mixture of experts", "cascade",
         "judge", "aggregator", "debate", "consensus", "swarm",
         "reasoning", "chain-of-thought", "self-refine", "best-of-n",
+        # === CYBERSECURITY (added 2026-07-06) ===
+        "jailbreak", "prompt injection", "adversarial", "guardrail",
+        "safety classifier", "constitutional", "cognitive firewall",
+        "red team", "vulnerability detection", "backdoor", "model security",
+        "supply chain", "agentic security", "MCP security", "alignment",
+        "robustness", "safety monitoring", "input safety",
+        # === EFFICIENCY (added 2026-07-06) ===
+        "speculative decoding", "KV cache", "prefix caching", "vLLM",
+        "PagedAttention", "continuous batching", "MoE", "mixture of experts",
+        "semantic cache", "caching", "quantization", "AWQ", "GGUF",
+        "early exit", "adaptive computation", "cascade routing",
+        "cost reduction", "efficiency", "throughput", "speedup",
+        "lossless", "Pareto", "token reduction", "context compression",
+        "distillation", "model merging", "structured output",
     ]
     
     papers = []
@@ -99,6 +113,20 @@ def search_hf_models():
         ("orchestration", 10),
         ("verification", 10),
         ("math reasoning", 10),
+        # === CYBERSECURITY (added 2026-07-06) ===
+        ("jailbreak defense", 10),
+        ("prompt injection guardrail", 10),
+        ("safety classifier", 10),
+        ("adversarial robustness", 10),
+        ("red team LLM", 10),
+        ("vulnerability detection", 10),
+        # === EFFICIENCY (added 2026-07-06) ===
+        ("speculative decoding", 10),
+        ("KV cache", 10),
+        ("semantic cache", 10),
+        ("model quantization AWQ", 10),
+        ("efficient inference", 10),
+        ("model merging", 10),
     ]
     
     models = []
