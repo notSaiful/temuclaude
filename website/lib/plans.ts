@@ -32,7 +32,7 @@ export const PLANS: Record<PlanId, Plan> = {
     period: 'forever',
     description: 'Try Temuclaude in the playground. No signup required.',
     features: [
-      '100 queries/day',
+      '20 queries/day',
       'Full 10-layer orchestration',
       'All 8 models',
       'Visible orchestration panel',
@@ -40,7 +40,7 @@ export const PLANS: Record<PlanId, Plan> = {
     ],
     cta: 'Start Free',
     featured: false,
-    queriesPerMonth: 3000, // 100/day * 30
+    queriesPerMonth: 600, // 20/day * 30
     apiAccess: false,
     support: 'Community',
   },
@@ -128,7 +128,7 @@ export const PAYG_PRICING = {
 
 // Query limits per plan (per day for free, per month for paid)
 export const QUERY_LIMITS = {
-  free: { perDay: 100, perMonth: 3000 },
+  free: { perDay: 20, perMonth: 600 },
   developer: { perDay: Infinity, perMonth: 50000 },
   pro: { perDay: Infinity, perMonth: 500000 },
   enterprise: { perDay: Infinity, perMonth: -1 }, // unlimited
