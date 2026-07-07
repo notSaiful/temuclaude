@@ -69,7 +69,7 @@ export default function HomePage() {
                 >
                   <span><strong className="text-text-primary">$0.50</strong> /MTok input</span>
                   <span className="text-border-default">·</span>
-                  <span><strong className="text-text-primary">100</strong> free queries/day</span>
+                  <span><strong className="text-text-primary">20</strong> free queries/day</span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">25%</strong> → charity</span>
                 </div>
@@ -190,9 +190,9 @@ export default function HomePage() {
 
               {/* Small card — Charity Fund */}
               <div className="card" style={{ background: 'linear-gradient(135deg, #788C5D 0%, #5D7048 100%)', color: '#fff', borderColor: 'transparent' }}>
-                <h3 className="text-base font-semibold mb-2">25% → Charity</h3>
+                <h3 className="text-base font-semibold mb-2">25% of profit → charity</h3>
                 <p className="text-sm opacity-90 leading-relaxed">
-                  A quarter of all profit funds food relief, community kitchens,
+                  25% of profit funds food relief, community kitchens,
                   medical clinics, and education programs. Every query helps.
                 </p>
               </div>
