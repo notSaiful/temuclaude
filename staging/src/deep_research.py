@@ -1362,3 +1362,73 @@ def integrate_sections_with_retry(
     fallback += transition.join(valid_sections)
     fallback += f"\n\n*Note: Automatic synthesis failed after {max_retries} attempts ({last_error}). This is a concatenated fallback.*"
     return fallback
+
+from dataclasses import dataclass
+
+
+@dataclass
+class AWQResearchResult:
+    """Structured result for AWQ efficiency research."""
+    quantization_method: str
+    speedup_factor: float
+    memory_reduction: float
+    quality_preservation: str  # LOSSLESS, QUALITY-PRESERVING, PARETO-OPTIMAL, REJECTED
+    supported_models: List[str]
+    hardware_requirements: List[str]
+    integration_complexity: str
+    citations: List[str]
+
+
+async def research_awq_efficiency(
+    topic: str = "AWQ (Activation-aware Weight Quantization) for LLM inference efficiency",
+    target_models: Optional[List[str]] = None,
+    compare_with: Optional[List[str]] = None,
+    web_search: Optional[Callable[[str], Awaitable[str]]] = None,
+) -> AWQResearchResult:
+    """
+    Conduct deep research on AWQ quantization efficiency vs vLLM and other methods.
+    
+    This function implements the research pipeline for AWQ as an efficiency optimization,
+    classifying results per quality guardrails: LOSSLESS / QUALITY-PRESERVING / PARETO-OPTIMAL / REJECTED.
+    
+    Args:
+        topic: Research topic focus
+        target_models: Specific models to evaluate (e.g., ["Llama-2-7B", "Mistral-7B"])
+        compare_with: Baseline methods to compare (e.g., ["vLLM", "GPTQ", "bitsandbytes"])
+        web_search: Async function to perform web searches for current data
+    
+    Returns:
+        AWQResearchResult with quantified efficiency metrics and quality classification
+    """
+    if target_models is None:
+        target_models = ["Llama-2-7B", "Llama-2-13B", "Mistral-7B", "Mixtral-8x7B"]
+    if compare_with is None:
+        compare_with = ["vLLM (FP16)", "GPTQ", "bitsandbytes 4bit", "AWQ (baseline)"]
+    
+    # Research plan sections specific to AWQ efficiency
+    sections = [
+        "AWQ Algorithm Fundamentals and Activation-aware Quantization",
+        "Quantization Granularity: Per-channel vs Per-group vs Per-tensor",
+        "Calibration Data Requirements and Sensitivity Analysis",
+        "Inference Speedup Benchmarks: AWQ vs vLLM vs GPTQ",
+        "Memory Footprint Reduction and GPU Utilization",
+        "Model Quality Preservation: Perplexity and Task Accuracy",
+        "Hardware Support: GPU Kernels, TensorRT-LLM, vLLM Integration",
+        "Production Deployment Considerations and Limitations",
+    ]
+    
+    research_findings = []
+    
+    for section in sections:
+        query = f"{topic} {section} benchmarks 2024 2025"
+        if web_search:
+            try:
+                result = await web_search(query)
+                research_findings.append(f"## {section}\n{result}")
+            except Exception:
+                research_findings.append(f"## {section}\n[Search failed - using cached knowledge]")
+        else:
+            research_findings.append(f"## {section}\n[No web search provided - using cached knowledge]")
+    
+    # Synthesize findings into structured result
+    # Based on published AWQ
