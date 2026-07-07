@@ -118,8 +118,23 @@ start_daemon "revenue_daemon" "revenue_daemon.py" "tracks income + Ummah fund ro
 # Website
 start_daemon "website_daemon" "website_daemon.py" "auto-updates website + Vercel deploy"
 
+# Start shared intelligence hub
+echo "  Starting shared intelligence hub..."
+python3 "$RESEARCH_DIR/share_intelligence.py" > /dev/null 2>&1 &
+
+# Start self-healing watchdog
+echo "  Starting self-healing watchdog..."
+rm -f "$STATE_DIR/watchdog.pid" "$STATE_DIR/watchdog_heartbeat.json" 2>/dev/null
+nohup python3 "$RESEARCH_DIR/watchdog.py" > "$STATE_DIR/watchdog.log" 2>&1 &
+echo "  watchdog: $!"
+
+# Start live state sync daemon (pushes live data to Vercel)
+echo "  Starting live state sync daemon..."
+nohup python3 "$RESEARCH_DIR/sync_daemon.py" > "$STATE_DIR/sync_daemon.log" 2>&1 &
+echo "  sync_daemon: $!"
+
 echo ""
-echo "=== All 23 daemons started ==="
+echo "=== All 23 daemons + watchdog + shared intelligence + sync started ==="
 echo ""
 echo "PIDs:"
 for pidfile in "$STATE_DIR"/*.pid; do

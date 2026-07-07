@@ -220,7 +220,7 @@ export default function PlaygroundPage() {
               {messages.length === 0 && (
                 <div className="text-center pt-12">
                   <h2 className="text-2xl font-semibold text-text-primary mb-2">
-                    Ask Temuclaude anything
+                    Ask TemuClaude anything
                   </h2>
                   <p className="text-text-secondary mb-8">
                     One model. Eight minds behind the scenes. One superior answer.

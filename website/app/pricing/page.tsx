@@ -6,16 +6,17 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is Temuclaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. Temuclaude orchestrates 8 models — fusing their answers, verifying with code, and quality-checking with self-QA. The result is measurably better, at 15x lower cost.' },
+  { q: 'How is TemuClaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 25x lower cost.' },
   { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 100 queries/day, no signup required. Upgrade when you need more.' },
-  { q: 'Which models does Temuclaude use?', a: '8 models: GLM-5.2, DeepSeek V4 Pro, Hy3 Preview, MiMo-V2.5, Gemini 3 Flash, MiniMax M3, Claude Sonnet 5, and Nemotron 3 Ultra. We route to the best model automatically — you never have to choose.' },
-  { q: 'How does the orchestration work?', a: 'Temuclaude classifies your query, routes it to the best model(s), fuses multiple answers, verifies math with code execution, and quality-checks with a self-QA gate. You see the whole process in the playground.' },
-  { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored.' },
-  { q: 'What about enterprise?', a: 'Enterprise includes SSO, SLA 99.9%, dedicated support, custom models, and unlimited queries.' },
+  { q: 'Which models does TemuClaude use?', a: '8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (reasoning), Hy3 Preview (cheapest), Gemini 3 Flash (legal/health), MiniMax M3 (vision/creative), MiMo-V2.5 (multimodal), Claude Sonnet 5 (frontier fallback), and Nemotron 3 Ultra (QA gate, free). We route to the best model automatically.' },
+  { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through a 3-layer Mixture-of-Agents, verifies math with code execution, and quality-checks with a self-QA gate on 5 rubrics. You see the whole process in the playground.' },
+  { q: 'Are the benchmark scores verified?', a: 'Not yet. Our benchmark scores are projected from research analysis of our orchestration architecture. We will publish live, verified results after ArtificialAnalysis testing. We believe in transparency.' },
+  { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored. We log routing decisions and quality scores for self-improvement, but never the content of your queries.' },
+  { q: 'What about enterprise?', a: 'Enterprise includes SSO/SAML, SLA 99.9%, dedicated support, custom integrations, and unlimited queries. Contact us for details.' },
   { q: 'Can I cancel anytime?', a: 'Yes. No contracts. Cancel anytime from your dashboard or contact us.' },
-  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users can pay per token: $0.50/M input, $2.00/M output. Cached input is just $0.05/M. Contact us to set up metered billing.' },
-  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to free models, 30% to ultra-cheap models ($0.05-0.14/M), and only 10% to premium models. Our orchestration layer fuses multiple cheap models to match frontier quality. You get frontier-level answers at a fraction of the cost.' },
-  { q: 'Does Temuclaude support the Ummah?', a: 'Yes. 25% of all profit goes to verified Muslim charities — Palestine food relief, community kitchens, orphan feeding, medical clinics, and Islamic schools. Every query you make helps feed children and build infrastructure for the Ummah.' },
+  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users pay per token: $0.50/M input, $2.00/M output, $0.05/M cached input. Contact us to set up metered billing.' },
+  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to free models, 30% to ultra-cheap models ($0.06-0.14/M), and only 10% to premium models. Our 3-layer MoA fusion makes cheap models together smarter than one expensive model alone. You get frontier-level answers at a fraction of the cost.' },
+  { q: 'Does TemuClaude support the Ummah?', a: 'Yes. 25% of all profit goes to verified Muslim charities — Palestine food relief, community kitchens, orphan feeding, medical clinics, and Islamic schools. Every query you make helps feed children and build infrastructure for the Ummah.' },
 ];
 
 export default function PricingPage() {
@@ -81,7 +82,7 @@ export default function PricingPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3 text-center" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Pricing</h1>
           <p className="text-text-secondary text-center mb-10 max-w-xl mx-auto">
-            Frontier-level intelligence at 1/10th the cost. Every query feeds a child in Palestine.
+            Frontier-level intelligence at 1/10th the cost. 25% of every payment feeds the Ummah.
           </p>
 
           {/* Price comparison banner */}
