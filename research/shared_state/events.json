@@ -1,146 +1,6 @@
 {
   "events": [
     {
-      "id": "evt_1783422689462_coordinator_daemon",
-      "timestamp": "2026-07-07T16:41:29.462229",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.04
-      }
-    },
-    {
-      "id": "evt_1783422714602_distiller_daemon",
-      "timestamp": "2026-07-07T16:41:54.602665",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.2s",
-      "extra": {
-        "duration": 0.15
-      }
-    },
-    {
-      "id": "evt_1783422728873_integrator_daemon",
-      "timestamp": "2026-07-07T16:42:08.873938",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 160.5s",
-      "extra": {
-        "duration": 160.49
-      }
-    },
-    {
-      "id": "evt_1783422744458_distiller_daemon",
-      "timestamp": "2026-07-07T16:42:24.458865",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783422749471_coordinator_daemon",
-      "timestamp": "2026-07-07T16:42:29.471615",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.04
-      }
-    },
-    {
-      "id": "evt_1783422774460_distiller_daemon",
-      "timestamp": "2026-07-07T16:42:54.460112",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783422804464_distiller_daemon",
-      "timestamp": "2026-07-07T16:43:24.464497",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783422805356_research_daemon_1",
-      "timestamp": "2026-07-07T16:43:25.356801",
-      "daemon": "research_daemon_1",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783422806357_research_daemon_2",
-      "timestamp": "2026-07-07T16:43:26.357965",
-      "daemon": "research_daemon_2",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783422807362_research_daemon_3",
-      "timestamp": "2026-07-07T16:43:27.362413",
-      "daemon": "research_daemon_3",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783422809469_coordinator_daemon",
-      "timestamp": "2026-07-07T16:43:29.469603",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.04
-      }
-    },
-    {
-      "id": "evt_1783422823762_integrator_daemon",
-      "timestamp": "2026-07-07T16:43:43.762503",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 94.9s",
-      "extra": {
-        "duration": 94.89
-      }
-    },
-    {
-      "id": "evt_1783422834473_distiller_daemon",
-      "timestamp": "2026-07-07T16:43:54.473739",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783422864481_distiller_daemon",
-      "timestamp": "2026-07-07T16:44:24.481468",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
       "id": "evt_1783422869468_coordinator_daemon",
       "timestamp": "2026-07-07T16:44:29.468635",
       "daemon": "coordinator_daemon",
@@ -1999,7 +1859,147 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783425248054_integrator_daemon",
+      "timestamp": "2026-07-07T17:24:08.054230",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 144.3s",
+      "extra": {
+        "duration": 144.25
+      }
+    },
+    {
+      "id": "evt_1783425265157_distiller_daemon",
+      "timestamp": "2026-07-07T17:24:25.157687",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783425269797_coordinator_daemon",
+      "timestamp": "2026-07-07T17:24:29.797128",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.03
+      }
+    },
+    {
+      "id": "evt_1783425287732_cyber_daemon",
+      "timestamp": "2026-07-07T17:24:47.732439",
+      "daemon": "cyber_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425290778_efficiency_daemon",
+      "timestamp": "2026-07-07T17:24:50.778762",
+      "daemon": "efficiency_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425293835_media_daemon",
+      "timestamp": "2026-07-07T17:24:53.835538",
+      "daemon": "media_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425295163_distiller_daemon",
+      "timestamp": "2026-07-07T17:24:55.163803",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783425325184_distiller_daemon",
+      "timestamp": "2026-07-07T17:25:25.184047",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425329806_coordinator_daemon",
+      "timestamp": "2026-07-07T17:25:29.806651",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.03
+      }
+    },
+    {
+      "id": "evt_1783425355192_distiller_daemon",
+      "timestamp": "2026-07-07T17:25:55.192227",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425385207_distiller_daemon",
+      "timestamp": "2026-07-07T17:26:25.207267",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783425390077_coordinator_daemon",
+      "timestamp": "2026-07-07T17:26:30.077831",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.3s",
+      "extra": {
+        "duration": 0.29
+      }
+    },
+    {
+      "id": "evt_1783425429699_integrator_daemon",
+      "timestamp": "2026-07-07T17:27:09.699723",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 181.6s",
+      "extra": {
+        "duration": 181.64
+      }
+    },
+    {
+      "id": "evt_1783425443079_distiller_daemon",
+      "timestamp": "2026-07-07T17:27:23.079868",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
     }
   ],
-  "last_update": "2026-07-07T17:23:55.142226"
+  "last_update": "2026-07-07T17:27:23.079882"
 }
