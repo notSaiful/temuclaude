@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spiral Galaxy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05030a; font-family: 'Courier New', monospace; }
+  canvas { display: block; position: fixed; top: 0; left: 0; }
+  #ui {
+    position: fixed; top: 16px; left: 16px; z-index: 10;
+    color: #c9b6ff; text-shadow: 0 0 8px rgba(180,140,255,0.6);
+    pointer-events: none; user-select: none;
+    font-size: 13px; line-height: 1.6;
+  }
+  #ui .title { font-size: 18px; color: #ffd9a0; letter-spacing: 2px; margin-bottom: 4px; }
+  #fps { color: #8effc0; font-weight: bold; }
+  #reset {
+    position: fixed; top: 16px; right: 16px; z-index: 10;
+    background: rgba(40,20,70,0.5); color: #ffd9a0;
+    border: 1px solid rgba(255,180,120,0.4);
+    padding: 8px 18px; cursor: pointer;
+    font-family: 'Courier New', monospace; font-size: 13px; letter-spacing: 2px;
+    border-radius: 4px; backdrop-filter: blur(6px);
+    transition: all 0.2s;
+  }
+  #reset:hover { background: rgba(80,40,120,0.7); color: #fff; box-shadow: 0 0 20px rgba(255,180,120,0.5); }
+  #hint {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    color: rgba(200,180,255,0.5); font-size: 11px; letter-spacing: 1px; z-index: 10;
+    pointer-events: none; user-select: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div class="title">SPIRAL GALAXY</div>
+  <div>Particles: <span id="count">0</span></div>
+  <div>FPS: <span id="fps">0</span></div>
+</div>
+<button id="reset">RESET</button>
+<div id="hint">MOVE MOUSE TO ATTRACT · CLICK TO EXPLODE</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const fpsEl = document.getElementById('fps');
+const countEl = document.getElementById('count');
+const resetBtn = document.getElementById('reset');
+
+let W, H, CX, CY;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  CX = W / 2;
+  CY = H / 2;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Offscreen nebula
+let nebulaCanvas = document.createElement('canvas');
+let nebulaCtx = nebulaCanvas.getContext('2d');
+
+function drawNebula() {
+  nebulaCanvas.width = W;
+  nebulaCanvas.height = H;
+  const nctx = nebulaCtx;
+  nctx.clearRect(0, 0, W, H);
+  // base
+  const baseGrad = nctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.7);
+  baseGrad.addColorStop(0, 'rgba(30,15,40,1)');
+  baseGrad.addColorStop(0.5, 'rgba(12,6,22,1)');
+  baseGrad.addColorStop(1, 'rgba(4,2,10,1)');
+  nctx.fillStyle = baseGrad;
+  nctx.fillRect(0, 0, W, H);
+
+  // nebula clouds
+  const clouds = [
+    { x: 0.5, y: 0.5, r: 0.45, color: 'rgba(120,60,180,' },
+    { x: 0.3, y: 0.4, r: 0.35, color: 'rgba(200,80,120,' },
+    { x: 0.7, y: 0.6, r: 0.4, color: 'rgba(60,100,200,' },
+    { x: 0.6, y: 0.3, r: 0.3, color: 'rgba(180,120,60,' },
+    { x: 0.4, y: 0.7, r: 0.35, color: 'rgba(80,40,140,' },
+  ];
+  nctx.globalCompositeOperation = 'screen';
+  for (const c of clouds) {
+    const cx = c.x * W, cy = c.y * H, r = c.r * Math.min(W, H);
+    const g = nctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, c.color + '0.18)');
+    g.addColorStop(0.4, c.color + '0.08)');
+    g.addColorStop(1, c.color + '0)');
+    nctx.fillStyle = g;
+    nctx.fillRect(0, 0, W, H);
+  }
+  // stars
+  nctx.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < 300; i++) {
+    const x = Math.random() * W;
+    const y = Math.random() * H;
+    const s = Math.random() * 1.2 + 0.2;
+    const a = Math.random() * 0.6 + 0.2;
+    nctx.fillStyle = `rgba(255,255,255,${a})`;
+    nctx.fillRect(x, y, s, s);
+  }
+}
+drawNebula();
+window.addEventListener('resize', drawNebula);
+
+// Particles
+const PARTICLE_COUNT = 1500;
+const ARMS = 4;
+const particles = [];
+const explosions = [];
+
+function rand(a, b) { return a + Math.random() * (b - a); }
+
+function createParticle() {
+  // spiral arm distribution
+  const arm = Math.floor(Math.random() * ARMS);
+  const armOffset = (arm / ARMS) * Math.PI * 2;
+  const t = Math.pow(Math.random(), 0.6); // bias toward center
+  const maxR = Math.min(W, H) * 0.42;
+  const radius = t * maxR + rand(0, 15);
+  // spiral twist
+  const twist = radius * 0.012;
+  const angle = armOffset + twist + rand(-0.25, 0.25);
+
+  // orbital speed: inner faster (Keplerian-ish but softened)
+  const speed = 0.0009 + (1 - t) * 0.0025;
+  const dir = 1; // all same direction
+
+  // color: warm center -> cool edge
+  const heat = 1 - t; // 1 center, 0 edge
+  let r, g, b;
+  if (heat > 0.7) {
+    // hot white-yellow
+    r = 255; g = 230 + Math.random() * 25; b = 160 + Math.random() * 60;
+  } else if (heat > 0.4) {
+    // orange
+    r = 255; g = 150 + Math.random() * 60; b = 80 + Math.random() * 60;
+  } else if (heat > 0.2) {
+    // pink/purple
+    r = 200 + Math.random() * 55; g = 100 + Math.random() * 60; b = 180 + Math.random() * 60;
+  } else {
+    // cool blue
+    r = 100 + Math.random() * 80; g = 140 + Math.random() * 80; b = 230 + Math.random() * 25;
+  }
+
+  const size = heat > 0.7 ? rand(1.2, 2.4) : rand(0.6, 1.6);
+
+  return {
+    baseAngle: angle,
+    angle: angle,
+    radius: radius,
+    baseRadius: radius,
+    speed: speed * dir,
+    x: CX + Math.cos(angle) * radius,
+    y: CY + Math.sin(angle) * radius,
+    vx: 0, vy: 0,
+    size: size,
+    color: [r, g, b],
+    heat: heat,
+    free: false, // when attracted/exploded
+    returnForce: 0,
+  };
+}
+
+function initParticles() {
+  particles.length = 0;
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(createParticle());
+  }
+  countEl.textContent = particles.length;
+}
+initParticles();
+
+// Mouse
+let mouse = { x: -9999, y: -9999, active: false };
+window.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  mouse.active = true;
+});
+window.addEventListener('mouseleave', () => { mouse.active = false; mouse.x = -9999; mouse.y = -9999; });
+window.addEventListener('mouseenter', () => { mouse.active = true; });
+
+window.addEventListener('click', e => {
+  explosions.push({
+    x: e.clientX, y: e.clientY,
+    radius: 0, maxRadius: 250, life: 1, particles: []
+  });
+  // push nearby particles outward
+  for (const p of particles) {
+    const dx = p.x - e.clientX;
+    const dy = p.y - e.clientY;
+    const d2 = dx*dx + dy*dy;
+    if (d2 < 200*200) {
+      const d = Math.sqrt(d2) + 0.001;
+      const force = (1 - d / 200) * 18;
+      p.vx += (dx / d) * force;
+      p.vy += (dy / d) * force;
+      p.free = true;
+    }
+  }
+});
+
+resetBtn.addEventListener('click', () => {
+  initParticles();
+  explosions.length = 0;
+});
+
+// FPS
+let lastTime = performance.now();
+let frames = 0;
+let fpsAccum = 0;
+let fpsTimer = 0;
+
+function update(dt) {
+  const dtScale = dt / 16.6667;
+
+  for (const p of particles) {
+    if (!p.free) {
+      // orbital motion
+      p.angle += p.speed * dtScale;
+      const tx = CX + Math.cos(p.angle) * p.radius;
+      const ty = CY + Math.sin(p.angle) * p.radius;
+      // smooth follow
+      p.x += (tx - p.x) * 0.3;
+      p.y += (ty - p.y) * 0.3;
+      p.vx = 0; p.vy = 0;
+    }
+
+    // mouse attraction
+    if (mouse.active) {
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const d2 = dx*dx + dy*dy;
+      const range = 220;
+      if (d2 < range * range) {
+        const d = Math.sqrt(d2) + 0.001;
+        const force = (1 - d / range) * 0.8;
+        p.vx += (dx / d) * force * dtScale;
+        p.vy += (dy / d) * force * dtScale;
+        p.free = true;
+      }
+    }
+
+    if (p.free) {
+      p.x += p.vx * dtScale;
+      p.y += p.vy * dtScale;
+      // friction
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+
+      // return to orbit
+      const targetX = CX + Math.cos(p.angle) * p.radius;
+      const targetY = CY + Math.sin(p.angle) * p.radius;
+      const rdx = targetX - p.x;
+      const rdy = targetY - p.y;
+      p.vx += rdx * 0.015 * dtScale;
+      p.vy += rdy * 0.015 * dtScale;
+
+      // if slow and close, snap back to orbit
+      const speed2 = p.vx*p.vx + p.vy*p.vy;
+      const dist2 = rdx*rdx + rdy*rdy;
+      if (!mouse.active && speed2 < 0.05 && dist2 < 30) {
+        p.free = false;
+        p.x = targetX;
+        p.y = targetY;
+      }
+    }
+  }
+
+  // explosions
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    const ex = explosions[i];
+    ex.radius += 8 * dtScale;
+    ex.life -= 0.02 * dtScale;
+    if (ex.life <= 0 || ex.radius > ex.maxRadius) {
+      explosions.splice(i, 1);
+    }
+  }
+}
+
+function draw() {
+  // draw nebula background
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(nebulaCanvas, 0, 0);
+
+  // subtle trail fade for glow accumulation
+  ctx.globalCompositeOperation = 'lighter';
+
+  // central glow
+  const coreGrad = ctx.createRadialGradient(CX, CY, 0, CX, CY, 120);
+  coreGrad.addColorStop(0, 'rgba(255,220,150,0.35)');
+  coreGrad.addColorStop(0.4, 'rgba(255,140,80,0.12)');
+  coreGrad.addColorStop(1, 'rgba(255,100,60,0)');
+  ctx.fillStyle = coreGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // particles
+  for (const p of particles) {
+    const [r, g, b] = p.color;
+    const sz = p.size;
+    // glow
+    const glowR = sz * 4;
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
+    grad.addColorStop(0, `rgba(${r|0},${g|0},${b|0},0.9)`);
+    grad.addColorStop(0.3, `rgba(${r|0},${g|0},${b|0},0.4)`);
+    grad.addColorStop(1, `rgba(${r|0},${g|0},${b|0},0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // bright core
+    ctx.fillStyle = `rgba(255,255,255,0.9)`;
+    ctx.fillRect(p.x - sz*0.4, p.y - sz*0.4, sz*0.8, sz*0.8);
+  }
+
+  // explosions
+  for (const ex of explosions) {
+    const grad = ctx.createRadialGradient(ex.x, ex.y, ex.radius * 0.6, ex.x, ex.y, ex.radius);
+    grad.addColorStop(0, `rgba(255,200,120,0)`);
+    grad.addColorStop(0.7, `rgba(255,160,80,${ex.life * 0.5})`);
+    grad.addColorStop(1, `rgba(255,100,60,0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(ex.x, ex.y, ex.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // bright ring
+    ctx.strokeStyle = `rgba(255,230,180,${ex.life * 0.6})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(ex.x, ex.y, ex.radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function loop(now) {
+  const dt = Math.min(now - lastTime, 50);
+  lastTime = now;
+
+  update(dt);
+  draw();
+
+  // FPS
+  frames++;
+  fpsTimer += dt;
+  if (fpsTimer >= 500) {
+    const fps = Math.round((frames * 1000) / fpsTimer);
+    fpsEl.textContent = fps;
+    frames = 0;
+    fpsTimer = 0;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
