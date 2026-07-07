@@ -18,6 +18,9 @@ from benchmarks.benchmark_runner import run_benchmark, save_results
 from benchmarks.results import load_results, print_report, compare_results, compare_files
 from src.orchestrator import Temuclaude
 
+_SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
+skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
+
 
 # ============================================================
 # TEST 1: Dataset Loading
@@ -118,7 +121,8 @@ confidence: 90
 # ============================================================
 # TEST 3: Benchmark Runner (with exact match, small sample, live)
 # ============================================================
-def test_benchmark_runner_live() -> bool:
+@skip_no_api
+def test_benchmark_runner_live():
     """Test that the benchmark runner works with a live model (small sample)."""
     print("\n=== BENCHMARK RUNNER LIVE TESTS ===")
     
