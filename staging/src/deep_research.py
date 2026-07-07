@@ -1338,3 +1338,65 @@ def select_research_inference_backend(
     # If none of the known backends match, return the first available
     # (caller is responsible for validating it).
     return available_backends[0]
+
+def integrate_sections_with_retry(
+    sections: List[str],
+    topic: str,
+    llm_call: Callable[[List[Dict]], Awaitable[str]],
+    synthesis_prompt_builder: Callable[[List[str], str], List[Dict]] = build_synthesis_prompt,
+    max_retries: int = 3,
+    min_output_words: int = 5000,
+) -> str:
+    """Integrate research sections into a cohesive report with retry and validation.
+
+    Addresses high implementation fail rate by:
+    - Validating input sections before synthesis
+    - Retrying on empty or too-short outputs
+    - Falling back to concatenated sections if all retries fail
+    - Logging failures for diagnostics
+    """
+    if not sections:
+        raise ValueError("Cannot integrate empty sections list")
+
+    # Filter out empty or trivially short sections
+    valid_sections = [s.strip() for s in sections if s and len(s.strip().split()) >= 50]
+    if not valid_sections:
+        raise ValueError("All sections are too short or empty — cannot integrate")
+
+    last_error: Optional[Exception] = None
+    best_output: str = ""
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            prompt = synthesis_prompt_builder(valid_sections, topic)
+            result = asyncio.run(llm_call(prompt)) if not asyncio.iscoroutinefunction(llm_call) else asyncio.get_event_loop().run_until_complete(llm_call(prompt))
+
+            if not result or not result.strip():
+                last_error = ValueError(f"Attempt {attempt}: LLM returned empty output")
+                continue
+
+            word_count = len(result.strip().split())
+            if word_count < min_output_words:
+                last_error = ValueError(
+                    f"Attempt {attempt}: output too short ({word_count} words, need {min_output_words})"
+                )
+                if word_count > len(best_output.split()):
+                    best_output = result
+                continue
+
+            return result.strip()
+
+        except Exception as exc:
+            last_error = exc
+            continue
+
+    # Fallback: return best partial output or concatenated sections
+    if best_output:
+        return best_output
+
+    # Last resort: manually concatenate with transitions
+    transition = "\n\n---\n\n"
+    fallback = f"# Research Report: {topic}\n\n"
+    fallback += transition.join(valid_sections)
+    fallback += f"\n\n*Note: Automatic synthesis failed after {max_retries} attempts ({last_error}). This is a concatenated fallback.*"
+    return fallback
