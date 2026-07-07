@@ -2,10 +2,10 @@
   "version": 1,
   "functions": {
     "/api/hasan/identity": {},
-    "/api/hasan/deploy": {},
     "/api/hasan/power": {},
     "/api/hasan/sync": {},
     "/api/hasan": {},
+    "/api/hasan/deploy": {},
     "/api/hasan/chat": {
       "maxDuration": 60
     }

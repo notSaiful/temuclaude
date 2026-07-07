@@ -47,33 +47,33 @@ interface HasanData {
   stats: { sourceModules: number };
 }
 
-const DAEMON_META: Record<string, { label: string; group: string; icon: string }> = {
-  scout_daemon: { label: 'ArXiv Scout', group: 'Research Pipeline', icon: 'search' },
-  distiller_daemon: { label: 'Finding Distiller', group: 'Research Pipeline', icon: 'filter' },
-  research_daemon_1: { label: 'Deep Researcher I', group: 'Research Pipeline', icon: 'microscope' },
-  research_daemon_2: { label: 'Deep Researcher II', group: 'Research Pipeline', icon: 'microscope' },
-  research_daemon_3: { label: 'Deep Researcher III', group: 'Research Pipeline', icon: 'microscope' },
-  integrator_daemon: { label: 'Code Integrator (Staging)', group: 'Research Pipeline', icon: 'code' },
-  coordinator_daemon: { label: 'Swarm Coordinator', group: 'Core', icon: 'cpu' },
-  cyber_daemon: { label: 'Cybersecurity Shield', group: 'Security', icon: 'shield' },
-  efficiency_daemon: { label: 'Cost Efficiency Optimizer', group: 'Optimization', icon: 'zap' },
-  media_daemon: { label: 'Media Generation Lab', group: 'Research Pipeline', icon: 'film' },
-  marketing_daemon: { label: 'X/Twitter Auto-Poster', group: 'Growth', icon: 'megaphone' },
-  feedback_daemon: { label: 'Performance Evaluator', group: 'Self-Improvement', icon: 'refresh' },
-  meta_auditor_daemon: { label: '7-Layer Code Auditor', group: 'Self-Healing', icon: 'stethoscope' },
-  swot_daemon: { label: 'SWOT Strategy Analyst', group: 'Strategy', icon: 'bar-chart' },
-  website_daemon: { label: 'Website & Vercel Updater', group: 'Growth', icon: 'globe' },
-  industry_radar_daemon: { label: 'Industry News Radar', group: 'Awareness', icon: 'radar' },
-  model_optimizer_daemon: { label: 'Model Benchmark & Swap', group: 'Optimization', icon: 'robot' },
-  cost_efficiency_daemon: { label: 'Credit & Throttle Guard', group: 'Finance', icon: 'dollar' },
-  revenue_daemon: { label: 'Revenue & Charity Fund', group: 'Finance', icon: 'banknote' },
-  growth_daemon: { label: 'SEO & User Growth', group: 'Growth', icon: 'trending-up' },
-  competitive_dominance_daemon: { label: 'Competitive Benchmark Scorer', group: 'Strategy', icon: 'trophy' },
-  self_expansion_daemon: { label: 'Auto-Daemon Creator', group: 'Self-Improvement', icon: 'seedling' },
-  super_intelligence_daemon: { label: 'Prompt Evolution Engine', group: 'Self-Improvement', icon: 'sparkles' },
+const DAEMON_META: Record<string, { label: string; group: string; icon: string; desc: string }> = {
+  scout_daemon: { label: 'Paper Finder', group: 'Research', icon: 'search', desc: 'Searches the internet for new AI breakthroughs and research papers' },
+  distiller_daemon: { label: 'Idea Filter', group: 'Research', icon: 'filter', desc: 'Filters out bad ideas, keeps only the best discoveries worth trying' },
+  research_daemon_1: { label: 'Researcher 1', group: 'Research', icon: 'microscope', desc: 'Deep-dives into AI papers to find techniques we can use' },
+  research_daemon_2: { label: 'Researcher 2', group: 'Research', icon: 'microscope', desc: 'Deep-dives into AI papers to find techniques we can use' },
+  research_daemon_3: { label: 'Researcher 3', group: 'Research', icon: 'microscope', desc: 'Deep-dives into AI papers to find techniques we can use' },
+  integrator_daemon: { label: 'Code Tester', group: 'Research', icon: 'code', desc: 'Tries out new ideas in a safe staging area, never touches the real code' },
+  coordinator_daemon: { label: 'Team Manager', group: 'Core', icon: 'cpu', desc: 'Keeps all 23 workers running, restarts them if they crash' },
+  cyber_daemon: { label: 'Security Guard', group: 'Security', icon: 'shield', desc: 'Protects the system from hackers and finds new security ideas' },
+  efficiency_daemon: { label: 'Money Saver', group: 'Optimization', icon: 'zap', desc: 'Finds ways to make Temuclaude faster and cheaper without losing quality' },
+  media_daemon: { label: 'Media Researcher', group: 'Research', icon: 'film', desc: 'Researches how to make better images, video, and audio with AI' },
+  marketing_daemon: { label: 'Twitter Poster', group: 'Growth', icon: 'megaphone', desc: 'Writes and posts tweets about Temuclaude automatically' },
+  feedback_daemon: { label: 'Report Card', group: 'Self-Improvement', icon: 'refresh', desc: 'Grades how well the team is doing and suggests fixes' },
+  meta_auditor_daemon: { label: 'Quality Checker', group: 'Self-Healing', icon: 'stethoscope', desc: 'Checks the code for bugs and tries to fix them automatically' },
+  swot_daemon: { label: 'Strategy Planner', group: 'Strategy', icon: 'bar-chart', desc: 'Plans our strengths, weaknesses, opportunities, and threats' },
+  website_daemon: { label: 'Website Updater', group: 'Growth', icon: 'globe', desc: 'Keeps the website updated and deploys changes to Vercel' },
+  industry_radar_daemon: { label: 'News Watcher', group: 'Awareness', icon: 'radar', desc: 'Watches competitor moves and AI industry news 24/7' },
+  model_optimizer_daemon: { label: 'Model Tester', group: 'Optimization', icon: 'robot', desc: 'Tests different AI models and picks the best ones for us' },
+  cost_efficiency_daemon: { label: 'Budget Guard', group: 'Finance', icon: 'dollar', desc: 'Watches our spending, prevents waste, slows down if we run low' },
+  revenue_daemon: { label: 'Money & Charity Tracker', group: 'Finance', icon: 'banknote', desc: 'Tracks income and sends 25% of profit to feed Palestinians' },
+  growth_daemon: { label: 'User Finder', group: 'Growth', icon: 'trending-up', desc: 'Works on getting more users through SEO and content' },
+  competitive_dominance_daemon: { label: 'Scoreboard Keeper', group: 'Strategy', icon: 'trophy', desc: 'Compares us vs competitors and tracks where we win' },
+  self_expansion_daemon: { label: 'Team Builder', group: 'Self-Improvement', icon: 'seedling', desc: 'Creates new workers when it finds gaps in our abilities' },
+  super_intelligence_daemon: { label: 'Brain Trainer', group: 'Self-Improvement', icon: 'sparkles', desc: 'Improves our AI prompts to get smarter answers over time' },
 };
 
-const GROUP_ORDER = ['Core', 'Research Pipeline', 'Security', 'Optimization', 'Self-Improvement', 'Self-Healing', 'Strategy', 'Awareness', 'Growth', 'Finance'];
+const GROUP_ORDER = ['Core', 'Research', 'Security', 'Optimization', 'Self-Improvement', 'Self-Healing', 'Strategy', 'Awareness', 'Growth', 'Finance'];
 
 const THROTTLE_COLORS: Record<string, string> = {
   green: '#10b981', yellow: '#f59e0b', orange: '#f97316', red: '#ef4444',
@@ -237,7 +237,7 @@ export default function HasanPage() {
   const throttleColor = THROTTLE_COLORS[data?.cost?.throttleLevel || 'green'];
   const daemonsByGroup: Record<string, DaemonStatus[]> = {};
   (data?.daemons?.list || []).forEach(d => {
-    const meta = DAEMON_META[d.name] || { label: d.name, group: 'Other', icon: '' };
+    const meta = DAEMON_META[d.name] || { label: d.name, group: 'Other', icon: '', desc: '' };
     if (!daemonsByGroup[meta.group]) daemonsByGroup[meta.group] = [];
     daemonsByGroup[meta.group].push(d);
   });
@@ -436,7 +436,7 @@ export default function HasanPage() {
                   <h3 style={s.groupTitle}>{group}</h3>
                   <div style={s.daemonGrid}>
                     {daemons.map((d, i) => {
-                      const meta = DAEMON_META[d.name] || { label: d.name, icon: '', group: '' };
+                      const meta = DAEMON_META[d.name] || { label: d.name, icon: '', group: '', desc: '' };
                       const isAlive = d.alive;
                       const hbFresh = d.heartbeatAge !== null && d.heartbeatAge < 120;
                       const dotColor = isAlive ? (hbFresh ? '#10b981' : '#f59e0b') : '#ef4444';
@@ -453,6 +453,7 @@ export default function HasanPage() {
                               {isAlive ? (hbFresh ? 'Active' : 'Stale') : 'Offline'}
                               {d.heartbeatAge !== null && ` · ${d.heartbeatAge}s`}
                             </span>
+                            <span style={s.daemonDesc}>{meta.desc || ''}</span>
                           </div>
                           <motion.div animate={isAlive && hbFresh ? { opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] } : { opacity: 0.3 }}
                             transition={{ duration: 2, repeat: Infinity }}
@@ -741,6 +742,7 @@ const s: Record<string, React.CSSProperties> = {
   daemonText: { flex: 1, minWidth: 0 },
   daemonLabel: { fontSize: '13px', fontWeight: 600, color: '#e8e8f0', display: 'block' },
   daemonStatus: { fontSize: '11px', color: '#6b6b7b' },
+  daemonDesc: { fontSize: '10px', color: '#8b8b9b', display: 'block', marginTop: '3px', lineHeight: '1.3' },
   daemonDot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0 },
   // Chat tab
   chatContainer: { maxWidth: '800px', margin: '0 auto', padding: '24px', position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 120px)' },
