@@ -258,8 +258,8 @@ export default function HomePage() {
             {/* Stats strip */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               {[
-                { value: '100%', label: 'accuracy on our 20-question benchmark', color: '#788C5D' },
-                { value: '8', label: 'models fused', color: '#E25822' },
+                { value: '8', label: 'models in the pool', color: '#788C5D' },
+                { value: '6', label: 'quality layers per hard query', color: '#E25822' },
                 { value: '4x', label: 'cheaper than Claude Sonnet 5', color: '#E8B547' },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
@@ -397,52 +397,50 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ━━ Benchmarks ━━ */}
+        {/* ━━ Pipeline ━━ */}
         <section className="py-24 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                Benchmarks
+                The pipeline
               </h2>
               <p className="text-text-secondary">
-                Projected from research analysis. Live results coming after third-party verification.
-                We show projected scores because we believe in honesty over hype.
+                Every question goes through 6 quality layers. Here's what happens
+                when you send a hard question.
               </p>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border-default">
-                    <th className="text-left py-3 px-4 font-semibold text-text-primary">Benchmark</th>
-                    <th className="text-center py-3 px-4 font-semibold text-accent-primary">TemuClaude*</th>
-                    <th className="text-center py-3 px-4 font-semibold text-text-muted">Claude Sonnet 5</th>
-                    <th className="text-center py-3 px-4 font-semibold text-text-muted">GPT-5.5</th>
-                    <th className="text-center py-3 px-4 font-semibold text-text-muted">Gemini 3.1</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { name: 'GPQA Diamond', tc: '95-98%', comp: '88%', gpt: '94%', gem: '89%' },
-                    { name: 'LiveCodeBench', tc: '96-99%', comp: '87%', gpt: '91%', gem: '85%' },
-                    { name: 'SWE-Bench Pro', tc: '75-85%', comp: '70%', gpt: '68%', gem: '65%' },
-                    { name: 'Terminal-Bench', tc: '91-96%', comp: '85%', gpt: '82%', gem: '80%' },
-                    { name: 'MultiChallenge', tc: '87-94%', comp: '82%', gpt: '85%', gem: '79%' },
-                  ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? 'bg-bg-secondary/40' : ''}>
-                      <td className="py-3 px-4 text-text-primary font-medium">{row.name}</td>
-                      <td className="py-3 px-4 text-center font-bold text-accent-primary">{row.tc}</td>
-                      <td className="py-3 px-4 text-center text-text-secondary">{row.comp}</td>
-                      <td className="py-3 px-4 text-center text-text-secondary">{row.gpt}</td>
-                      <td className="py-3 px-4 text-center text-text-secondary">{row.gem}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <StaggerReveal className="grid md:grid-cols-2 gap-4">
+              {[
+                { num: '01', title: 'Classify', desc: 'Your question is analyzed and classified by difficulty (trivial, medium, hard) and type (math, coding, creative, reasoning). No API call needed — pure heuristics.' },
+                { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (Hy3 Preview, $0.06/M). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
+                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash. For math, DeepSeek runs 3 samples and votes (self-consistency).' },
+                { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all 3 responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
+                { num: '05', title: 'QA Gate', desc: 'Nemotron (free, independent) scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
+                { num: '06', title: 'Reflexion', desc: 'DeepSeek retries with the QA feedback. If still below 6/10, Claude Sonnet 5 is called as frontier fallback. You always get the best version.' },
+              ].map((step, i) => (
+                <StaggerItem key={i}>
+                  <div className="card h-full flex gap-4">
+                    <div className="text-2xl font-light text-accent-primary shrink-0" style={{ fontWeight: 300 }}>{step.num}</div>
+                    <div>
+                      <h3 className="text-base font-semibold text-text-primary mb-1">{step.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerReveal>
+
+            <div className="mt-12 max-w-2xl mx-auto text-center">
+              <p className="text-sm text-text-muted mb-4">
+                Benchmark scores coming after third-party verification by ArtificialAnalysis, LiveBench, and LMSys.
+                We don't publish unverified numbers.
+              </p>
+              <a href="/playground" className="btn-accent">
+                Try it yourself
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </a>
             </div>
-            <p className="text-xs text-text-muted mt-4">
-              * Projected from research analysis, not yet verified by ArtificialAnalysis. Frontier scores from published results.
-            </p>
           </div>
         </section>
 
