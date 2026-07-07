@@ -69,7 +69,83 @@
       "extra": {
         "duration": 9.23
       }
+    },
+    {
+      "id": "evt_1783417626756_integrator_daemon",
+      "timestamp": "2026-07-07T15:17:06.756029",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 12.8s",
+      "extra": {
+        "duration": 12.81
+      }
+    },
+    {
+      "id": "evt_1783417627534_cost_efficiency_daemon",
+      "timestamp": "2026-07-07T15:17:07.534301",
+      "daemon": "cost_efficiency_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.9s",
+      "extra": {
+        "duration": 0.94
+      }
+    },
+    {
+      "id": "evt_1783417629907_meta_auditor_daemon",
+      "timestamp": "2026-07-07T15:17:09.907127",
+      "daemon": "meta_auditor_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 14.8s",
+      "extra": {
+        "duration": 14.85
+      }
+    },
+    {
+      "id": "evt_1783417629962_growth_daemon",
+      "timestamp": "2026-07-07T15:17:09.962632",
+      "daemon": "growth_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.03
+      }
+    },
+    {
+      "id": "evt_1783417632221_revenue_daemon",
+      "timestamp": "2026-07-07T15:17:12.221176",
+      "daemon": "revenue_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.1s",
+      "extra": {
+        "duration": 0.13
+      }
+    },
+    {
+      "id": "evt_1783417634316_model_optimizer_daemon",
+      "timestamp": "2026-07-07T15:17:14.316276",
+      "daemon": "model_optimizer_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 8.9s",
+      "extra": {
+        "duration": 8.91
+      }
+    },
+    {
+      "id": "evt_1783417635862_watchdog",
+      "timestamp": "2026-07-07T15:17:15.862067",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783417635880_watchdog",
+      "timestamp": "2026-07-07T15:17:15.880383",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T15:17:04.286276"
+  "last_update": "2026-07-07T15:17:15.880393"
 }

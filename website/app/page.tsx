@@ -5,6 +5,7 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
 import { MagneticButton } from '@/components/MagneticButton';
 import { PricingSection } from '@/components/PricingSection';
+import { ScrollProgress } from '@/components/ScrollProgress';
 
 export default function HomePage() {
   return (
