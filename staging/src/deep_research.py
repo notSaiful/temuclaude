@@ -504,32 +504,37 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
         )},
     ]
 
-def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, quality_loss_pct: float) -> str:
-    """Classify an efficiency finding according to quality guardrails.
-    
+def classify_efficiency_finding(
+    technique_name: str,
+    speedup_factor: float,
+    memory_savings_pct: float,
+    quality_loss_pct: float,
+    description: str = "",
+) -> str:
+    """Classify an efficiency finding under the quality guardrail system.
+
     Categories:
-    - LOSSLESS: speedup/savings with zero quality loss
-    - QUALITY-PRESERVING: speedup/savings with negligible quality loss (< 2%)
-    - PARETO-OPTIMAL: meaningful speedup/savings with acceptable quality tradeoff
-    - REJECTED: insufficient benefit or excessive quality loss
+      - LOSSLESS: speedup/savings with zero measurable quality loss
+      - QUALITY-PRESERVING: negligible quality loss (< 1%) with meaningful gains
+      - PARETO-OPTIMAL: meaningful gains with acceptable, documented trade-offs
+      - REJECTED: gains insufficient to justify quality degradation
+
+    For AWQ specifically: AWQ is activation-aware weight quantization that
+    typically achieves ~2-3x speedup and ~50-70% memory reduction with
+    < 1% quality loss on most benchmarks, classifying as QUALITY-PRESERVING.
     """
-    has_speedup = speedup_factor > 1.0
-    has_savings = cost_savings_pct > 0.0
-    has_benefit = has_speedup or has_savings
-    
-    if not has_benefit:
+    if quality_loss_pct < 0 or speedup_factor < 1.0 or memory_savings_pct < 0:
         return "REJECTED"
-    
-    if quality_loss_pct <= 0.0:
+
+    if quality_loss_pct == 0.0 and (speedup_factor > 1.0 or memory_savings_pct > 0):
         return "LOSSLESS"
-    
-    if quality_loss_pct < 2.0:
+
+    if quality_loss_pct < 1.0 and (speedup_factor >= 1.5 or memory_savings_pct >= 20):
         return "QUALITY-PRESERVING"
-    
-    benefit_score = (speedup_factor - 1.0) * 10 + cost_savings_pct / 10.0
-    if benefit_score > quality_loss_pct:
+
+    if quality_loss_pct < 5.0 and (speedup_factor >= 2.0 or memory_savings_pct >= 40):
         return "PARETO-OPTIMAL"
-    
+
     return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
     """Build a prompt for researching competitor analysis, e.g. AWQ vs vLLM.
