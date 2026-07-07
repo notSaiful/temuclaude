@@ -80,7 +80,7 @@ export default function HomePage() {
                   style={{ animationDelay: '300ms' }}
                 >
                   TemuClaude runs 8 AI models in parallel, fuses their best answers,
-                  verifies math with code execution, and self-checks every response.
+                  self-checks every response, and retries if quality is low.
                   You get one answer — smarter than any single model, at a fraction of the cost.
                 </p>
 
@@ -346,7 +346,7 @@ export default function HomePage() {
                 {
                   num: '02',
                   title: 'TemuClaude routes & fuses',
-                  desc: 'It classifies your question, picks the best models, runs them in parallel, cross-reviews, and synthesizes the best answer. 10 quality layers for hard questions.',
+                  desc: 'It classifies your question, picks the best models, runs them in parallel, and synthesizes the best answer. 6 quality layers for hard questions.',
                 },
                 {
                   num: '03',
@@ -375,7 +375,7 @@ export default function HomePage() {
                 <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-3-flash"]</div>
                 <div className="pl-4 text-accent-fig">"qaScore"</div><div className="pl-8 text-text-inverse">9.2</div>
                 <div className="pl-4 text-accent-fig">"cost"</div><div className="pl-8 text-text-inverse">"$0.015"</div>
-                <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-3-layer", "code-verification", "reflexion"]</div>
+                <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-fusion", "self-consistency", "aggregation", "qa-gate", "reflexion"]</div>
               </div>
             </div>
           </div>
@@ -390,7 +390,7 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
-                Easy questions cost $0. Hard ones get the full fusion pipeline.
+                Easy questions use Hy3 Preview (cheapest). Hard ones get the full fusion pipeline.
               </p>
             </div>
 

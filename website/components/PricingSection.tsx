@@ -66,11 +66,11 @@ const tiers = [
 const faqs = [
   {
     q: 'How are you this cheap?',
-    a: '60% of queries go to free models. 30% to ultra-cheap models ($0.06-0.14/M). Only 10% use premium models. The cache serves repeat queries at $0. You pay for the smart routing, not the raw compute.',
+    a: '60% of queries go to Hy3 Preview ($0.06/$0.21 per M). 30% route to specialists. Only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron). You pay for smart routing, not raw frontier compute.',
   },
   {
     q: 'Is quality really frontier-level?',
-    a: 'For hard questions, 3 models answer independently in parallel, cross-review each other, and a dynamic aggregator synthesizes the best answer. Projected benchmarks show 95-98% on GPQA Diamond. Live results coming after third-party verification.',
+    a: 'For hard questions, 3 models answer independently in parallel, and a dynamic aggregator synthesizes the best answer. A free QA gate scores every response on 5 rubrics. If quality is low, it retries with feedback. Live results coming after third-party verification.',
   },
   {
     q: 'Can I use this in production?',
@@ -86,7 +86,7 @@ const faqs = [
   },
   {
     q: 'How does the fusion work?',
-    a: 'TemuClaude classifies your question, picks the best models for the task type, runs them in parallel, has each model review the others, then a dynamic aggregator picks the best parts and synthesizes one superior answer. 10 quality layers for hard questions.',
+    a: 'TemuClaude classifies your question, picks the best models for the task type, runs them in parallel, and a dynamic aggregator analyzes consensus and contradictions to synthesize one superior answer. 6 quality layers for hard questions.',
   },
 ];
 
