@@ -524,46 +524,38 @@ def classify_efficiency_finding(speedup_factor: float, memory_savings_pct: float
     if quality_loss_pct < 5.0 and (speedup_factor >= 2.0 or memory_savings_pct >= 50):
         return "PARETO-OPTIMAL"
     return "REJECTED"
-def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
-    """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
+def build_competitor_analysis_prompt(technology: str, competitor: str, topic: str) -> List[Dict]:
+    """Build a prompt for researching a technology against a competitor (e.g., AWQ vs vLLM).
     
-    Generates a structured research plan tailored to comparing ML inference/quantization
-    technologies, covering architecture, performance benchmarks, deployment, and ecosystem.
+    Generates a specialized research prompt focused on quantization and inference
+    optimization technologies, covering architecture, performance benchmarks,
+    memory efficiency, deployment considerations, and ecosystem support.
     """
-    if focus_areas is None:
-        focus_areas = [
-            "Architecture & Core Design",
-            "Quantization Methodology",
-            "Performance Benchmarks (throughput, latency, memory)",
-            "Hardware Compatibility & Deployment",
-            "Ease of Integration & API Design",
-            "Community & Ecosystem Maturity",
-            "Limitations & Trade-offs",
-            "Future Roadmap & Industry Adoption",
-        ]
-    competitors_text = ", ".join(competitors)
-    focus_text = "\n".join(f"  {i+1}. {area}" for i, area in enumerate(focus_areas))
     return [
         {"role": "system", "content": (
-            "You are a competitive intelligence research planner specializing in "
-            "ML inference and model quantization technologies. Create a detailed "
-            "research outline that systematically compares the specified technologies. "
-            "For each focus area, define 3-5 subsections with specific metrics, "
-            "benchmarks, or qualitative criteria to evaluate. Prioritize verifiable "
-            "data: published benchmarks, GitHub metrics, paper citations, and "
-            "production deployment reports. Flag areas where public data is scarce "
-            "so the research agent can search deeper."
+            "You are a deep research agent specializing in LLM inference optimization "
+            "and model quantization technologies. Write a comprehensive comparative "
+            "analysis using prose (not bullet points). Include quantitative benchmarks, "
+            "memory footprint comparisons, throughput metrics, accuracy preservation "
+            "results, and deployment trade-offs where available. Cite specific papers, "
+            "GitHub repositories, and benchmark sources. Write at least 2000 words."
         )},
         {"role": "user", "content": (
-            f"Topic: {topic}\n"
-            f"Technologies to compare: {competitors_text}\n\n"
-            f"Suggested focus areas:\n{focus_text}\n\n"
-            "Create a comprehensive competitor analysis research outline. "
-            "Include a section on quantitative benchmark comparison and a "
-            "section on practical deployment recommendations."
+            f"Research Topic: {topic}\n"
+            f"Primary Technology: {technology}\n"
+            f"Competitor/Alternative: {competitor}\n\n"
+            f"Cover the following areas in depth:\n"
+            f"  - Quantization methodology of {technology} (e.g., activation-aware weight quantization, group size, zero-point handling)\n"
+            f"  - Architecture and inference engine of {competitor}\n"
+            f"  - Performance benchmarks: throughput (tokens/sec), latency, memory usage (GB)\n"
+            f"  - Accuracy preservation: perplexity, task-specific scores vs full precision\n"
+            f"  - Hardware compatibility: GPU types, CPU support, edge deployment\n"
+            f"  - Ease of integration: API surface, supported model formats, community ecosystem\n"
+            f"  - Use-case recommendations: when to choose {technology} over {competitor} and vice versa\n"
+            f"  - Recent developments and roadmap for both technologies\n\n"
+            f"Write this comparative analysis in full."
         )},
     ]
-
 def build_quantization_research_prompt(topic: str, competitors: Optional[List[str]] = None) -> List[Dict]:
     """Build a specialized research prompt for model quantization and inference
     optimization topics such as AWQ, GPTQ, vLLM, and related technologies.
