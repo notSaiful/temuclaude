@@ -740,43 +740,30 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
 from typing import Optional, Callable, Awaitable, List, Dict
 
 
-def build_awq_research_prompt(topic: str, focus_areas: Optional[List[str]] = None) -> List[Dict]:
-    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization) topics.
+def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM quantization") -> List[Dict]:
+    """Build a specialized deep research prompt for AWQ quantization vs vLLM.
     
-    Args:
-        topic: The AWQ-related research topic (e.g., "AWQ quantization for LLM inference")
-        focus_areas: Optional list of specific areas to focus on (e.g., ["kernel optimization", "accuracy preservation", "hardware support"])
-    
-    Returns:
-        List of message dicts for the research planner
+    AWQ is a weight-only quantization method that protects salient weights
+    by observing activation magnitudes, achieving better accuracy than
+    GPTQ at 4-bit/3-bit. vLLM uses AWQ kernels for fast inference.
+    This prompt covers technical details, benchmarks, and integration.
     """
-    if focus_areas is None:
-        focus_areas = [
-            "quantization algorithm and activation-aware scaling",
-            "comparison with GPTQ, SmoothQuant, and RTN baselines",
-            "kernel implementation and GPU/CPU optimization",
-            "accuracy evaluation on benchmarks (MMLU, GSM8K, HumanEval)",
-            "integration with inference engines (vLLM, TensorRT-LLM, llama.cpp)",
-            "memory bandwidth and latency analysis",
-            "deployment considerations for edge and cloud"
-        ]
-    
-    focus_text = "\n".join(f"  - {area}" for area in focus_areas)
-    
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization techniques. "
-            "Create a comprehensive research outline for AWQ (Activation-aware Weight Quantization) "
-            "with at least 6 major sections. Each section should have 3-5 subsections. "
-            "Cover: theoretical foundations, algorithmic innovations, implementation details, "
-            "empirical evaluation, systems integration, and future research directions. "
-            "Include specific technical details about weight-only quantization, "
-            "activation outlier handling, and kernel-level optimizations. "
-            "Output as a numbered list of sections with subsections."
+            "You are a deep research agent specializing in LLM quantization. "
+            "Write a comprehensive technical section comparing AWQ (Activation-aware "
+            "Weight Quantization) with vLLM's quantization stack. Cover: "
+            "1) AWQ algorithm (salient weight detection via activation scaling), "
+            "2) vLLM's AWQ kernel implementation (fused kernels, Marlin, GEMM), "
+            "3) Benchmark comparisons (perplexity, latency, throughput at 4-bit/3-bit), "
+            "4) Integration patterns (AutoAWQ, llm-compressor, vLLM AWQ backend), "
+            "5) Limitations and future directions (W4A8, W4A4, kernel fusion). "
+            "Include specific numbers from papers (AWQ: arXiv:2306.00978, "
+            "vLLM AWQ benchmarks). Write at least 2000 words with citations."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n\n"
-            f"Key focus areas to cover:\n{focus_text}\n\n"
-            "Create a detailed research outline optimized for AWQ quantization research."
+            "Produce a detailed technical comparison suitable for engineers "
+            "evaluating quantization backends for production LLM serving."
         )},
     ]
