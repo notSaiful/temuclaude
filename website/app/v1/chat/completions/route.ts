@@ -27,10 +27,10 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // Model pool — role assignments based on MoA research principles
 const ORCHESTRATOR = 'z-ai/glm-5.2';           // IQ 51 — proposer + AGGREGATOR (strongest synthesizes)
 const REASONING_MODEL = 'deepseek/deepseek-v4-pro';  // IQ 44 — proposer + self-consistency + reflexion
-const SPECIALIST_MODEL = 'google/gemini-3.5-flash';   // IQ 50 — proposer + cross-review + QA JUDGE (independent)
-const QA_MODEL = 'google/gemini-3.5-flash';    // IQ 50 — INDEPENDENT QA judge (not a proposer, no bias)
-const QA_MODEL_BACKUP = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // Fallback only
-const FRONTIER_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — hardest 2%
+const SPECIALIST_MODEL = 'google/gemini-3.5-flash';   // IQ 50 — proposer + cross-review
+const QA_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — INDEPENDENT QA judge (strongest, no conflict)
+const QA_MODEL_BACKUP = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // Fallback only if Claude fails
+const FRONTIER_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — hardest 2% + QA judge
 
 interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -256,8 +256,9 @@ Output ONLY the final answer.`,
     },
   ];
 
-  // Use DeepSeek as aggregator (different from GLM-5.2 which proposed)
-  return callModel(REASONING_MODEL, messages, 0.3, maxTokens);
+  // Use GLM-5.2 as aggregator — strongest model synthesizes the final answer
+  // (MoA paper: aggregator should be the most capable model)
+  return callModel(ORCHESTRATOR, messages, 0.3, maxTokens);
 }
 
 /**
@@ -350,11 +351,13 @@ CORRECT_ANSWER: <the correct answer if mismatch, otherwise same as proposed>`,
 }
 
 /**
- * Layer 6: QA Gate — scored by STRONG model (GLM-5.2 IQ 51, not Nemotron IQ 38)
+ * Layer 6: QA Gate — scored by Claude Sonnet 5 (IQ 53, independent, no conflict)
+ * For frontier fallback re-score: uses Nemotron (independent from Claude)
  */
 async function qaGate(
   question: string,
   answer: string,
+  useBackupJudge: boolean = false,
 ): Promise<{ score: number; tokens: number; feedback: string }> {
   const messages: ChatMessage[] = [
     {
@@ -381,11 +384,14 @@ FEEDBACK: <one sentence on what to improve>`,
     },
   ];
 
-  // Use GLM-5.2 (IQ 51) as judge — strong model judging, not weak
-  let result = await callModel(QA_MODEL, messages, 0.0, 200);
-  // Fallback to Nemotron only if GLM fails
+  // Primary: Claude Sonnet 5 (IQ 53, independent judge)
+  // Backup: Nemotron (used for frontier fallback re-score to avoid Claude judging Claude)
+  const judgeModel = useBackupJudge ? QA_MODEL_BACKUP : QA_MODEL;
+  let result = await callModel(judgeModel, messages, 0.0, 200);
+  // If primary fails, try the other
   if (!result.success) {
-    result = await callModel(QA_MODEL_BACKUP, messages, 0.0, 200);
+    const fallbackModel = useBackupJudge ? QA_MODEL : QA_MODEL_BACKUP;
+    result = await callModel(fallbackModel, messages, 0.0, 200);
   }
 
   const avgMatch = result.content?.match(/AVERAGE:\s*(\d+(?:\.\d+)?)/i);
@@ -520,6 +526,16 @@ async function runOrchestration(messages: ChatMessage[], temperature: number = 0
 
     let finalContent = (aggResult.success && aggResult.content) ? aggResult.content : reviewed[0]?.content || '';
 
+    // BUDGET FORCING: If answer is too short for a hard question, force more reasoning
+    if (finalContent) {
+      techniques.push('budget-forcing');
+      const bfResult = await budgetForcing(lastMessage, finalContent, ORCHESTRATOR, maxTokens);
+      totalTokens += bfResult.tokens;
+      if (bfResult.forced) {
+        finalContent = bfResult.content;
+      }
+    }
+
     // LAYER 5: Code verification for math
     if (finalContent && hasMath) {
       techniques.push('code-verification');
@@ -563,7 +579,7 @@ async function runOrchestration(messages: ChatMessage[], temperature: number = 0
         totalTokens += frontierResult.tokens;
         modelsUsed.push(FRONTIER_MODEL);
         if (frontierResult.success && frontierResult.content) {
-          const qa3 = await qaGate(lastMessage, frontierResult.content);
+          const qa3 = await qaGate(lastMessage, frontierResult.content, true); // Use Nemotron to avoid Claude judging Claude
           totalTokens += qa3.tokens;
           if (qa3.score > qa.score) {
             finalContent = frontierResult.content;
@@ -629,6 +645,16 @@ async function runOrchestration(messages: ChatMessage[], temperature: number = 0
   totalTokens += aggResult.tokens;
 
   let finalContent = (aggResult.success && aggResult.content) ? aggResult.content : reviewed[0]?.content || '';
+
+  // BUDGET FORCING: If answer is too short for a hard question, force more reasoning
+  if (finalContent) {
+    techniques.push('budget-forcing');
+    const bfResult = await budgetForcing(lastMessage, finalContent, ORCHESTRATOR, maxTokens);
+    totalTokens += bfResult.tokens;
+    if (bfResult.forced) {
+      finalContent = bfResult.content;
+    }
+  }
 
   // LAYER 6: QA Gate
   if (finalContent) {

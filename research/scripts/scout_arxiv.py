@@ -7,6 +7,7 @@ Outputs raw findings as JSON for the Distiller to process.
 import json
 import urllib.request
 import urllib.parse
+import urllib.error
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 import os
@@ -139,6 +140,12 @@ def search_arxiv(query, max_results=10):
         req = urllib.request.Request(url, headers={"User-Agent": "Temuclaude-Research/1.0"})
         with urllib.request.urlopen(req, timeout=30, context=_ssl_ctx) as resp:
             xml_data = resp.read().decode("utf-8")
+    except urllib.error.HTTPError as e:
+        if e.code == 403:
+            print(f"RATE LIMITED on '{query}' — skipping (will retry next cycle)")
+            return []  # Don't retry — just skip to next query
+        print(f"ERROR fetching '{query}': {e}")
+        return []
     except Exception as e:
         print(f"ERROR fetching '{query}': {e}")
         return []
@@ -169,13 +176,24 @@ def main():
     
     all_papers = []
     seen_ids = set()  # In-run dedup
+    rate_limit_hits = 0
     for q in QUERIES:
         papers = search_arxiv(q, max_results=8)
-        for p in papers:
-            if p["arxiv_id"] not in seen_ids:
-                all_papers.append(p)
-                seen_ids.add(p["arxiv_id"])
-        time.sleep(15)
+        if not papers:
+            # Could be rate limited — increase backoff
+            rate_limit_hits += 1
+            if rate_limit_hits >= 5:
+                print(f"5+ consecutive rate limits — pausing for 60s")
+                time.sleep(60)
+                rate_limit_hits = 0
+                continue
+        else:
+            rate_limit_hits = 0
+            for p in papers:
+                if p["arxiv_id"] not in seen_ids:
+                    all_papers.append(p)
+                    seen_ids.add(p["arxiv_id"])
+        time.sleep(5)  # 5s between queries — arXiv recommends 3+ seconds
     
     # Cross-run dedup: only keep papers we haven't seen before
     before = len(all_papers)

@@ -58,6 +58,7 @@ def is_alive(pid):
 
 def get_daemon_statuses():
     results = []
+    now = datetime.now()
     for name in DAEMONS:
         pid = None
         try:
@@ -69,15 +70,38 @@ def get_daemon_statuses():
         hb_age = None
         if hb and hb.get('timestamp'):
             try:
-                hb_age = int((datetime.now() - datetime.fromisoformat(hb['timestamp'])).total_seconds())
+                hb_age = int((now - datetime.fromisoformat(hb['timestamp'])).total_seconds())
             except:
                 pass
 
         alive = is_alive(pid)
+        
+        # Health check: a daemon is healthy if alive AND heartbeat < 5 min old
+        # AND no error in heartbeat extra
+        healthy = False
+        health_reason = ''
+        if not alive:
+            healthy = False
+            health_reason = 'process_dead'
+        elif hb_age is None:
+            healthy = False
+            health_reason = 'no_heartbeat'
+        elif hb_age > 300:
+            healthy = False
+            health_reason = f'heartbeat_stale_{hb_age}s'
+        elif hb and hb.get('extra', {}).get('error'):
+            healthy = False
+            health_reason = f'error: {hb["extra"]["error"][:50]}'
+        else:
+            healthy = True
+            health_reason = 'ok'
+        
         results.append({
             'name': name,
             'pid': pid,
             'alive': alive,
+            'healthy': healthy,
+            'healthReason': health_reason,
             'status': hb.get('status', 'unknown') if hb else 'unknown',
             'heartbeatAge': hb_age,
             'extra': hb.get('extra', {}) if hb else {},
@@ -181,14 +205,44 @@ def get_watchdog_status():
 def gather_all_data():
     daemons = get_daemon_statuses()
     alive_count = sum(1 for d in daemons if d['alive'])
+    healthy_count = sum(1 for d in daemons if d.get('healthy'))
+    
+    # Real health status: not just "are processes alive" but "are they healthy"
+    if alive_count == 0:
+        status = 'deactivated'
+    elif healthy_count == 23:
+        status = 'all_systems_nominal'
+    elif healthy_count >= 18:
+        status = 'mostly_healthy'
+    elif healthy_count > 0:
+        status = 'partial'
+    else:
+        status = 'all_unhealthy'
+    
+    # Health score: 0-100 based on healthy daemons
+    health_score = round((healthy_count / 23) * 100) if alive_count > 0 else 0
+    
+    # Collect unhealthy daemon names for diagnostics
+    unhealthy_daemons = [
+        {'name': d['name'], 'reason': d.get('healthReason', 'unknown')}
+        for d in daemons if not d.get('healthy')
+    ]
     
     return {
         'timestamp': datetime.now().isoformat(),
         'system': 'hasan',
-        'status': 'all_systems_nominal' if alive_count == 23 else 'partial' if alive_count > 0 else 'deactivated',
+        'status': status,
+        'healthScore': health_score,
+        'healthSummary': {
+            'alive': alive_count,
+            'healthy': healthy_count,
+            'unhealthy': 23 - healthy_count,
+            'unhealthyDaemons': unhealthy_daemons,
+        },
         'daemons': {
             'total': 23,
             'alive': alive_count,
+            'healthy': healthy_count,
             'list': daemons,
         },
         'queue': {

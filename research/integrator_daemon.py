@@ -53,7 +53,12 @@ class IntegratorDaemon(DaemonBase):
     
     def run_once(self) -> bool:
         """Process one implementation task."""
-        task_file = pop_implementation()
+        try:
+            task_file = pop_implementation()
+        except Exception as e:
+            self.logger.error(f"Failed to pop from queue: {e}")
+            return True  # Don't crash — just skip this cycle
+        
         if not task_file:
             return True
         
