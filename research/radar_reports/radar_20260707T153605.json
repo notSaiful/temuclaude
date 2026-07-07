@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-07-07T15:36:05.248681+00:00",
+  "total_signals": 2,
+  "top_signals": [
+    {
+      "title": "Hugging Face Models on Foundry Managed Compute",
+      "source": "rss_huggingface",
+      "score": 10,
+      "url": ""
+    },
+    {
+      "title": "C++ Details of Asymmetric Fences",
+      "source": "hackernews",
+      "score": 2.4,
+      "url": "https://nekrozqliphort.github.io/posts/membarrier/"
+    }
+  ]
+}

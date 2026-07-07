@@ -1,7 +1,11 @@
 {
   "swarm": {
-    "alive_count": 23,
+    "alive_count": 21,
     "daemons": [
+      "research_daemon_1",
+      "research_daemon_2",
+      "research_daemon_3",
+      "growth_daemon",
       "integrator_daemon",
       "coordinator_daemon",
       "industry_radar_daemon",
@@ -9,119 +13,45 @@
       "swot_daemon",
       "cost_efficiency_daemon",
       "competitive_dominance_daemon",
-      "super_intelligence_daemon",
       "scout_daemon",
       "distiller_daemon",
-      "research_daemon_1",
-      "research_daemon_2",
-      "research_daemon_3",
       "cyber_daemon",
       "efficiency_daemon",
       "media_daemon",
       "marketing_daemon",
       "feedback_daemon",
       "meta_auditor_daemon",
+      "super_intelligence_daemon",
       "self_expansion_daemon",
       "revenue_daemon",
-      "growth_daemon",
       "website_daemon"
     ]
   },
   "recent_events": [
-    {
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "research_daemon_1",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "research_daemon_2",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "research_daemon_3",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "efficiency_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.1s"
-    },
-    {
-      "daemon": "cyber_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "self_expansion_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "swot_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "revenue_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.1s"
-    },
     {
       "daemon": "growth_daemon",
       "type": "cycle_complete",
       "message": "Cycle completed in 0.0s"
     },
     {
-      "daemon": "feedback_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 1.0s"
-    },
-    {
       "daemon": "cost_efficiency_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 1.2s"
+      "message": "Cycle completed in 0.8s"
+    },
+    {
+      "daemon": "feedback_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 1.3s"
     },
     {
       "daemon": "marketing_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 9.2s"
+      "message": "Cycle completed in 8.1s"
     },
     {
       "daemon": "model_optimizer_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 10.5s"
+      "message": "Cycle completed in 9.2s"
     },
     {
       "daemon": "watchdog",

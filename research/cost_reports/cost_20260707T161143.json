@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-07-07T16:11:43.344488+00:00",
+  "level": "red",
+  "credits": {
+    "total_credits": 0,
+    "total_usage": 0,
+    "timestamp": "2026-07-07T16:11:43.342676+00:00"
+  },
+  "burn": {
+    "per_day": 0
+  },
+  "roi": {
+    "timestamp": "2026-07-07T16:11:43.344126+00:00",
+    "total_spent_24h": 0,
+    "outcomes": {
+      "research_reports": 166,
+      "implementations_success": 1,
+      "implementations_failed": 8,
+      "bugs_fixed": 0,
+      "model_swaps": 0
+    },
+    "cost_per_metric": {
+      "research_report": 0.0,
+      "implementation": 0.0
+    },
+    "daemon_roi": {},
+    "recommendations": []
+  }
+}

@@ -1,200 +1,106 @@
 {
   "daemons": {
-    "research_daemon_1": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:18.633371",
-      "extra": {
-        "pid": 45677,
-        "last_success": 1783433566.753231,
-        "cycle_duration": 0.02,
-        "last_run": "2026-07-07T14:12:46.753238+00:00"
-      }
-    },
-    "research_daemon_2": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:19.629265",
-      "extra": {
-        "pid": 45679,
-        "last_success": 1783433567.757279,
-        "cycle_duration": 0.02,
-        "last_run": "2026-07-07T14:12:47.757288+00:00"
-      }
-    },
-    "research_daemon_3": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:20.564810",
-      "extra": {
-        "pid": 45681,
-        "last_success": 1783433568.761964,
-        "cycle_duration": 0.02,
-        "last_run": "2026-07-07T14:12:48.761971+00:00"
-      }
-    },
-    "growth_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:20.576257",
-      "extra": {
-        "pid": 46427,
-        "last_success": 1783431348.5943491,
-        "cycle_duration": 0.0,
-        "last_run": "2026-07-07T13:35:48.594380+00:00"
-      }
-    },
-    "integrator_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:21.596537",
-      "extra": {
-        "pid": 45684,
-        "last_success": 1783433497.036553,
-        "cycle_duration": 7.82,
-        "last_run": "2026-07-07T14:11:37.036556+00:00"
-      }
-    },
-    "coordinator_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:22.715505",
-      "extra": {
-        "pid": 45686,
-        "last_success": 1783433571.654631,
-        "cycle_duration": 0.03,
-        "last_run": "2026-07-07T14:12:51.654632+00:00"
-      }
-    },
-    "industry_radar_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:23.485711",
-      "extra": {
-        "pid": 46321,
-        "last_success": 1783431362.6948512,
-        "cycle_duration": 41.34,
-        "last_run": "2026-07-07T13:36:02.694862+00:00"
-      }
-    },
     "model_optimizer_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.046580",
-      "extra": {
-        "pid": 46332
-      }
-    },
-    "swot_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.043899",
-      "extra": {
-        "pid": 46244
-      }
-    },
-    "cost_efficiency_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.047167",
-      "extra": {
-        "pid": 46371
-      }
-    },
-    "competitive_dominance_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.049375",
-      "extra": {
-        "pid": 46822
-      }
-    },
-    "scout_daemon": {
       "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:16.610012",
+      "last_seen": "2026-07-07T21:42:42.499592",
       "extra": {
-        "pid": 45670,
-        "last_success": 1783422983.2220821,
-        "cycle_duration": 779.9,
-        "last_run": "2026-07-07T11:16:23.222087+00:00"
-      }
-    },
-    "distiller_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:17.632051",
-      "extra": {
-        "pid": 45673,
-        "last_success": 1783433568.098027,
-        "cycle_duration": 0.0,
-        "last_run": "2026-07-07T14:12:48.098046+00:00"
-      }
-    },
-    "cyber_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.039330",
-      "extra": {
-        "pid": 46048
+        "pid": 98694,
+        "last_success": 1783440711.736651,
+        "cycle_duration": 9.25,
+        "last_run": "2026-07-07T16:11:51.736659+00:00"
       }
     },
     "efficiency_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.040143",
-      "extra": {
-        "pid": 46054
-      }
-    },
-    "media_daemon": {
       "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:16.978837",
+      "last_seen": "2026-07-07T21:42:42.500354",
       "extra": {
-        "pid": 46056,
-        "last_success": 1783433355.112524,
-        "cycle_duration": 0.01,
-        "last_run": "2026-07-07T14:09:15.112529+00:00"
-      }
-    },
-    "marketing_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.041838",
-      "extra": {
-        "pid": 46178
+        "pid": 98686,
+        "last_success": 1783440702.504779,
+        "cycle_duration": 0.02,
+        "last_run": "2026-07-07T16:11:42.504782+00:00"
       }
     },
     "feedback_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.042561",
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.509649",
       "extra": {
-        "pid": 46183
-      }
-    },
-    "meta_auditor_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.043264",
-      "extra": {
-        "pid": 46189
-      }
-    },
-    "super_intelligence_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.044635",
-      "extra": {
-        "pid": 46288
-      }
-    },
-    "self_expansion_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.045344",
-      "extra": {
-        "pid": 46297
+        "pid": 98689,
+        "last_success": 1783440703.755717,
+        "cycle_duration": 1.26,
+        "last_run": "2026-07-07T16:11:43.755720+00:00"
       }
     },
     "revenue_daemon": {
       "status": "sleeping",
-      "last_seen": "2026-07-07T19:43:17.636244",
+      "last_seen": "2026-07-07T21:42:42.512204",
       "extra": {
-        "pid": 46421,
-        "last_success": 1783431345.5322702,
-        "cycle_duration": 0.01,
-        "last_run": "2026-07-07T13:35:45.532275+00:00"
+        "pid": 98696,
+        "last_success": 1783440702.5377228,
+        "cycle_duration": 0.03,
+        "last_run": "2026-07-07T16:11:42.537730+00:00"
       }
     },
-    "website_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T19:43:16.049706",
+    "growth_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.532889",
       "extra": {
-        "pid": 46561
+        "pid": 98697,
+        "last_success": 1783440702.547217,
+        "cycle_duration": 0.04,
+        "last_run": "2026-07-07T16:11:42.547223+00:00"
+      }
+    },
+    "self_expansion_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.544578",
+      "extra": {
+        "pid": 98699,
+        "last_success": 1783440702.5354218,
+        "cycle_duration": 0.0,
+        "last_run": "2026-07-07T16:11:42.535426+00:00"
+      }
+    },
+    "industry_radar_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.547782",
+      "extra": {
+        "pid": 98693,
+        "last_success": 1783440745.176945,
+        "cycle_duration": 42.64,
+        "last_run": "2026-07-07T16:12:25.176955+00:00"
+      }
+    },
+    "cost_efficiency_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.556038",
+      "extra": {
+        "pid": 98695,
+        "last_success": 1783440703.344741,
+        "cycle_duration": 0.8,
+        "last_run": "2026-07-07T16:11:43.344743+00:00"
+      }
+    },
+    "super_intelligence_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.578497",
+      "extra": {
+        "pid": 98700,
+        "last_success": 1783440761.836624,
+        "cycle_duration": 59.27,
+        "last_run": "2026-07-07T16:12:41.836647+00:00"
+      }
+    },
+    "competitive_dominance_daemon": {
+      "status": "sleeping",
+      "last_seen": "2026-07-07T21:42:42.582315",
+      "extra": {
+        "pid": 98698,
+        "last_success": 1783440746.121877,
+        "cycle_duration": 43.55,
+        "last_run": "2026-07-07T16:12:26.121889+00:00"
       }
     }
   },
-  "last_update": "2026-07-07T19:43:23.485745",
-  "alive_count": 23
+  "last_update": "2026-07-07T21:42:42.582337",
+  "alive_count": 10
 }
