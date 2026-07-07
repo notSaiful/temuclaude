@@ -405,5 +405,153 @@
         "status": "ok"
       }
     }
+  },
+  {
+    "timestamp": "2026-07-07T10:05:49.300570+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-07T10:05:38.832837+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.19,
+        "status": "ok"
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-07T10:05:40.070745+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 4.7,
+        "status": "ok"
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-07T10:05:44.774741+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.57,
+        "status": "ok"
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-07T10:05:46.346210+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.95,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-07T10:08:11.382239+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-07T10:08:01.060202+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 3.49,
+        "status": "ok"
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-07T10:08:04.569695+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.48,
+        "status": "ok"
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-07T10:08:07.045405+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.38,
+        "status": "ok"
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-07T10:08:08.428666+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.95,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-07T10:09:38.164558+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-07T10:09:24.810486+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.2,
+        "status": "ok"
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-07T10:09:26.059743+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 7.66,
+        "status": "ok"
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-07T10:09:33.721604+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.55,
+        "status": "ok"
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-07T10:09:35.276708+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.88,
+        "status": "ok"
+      }
+    }
+  },
+  {
+    "timestamp": "2026-07-07T10:12:05.434683+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-07T10:11:58.579429+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.26,
+        "status": "ok"
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-07T10:11:59.857456+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.95,
+        "status": "ok"
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-07T10:12:01.809901+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.41,
+        "status": "ok"
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-07T10:12:03.224937+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.21,
+        "status": "ok"
+      }
+    }
   }
 ]

@@ -1,0 +1,25 @@
+You are the CYBERSECURITY RESEARCH AGENT for Temuclaude.
+Research this topic deeply: cognitive_firewall
+
+Priority Score: 125
+Reason: 4-gate zero-trust defense. Reduces attack success to 2%. NOT implemented.
+Action Needed: research_and_implement
+
+Focus on:
+1. Latest papers (arXiv cs.CR), repos (GitHub), models (HuggingFace)
+2. Concrete defense techniques we can implement in src/security/
+3. Code examples, APIs, integration details
+4. Benchmarks, results, tradeoffs (attack success rate, false positive rate)
+5. How to integrate with Temuclaude's existing orchestrator + daemon swarm
+
+Output a deep research report as markdown to:
+/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260707T101043.md
+
+Include:
+- Executive summary
+- Key techniques with implementation details
+- Code snippets / pseudo-code
+- Integration points for Temuclaude (which src/ files to modify)
+- Risk assessment
+- Priority: implement now / track for future / blocked
+- OWASP/MITRE/CSA framework mapping

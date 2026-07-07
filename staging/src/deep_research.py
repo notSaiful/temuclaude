@@ -510,30 +510,39 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
         )},
     ]
 
-def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, quality_loss_pct: float) -> str:
-    """Classify an efficiency research finding under the quality guardrail system.
+def classify_efficiency_finding(technique_name: str, speedup_estimate: float,
+                                 memory_savings_estimate: float,
+                                 quality_loss_estimate: float) -> str:
+    """
+    Classify an efficiency finding into one of four categories.
     
     Categories:
-    - LOSSLESS: speedup >= 1.5x, savings >= 20%, quality_loss == 0
-    - QUALITY-PRESERVING: speedup >= 1.2x, savings >= 10%, quality_loss < 1.0
-    - PARETO-OPTIMAL: speedup >= 1.1x, savings >= 5%, quality_loss < 5.0
-      (acceptable tradeoff where gains outweigh minor quality loss)
-    - REJECTED: does not meet any threshold above
+    - LOSSLESS: No quality loss (quality_loss == 0), meaningful speedup/savings
+    - QUALITY-PRESERVING: Negligible quality loss (< 1%), significant gains
+    - PARETO-OPTIMAL: Small quality loss (1-5%) traded for large gains
+    - REJECTED: Excessive quality loss (> 5%) or negligible gains
     
-    Args:
-        speedup_factor: Multiplicative speedup (e.g., 2.0 = 2x faster).
-        cost_savings_pct: Percentage of cost/memory saved (0-100).
-        quality_loss_pct: Percentage of quality degradation (0-100).
-    
-    Returns:
-        One of: LOSSLESS, QUALITY-PRESERVING, PARETO-OPTIMAL, REJECTED
+    Example: AWQ (Activation-aware Weight Quantization) typically achieves
+    ~3x speedup, ~4x memory savings, with <1% quality loss on most tasks,
+    classifying as QUALITY-PRESERVING.
     """
-    if quality_loss_pct == 0 and speedup_factor >= 1.5 and cost_savings_pct >= 20:
+    if quality_loss_estimate > 0.05:
+        return "REJECTED"
+    
+    total_gain = speedup_estimate + memory_savings_estimate
+    
+    if total_gain < 1.2:
+        return "REJECTED"
+    
+    if quality_loss_estimate == 0.0:
         return "LOSSLESS"
-    if quality_loss_pct < 1.0 and speedup_factor >= 1.2 and cost_savings_pct >= 10:
+    
+    if quality_loss_estimate < 0.01:
         return "QUALITY-PRESERVING"
-    if quality_loss_pct < 5.0 and speedup_factor >= 1.1 and cost_savings_pct >= 5:
+    
+    if quality_loss_estimate <= 0.05 and total_gain >= 2.0:
         return "PARETO-OPTIMAL"
+    
     return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
     """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
@@ -655,5 +664,34 @@ def build_media_research_prompt(topic: str, mission: str = "BEAT FRONTIERS",
             "research report covering verifier-guided denoising and related "
             "techniques. Include specific algorithmic details, pseudocode, "
             "and a step-by-step integration plan."
+        )},
+    ]
+
+def build_technical_comparison_prompt(topic: str, competitors: List[str], num_sections: int = 6) -> List[Dict]:
+    """Build a research outline prompt specialized for technical feature comparisons
+    such as AWQ vs vLLM quantization/inference engines.
+    
+    Produces sections covering: architecture, quantization methods, performance
+    benchmarks, memory efficiency, deployment ergonomics, and ecosystem support.
+    """
+    competitor_text = " vs ".join(competitors) if competitors else "competing solutions"
+    return [
+        {"role": "system", "content": (
+            "You are a technical research planner specializing in ML infrastructure "
+            "and LLM inference optimization. Create a comprehensive research outline "
+            f"with at least {num_sections} major sections comparing {competitor_text}. "
+            "Each section should have 3-5 subsections. Cover these dimensions: "
+            "(1) Architecture & design philosophy, (2) Quantization techniques "
+            "(e.g., AWQ, GPTQ, SmoothQuant, FP8) and their mathematical foundations, "
+            "(3) Throughput and latency benchmarks on common hardware (A100, H100, "
+            "consumer GPUs), (4) Memory footprint and KV-cache management, "
+            "(5) Deployment, API compatibility, and ease of integration, "
+            "(6) Community ecosystem, supported models, and roadmap. "
+            "Output as a numbered list of sections with subsections."
+        )},
+        {"role": "user", "content": (
+            f"Topic: {topic}\n"
+            f"Competitors to compare: {competitor_text}\n\n"
+            "Create a detailed technical comparison research outline."
         )},
     ]
