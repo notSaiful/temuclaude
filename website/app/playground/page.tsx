@@ -395,7 +395,7 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
           {data.models.length > 1 && (
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-accent-primary/20 flex items-center justify-center flex-shrink-0">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#D4621F" strokeWidth="2"><circle cx="12" cy="12" r="3" /></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E25822" strokeWidth="2"><circle cx="12" cy="12" r="3" /></svg>
               </div>
               <div className="flex-1">
                 <div className="text-sm font-medium text-text-primary mb-2">Combining multiple answers ({data.models.length} models)</div>

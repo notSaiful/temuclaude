@@ -1,5 +1,3 @@
-import { NextFont } from 'next/font';
-
 export const metadata = { title: 'Hasan — Temuclaude Autonomous System' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
