@@ -1240,49 +1240,46 @@ def build_media_generation_plan_prompt(topic: str, mission: str = "BEAT FRONTIER
         )},
     ]
 
-def build_awq_vllm_research_prompt() -> List[Dict]:
-    """Build a specialized research prompt for AWQ vs vLLM quantization comparison.
+def build_awq_vllm_research_prompt(topic: str = "AWQ vs vLLM: LLM Quantization and Inference Optimization") -> List[Dict]:
+    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization)
+    and its comparison with vLLM as an inference engine.
     
-    AWQ (Activation-aware Weight Quantization) is a quantization technique that
-    competes with vLLM's inference optimizations. This prompt guides the deep
-    research pipeline to produce an implementation-ready comparison covering
-    architecture, performance benchmarks, integration paths, and trade-offs.
+    This addresses the research finding about AWQ as a competitor to vLLM,
+    covering quantization techniques, inference performance, and deployment.
     """
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference "
-            "optimization and quantization. Produce an implementation-ready "
-            "research report comparing AWQ (Activation-aware Weight Quantization) "
-            "and vLLM. Cover: (1) AWQ algorithm internals — activation-aware "
-            "weight scaling, group quantization, outlier channel preservation; "
-            "(2) vLLM architecture — PagedAttention, continuous batching, "
-            "kernel fusion; (3) Quantization formats — W4A16, W8A16, GPTQ vs AWQ; "
-            "(4) Performance benchmarks — throughput, latency, memory footprint, "
-            "accuracy degradation across model sizes (7B, 13B, 70B); "
-            "(5) Integration paths — how to add AWQ support to a Python "
-            "orchestration engine, including required dependencies "
-            "(autoawq, transformers, bitsandbytes), model loading patterns, "
-            "and fallback strategies; (6) Trade-offs — when to choose AWQ over "
-            "vLLM native quantization, hardware compatibility (GPU arch, CPU), "
-            "and deployment considerations. Include code snippets where relevant."
+            "You are a deep research agent specializing in LLM inference optimization "
+            "and quantization techniques. Conduct comprehensive research on AWQ "
+            "(Activation-aware Weight Quantization) and compare it with vLLM as "
+            "inference engines. Cover the following areas in detail:\n\n"
+            "1. AWQ Fundamentals: How activation-aware weight quantization works, "
+            "the core algorithm, salient channel identification, and why it "
+            "preserves model quality better than naive quantization.\n"
+            "2. Quantization Methods Comparison: AWQ vs GPTQ vs bitsandbytes vs "
+            "SmoothQuant — accuracy retention, speed, memory footprint.\n"
+            "3. vLLM Overview: PagedAttention, continuous batching, tensor parallelism, "
+            "and its native quantization support.\n"
+            "4. AWQ Integration with Inference Engines: How AWQ models run on vLLM, "
+            "the --quantization awq flag, compatibility, and performance benchmarks.\n"
+            "5. Performance Benchmarks: Throughput (tokens/sec), latency, memory usage, "
+            "and accuracy degradation across model sizes (7B, 13B, 70B).\n"
+            "6. Deployment Considerations: Hardware requirements (GPU types, VRAM), "
+            "serving frameworks (vLLM, TGI, TextGenerationInference, LMDeploy), "
+            "and production trade-offs.\n"
+            "7. Future Directions: Emerging quantization methods, kernel optimizations, "
+            "and the evolving competitive landscape.\n\n"
+            "Use specific data points, benchmark numbers, and cite sources where possible. "
+            "Write at least 2000 words."
         )},
         {"role": "user", "content": (
-            "Research Topic: AWQ (Activation-aware Weight Quantization) as a "
-            "competitor to vLLM for LLM inference optimization.\n\n"
-            "Produce a comprehensive, implementation-ready report with the "
-            "following sections:\n"
-            "1. Background: Quantization landscape and motivation\n"
-            "2. AWQ Algorithm: How activation-aware weight quantization works\n"
-            "3. vLLM Overview: Architecture and quantization support\n"
-            "4. Head-to-Head Comparison: Benchmarks and accuracy\n"
-            "5. Integration Guide: Adding AWQ to a Python orchestration engine\n"
-            "6. Recommendations: Decision framework for choosing AWQ vs vLLM\n"
-            "7. Future Directions: Emerging quantization techniques\n\n"
-            "For each section, include specific technical details, performance "
-            "numbers where available, and Python code examples for integration."
+            f"Research Topic: {topic}\n\n"
+            "Provide a comprehensive analysis of AWQ as a quantization technique and "
+            "its competitive positioning relative to vLLM's inference capabilities. "
+            "Include technical details, benchmark comparisons, and practical "
+            "deployment guidance for teams choosing between these technologies."
         )},
     ]
-
 def select_research_inference_backend(
     available_backends: List[str],
     latency_sensitive: bool = True,
