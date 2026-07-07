@@ -1201,3 +1201,40 @@ def get_cascade_model_for_research_pass(
     }
 
     return cascade_map.get(pass_type, PREMIUM_MODEL)
+
+def build_media_generation_plan_prompt(topic: str, mission: str = "BEAT FRONTIERS", 
+                                        frontier_models: Optional[List[str]] = None,
+                                        num_sections: int = 7) -> List[Dict]:
+    """Build a specialized research outline prompt for media generation topics.
+    
+    Tailored for verifier-guided denoising and similar media generation research,
+    with emphasis on beating frontier models (GPT Image 2, Sora 2, Veo 3.1, etc.).
+    """
+    if frontier_models is None:
+        frontier_models = ["GPT Image 2", "Sora 2", "Veo 3.1", "Runway Gen-4.5"]
+    
+    frontier_text = ", ".join(frontier_models)
+    
+    return [
+        {"role": "system", "content": (
+            "You are a media generation research planner specializing in diffusion models, "
+            "verifier-guided denoising, and frontier media AI. Create a comprehensive "
+            "research outline with implementation-ready detail. The outline must cover: "
+            "(1) algorithmic foundations of verifier-guided denoising, "
+            "(2) current frontier model architectures and their limitations, "
+            "(3) verifier/reward model design for guiding denoising trajectories, "
+            "(4) sampling strategies and classifier-free guidance alternatives, "
+            "(5) training data and scaling laws for media generation, "
+            "(6) evaluation metrics and benchmarks (FVD, CLIP score, human preference), "
+            f"(7) concrete implementation roadmap to {mission} ({frontier_text}). "
+            f"Include at least {num_sections} major sections, each with 3-5 subsections. "
+            "Output as a numbered list of sections with subsections. "
+            "Prioritize arXiv papers, GitHub repos, and HuggingFace model cards as sources."
+        )},
+        {"role": "user", "content": (
+            f"Topic: {topic}\n"
+            f"Mission: {mission} ({frontier_text})\n\n"
+            "Create a research outline focused on verifier-guided denoising for media generation. "
+            "Include specific model names, paper titles, and GitHub repositories to investigate."
+        )},
+    ]
