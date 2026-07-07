@@ -42,8 +42,13 @@ class Result:
 
 
 async def call_model(client, model: str, messages: list, temp: float = 0.6, max_tok: int = 4096) -> Result:
-    """Call a model via OpenRouter with reasoning field fallback."""
+    """Call a model via OpenRouter with reasoning field fallback.
+    Prepends English enforcement system prompt to ensure consistent English output."""
     try:
+        # Prepend English system prompt if user didn't provide one
+        msgs = messages
+        if not any(m.get("role") == "system" for m in messages):
+            msgs = [{"role": "system", "content": "You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct."}] + messages
         r = await client.post(
             OPENROUTER_URL,
             headers={
@@ -52,11 +57,11 @@ async def call_model(client, model: str, messages: list, temp: float = 0.6, max_
             },
             json={
                 "model": model,
-                "messages": messages,
+                "messages": msgs,
                 "temperature": temp,
                 "max_tokens": max_tok,
             },
-            timeout=60,
+            timeout=90,
         )
         if r.status_code != 200:
             return Result(False, "", 0)
@@ -64,18 +69,23 @@ async def call_model(client, model: str, messages: list, temp: float = 0.6, max_
         msg = d.get("choices", [{}])[0].get("message", {})
         c = msg.get("content") or ""
         if not c:
+            # Fallback 1: reasoning field
             c = msg.get("reasoning") or ""
-            if not c:
-                rd = msg.get("reasoning_details")
-                if isinstance(rd, list):
-                    c = "".join(x.get("text", "") for x in rd if isinstance(x, dict))
-        return Result(True, c, d.get("usage", {}).get("total_tokens", 0))
+        if not c:
+            # Fallback 2: reasoning_details array
+            rd = msg.get("reasoning_details")
+            if isinstance(rd, list):
+                c = "".join(x.get("text", "") for x in rd if isinstance(x, dict))
+        # Strip whitespace
+        c = (c or "").strip()
+        return Result(bool(c), c, d.get("usage", {}).get("total_tokens", 0))
     except Exception:
         return Result(False, "", 0)
 
 
 def classify(text: str) -> str:
-    """Difficulty Classifier — heuristic, no API call"""
+    """Difficulty Classifier — heuristic, no API call.
+    Code generation tasks route to 'medium' (single strong model) not 'hard' (full MoA)."""
     l = text.lower()
     wc = len(text.split())
     s = 0
@@ -89,8 +99,6 @@ def classify(text: str) -> str:
         s += 3
     if len(re.findall(r'[+\-*/^=<>]', text)) > 3:
         s += 2
-    if re.search(r'\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b', l, re.I):
-        s += 3
     if re.search(r'\b(because|therefore|if.*then|contradiction|inference|deduce|imply|assume|prove that|show that|explain why|reason)\b', l, re.I):
         s += 2
     if re.search(r'\b(then|after|next|finally|step by step|how long|how many|show your work)\b', l, re.I):
@@ -99,6 +107,16 @@ def classify(text: str) -> str:
         s += 1
     if re.search(r'\b(if|when|where|given|assuming|suppose)\b', l, re.I):
         s += 1
+
+    # Code generation detection — route to medium (single model), not hard (MoA)
+    is_code_gen = bool(re.search(r'\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b', l, re.I)) and \
+                  bool(re.search(r'\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b', l, re.I))
+    if is_code_gen:
+        return "medium"
+
+    if re.search(r'\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b', l, re.I):
+        s += 3
+
     if s >= 7:
         return "hard"
     if s >= 3:
@@ -195,7 +213,7 @@ FEEDBACK: <one sentence>"""},
             if nums:
                 score = sum(nums) / len(nums)
     if not score:
-        score = 7
+        score = 5  # Default to 5 (triggers reflexion) not 7 (skips it)
     feedback = fb.group(1).strip() if fb else "Improve completeness and clarity"
     return (score, r.tokens, feedback)
 
