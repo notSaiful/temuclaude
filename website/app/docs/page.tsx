@@ -2,7 +2,7 @@ import { Navbar } from '@/components/Navbar';
 
 const sections = [
   { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
-  { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
+  { title: 'Features', items: ['6-Layer Pipeline', '3-Tier Routing', 'MoA Fusion', 'Self-Consistency', 'Self-QA Gate', 'Reflexion', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
@@ -184,34 +184,16 @@ Layer 3: QA Gate (free, Nemotron)
   If average < 6 → frontier fallback (Claude Sonnet 5)`} />
               <Callout type="tip">The aggregator sees all 3 responses and analyzes them directly — no separate cross-review layer needed. This reduces API calls from 14 to 7 while maintaining the same quality.</Callout>
             </section>
-  Gemini reviews A and B → improved C'
-
-Layer 3: Aggregation
-  GLM-5.2 synthesizes A' + B' + C' → final answer
-  With structured analysis: consensus, contradictions, insights, blind spots`} />
-              <Callout type="note">Research: 3-layer MoA achieves 65.1% on AlpacaEval 2.0 vs GPT-4o's 57.5%. Each layer adds measurable quality.</Callout>
-            </section>
 
             <section id="self-consistency" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-Consistency</h2>
-              <p className="text-text-secondary mb-4">For math and reasoning questions, TemuClaude generates N samples and votes:</p>
+              <p className="text-text-secondary mb-4">For math questions, TemuClaude generates 3 samples and votes:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Math: 3 samples at temperature 0.7</li>
-                <li>Reasoning: 2 samples</li>
-                <li>Each sample scored by Nemotron (PRM-weighted voting)</li>
-                <li>Highest-scoring answer selected as final</li>
+                <li>3 DeepSeek V4 Pro samples at temperature 0.7</li>
+                <li>Extract final answer from each sample</li>
+                <li>Majority vote — if 2 out of 3 agree, that's the answer</li>
+                <li>Research: +18.4% on MATH benchmark (arXiv:2203.11317)</li>
               </ul>
-            </section>
-
-            <section id="code-verification" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Code Verification</h2>
-              <p className="text-text-secondary mb-4">For math and coding questions, TemuClaude generates Python code, executes it in a sandbox, and returns the verified output:</p>
-              <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li>Model generates code to solve the problem</li>
-                <li>Code executed in sandboxed subprocess (no network, temp dir, timeout)</li>
-                <li>If output matches → answer is verified (ground truth)</li>
-                <li>If execution fails → trigger Reflexion: model reflects, retries</li>
-              </ol>
             </section>
 
             <section id="self-qa-gate" className="mb-12">
@@ -380,12 +362,10 @@ Response: SSE stream
     "aggregator": "glm-5.2",
     "consensus": 3,
     "qaScore": 8,
-    "codeVerified": true,
-    "totalLatency": "48.2",
-    "cost": "$0.015",
-    "techniques": ["moa-3-layer", "cross-review", "structured-aggregation",
-                   "self-consistency", "prm-weighted-voting", "code-verification",
-                   "reflexion", "usva-5-rubric-qa", "s1-budget-forcing"]}
+    "totalLatency": "28.5",
+    "cost": "$0.003",
+    "techniques": ["moa-fusion", "self-consistency", "aggregation",
+                   "qa-gate", "reflexion"]}
   }
 }`} />
               <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which layers were activated. Full transparency — no black boxes.</Callout>
