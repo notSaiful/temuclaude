@@ -1,23 +1,42 @@
 {
   "swarm": {
-    "alive_count": 9,
+    "alive_count": 23,
     "daemons": [
-      "meta_auditor_daemon",
-      "website_daemon",
-      "model_optimizer_daemon",
-      "revenue_daemon",
-      "cost_efficiency_daemon",
+      "integrator_daemon",
+      "coordinator_daemon",
       "industry_radar_daemon",
+      "model_optimizer_daemon",
+      "swot_daemon",
+      "cost_efficiency_daemon",
       "competitive_dominance_daemon",
+      "super_intelligence_daemon",
+      "scout_daemon",
+      "distiller_daemon",
+      "research_daemon_1",
+      "research_daemon_2",
+      "research_daemon_3",
+      "cyber_daemon",
+      "efficiency_daemon",
+      "media_daemon",
+      "marketing_daemon",
+      "feedback_daemon",
+      "meta_auditor_daemon",
       "self_expansion_daemon",
-      "super_intelligence_daemon"
+      "revenue_daemon",
+      "growth_daemon",
+      "website_daemon"
     ]
   },
   "recent_events": [
     {
-      "daemon": "industry_radar_daemon",
+      "daemon": "distiller_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 39.4s"
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
     },
     {
       "daemon": "coordinator_daemon",
@@ -25,19 +44,9 @@
       "message": "Cycle completed in 0.0s"
     },
     {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "website_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "distiller_daemon",
-      "type": "shutdown",
-      "message": "distiller_daemon shutting down"
-    },
-    {
       "daemon": "distiller_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 0.1s"
+      "message": "Cycle completed in 0.0s"
     },
     {
       "daemon": "research_daemon_1",
@@ -55,27 +64,22 @@
       "message": "Cycle completed in 0.0s"
     },
     {
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
       "daemon": "efficiency_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "media_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s"
-    },
-    {
-      "daemon": "swot_daemon",
       "type": "cycle_complete",
       "message": "Cycle completed in 0.0s"
     },
     {
       "daemon": "coordinator_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 0.2s"
+      "message": "Cycle completed in 0.1s"
     },
     {
-      "daemon": "growth_daemon",
+      "daemon": "cyber_daemon",
       "type": "cycle_complete",
       "message": "Cycle completed in 0.0s"
     },
@@ -85,34 +89,44 @@
       "message": "Cycle completed in 0.0s"
     },
     {
+      "daemon": "swot_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
       "daemon": "revenue_daemon",
       "type": "cycle_complete",
       "message": "Cycle completed in 0.1s"
     },
     {
-      "daemon": "cost_efficiency_daemon",
+      "daemon": "growth_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 0.3s"
+      "message": "Cycle completed in 0.0s"
     },
     {
       "daemon": "feedback_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 1.5s"
+      "message": "Cycle completed in 1.0s"
     },
     {
-      "daemon": "meta_auditor_daemon",
+      "daemon": "cost_efficiency_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 6.4s"
+      "message": "Cycle completed in 1.2s"
     },
     {
-      "daemon": "competitive_dominance_daemon",
+      "daemon": "marketing_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 7.2s"
+      "message": "Cycle completed in 9.2s"
     },
     {
       "daemon": "model_optimizer_daemon",
       "type": "cycle_complete",
-      "message": "Cycle completed in 13.4s"
+      "message": "Cycle completed in 10.5s"
+    },
+    {
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized"
     }
   ],
   "knowledge_count": 3,
