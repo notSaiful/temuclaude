@@ -1,4 +1,12 @@
 {
   "framework": "nextjs",
-  "regions": ["bom1"]
+  "regions": ["bom1"],
+  "functions": {
+    "app/v1/chat/completions/route.ts": {
+      "maxDuration": 120
+    },
+    "app/api/chat/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

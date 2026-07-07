@@ -119,7 +119,15 @@
       "type": "restart",
       "message": "integrator_daemon: no PID file, restarting",
       "extra": {}
+    },
+    {
+      "id": "evt_1783414159506_watchdog",
+      "timestamp": "2026-07-07T14:19:19.506575",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "growth_daemon: no PID file, restarting",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T11:48:50.127200"
+  "last_update": "2026-07-07T14:19:19.506580"
 }

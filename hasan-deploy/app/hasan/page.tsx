@@ -323,7 +323,7 @@ export default function HasanPage() {
   }
 
   const alive = data?.daemons?.alive || 0;
-  const total = data?.daemons?.total || 23;
+  const total = data?.daemons?.total || 24;
   const online = alive > 0;
   const throttleColor = THROTTLE_COLORS[data?.cost?.throttleLevel || 'green'];
   const daemonsByGroup: Record<string, DaemonStatus[]> = {};
@@ -511,6 +511,60 @@ export default function HasanPage() {
                   </motion.div>
                 ))}
               </div>
+            </div>
+
+            {/* Evolution Engine */}
+            <div style={s.evoBox}>
+              <div style={s.evoHead}>
+                <Icon name="seedling" size={16} color="#10b981" />
+                <span style={s.evoTitle}>Workforce Evolution</span>
+                <span style={s.evoCount}>
+                  {data?.evolution?.pendingChanges?.length || 0} pending
+                </span>
+              </div>
+              {data?.evolution?.lastCycle ? (
+                <>
+                  <p style={s.evoSummary}>{data.evolution.lastCycle.summary}</p>
+                  {(data.evolution.pendingChanges || []).length > 0 && (
+                    <div style={s.evoChanges}>
+                      {data.evolution.pendingChanges.slice(0, 6).map((change: any, i: number) => (
+                        <div key={i} style={{
+                          ...s.evoChange,
+                          borderColor: change.type === 'add' ? 'rgba(16,185,129,0.2)'
+                            : change.type === 'remove' ? 'rgba(239,68,68,0.2)'
+                            : 'rgba(59,130,246,0.2)',
+                        }}>
+                          <span style={{
+                            ...s.evoChangeType,
+                            color: change.type === 'add' ? '#10b981'
+                              : change.type === 'remove' ? '#ef4444'
+                              : '#3b82f6',
+                          }}>
+                            {change.type === 'add' ? '+ NEW' : change.type === 'remove' ? '− REMOVE' : '↻ IMPROVE'}
+                          </span>
+                          <span style={s.evoChangeTarget}>
+                            {change.daemon || change.name}
+                          </span>
+                          <span style={s.evoChangeReason}>
+                            {change.reason || change.change || ''}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {(!data?.evolution?.pendingChanges || data.evolution.pendingChanges.length === 0) && (
+                    <p style={s.evoIdle}>
+                      Last evaluation found no changes needed. Next cycle in 6 hours.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p style={s.evoIdle}>
+                  Evolution engine runs every 6 hours. It evaluates every worker's ROI,
+                  improves underperformers, adds new workers for gaps, and removes redundant ones.
+                  First cycle will appear after activation.
+                </p>
+              )}
             </div>
 
             {/* Live Activity Feed */}
@@ -854,6 +908,17 @@ const s: Record<string, React.CSSProperties> = {
   btImpact: { display: 'flex', alignItems: 'flex-start', gap: '6px', marginTop: '2px' },
   btImpactText: { fontSize: '11px', lineHeight: 1.5, color: '#10b981', fontWeight: 500 },
   btSource: { fontSize: '9px', color: '#6b6b7b', marginTop: '2px' },
+  evoBox: { background: 'rgba(16,185,129,0.03)', border: '1px solid rgba(16,185,129,0.12)', borderRadius: '12px', padding: '18px', marginBottom: '20px' },
+  evoHead: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' },
+  evoTitle: { fontSize: '14px', fontWeight: 700, color: '#e8e8f0', letterSpacing: '0.5px' },
+  evoCount: { marginLeft: 'auto', fontSize: '11px', color: '#f59e0b', fontFamily: "'JetBrains Mono', monospace" },
+  evoSummary: { fontSize: '12px', lineHeight: 1.6, color: '#a8a8b8', margin: '0 0 12px 0' },
+  evoChanges: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  evoChange: { display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px 14px' },
+  evoChangeType: { fontSize: '10px', fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", flexShrink: 0, width: '70px' },
+  evoChangeTarget: { fontSize: '12px', fontWeight: 600, color: '#e8e8f0', flexShrink: 0, maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  evoChangeReason: { fontSize: '11px', color: '#8b8b9b', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  evoIdle: { fontSize: '12px', lineHeight: 1.6, color: '#6b6b7b', margin: 0 },
   feedHead: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' },
   feedTitle: { fontSize: '14px', fontWeight: 600, color: '#8b8b9b', margin: 0 },
   liveDot: { width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' },

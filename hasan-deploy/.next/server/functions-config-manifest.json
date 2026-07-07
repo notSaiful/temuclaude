@@ -3,9 +3,9 @@
   "functions": {
     "/api/hasan/identity": {},
     "/api/hasan/deploy": {},
-    "/api/hasan/sync": {},
     "/api/hasan/power": {},
     "/api/hasan": {},
+    "/api/hasan/sync": {},
     "/api/hasan/chat": {
       "maxDuration": 60
     }
