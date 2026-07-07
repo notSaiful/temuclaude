@@ -1,0 +1,654 @@
+{
+  "distilled_at": "20260707T040455",
+  "total_raw_files": 11,
+  "total_findings": 20,
+  "new_findings": 20,
+  "already_distilled": 303,
+  "by_type": {
+    "github_repo": 20
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1252198630",
+      "name": "Hritikd/hermes",
+      "url": "https://github.com/Hritikd/hermes",
+      "description": "Test-time compute scaling engine with Process Reward Models, MCTS, and beam search \u2014 o1-style reasoning infrastructure",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-14T17:29:58Z",
+      "relevance_score": 70,
+      "matched_keywords": [
+        "mcts",
+        "process reward",
+        "test-time compute",
+        "reasoning",
+        "hermes",
+        "+mcts",
+        "+process reward"
+      ],
+      "dedup_key": "github_repo:1252198630"
+    },
+    {
+      "type": "github_repo",
+      "id": "1129083520",
+      "name": "dayuwang401/spectral-orthogonal-exploration",
+      "url": "https://github.com/dayuwang401/spectral-orthogonal-exploration",
+      "description": "Official code for \"Student Guides Teacher: Weak-to-Strong Inference via Spectral Orthogonal Exploration\" (SOE, ACL 2026 Oral). A training-free, test-time scaling method that fixes reasoning collapse in LLM mathematical reasoning via orthogonal probing.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T00:54:22Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "qwen",
+        "gemma"
+      ],
+      "dedup_key": "github_repo:1129083520"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221695486",
+      "name": "dinho-afsn/agentic-harness-patterns-skill",
+      "url": "https://github.com/dinho-afsn/agentic-harness-patterns-skill",
+      "description": "Build production patterns for AI coding agents from Claude Code source analysis and harness engineering practice.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-07T03:38:56Z",
+      "relevance_score": 29,
+      "matched_keywords": [
+        "agentic",
+        "claude code",
+        "codex",
+        "coding agent"
+      ],
+      "dedup_key": "github_repo:1221695486"
+    },
+    {
+      "type": "github_repo",
+      "id": "1229033505",
+      "name": "zizhao-hu/llm-alignment-compute-scaling",
+      "url": "https://github.com/zizhao-hu/llm-alignment-compute-scaling",
+      "description": "Audit how safety alignment degrades as a function of test-time compute budget \u2014 best-of-N sampling, extended CoT, and verifier-guided search.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-05-04T16:22:42Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "test-time compute",
+        "best-of-n"
+      ],
+      "dedup_key": "github_repo:1229033505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1277685195",
+      "name": "dhanushcodie/AgentTwo",
+      "url": "https://github.com/dhanushcodie/AgentTwo",
+      "description": "Multi-agent technical architecture pipeline \u2014 turns an AgentOne requirements plan into an in-depth, cost-weighed technical implementation and release plan (Claude Code plugin)",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:44:12Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "multi-agent",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1277685195"
+    },
+    {
+      "type": "github_repo",
+      "id": "1048895505",
+      "name": "IINemo/thinkbooster",
+      "url": "https://github.com/IINemo/thinkbooster",
+      "description": "Open-source framework for test-time compute scaling of LLMs. Includes a visual debugger for inspecting reasoning traces and an endpoint that provides OpenAI-compatible API.",
+      "stars": 26,
+      "language": "Python",
+      "updated_at": "2026-07-06T00:30:20Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1048895505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1259195698",
+      "name": "pr0mila/Frontier-AI-Concepts",
+      "url": "https://github.com/pr0mila/Frontier-AI-Concepts",
+      "description": "A technical reading guide on Mechanistic Interpretability, Test-Time Compute Scaling, and Native Multimodal Pretraining. Built for ML practitioners, not beginners.",
+      "stars": 2,
+      "language": null,
+      "updated_at": "2026-06-27T15:52:37Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1259195698"
+    },
+    {
+      "type": "github_repo",
+      "id": "1225965956",
+      "name": "jrajath94/stair-tts-scaling-laws",
+      "url": "https://github.com/jrajath94/stair-tts-scaling-laws",
+      "description": "STAIR: Per-Problem Discrete Structure in Test-Time Compute Scaling for LLM Reasoning \u2014 NeurIPS 2025 submission",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-30T20:44:15Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1225965956"
+    },
+    {
+      "type": "github_repo",
+      "id": "856875371",
+      "name": "Multi-Agent-LLMs/lm-evaluation-harness",
+      "url": "https://github.com/Multi-Agent-LLMs/lm-evaluation-harness",
+      "description": "Fork from EleutherAI\u2019s lm\u2011evaluation\u2011harness with added multi\u2011agent and single\u2011agent test\u2011time inference scaling pipelines for LLM evaluation with compute-estimation for the paper \"Multi-Agent Reasoning Improves Compute Efficiency: Pareto-Optimal Scaling of Test-Time\"",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-29T10:28:00Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent"
+      ],
+      "dedup_key": "github_repo:856875371"
+    },
+    {
+      "type": "github_repo",
+      "id": "1281055667",
+      "name": "TsingFengIceberg/Harness-study",
+      "url": "https://github.com/TsingFengIceberg/Harness-study",
+      "description": "Horizontal study of AI Agent Harness architectures \u2014 comparing DeerFlow, OpenClaw, Claw-Code, Hermes Agent, and Claude Code internals. \u6a2a\u5411\u5b66\u4e60 AI Agent Harness \u67b6\u6784\u8bbe\u8ba1 \u2014 \u5bf9\u6bd4 DeerFlow\u3001OpenClaw\u3001Claw-Code\u3001Hermes Agent \u53ca Claude Code \u5b9e\u73b0\u539f\u7406\u3002",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:48:23Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "hermes"
+      ],
+      "dedup_key": "github_repo:1281055667"
+    },
+    {
+      "type": "github_repo",
+      "id": "1020321366",
+      "name": "leeIITM/layered_diffusion",
+      "url": "https://github.com/leeIITM/layered_diffusion",
+      "description": "This project implements layered image generation using pretrained diffusion models like Stable Diffusion 1.5. It enables staged control of background, midground, and foreground using ControlNet, inpainting, and semantic masks\u2014allowing structured, interpretable image synthesis with minimal compute.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-06-15T14:40:09Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1020321366"
+    },
+    {
+      "type": "github_repo",
+      "id": "1264089013",
+      "name": "Tingyi0819/DL2026_Team2_Sketch-to-Real-Generation",
+      "url": "https://github.com/Tingyi0819/DL2026_Team2_Sketch-to-Real-Generation",
+      "description": "Controllable Image Generation  Using ControlNet or Stable Diffusion, implement a \u201cSketch-to-Real\u201d system where users draw rough outlines and the model generates a high-fidelity images.",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-10T02:12:52Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1264089013"
+    },
+    {
+      "type": "github_repo",
+      "id": "626572346",
+      "name": "kai9987kai/scribble-diffusion",
+      "url": "https://github.com/kai9987kai/scribble-diffusion",
+      "description": "Scribble Diffusion is a small Next.js app powered by Replicate ControlNet. Draw or edit a scribble, describe the image you want, then run generation with optional experiment controls for variations, guidance, seeds, and ControlNet structure modes.",
+      "stars": 0,
+      "language": "JavaScript",
+      "updated_at": "2026-05-19T09:53:11Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:626572346"
+    },
+    {
+      "type": "github_repo",
+      "id": "1199986144",
+      "name": "AI688-Final-Project-Spring-2026/Sketch2Style-ControlNet-Fashion",
+      "url": "https://github.com/AI688-Final-Project-Spring-2026/Sketch2Style-ControlNet-Fashion",
+      "description": "Sketch2Style: A controllable AI fashion design system using Stable Diffusion v1.5 with ControlNet for sketch-conditioned fashion image generation on Fashion-MNIST dataset.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-05-23T22:58:48Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1199986144"
+    },
+    {
+      "type": "github_repo",
+      "id": "1146238980",
+      "name": "PotatoJnny/Scaling-Law-Guided-search",
+      "url": "https://github.com/PotatoJnny/Scaling-Law-Guided-search",
+      "description": "Scaling-Law Guided (SLG) Search: Optimizing LLM test-time compute via tail estimation and dynamic budget allocation.",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-27T02:33:20Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1146238980"
+    },
+    {
+      "type": "github_repo",
+      "id": "1136703179",
+      "name": "neosun100/Step-Audio-R1.1",
+      "url": "https://github.com/neosun100/Step-Audio-R1.1",
+      "description": "Step-Audio-R1.1: The First Audio Language Model with Test-Time Compute Scaling. All-in-One Docker with vLLM + Web UI + API.",
+      "stars": 4,
+      "language": "Python",
+      "updated_at": "2026-02-27T02:21:16Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1136703179"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221410058",
+      "name": "tammychurchly25/ClaudeCode-Source-Analysis",
+      "url": "https://github.com/tammychurchly25/ClaudeCode-Source-Analysis",
+      "description": "Analyze Claude Code source leaks, map the architecture, and document its TypeScript, Bun, agent, and security systems.",
+      "stars": 1,
+      "language": "Rust",
+      "updated_at": "2026-07-07T03:38:41Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221410058"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221263673",
+      "name": "Angeliquetreated862/claude-code-src",
+      "url": "https://github.com/Angeliquetreated862/claude-code-src",
+      "description": "Explore a public Claude Code source snapshot for security research, supply-chain analysis, and CLI architecture review",
+      "stars": 2,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T03:38:25Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221263673"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221218233",
+      "name": "ptolemaic-programmemusic151/claude-code-book",
+      "url": "https://github.com/ptolemaic-programmemusic151/claude-code-book",
+      "description": "Explore Claude Code CLI architecture and implementation with a clear technical guide from startup flow to advanced query engine design",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:38:23Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221218233"
+    },
+    {
+      "type": "github_repo",
+      "id": "1268701988",
+      "name": "DarkWaterReflection/comfyui-controlnet-scene-control",
+      "url": "https://github.com/DarkWaterReflection/comfyui-controlnet-scene-control",
+      "description": "ControlNet OpenPose workflow in ComfyUI \u2014 same pose, four styles.  Proves creative control over AI image generation using pose extraction,  prompt conditioning, and scene control. Runs on GTX 1650 4GB.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-06-27T09:43:08Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "reflection"
+      ],
+      "dedup_key": "github_repo:1268701988"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1252198630",
+      "name": "Hritikd/hermes",
+      "url": "https://github.com/Hritikd/hermes",
+      "description": "Test-time compute scaling engine with Process Reward Models, MCTS, and beam search \u2014 o1-style reasoning infrastructure",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-06-14T17:29:58Z",
+      "relevance_score": 70,
+      "matched_keywords": [
+        "mcts",
+        "process reward",
+        "test-time compute",
+        "reasoning",
+        "hermes",
+        "+mcts",
+        "+process reward"
+      ],
+      "dedup_key": "github_repo:1252198630"
+    },
+    {
+      "type": "github_repo",
+      "id": "1129083520",
+      "name": "dayuwang401/spectral-orthogonal-exploration",
+      "url": "https://github.com/dayuwang401/spectral-orthogonal-exploration",
+      "description": "Official code for \"Student Guides Teacher: Weak-to-Strong Inference via Spectral Orthogonal Exploration\" (SOE, ACL 2026 Oral). A training-free, test-time scaling method that fixes reasoning collapse in LLM mathematical reasoning via orthogonal probing.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T00:54:22Z",
+      "relevance_score": 33,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "reasoning",
+        "qwen",
+        "gemma"
+      ],
+      "dedup_key": "github_repo:1129083520"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221695486",
+      "name": "dinho-afsn/agentic-harness-patterns-skill",
+      "url": "https://github.com/dinho-afsn/agentic-harness-patterns-skill",
+      "description": "Build production patterns for AI coding agents from Claude Code source analysis and harness engineering practice.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-07T03:38:56Z",
+      "relevance_score": 29,
+      "matched_keywords": [
+        "agentic",
+        "claude code",
+        "codex",
+        "coding agent"
+      ],
+      "dedup_key": "github_repo:1221695486"
+    },
+    {
+      "type": "github_repo",
+      "id": "1229033505",
+      "name": "zizhao-hu/llm-alignment-compute-scaling",
+      "url": "https://github.com/zizhao-hu/llm-alignment-compute-scaling",
+      "description": "Audit how safety alignment degrades as a function of test-time compute budget \u2014 best-of-N sampling, extended CoT, and verifier-guided search.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-05-04T16:22:42Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "test-time compute",
+        "best-of-n"
+      ],
+      "dedup_key": "github_repo:1229033505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1277685195",
+      "name": "dhanushcodie/AgentTwo",
+      "url": "https://github.com/dhanushcodie/AgentTwo",
+      "description": "Multi-agent technical architecture pipeline \u2014 turns an AgentOne requirements plan into an in-depth, cost-weighed technical implementation and release plan (Claude Code plugin)",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:44:12Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "multi-agent",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1277685195"
+    },
+    {
+      "type": "github_repo",
+      "id": "1048895505",
+      "name": "IINemo/thinkbooster",
+      "url": "https://github.com/IINemo/thinkbooster",
+      "description": "Open-source framework for test-time compute scaling of LLMs. Includes a visual debugger for inspecting reasoning traces and an endpoint that provides OpenAI-compatible API.",
+      "stars": 26,
+      "language": "Python",
+      "updated_at": "2026-07-06T00:30:20Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1048895505"
+    },
+    {
+      "type": "github_repo",
+      "id": "1259195698",
+      "name": "pr0mila/Frontier-AI-Concepts",
+      "url": "https://github.com/pr0mila/Frontier-AI-Concepts",
+      "description": "A technical reading guide on Mechanistic Interpretability, Test-Time Compute Scaling, and Native Multimodal Pretraining. Built for ML practitioners, not beginners.",
+      "stars": 2,
+      "language": null,
+      "updated_at": "2026-06-27T15:52:37Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "frontier"
+      ],
+      "dedup_key": "github_repo:1259195698"
+    },
+    {
+      "type": "github_repo",
+      "id": "1225965956",
+      "name": "jrajath94/stair-tts-scaling-laws",
+      "url": "https://github.com/jrajath94/stair-tts-scaling-laws",
+      "description": "STAIR: Per-Problem Discrete Structure in Test-Time Compute Scaling for LLM Reasoning \u2014 NeurIPS 2025 submission",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-30T20:44:15Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "test-time compute",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1225965956"
+    },
+    {
+      "type": "github_repo",
+      "id": "856875371",
+      "name": "Multi-Agent-LLMs/lm-evaluation-harness",
+      "url": "https://github.com/Multi-Agent-LLMs/lm-evaluation-harness",
+      "description": "Fork from EleutherAI\u2019s lm\u2011evaluation\u2011harness with added multi\u2011agent and single\u2011agent test\u2011time inference scaling pipelines for LLM evaluation with compute-estimation for the paper \"Multi-Agent Reasoning Improves Compute Efficiency: Pareto-Optimal Scaling of Test-Time\"",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-04-29T10:28:00Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "reasoning",
+        "multi-agent"
+      ],
+      "dedup_key": "github_repo:856875371"
+    },
+    {
+      "type": "github_repo",
+      "id": "1281055667",
+      "name": "TsingFengIceberg/Harness-study",
+      "url": "https://github.com/TsingFengIceberg/Harness-study",
+      "description": "Horizontal study of AI Agent Harness architectures \u2014 comparing DeerFlow, OpenClaw, Claw-Code, Hermes Agent, and Claude Code internals. \u6a2a\u5411\u5b66\u4e60 AI Agent Harness \u67b6\u6784\u8bbe\u8ba1 \u2014 \u5bf9\u6bd4 DeerFlow\u3001OpenClaw\u3001Claw-Code\u3001Hermes Agent \u53ca Claude Code \u5b9e\u73b0\u539f\u7406\u3002",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:48:23Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "hermes"
+      ],
+      "dedup_key": "github_repo:1281055667"
+    },
+    {
+      "type": "github_repo",
+      "id": "1020321366",
+      "name": "leeIITM/layered_diffusion",
+      "url": "https://github.com/leeIITM/layered_diffusion",
+      "description": "This project implements layered image generation using pretrained diffusion models like Stable Diffusion 1.5. It enables staged control of background, midground, and foreground using ControlNet, inpainting, and semantic masks\u2014allowing structured, interpretable image synthesis with minimal compute.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-06-15T14:40:09Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1020321366"
+    },
+    {
+      "type": "github_repo",
+      "id": "1264089013",
+      "name": "Tingyi0819/DL2026_Team2_Sketch-to-Real-Generation",
+      "url": "https://github.com/Tingyi0819/DL2026_Team2_Sketch-to-Real-Generation",
+      "description": "Controllable Image Generation  Using ControlNet or Stable Diffusion, implement a \u201cSketch-to-Real\u201d system where users draw rough outlines and the model generates a high-fidelity images.",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-10T02:12:52Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1264089013"
+    },
+    {
+      "type": "github_repo",
+      "id": "626572346",
+      "name": "kai9987kai/scribble-diffusion",
+      "url": "https://github.com/kai9987kai/scribble-diffusion",
+      "description": "Scribble Diffusion is a small Next.js app powered by Replicate ControlNet. Draw or edit a scribble, describe the image you want, then run generation with optional experiment controls for variations, guidance, seeds, and ControlNet structure modes.",
+      "stars": 0,
+      "language": "JavaScript",
+      "updated_at": "2026-05-19T09:53:11Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:626572346"
+    },
+    {
+      "type": "github_repo",
+      "id": "1199986144",
+      "name": "AI688-Final-Project-Spring-2026/Sketch2Style-ControlNet-Fashion",
+      "url": "https://github.com/AI688-Final-Project-Spring-2026/Sketch2Style-ControlNet-Fashion",
+      "description": "Sketch2Style: A controllable AI fashion design system using Stable Diffusion v1.5 with ControlNet for sketch-conditioned fashion image generation on Fashion-MNIST dataset.",
+      "stars": 0,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-05-23T22:58:48Z",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "github_repo:1199986144"
+    },
+    {
+      "type": "github_repo",
+      "id": "1146238980",
+      "name": "PotatoJnny/Scaling-Law-Guided-search",
+      "url": "https://github.com/PotatoJnny/Scaling-Law-Guided-search",
+      "description": "Scaling-Law Guided (SLG) Search: Optimizing LLM test-time compute via tail estimation and dynamic budget allocation.",
+      "stars": 3,
+      "language": "Python",
+      "updated_at": "2026-06-27T02:33:20Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1146238980"
+    },
+    {
+      "type": "github_repo",
+      "id": "1136703179",
+      "name": "neosun100/Step-Audio-R1.1",
+      "url": "https://github.com/neosun100/Step-Audio-R1.1",
+      "description": "Step-Audio-R1.1: The First Audio Language Model with Test-Time Compute Scaling. All-in-One Docker with vLLM + Web UI + API.",
+      "stars": 4,
+      "language": "Python",
+      "updated_at": "2026-02-27T02:21:16Z",
+      "relevance_score": 9,
+      "matched_keywords": [
+        "test-time compute"
+      ],
+      "dedup_key": "github_repo:1136703179"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221410058",
+      "name": "tammychurchly25/ClaudeCode-Source-Analysis",
+      "url": "https://github.com/tammychurchly25/ClaudeCode-Source-Analysis",
+      "description": "Analyze Claude Code source leaks, map the architecture, and document its TypeScript, Bun, agent, and security systems.",
+      "stars": 1,
+      "language": "Rust",
+      "updated_at": "2026-07-07T03:38:41Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221410058"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221263673",
+      "name": "Angeliquetreated862/claude-code-src",
+      "url": "https://github.com/Angeliquetreated862/claude-code-src",
+      "description": "Explore a public Claude Code source snapshot for security research, supply-chain analysis, and CLI architecture review",
+      "stars": 2,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T03:38:25Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221263673"
+    },
+    {
+      "type": "github_repo",
+      "id": "1221218233",
+      "name": "ptolemaic-programmemusic151/claude-code-book",
+      "url": "https://github.com/ptolemaic-programmemusic151/claude-code-book",
+      "description": "Explore Claude Code CLI architecture and implementation with a clear technical guide from startup flow to advanced query engine design",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T03:38:23Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1221218233"
+    },
+    {
+      "type": "github_repo",
+      "id": "1268701988",
+      "name": "DarkWaterReflection/comfyui-controlnet-scene-control",
+      "url": "https://github.com/DarkWaterReflection/comfyui-controlnet-scene-control",
+      "description": "ControlNet OpenPose workflow in ComfyUI \u2014 same pose, four styles.  Proves creative control over AI image generation using pose extraction,  prompt conditioning, and scene control. Runs on GTX 1650 4GB.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-06-27T09:43:08Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "reflection"
+      ],
+      "dedup_key": "github_repo:1268701988"
+    }
+  ]
+}
