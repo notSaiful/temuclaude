@@ -223,34 +223,13 @@ Layer 3: QA Gate (free, Nemotron)
               <Callout type="tip">Reflexion achieves 91% on HumanEval (vs 80% without). The difference between a model that gives up and one that learns from mistakes.</Callout>
             </section>
 
-            <section id="budget-forcing" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Budget Forcing</h2>
-              <p className="text-text-secondary mb-4">If the answer is suspiciously short for a hard problem, TemuClaude appends "Wait" to force the model to continue reasoning (s1 paper, arXiv:2501.19393):</p>
-              <CodeBlock lang="text" code={`Model answer: "The answer is 42."
-  → Too short for a hard math problem
-  → Append "Wait"
-  → Model continues: "Let me verify... [longer reasoning]"`} />
-            </section>
-
-            <section id="z3-verification" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Z3 Logical Verification</h2>
-              <p className="text-text-secondary mb-4">For reasoning questions, TemuClaude extracts logical claims and checks them with a Z3 SMT solver:</p>
-              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Extracts "if X then Y", "X implies Y" patterns</li>
-                <li>Encodes as Z3 boolean constraints</li>
-                <li>Checks satisfiability (no contradictions)</li>
-                <li>If contradiction found → triggers multi-agent debate</li>
-              </ul>
-              <Callout type="note">Requires z3-solver: <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">pip install z3-solver</code>. Falls back gracefully if not installed.</Callout>
-            </section>
-
             <section id="frontier-fallback" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
-              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to Claude Sonnet 5 (IQ 53 — the highest available):</p>
+              <p className="text-text-secondary mb-4">For the hardest 2% of queries where QA score is below 6, TemuClaude escalates to Claude Sonnet 5 (IQ 53 — the highest available):</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Only triggers when QA score &lt; 0.75 after all retries</li>
-                <li>Query must match frontier criteria (prove, derive, theorem, system design, refactor)</li>
-                <li>Frontier model gets the previous best answer as context</li>
+                <li>Only triggers when QA score &lt; 6 after reflexion</li>
+                <li>Re-scored by Nemotron (not Claude, to avoid conflict)</li>
+                <li>If Nemotron scores the Claude answer higher, it replaces the previous answer</li>
                 <li>Re-scored — if better, replaces the answer</li>
               </ul>
             </section>
