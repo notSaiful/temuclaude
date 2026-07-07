@@ -1,0 +1,172 @@
+{
+  "distilled_at": "20260707T055517",
+  "total_raw_files": 13,
+  "total_findings": 3,
+  "new_findings": 3,
+  "already_distilled": 323,
+  "by_type": {
+    "arxiv_paper": 3
+  },
+  "top_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05339v1",
+      "title": "TREK: Distill to Explore, Reinforce to Refine",
+      "abstract": "Group Relative Policy Optimization (GRPO) is effective when the current policy already samples useful reasoning trajectories, but it stalls on hard prompts whose correct solution modes lie outside the student's on-policy support. We propose TREK (Teacher-Routed Exploration via Forward KL), a simple staged procedure that uses distillation not for imitation but for exploration support expansion. A key advantage of TREK is its generality: because it only consumes verified output trajectories, it ca",
+      "authors": [
+        "Yuanda Xu",
+        "Zhengze Zhou",
+        "Kayhan Behdin",
+        "Jelena Markovic-Voronov",
+        "Hejian Sang",
+        "Xiaomin Li",
+        "Wenhui Zhu",
+        "Xinchen Du",
+        "Aida Rahmattalabi",
+        "Ran He",
+        "Sen Na",
+        "Zhipeng Wang",
+        "Alborz Geramifard"
+      ],
+      "published": "2026-07-06T17:21:16Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "reasoning",
+        "agentic",
+        "deepseek",
+        "qwen"
+      ],
+      "url": "http://arxiv.org/abs/2607.05339v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05339v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05319v1",
+      "title": "Steering Optimisation Trajectories in Diffusion Representation Learning",
+      "abstract": "We study why diffusion autoencoders can achieve similar image quality while learning substantially different latent structures. We trace this behaviour to optimisation dynamics; we analyse curves of image reconstruction against latent representation quality, revealing trajectories that organise around two distinct regimes early in training. Models in the reconstruction regime prioritise image fidelity early, whereas those in the disentanglement regime improve reconstruction and disentanglement m",
+      "authors": [
+        "Rajat Rasal",
+        "Avinash Kori",
+        "Tian Xia",
+        "Ben Glocker"
+      ],
+      "published": "2026-07-06T16:58:05Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "fusion",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.05319v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05319v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05362v1",
+      "title": "Rerouting Curves on Surfaces",
+      "abstract": "We study the problem of reconfiguring a crossing-free embedding of a graph on a surface, with edges represented as curves, into another crossing-free embedding of the same graph on the same surface with the same fixed vertex positions. In this process, we reroute one edge at a time while maintaining crossing-free intermediate embeddings. This problem was introduced by Ito et al. [TALG 2025], who showed that even if the graph is a matching of two edges, reconfiguration is not always possible in t",
+      "authors": [
+        "Timo Brand",
+        "Stefan Felsner",
+        "Henry F\u00f6rster",
+        "Stephen Kobourov",
+        "Anna Lubiw",
+        "Yoshio Okamoto",
+        "J\u00e1nos Pach",
+        "Csaba D. T\u00f3th",
+        "G\u00e9za T\u00f3th",
+        "Torsten Ueckerdt",
+        "Pavel Valtr"
+      ],
+      "published": "2026-07-06T17:38:19Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "routing",
+        "+routing"
+      ],
+      "url": "http://arxiv.org/abs/2607.05362v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05362v1"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05339v1",
+      "title": "TREK: Distill to Explore, Reinforce to Refine",
+      "abstract": "Group Relative Policy Optimization (GRPO) is effective when the current policy already samples useful reasoning trajectories, but it stalls on hard prompts whose correct solution modes lie outside the student's on-policy support. We propose TREK (Teacher-Routed Exploration via Forward KL), a simple staged procedure that uses distillation not for imitation but for exploration support expansion. A key advantage of TREK is its generality: because it only consumes verified output trajectories, it ca",
+      "authors": [
+        "Yuanda Xu",
+        "Zhengze Zhou",
+        "Kayhan Behdin",
+        "Jelena Markovic-Voronov",
+        "Hejian Sang",
+        "Xiaomin Li",
+        "Wenhui Zhu",
+        "Xinchen Du",
+        "Aida Rahmattalabi",
+        "Ran He",
+        "Sen Na",
+        "Zhipeng Wang",
+        "Alborz Geramifard"
+      ],
+      "published": "2026-07-06T17:21:16Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "reasoning",
+        "agentic",
+        "deepseek",
+        "qwen"
+      ],
+      "url": "http://arxiv.org/abs/2607.05339v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05339v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05319v1",
+      "title": "Steering Optimisation Trajectories in Diffusion Representation Learning",
+      "abstract": "We study why diffusion autoencoders can achieve similar image quality while learning substantially different latent structures. We trace this behaviour to optimisation dynamics; we analyse curves of image reconstruction against latent representation quality, revealing trajectories that organise around two distinct regimes early in training. Models in the reconstruction regime prioritise image fidelity early, whereas those in the disentanglement regime improve reconstruction and disentanglement m",
+      "authors": [
+        "Rajat Rasal",
+        "Avinash Kori",
+        "Tian Xia",
+        "Ben Glocker"
+      ],
+      "published": "2026-07-06T16:58:05Z",
+      "relevance_score": 23,
+      "matched_keywords": [
+        "fusion",
+        "benchmark",
+        "+benchmark"
+      ],
+      "url": "http://arxiv.org/abs/2607.05319v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05319v1"
+    },
+    {
+      "type": "arxiv_paper",
+      "id": "http://arxiv.org/abs/2607.05362v1",
+      "title": "Rerouting Curves on Surfaces",
+      "abstract": "We study the problem of reconfiguring a crossing-free embedding of a graph on a surface, with edges represented as curves, into another crossing-free embedding of the same graph on the same surface with the same fixed vertex positions. In this process, we reroute one edge at a time while maintaining crossing-free intermediate embeddings. This problem was introduced by Ito et al. [TALG 2025], who showed that even if the graph is a matching of two edges, reconfiguration is not always possible in t",
+      "authors": [
+        "Timo Brand",
+        "Stefan Felsner",
+        "Henry F\u00f6rster",
+        "Stephen Kobourov",
+        "Anna Lubiw",
+        "Yoshio Okamoto",
+        "J\u00e1nos Pach",
+        "Csaba D. T\u00f3th",
+        "G\u00e9za T\u00f3th",
+        "Torsten Ueckerdt",
+        "Pavel Valtr"
+      ],
+      "published": "2026-07-06T17:38:19Z",
+      "relevance_score": 17,
+      "matched_keywords": [
+        "routing",
+        "+routing"
+      ],
+      "url": "http://arxiv.org/abs/2607.05362v1",
+      "dedup_key": "arxiv_paper:http://arxiv.org/abs/2607.05362v1"
+    }
+  ]
+}

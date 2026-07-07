@@ -113,7 +113,7 @@ export default function HomePage() {
                 Built for builders
               </h2>
               <p className="text-text-secondary">
-                Stop paying $30/M tokens for GPT-5. Stop wrangling multiple APIs.
+                Stop paying $30/M tokens for GPT-5.5. Stop wrangling multiple APIs.
                 One endpoint, frontier quality, a fraction of the cost.
               </p>
             </div>

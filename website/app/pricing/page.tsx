@@ -6,7 +6,7 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 30x lower cost than Claude Sonnet 5.' },
+  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 6x lower cost than Claude Sonnet 5.' },
   { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 20 queries/day, no signup required. Upgrade when you need more.' },
   { q: 'Which models does TemuClaude use?', a: '8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (reasoning), Hy3 Preview (cheapest), Gemini 3 Flash (legal/health), MiniMax M3 (vision/creative), MiMo-V2.5 (multimodal), Claude Sonnet 5 (frontier fallback), and Nemotron 3 Ultra (QA gate, free). We route to the best model automatically.' },
   { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through a 3-layer Mixture-of-Agents, verifies math with code execution, and quality-checks with a self-QA gate on 5 rubrics. You see the whole process in the playground.' },
@@ -82,7 +82,7 @@ export default function PricingPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3 text-center" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Pricing</h1>
           <p className="text-text-secondary text-center mb-10 max-w-xl mx-auto">
-            Frontier-level intelligence at 1/10th the cost. 25% of every payment goes to charity.
+            Frontier-level intelligence at a fraction of the cost. 25% of every payment goes to charity.
           </p>
 
           {/* Price comparison banner */}
@@ -173,7 +173,7 @@ export default function PricingPage() {
               </div>
             </div>
             <p className="text-center text-sm text-text-secondary mt-4">
-              30x cheaper than Claude Sonnet 5 ($3/$15). 15x cheaper than GPT-5.5 ($5/$30). 7x cheaper than GLM-5.2 ($1.40/$4.40).
+              6x cheaper than Claude Sonnet 5 ($3/$15). 10x cheaper than GPT-5.5 ($5/$30). 2.8x cheaper than GLM-5.2 ($1.40/$4.40).
             </p>
           </div>
 
