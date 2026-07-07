@@ -1427,3 +1427,47 @@ async def research_awq_efficiency(
     
     # Synthesize findings into structured result
     # Based on published AWQ
+
+def validate_research_for_integration(report: str, topic: str, min_words: int = DEFAULT_MIN_WORDS) -> Dict:
+    """Validate a research report before passing to the auto-integrator.
+    
+    Returns a dict with 'valid' (bool), 'issues' (list), and 'metrics' (dict).
+    This pre-integration check reduces the 89% implementation fail rate by
+    catching quality problems before the integrator attempts to use the report.
+    """
+    issues = []
+    word_count = len(report.split())
+    has_intro = bool(re.search(r'(?i)^#\s*(introduction|overview|background)', report.strip()))
+    has_conclusion = bool(re.search(r'(?i)(conclusion|summary|final\s+thoughts)', report))
+    has_citations = bool(re.search(r'\[\d+\]|\(https?://|doi:', report))
+    has_sections = report.count('\n#') >= DEFAULT_SECTIONS - 1 or report.count('\n##') >= DEFAULT_SECTIONS
+    topic_mentions = len(re.findall(re.escape(topic.split()[0]), report, re.IGNORECASE))
+    
+    if word_count < min_words:
+        issues.append(f"Word count {word_count} below minimum {min_words}")
+    if not has_intro:
+        issues.append("Missing introduction section")
+    if not has_conclusion:
+        issues.append("Missing conclusion section")
+    if not has_citations:
+        issues.append("No citations or sources found")
+    if not has_sections:
+        issues.append(f"Fewer than {DEFAULT_SECTIONS} sections detected")
+    if topic_mentions < 3:
+        issues.append(f"Topic keyword appears only {topic_mentions} times — may be off-topic")
+    
+    metrics = {
+        "word_count": word_count,
+        "has_intro": has_intro,
+        "has_conclusion": has_conclusion,
+        "has_citations": has_citations,
+        "section_count": max(report.count('\n#'), report.count('\n##')),
+        "topic_mentions": topic_mentions,
+        "quality_score": round(1.0 - (len(issues) / 6.0), 2),
+    }
+    
+    return {
+        "valid": len(issues) == 0,
+        "issues": issues,
+        "metrics": metrics,
+    }
