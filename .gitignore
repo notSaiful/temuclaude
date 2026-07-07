@@ -37,3 +37,6 @@ website/.vercel
 
 # Hermes
 hermes-backup/website/.env.bak
+
+# Graphify (generated AST index, not source code)
+graphify-out/
