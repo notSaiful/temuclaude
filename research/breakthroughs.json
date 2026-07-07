@@ -45,7 +45,7 @@
         }
       ],
       "impact": "A critical finding for Temuclaude is the transfer learning capability. The paper shows that routers trained on one model pair (e.g., GPT-4 vs Mixtral-8x7B) maintain their performance even when the str",
-      "source": "2606.30217 \u00b7 2511.16664 \u00b7 2406.18665",
+      "source": "2606.30217 \u00b7 2605.18796 \u00b7 2511.16664",
       "date": "2026-07-07",
       "reportFile": "deep_research_efficiency_routellm_cascade_20260706T214240.md",
       "lines": 371
@@ -95,7 +95,7 @@
         }
       ],
       "impact": "The KDS paper (arXiv:2507.05604) from Google DeepMind and the University of Michigan introduces N-particle ensembling for diffusion models. KDS employs an N-particle ensemble of diffusion samples that",
-      "source": "2501.09732 \u00b7 2507.05604 \u00b7 2604.06260",
+      "source": "2311.04287 \u00b7 2507.05604 \u00b7 2501.09732",
       "date": "2026-07-06",
       "reportFile": "deep_research_media_generation_2026-07-06.md",
       "lines": 97
@@ -145,7 +145,7 @@
         }
       ],
       "impact": "- **What**: Objectives are qualitative, inspirational goals. Key Results are quantitative measures (3-5 per objective) that indicate progress. - **How",
-      "source": "2402.18679 \u00b7 2302.04761 \u00b7 2308.11432",
+      "source": "2406.18532 \u00b7 2308.11432 \u00b7 2308.10848",
       "date": "2026-07-04",
       "reportFile": "deep_research_management_science_2026-07-03.md",
       "lines": 851
@@ -195,7 +195,7 @@
         }
       ],
       "impact": "- **** HIGHLY INTEGRABLE. Temuclaude's current panel+judge is essentially a 2-layer MoA. Adding a 3rd layer where the 5 models (GLM-5.2, DeepSeek V4, Kimi K2.6, MiniMax M3, Nemotron) first propose, th",
-      "source": "github.com/EnnengYang/Awesome-Model-Merging-Methods-Theories-Applications \u00b7 github.com/hemingkx/SpeculativeDecodingPapers \u00b7 github.com/TogetherAI/MoA",
+      "source": "2511.11306 \u00b7 2408.07666 \u00b7 2502.00674",
       "date": "2026-07-04",
       "reportFile": "deep_research_orchestration_2026-07-03.md",
       "lines": 339
@@ -220,7 +220,7 @@
         }
       ],
       "impact": "-  HIGH PRIORITY \u2014 upgrade to MIPROv2 for joint instruction+demo optimization",
-      "source": "github.com/NousResearch/hermes-agent-self-evolution \u00b7 github.com/stanfordnlp/dspy \u00b7 2406.04692",
+      "source": "github.com/stanfordnlp/dspy \u00b7 github.com/NousResearch/hermes-agent-self-evolution \u00b7 2406.04692",
       "date": "2026-07-04",
       "reportFile": "deep_research_agent_arch_2026-07-03.md",
       "lines": 268
@@ -245,7 +245,7 @@
         }
       ],
       "impact": "-  HIGH PRIORITY \u2014 MCTS + PPM is the architecture Temuclaude already planned",
-      "source": "2303.11366 \u00b7 2302.04761 \u00b7 2305.14992",
+      "source": "2305.10601 \u00b7 2501.04519 \u00b7 2305.20050",
       "date": "2026-07-04",
       "reportFile": "deep_research_reasoning_2026-07-03.md",
       "lines": 206
@@ -276,6 +276,6 @@
       "lines": 240
     }
   ],
-  "totalReports": 87,
-  "lastUpdated": "2026-07-07T14:45:48.956345"
+  "totalReports": 90,
+  "lastUpdated": "2026-07-07T15:07:20.572529"
 }

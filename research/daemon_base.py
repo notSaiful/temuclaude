@@ -26,6 +26,12 @@ DAEMON_STATE_DIR.mkdir(exist_ok=True)
 class DaemonBase(ABC):
     """Base class for all research swarm daemons."""
     
+    # Circuit breaker: track crash count per daemon
+    _crash_counts: Dict[str, int] = {}
+    _crash_window: Dict[str, float] = {}
+    CIRCUIT_BREAKER_THRESHOLD = 3  # 3 crashes in 10 min = stay dead
+    CIRCUIT_BREAKER_WINDOW = 600  # 10 minutes in seconds
+    
     def __init__(self, name: str, config: Optional[Dict[str, Any]] = None):
         self.name = name
         self.config = config or {}
@@ -35,6 +41,7 @@ class DaemonBase(ABC):
         self.running = False
         self._idle = False
         self._heartbeat_extra = {}
+        self._last_success_time = time.time()
         self.logger = self._setup_logger()
         
         # Verify Hasan core identity at startup
@@ -130,17 +137,44 @@ class DaemonBase(ABC):
         pass
     
     def _heartbeat_loop(self):
-        """Background heartbeat thread — updates every 30s while running."""
+        """Background heartbeat thread — updates every 30s while running.
+        Also broadcasts to shared intelligence hub so all daemons know each other."""
         while self.running:
             try:
                 status = "sleeping" if self._idle else "running"
                 self.write_heartbeat(status, self._heartbeat_extra or {})
+                # Broadcast to shared intelligence hub
+                _si.update_state(self.name, status, {
+                    "pid": os.getpid(),
+                    "last_success": self._last_success_time,
+                    **(self._heartbeat_extra or {})
+                })
             except Exception:
                 pass
             time.sleep(30)
 
     def run(self, interval: float = 60.0):
-        """Main daemon loop with background heartbeat thread."""
+        """Main daemon loop with background heartbeat thread.
+        Includes circuit breaker: 3 crashes in 10 minutes = stop daemon."""
+        # Circuit breaker check
+        now = time.time()
+        if self.name in DaemonBase._crash_counts:
+            # Reset crash count if outside the window
+            if now - DaemonBase._crash_window.get(self.name, 0) > DaemonBase.CIRCUIT_BREAKER_WINDOW:
+                DaemonBase._crash_counts[self.name] = 0
+            elif DaemonBase._crash_counts[self.name] >= DaemonBase.CIRCUIT_BREAKER_THRESHOLD:
+                self.logger.error(
+                    f"{self.name} circuit breaker tripped — "
+                    f"{DaemonBase._crash_counts[self.name]} crashes in 10min. Staying dead."
+                )
+                # Notify shared intelligence about the circuit break
+                try:
+                    _si.broadcast(self.name, "circuit_break", 
+                                  f"Circuit breaker tripped — {self.name} staying dead after 3 crashes")
+                except Exception:
+                    pass
+                sys.exit(1)
+
         if self.is_already_running():
             self.logger.error(f"{self.name} already running (PID file exists)")
             sys.exit(1)
@@ -149,6 +183,7 @@ class DaemonBase(ABC):
         self.running = True
         self._idle = False
         self._heartbeat_extra = {}
+        self._last_success_time = time.time()
         self.logger.info(f"{self.name} started (PID: {os.getpid()})")
 
         # Start background heartbeat thread
@@ -164,11 +199,20 @@ class DaemonBase(ABC):
                 should_continue = self.run_once()
 
                 elapsed = time.time() - start
+                self._last_success_time = time.time()
                 self._idle = True
                 self._heartbeat_extra = {
                     "cycle_duration": round(elapsed, 2),
                     "last_run": datetime.now(timezone.utc).isoformat(),
                 }
+
+                # Broadcast successful cycle to shared intelligence
+                try:
+                    _si.broadcast(self.name, "cycle_complete",
+                                  f"Cycle completed in {elapsed:.1f}s",
+                                  {"duration": round(elapsed, 2)})
+                except Exception:
+                    pass
 
                 if not should_continue:
                     self.logger.info("run_once returned False, stopping")
@@ -183,7 +227,27 @@ class DaemonBase(ABC):
                 self.logger.exception(f"Error in main loop: {e}")
                 self._heartbeat_extra = {"error": str(e)}
                 self._idle = True
+                # Track crash for circuit breaker
+                DaemonBase._crash_counts[self.name] = DaemonBase._crash_counts.get(self.name, 0) + 1
+                DaemonBase._crash_window[self.name] = time.time()
+                self.logger.warning(
+                    f"Crash count for {self.name}: {DaemonBase._crash_counts[self.name]}/"
+                    f"{DaemonBase.CIRCUIT_BREAKER_THRESHOLD}"
+                )
+                # Broadcast crash to shared intelligence
+                try:
+                    _si.broadcast(self.name, "crash", f"Crashed: {e}",
+                                  {"crash_count": DaemonBase._crash_counts[self.name]})
+                except Exception:
+                    pass
                 time.sleep(30)  # Back off on error
+
+        # Broadcast shutdown
+        try:
+            _si.update_state(self.name, "stopped", {"pid": os.getpid()})
+            _si.broadcast(self.name, "shutdown", f"{self.name} shutting down")
+        except Exception:
+            pass
 
         self.cleanup()
 

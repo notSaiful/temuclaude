@@ -127,7 +127,23 @@
       "type": "restart",
       "message": "growth_daemon: no PID file, restarting",
       "extra": {}
+    },
+    {
+      "id": "evt_1783417125654_watchdog",
+      "timestamp": "2026-07-07T15:08:45.654299",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783417125654_test",
+      "timestamp": "2026-07-07T15:08:45.654948",
+      "daemon": "test",
+      "type": "test_event",
+      "message": "Testing shared intelligence",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T14:19:19.506580"
+  "last_update": "2026-07-07T15:08:45.654956"
 }

@@ -41,3 +41,20 @@ hermes-backup/website/.env.bak
 # Graphify (generated AST index, not source code)
 graphify-out/
 hasan-deploy/node_modules/
+
+# Runtime state files (constantly changing, not source code)
+research/live_state.json
+research/daemon_metrics.json
+research/shared_state/events.json
+research/shared_state/swarm_state.json
+research/shared_state/knowledge.json
+research/shared_state/intelligence.json
+research/feedback_adjustments.json
+research/priorities.json
+research/PRIORITY_REPORT.md
+research/queue.json
+research/queue.lock
+research/cost_data.json
+research/breakthroughs.json
+research/deployment/
+research/live_state_sync.json
