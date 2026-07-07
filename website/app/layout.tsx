@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 10-layer pipeline. 25x cheaper. Open source. 25% to the Ummah.',
+    description: '8 models. 10-layer pipeline. 25x cheaper. Open source. 25% to charity.',
     images: ['/og-image.png'],
     site: '@temuclaude',
   },

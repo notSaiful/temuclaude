@@ -16,7 +16,7 @@ const faqs = [
   { q: 'Can I cancel anytime?', a: 'Yes. No contracts. Cancel anytime from your dashboard or contact us.' },
   { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users pay per token: $0.50/M input, $2.00/M output, $0.05/M cached input. Contact us to set up metered billing.' },
   { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to free models, 30% to ultra-cheap models ($0.06-0.14/M), and only 10% to premium models. Our 3-layer MoA fusion makes cheap models together smarter than one expensive model alone. You get frontier-level answers at a fraction of the cost.' },
-  { q: 'Does TemuClaude support the Ummah?', a: 'Yes. 25% of all profit goes to verified Muslim charities — Palestine food relief, community kitchens, orphan feeding, medical clinics, and Islamic schools. Every query you make helps feed children and build infrastructure for the Ummah.' },
+  { q: 'Does TemuClaude give back to the community?', a: 'Yes. 25% of all profit goes to verified charitable causes — food relief, community kitchens, medical clinics, and education programs. Every query you make helps.' },
 ];
 
 export default function PricingPage() {
