@@ -449,11 +449,11 @@ export default function HomePage() {
 
             <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-3 mb-10">
               {[
-                { name: 'Landing Page', cat: 'Website', cost: '$0.012', size: '23KB', color: '#E25822' },
-                { name: '2048 Game', cat: 'Game', cost: '$0.005', size: '11KB', color: '#788C5D' },
-                { name: 'Solar System', cat: 'Webpage', cost: '$0.007', size: '14KB', color: '#C46686' },
-                { name: 'Particle Galaxy', cat: 'Animation', cost: '$0.006', size: '11KB', color: '#E8B547' },
-                { name: 'Agent Swarm', cat: 'AI System', cost: '$0.003', size: '8KB', color: '#5D9CEC' },
+                { name: 'Landing Page', cat: 'Website', cost: '$0.012', size: '31KB', color: '#6366f1' },
+                { name: '2048 Game', cat: 'Game', cost: '$0.010', size: '21KB', color: '#788C5D' },
+                { name: 'Solar System', cat: 'Webpage', cost: '$0.008', size: '16KB', color: '#C46686' },
+                { name: 'Particle Galaxy', cat: 'Animation', cost: '$0.006', size: '12KB', color: '#E8B547' },
+                { name: 'Agent Swarm', cat: 'AI System', cost: '$0.015', size: '44KB', color: '#5D9CEC' },
               ].map((p, i) => (
                 <div key={i} className="card" style={{ padding: '16px' }}>
                   <div className="flex items-center gap-2 mb-2">

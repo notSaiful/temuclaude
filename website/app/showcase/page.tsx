@@ -4,68 +4,67 @@ const projects = [
   {
     name: 'SaaS Landing Page',
     category: 'Website',
-    description: 'A complete, production-quality landing page with animated hero, glassmorphism feature cards, scroll reveals, pricing section, and testimonials carousel.',
+    description: 'A complete "Nebula" analytics SaaS landing page with animated gradient mesh hero, floating shapes with mouse parallax, glassmorphism bento grid features, count-up stats, testimonials carousel, and pricing with monthly/annual toggle. Dark theme with indigo-to-pink gradients.',
     url: '/showcase/website.html',
-    tokens: 8127,
-    cost: '$0.0117',
-    time: '118.8s',
-    size: '23KB',
-    accent: '#E25822',
+    tokens: 8183,
+    cost: '$0.012',
+    time: '137s',
+    size: '31KB',
+    accent: '#6366f1',
   },
   {
     name: '2048 Game',
     category: 'Game',
-    description: 'A polished 2048 game with smooth tile animations, keyboard and touch swipe controls, score tracking with localStorage, game over overlay, and win celebration.',
+    description: 'A polished 2048 game with glassmorphism tiles, unique gradient colors per value, smooth slide and merge pop animations, keyboard and touch swipe controls, localStorage score tracking, game over overlay, and win celebration.',
     url: '/showcase/game.html',
-    tokens: 3668,
-    cost: '$0.0053',
-    time: '117.0s',
-    size: '11KB',
+    tokens: 6671,
+    cost: '$0.010',
+    time: '77s',
+    size: '21KB',
     accent: '#788C5D',
   },
   {
     name: 'Interactive Solar System',
     category: 'Webpage',
-    description: 'All 8 planets orbiting the sun with relative speeds, twinkling starfield, click planets for info, zoom and pan controls, orbit paths, and particle trails.',
+    description: 'All 8 planets orbiting a glowing pulsing sun with correct relative speeds. Saturn has rings. 200+ twinkling stars. Click planets for info panels. Mouse wheel zoom, click-drag pan. Orbit paths, planet trails, 60fps animation.',
     url: '/showcase/solar.html',
-    tokens: 5145,
-    cost: '$0.0074',
-    time: '97.5s',
-    size: '14KB',
+    tokens: 5467,
+    cost: '$0.008',
+    time: '85s',
+    size: '16KB',
     accent: '#C46686',
   },
   {
     name: 'Particle Galaxy',
     category: 'Animation',
-    description: '1000+ particles forming a rotating spiral galaxy with warm center and cool edges. Mouse attraction, click explosions, glow effects, and FPS counter.',
+    description: '1500+ particles forming a rotating spiral galaxy with warm center and cool edges. Mouse attraction, click shockwave explosions, glow effects, nebula gradient background, FPS counter, and reset button.',
     url: '/showcase/particles.html',
-    tokens: 3830,
-    cost: '$0.0055',
-    time: '88.4s',
-    size: '11KB',
+    tokens: 4272,
+    cost: '$0.006',
+    time: '60s',
+    size: '12KB',
     accent: '#E8B547',
   },
   {
-    name: 'Agent Swarm',
-    category: 'Agent System',
-    description: 'A 3-agent research pipeline (Researcher, Analyzer, Writer) that collaborates to produce a full research report on AI orchestration. Built and executed via the API.',
-    url: '/showcase/swarm.py',
-    tokens: 2250,
-    cost: '$0.0032',
-    time: '82.8s',
-    size: '8KB',
+    name: 'Agent Swarm Dashboard',
+    category: 'AI System',
+    description: 'A visual dashboard showing 3 AI agents (Researcher, Analyzer, Writer) collaborating in real-time. Animated progress bars, flowing connection lines, token counters, output previews, and a replay button. Uses real data from the swarm execution.',
+    url: '/showcase/swarm.html',
+    tokens: 10488,
+    cost: '$0.015',
+    time: '88s',
+    size: '44KB',
     accent: '#5D9CEC',
-    runTokens: 8761,
-    runCost: '$0.0126',
-    runTime: '208.2s',
   },
 ];
 
-const totalBuildTokens = 23020;
-const totalBuildCost = '$0.0331';
-const totalRunTokens = 8761;
-const totalRunCost = '$0.0126';
-const grandTotal = '$0.0457';
+const swarmBuildTokens = 2250;
+const swarmBuildCost = '$0.003';
+const swarmRunTokens = 8761;
+const swarmRunCost = '$0.013';
+const swarmRunTime = '208s';
+const totalBuildTokens = 37331;
+const totalBuildCost = '$0.054';
 
 export default function ShowcasePage() {
   return (
@@ -88,19 +87,19 @@ export default function ShowcasePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
                 <div className="text-2xl font-serif text-text-primary" style={{ fontWeight: 300 }}>{totalBuildTokens.toLocaleString()}</div>
-                <div className="text-xs text-text-muted mt-1">tokens to build all 5</div>
+                <div className="text-xs text-text-muted mt-1">total tokens used</div>
               </div>
               <div>
                 <div className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300 }}>{totalBuildCost}</div>
-                <div className="text-xs text-text-muted mt-1">cost to build all 5</div>
-              </div>
-              <div>
-                <div className="text-2xl font-serif text-text-primary" style={{ fontWeight: 300 }}>{(totalBuildTokens + totalRunTokens).toLocaleString()}</div>
-                <div className="text-xs text-text-muted mt-1">total tokens (build + run)</div>
-              </div>
-              <div>
-                <div className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300 }}>{grandTotal}</div>
                 <div className="text-xs text-text-muted mt-1">total cost (build + run)</div>
+              </div>
+              <div>
+                <div className="text-2xl font-serif text-text-primary" style={{ fontWeight: 300 }}>124KB</div>
+                <div className="text-xs text-text-muted mt-1">total code generated</div>
+              </div>
+              <div>
+                <div className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300 }}>5</div>
+                <div className="text-xs text-text-muted mt-1">complete projects</div>
               </div>
             </div>
           </div>
@@ -125,29 +124,32 @@ export default function ShowcasePage() {
                     <div className="text-[10px] text-text-muted mt-0.5">cost</div>
                   </div>
                   <div className="bg-bg-tertiary/40 rounded-sm py-2 px-1">
-                    <div className="text-sm font-mono text-text-primary">{project.time}</div>
-                    <div className="text-[10px] text-text-muted mt-0.5">gen time</div>
+                    <div className="text-sm font-mono text-text-primary">{project.size}</div>
+                    <div className="text-[10px] text-text-muted mt-0.5">code size</div>
                   </div>
                 </div>
 
-                {project.runTokens && (
+                {project.name === 'Agent Swarm Dashboard' && (
                   <div className="mb-4 p-3 rounded-sm" style={{ background: 'rgba(93,156,236,0.05)', border: '1px solid rgba(93,156,236,0.15)' }}>
-                    <div className="text-xs text-text-muted mb-1">After execution (3 agents collaborating):</div>
+                    <div className="text-xs text-text-muted mb-1">The swarm was also executed (3 agents collaborating):</div>
                     <div className="flex gap-4 text-xs font-mono">
-                      <span className="text-text-primary">{project.runTokens.toLocaleString()} tokens</span>
-                      <span className="text-accent-primary">{project.runCost}</span>
-                      <span className="text-text-muted">{project.runTime}</span>
+                      <span className="text-text-primary">{swarmRunTokens.toLocaleString()} tokens</span>
+                      <span className="text-accent-primary">{swarmRunCost}</span>
+                      <span className="text-text-muted">{swarmRunTime}</span>
+                    </div>
+                    <div className="mt-2">
+                      <a href="/showcase/swarm.py" className="text-xs text-accent-primary hover:underline">View Python source →</a>
                     </div>
                   </div>
                 )}
 
                 <a
                   href={project.url}
-                  target={project.url.endsWith('.html') ? '_blank' : undefined}
-                  rel={project.url.endsWith('.html') ? 'noopener noreferrer' : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="btn-secondary w-full justify-center"
                 >
-                  {project.url.endsWith('.html') ? 'View Live' : 'View Source'}
+                  View Live
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </a>
               </div>
@@ -159,24 +161,22 @@ export default function ShowcasePage() {
             <h2 className="text-xl font-semibold text-text-primary mb-4">How this works</h2>
             <div className="space-y-3 text-sm text-text-secondary">
               <p>
-                <strong className="text-text-primary">1.</strong> A single prompt was sent to the TemuClaude API
-                (<code className="text-xs bg-bg-tertiary px-1.5 py-0.5 rounded font-mono">POST /v1/chat/completions</code>)
-                for each project. The API ran the full 8-model orchestration pipeline — classifying the task,
-                routing to the best models, fusing their outputs, and quality-checking the result.
+                <strong className="text-text-primary">1.</strong> A single prompt was sent to TemuClaude
+                for each project. The API routed the request through its 8-model orchestration pipeline,
+                selecting the best model for code generation.
               </p>
               <p>
-                <strong className="text-text-primary">2.</strong> The returned code was saved as-is — no edits,
-                no cherry-picking. What you see is exactly what the API produced.
+                <strong className="text-text-primary">2.</strong> The returned code was saved as-is —
+                no edits, no cherry-picking. What you see is exactly what the API produced.
               </p>
               <p>
-                <strong className="text-text-primary">3.</strong> Token counts and costs are from the actual API
-                response <code className="text-xs bg-bg-tertiary px-1.5 py-0.5 rounded font-mono">usage</code> field.
-                Cost is calculated at $1.44/M tokens (blended average).
+                <strong className="text-text-primary">3.</strong> Token counts and costs are from the
+                actual API response. Cost is calculated at $1.44/M tokens (blended average).
               </p>
               <p>
-                <strong className="text-text-primary">4.</strong> The agent swarm was then executed — 3 agents
-                (Researcher, Analyzer, Writer) each made their own API calls, collaborating to produce a
-                full research report on AI orchestration. That cost is tracked separately.
+                <strong className="text-text-primary">4.</strong> The agent swarm was then executed —
+                3 agents (Researcher, Analyzer, Writer) each made their own API calls, collaborating
+                to produce a full research report. The dashboard visualizes that execution.
               </p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function ShowcasePage() {
           {/* CTA */}
           <div className="mt-12 text-center">
             <p className="text-sm text-text-muted mb-4">
-              Total cost to build and run everything: <strong className="text-accent-primary">{grandTotal}</strong>.
+              Total cost to build and run everything: <strong className="text-accent-primary">{totalBuildCost}</strong>.
               That's less than a single Claude API call.
             </p>
             <a href="/playground" className="btn-accent">
