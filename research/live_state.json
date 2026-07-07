@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07T09:41:13.493937",
+  "timestamp": "2026-07-07T09:41:53.559391",
   "system": "hasan",
   "status": "all_systems_nominal",
   "daemons": {
@@ -25,7 +25,7 @@
         "heartbeatAge": null,
         "extra": {
           "cycle_duration": 0.0,
-          "last_run": "2026-07-07T04:10:55.496254+00:00"
+          "last_run": "2026-07-07T04:11:25.502025+00:00"
         }
       },
       {
@@ -79,8 +79,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.02,
-          "last_run": "2026-07-07T04:09:47.063296+00:00"
+          "cycle_duration": 0.04,
+          "last_run": "2026-07-07T04:10:47.089490+00:00"
         }
       },
       {
@@ -101,8 +101,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.02,
-          "last_run": "2026-07-07T04:06:37.806086+00:00"
+          "cycle_duration": 0.01,
+          "last_run": "2026-07-07T04:11:37.803656+00:00"
         }
       },
       {
@@ -307,6 +307,36 @@
   },
   "activity": [
     {
+      "time": "2026-07-07 09:41:37",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "Top efficiency priority: routellm_cascade (score: 125, quality: quality_preserving)"
+    },
+    {
+      "time": "2026-07-07 09:41:37",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "Already researched routellm_cascade this session, skipping"
+    },
+    {
+      "time": "2026-07-07 09:41:37",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "Already researched routellm_cascade this session, skipping"
+    },
+    {
+      "time": "2026-07-07 09:41:37",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "=== Efficiency research cycle 6 complete ==="
+    },
+    {
+      "time": "2026-07-07 09:41:37",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "=== Efficiency research cycle 6 complete ==="
+    },
+    {
       "time": "2026-07-07 09:40:31",
       "daemon": "research_daemon_2",
       "level": "INFO",
@@ -455,36 +485,6 @@
       "daemon": "media_daemon",
       "level": "INFO",
       "message": "Created media research prompt: research_prompt_media_s3_verifier_guided_denoising_20260707T040747.txt"
-    },
-    {
-      "time": "2026-07-07 09:37:47",
-      "daemon": "media_daemon",
-      "level": "INFO",
-      "message": "Media research report queued: deep_research_media_s3_verifier_guided_denoising_20260707T040747.md"
-    },
-    {
-      "time": "2026-07-07 09:37:47",
-      "daemon": "media_daemon",
-      "level": "INFO",
-      "message": "=== Media research cycle 1 complete ==="
-    },
-    {
-      "time": "2026-07-07 09:37:45",
-      "daemon": "coordinator_daemon",
-      "level": "INFO",
-      "message": "Started media_daemon (PID: 44048)"
-    },
-    {
-      "time": "2026-07-07 09:37:33",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "Top priority: marketing_strategy (score: 145)"
-    },
-    {
-      "time": "2026-07-07 09:37:33",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
     }
   ],
   "identity": {
