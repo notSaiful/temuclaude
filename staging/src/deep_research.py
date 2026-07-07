@@ -504,35 +504,32 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
         )},
     ]
 
-def classify_efficiency_finding(technique_name: str, speedup_factor: float,
-                                 memory_savings_pct: float, quality_loss_pct: float,
-                                 quality_metric: str = "accuracy") -> str:
+def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, quality_loss_pct: float) -> str:
+    """Classify an efficiency finding according to quality guardrails.
+    
+    Categories:
+    - LOSSLESS: speedup/savings with zero quality loss
+    - QUALITY-PRESERVING: speedup/savings with negligible quality loss (< 2%)
+    - PARETO-OPTIMAL: meaningful speedup/savings with acceptable quality tradeoff
+    - REJECTED: insufficient benefit or excessive quality loss
     """
-    Classify an efficiency finding into one of four categories.
-
-    Categories (per quality guardrail):
-      - LOSSLESS: speedup/memory savings with zero measurable quality loss
-      - QUALITY-PRESERVING: quality loss < 1% on the primary metric
-      - PARETO-OPTIMAL: meaningful speedup/savings with small, acceptable trade-off
-      - REJECTED: quality degradation too severe relative to gains
-
-    AWQ (Activation-aware Weight Quantization) example:
-      speedup ~2-3x, memory ~50-65% savings, quality loss ~0.5-1.5%
-      => typically QUALITY-PRESERVING or PARETO-OPTIMAL
-
-    Returns one of: "LOSSLESS", "QUALITY-PRESERVING", "PARETO-OPTIMAL", "REJECTED"
-    """
-    if quality_loss_pct <= 0.0 and (speedup_factor > 1.0 or memory_savings_pct > 0.0):
+    has_speedup = speedup_factor > 1.0
+    has_savings = cost_savings_pct > 0.0
+    has_benefit = has_speedup or has_savings
+    
+    if not has_benefit:
+        return "REJECTED"
+    
+    if quality_loss_pct <= 0.0:
         return "LOSSLESS"
-
-    if quality_loss_pct < 1.0 and (speedup_factor >= 1.5 or memory_savings_pct >= 20.0):
+    
+    if quality_loss_pct < 2.0:
         return "QUALITY-PRESERVING"
-
-    # Pareto-optimal: gains must be substantial relative to loss
-    gain_score = (speedup_factor - 1.0) * 10 + memory_savings_pct / 5.0
-    if gain_score > quality_loss_pct * 3 and quality_loss_pct < 5.0:
+    
+    benefit_score = (speedup_factor - 1.0) * 10 + cost_savings_pct / 10.0
+    if benefit_score > quality_loss_pct:
         return "PARETO-OPTIMAL"
-
+    
     return "REJECTED"
 def build_competitor_analysis_prompt(technology: str, competitor: str, topic: str) -> List[Dict]:
     """Build a prompt for researching a technology against a competitor (e.g., AWQ vs vLLM).
