@@ -47,7 +47,55 @@
       "type": "restart",
       "message": "revenue_daemon: no PID file, restarting",
       "extra": {}
+    },
+    {
+      "id": "evt_1783404939742_watchdog",
+      "timestamp": "2026-07-07T11:45:39.742343",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783404956789_watchdog",
+      "timestamp": "2026-07-07T11:45:56.789729",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783404971810_watchdog",
+      "timestamp": "2026-07-07T11:46:11.810361",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783404988841_watchdog",
+      "timestamp": "2026-07-07T11:46:28.841965",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783405003864_watchdog",
+      "timestamp": "2026-07-07T11:46:43.864814",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783405020909_watchdog",
+      "timestamp": "2026-07-07T11:47:00.909869",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T10:45:40.896203"
+  "last_update": "2026-07-07T11:47:00.909879"
 }
