@@ -1,0 +1,180 @@
+{
+  "distilled_at": "20260707T162437",
+  "total_raw_files": 23,
+  "total_findings": 5,
+  "new_findings": 5,
+  "already_distilled": 340,
+  "by_type": {
+    "github_repo": 5
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1292273952",
+      "name": "firststone-vc/reasoning-pack",
+      "url": "https://github.com/firststone-vc/reasoning-pack",
+      "description": "Make a cheap model reason like Claude Fable 5 - 11 installable Claude skills: plan-then-execute, self-consistency, reflexion, tree-of-thoughts, verification and more. MIT.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T12:06:06Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "verification",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1292273952"
+    },
+    {
+      "type": "github_repo",
+      "id": "1292054362",
+      "name": "Jarroslav/agentic-os",
+      "url": "https://github.com/Jarroslav/agentic-os",
+      "description": "Portable, governed multi-agent architecture for Claude Code \u2014 install role presets, HITL escalation gates, and an SDLC pipeline into any repo in one interview.",
+      "stars": 0,
+      "language": "HTML",
+      "updated_at": "2026-07-07T15:35:53Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1292054362"
+    },
+    {
+      "type": "github_repo",
+      "id": "1208041950",
+      "name": "Aethis-ai/confidently-wrong-benchmark",
+      "url": "https://github.com/Aethis-ai/confidently-wrong-benchmark",
+      "description": "Benchmark dataset for 'Confidently Wrong: Exception Chain Collapse in Frontier LLM Rule Evaluation' \u2014 225 scenarios across 4 domains",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T16:04:56Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "benchmark",
+        "frontier",
+        "+benchmark"
+      ],
+      "dedup_key": "github_repo:1208041950"
+    },
+    {
+      "type": "github_repo",
+      "id": "1183638378",
+      "name": "timothywarner-org/claude-architect",
+      "url": "https://github.com/timothywarner-org/claude-architect",
+      "description": "Study materials, code examples, and practice scenarios for Anthropic's Claude Certified Architect: Foundations (CCA-F) certification exam. Covers all five exam domains: agentic architecture, MCP integration, Claude Code workflows, prompt engineering, and context management.",
+      "stars": 43,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-07-07T15:33:08Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1183638378"
+    },
+    {
+      "type": "github_repo",
+      "id": "1231038355",
+      "name": "ninthhousestudios/vidhi",
+      "url": "https://github.com/ninthhousestudios/vidhi",
+      "description": "Engineering methodology skills for Claude Code agents \u2014 planning, TDD, diagnosis, architecture",
+      "stars": 0,
+      "language": "Shell",
+      "updated_at": "2026-07-07T15:42:22Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1231038355"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1292273952",
+      "name": "firststone-vc/reasoning-pack",
+      "url": "https://github.com/firststone-vc/reasoning-pack",
+      "description": "Make a cheap model reason like Claude Fable 5 - 11 installable Claude skills: plan-then-execute, self-consistency, reflexion, tree-of-thoughts, verification and more. MIT.",
+      "stars": 0,
+      "language": null,
+      "updated_at": "2026-07-07T12:06:06Z",
+      "relevance_score": 31,
+      "matched_keywords": [
+        "self-consistency",
+        "chain-of-thought",
+        "verification",
+        "reasoning"
+      ],
+      "dedup_key": "github_repo:1292273952"
+    },
+    {
+      "type": "github_repo",
+      "id": "1292054362",
+      "name": "Jarroslav/agentic-os",
+      "url": "https://github.com/Jarroslav/agentic-os",
+      "description": "Portable, governed multi-agent architecture for Claude Code \u2014 install role presets, HITL escalation gates, and an SDLC pipeline into any repo in one interview.",
+      "stars": 0,
+      "language": "HTML",
+      "updated_at": "2026-07-07T15:35:53Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1292054362"
+    },
+    {
+      "type": "github_repo",
+      "id": "1208041950",
+      "name": "Aethis-ai/confidently-wrong-benchmark",
+      "url": "https://github.com/Aethis-ai/confidently-wrong-benchmark",
+      "description": "Benchmark dataset for 'Confidently Wrong: Exception Chain Collapse in Frontier LLM Rule Evaluation' \u2014 225 scenarios across 4 domains",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T16:04:56Z",
+      "relevance_score": 19,
+      "matched_keywords": [
+        "benchmark",
+        "frontier",
+        "+benchmark"
+      ],
+      "dedup_key": "github_repo:1208041950"
+    },
+    {
+      "type": "github_repo",
+      "id": "1183638378",
+      "name": "timothywarner-org/claude-architect",
+      "url": "https://github.com/timothywarner-org/claude-architect",
+      "description": "Study materials, code examples, and practice scenarios for Anthropic's Claude Certified Architect: Foundations (CCA-F) certification exam. Covers all five exam domains: agentic architecture, MCP integration, Claude Code workflows, prompt engineering, and context management.",
+      "stars": 43,
+      "language": "Jupyter Notebook",
+      "updated_at": "2026-07-07T15:33:08Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1183638378"
+    },
+    {
+      "type": "github_repo",
+      "id": "1231038355",
+      "name": "ninthhousestudios/vidhi",
+      "url": "https://github.com/ninthhousestudios/vidhi",
+      "description": "Engineering methodology skills for Claude Code agents \u2014 planning, TDD, diagnosis, architecture",
+      "stars": 0,
+      "language": "Shell",
+      "updated_at": "2026-07-07T15:42:22Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1231038355"
+    }
+  ]
+}

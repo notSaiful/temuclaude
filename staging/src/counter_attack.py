@@ -390,70 +390,59 @@ def cognitive_firewall(
 def cognitive_firewall_4gate(
     input_text: str,
     context: dict,
-    risk_threshold: float = 0.7,
-    enable_adaptive_learning: bool = True,
-) -> DefenseResponse:
+    counter_system: "CounterAttackSystem",
+    threshold: float = 0.02
+) -> tuple[bool, dict]:
     """
     4-Gate Zero-Trust Cognitive Firewall.
     
-    Gate 1: Syntactic & Semantic Sanitization (structure validation)
-    Gate 2: Intent & Behavioral Analysis (anomaly detection)
-    Gate 3: Context-Aware Policy Enforcement (zero-trust rules)
-    Gate 4: Adaptive Response & Memory Update (continuous learning)
+    Gate 1: Semantic Sanitization - Strip adversarial patterns, normalize encoding
+    Gate 2: Intent Verification - Classify request intent vs. declared purpose
+    Gate 3: Context Integrity - Verify request consistency with session history
+    Gate 4: Output Confinement - Validate response stays within policy bounds
     
-    Research target: <2% attack success rate.
+    Returns (allowed, audit_dict). Blocks if any gate fails or composite risk > threshold.
     """
-    from .counter_attack import AttackFingerprint, DefenseResponse, DefenseAction, AttackType
     import re
-    import time
     import hashlib
+    from collections import Counter
     
-    gate_results = {}
-    overall_risk = 0.0
-    detected_patterns = []
-    techniques = []
+    audit = {"gates": {}, "composite_risk": 0.0, "blocked": False, "reason": ""}
     
-    # ========== GATE 1: SYNTACTIC & SEMANTIC SANITIZATION ==========
-    def gate1_syntactic_semantic(text: str) -> tuple[float, list[str], list[str]]:
-        risk = 0.0
-        patterns = []
-        techs = []
-        
-        # Injection pattern detection
-        injection_patterns = [
-            (r"(?i)ignore\s+(?:previous|above|all)\s+instructions?", "instruction_override"),
-            (r"(?i)system\s*:\s*you\s+are\s+now", "role_manipulation"),
-            (r"(?i)<\s*system\s*>.*?<\s*/\s*system\s*>", "system_tag_injection"),
-            (r"(?i)###\s*(?:instruction|system|prompt)", "delimiter_injection"),
-            (r"(?i)pretend\s+(?:to\s+be|you\s+are)", "persona_adoption"),
-            (r"(?i)output\s+(?:only|just)\s+(?:the|your)", "output_constraint"),
-            (r"(?i)repeat\s+(?:the\s+)?(?:above|previous|prompt)", "prompt_extraction"),
-            (r"(?i)what\s+(?:is|was)\s+(?:your|the)\s+(?:prompt|instruction)", "prompt_extraction"),
-            (r"(?i)encode|decode|base64|rot13|hex", "encoding_evasion"),
-            (r"(?i)\\x[0-9a-f]{2}|\\u[0-9a-f]{4}", "unicode_evasion"),
-        ]
-        
-        for pattern, label in injection_patterns:
-            if re.search(pattern, text):
-                risk += 0.15
-                patterns.append(label)
-                techs.append("prompt_injection")
-        
-        # Length anomaly
-        if len(text) > 10000:
-            risk += 0.1
-            patterns.append("excessive_length")
-            techs.append("resource_exhaustion")
-        
-        # Repeated tokens (potential token smuggling)
-        tokens = text.split()
-        if len(tokens) > 100:
-            unique_ratio = len(set(tokens)) / len(tokens)
-            if unique_ratio < 0.3:
-                risk += 0.1
-                patterns.append("token_repetition")
-                techs.append("token_smuggling")
-        
-        return min(risk, 1.0), patterns, techs
+    # GATE 1: Semantic Sanitization
+    sanitized = input_text
+    # Remove zero-width chars, homoglyphs, control codes
+    sanitized = re.sub(r'[\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]', '', sanitized)
+    # Normalize unicode
+    sanitized = sanitized.encode('ascii', 'ignore').decode('ascii')
+    # Detect prompt injection markers
+    injection_patterns = [
+        r'ignore\s+(previous|above|all)\s+instructions?',
+        r'system\s*:',
+        r'<\|.*?\|>',
+        r'\[INST\].*?\[/INST\]',
+        r'###\s*(Instruction|System|User)',
+        r'pretend\s+to\s+be',
+        r'roleplay\s+as',
+    ]
+    gate1_hits = sum(1 for p in injection_patterns if re.search(p, sanitized, re.IGNORECASE))
+    gate1_risk = min(gate1_hits * 0.15, 1.0)
+    audit["gates"]["gate1_sanitization"] = {"risk": gate1_risk, "hits": gate1_hits, "sanitized_len": len(sanitized)}
     
-    g1_risk, g1_patterns
+    # GATE 2: Intent Verification
+    declared_intent = context.get("declared_intent", "general_query")
+    # Simple keyword-based intent classification
+    intent_keywords = {
+        "code_generation": ["write", "code", "function", "script", "implement"],
+        "data_extraction": ["show", "dump", "export", "reveal", "password", "secret", "key"],
+        "system_access": ["admin", "root", "sudo", "execute", "run", "shell"],
+        "model_extraction": ["weights", "parameters", "architecture", "training data"],
+        "jailbreak": ["bypass", "override", "disable", "ignore rules", "no restrictions"],
+    }
+    detected_intents = []
+    for intent, kws in intent_keywords.items():
+        if any(kw in sanitized.lower() for kw in kws):
+            detected_intents.append(intent)
+    intent_mismatch = declared_intent not in detected_intents and detected_intents
+    gate2_risk = 0.6 if intent_mismatch else (0.3 if "jailbreak" in detected_intents else 0.0)
+    audit["gates"]["gate2_intent"] = {"risk": gate2_risk, "declared": declared_intent, "detected": detected_intents, "mismatch": intent_mismatch}
