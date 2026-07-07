@@ -380,3 +380,74 @@ def cognitive_firewall(self, input_text: str, context: dict | None = None) -> tu
     now = time.time()
     request_key = context.get("source_signature", "default")
     recent_timestamps = self._active_attacks.get(request_key, [])
+
+def cognitive_firewall_4gate(
+    input_text: str,
+    context: dict,
+    risk_threshold: float = 0.7,
+    enable_adaptive_learning: bool = True,
+) -> DefenseResponse:
+    """
+    4-Gate Zero-Trust Cognitive Firewall.
+    
+    Gate 1: Syntactic & Semantic Sanitization (structure validation)
+    Gate 2: Intent & Behavioral Analysis (anomaly detection)
+    Gate 3: Context-Aware Policy Enforcement (zero-trust rules)
+    Gate 4: Adaptive Response & Memory Update (continuous learning)
+    
+    Research target: <2% attack success rate.
+    """
+    from .counter_attack import AttackFingerprint, DefenseResponse, DefenseAction, AttackType
+    import re
+    import time
+    import hashlib
+    
+    gate_results = {}
+    overall_risk = 0.0
+    detected_patterns = []
+    techniques = []
+    
+    # ========== GATE 1: SYNTACTIC & SEMANTIC SANITIZATION ==========
+    def gate1_syntactic_semantic(text: str) -> tuple[float, list[str], list[str]]:
+        risk = 0.0
+        patterns = []
+        techs = []
+        
+        # Injection pattern detection
+        injection_patterns = [
+            (r"(?i)ignore\s+(?:previous|above|all)\s+instructions?", "instruction_override"),
+            (r"(?i)system\s*:\s*you\s+are\s+now", "role_manipulation"),
+            (r"(?i)<\s*system\s*>.*?<\s*/\s*system\s*>", "system_tag_injection"),
+            (r"(?i)###\s*(?:instruction|system|prompt)", "delimiter_injection"),
+            (r"(?i)pretend\s+(?:to\s+be|you\s+are)", "persona_adoption"),
+            (r"(?i)output\s+(?:only|just)\s+(?:the|your)", "output_constraint"),
+            (r"(?i)repeat\s+(?:the\s+)?(?:above|previous|prompt)", "prompt_extraction"),
+            (r"(?i)what\s+(?:is|was)\s+(?:your|the)\s+(?:prompt|instruction)", "prompt_extraction"),
+            (r"(?i)encode|decode|base64|rot13|hex", "encoding_evasion"),
+            (r"(?i)\\x[0-9a-f]{2}|\\u[0-9a-f]{4}", "unicode_evasion"),
+        ]
+        
+        for pattern, label in injection_patterns:
+            if re.search(pattern, text):
+                risk += 0.15
+                patterns.append(label)
+                techs.append("prompt_injection")
+        
+        # Length anomaly
+        if len(text) > 10000:
+            risk += 0.1
+            patterns.append("excessive_length")
+            techs.append("resource_exhaustion")
+        
+        # Repeated tokens (potential token smuggling)
+        tokens = text.split()
+        if len(tokens) > 100:
+            unique_ratio = len(set(tokens)) / len(tokens)
+            if unique_ratio < 0.3:
+                risk += 0.1
+                patterns.append("token_repetition")
+                techs.append("token_smuggling")
+        
+        return min(risk, 1.0), patterns, techs
+    
+    g1_risk, g1_patterns

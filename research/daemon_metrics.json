@@ -1,129 +1,129 @@
 {
-  "timestamp": "2026-07-07T11:15:29.479147+00:00",
+  "timestamp": "2026-07-07T11:23:29.522969+00:00",
   "daemons": {
     "scout_daemon": {
       "alive": true,
-      "status": "running",
-      "age_seconds": 5.9937591552734375
+      "status": "sleeping",
+      "age_seconds": 5.940417051315308
     },
     "distiller_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.024418115615845
+      "age_seconds": 4.981871128082275
     },
     "research_daemon_1": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 3.992269992828369
+      "age_seconds": 3.9427051544189453
     },
     "research_daemon_2": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 3.00337815284729
+      "age_seconds": 2.9356839656829834
     },
     "research_daemon_3": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 1.9825870990753174
+      "age_seconds": 1.9244740009307861
     },
     "integrator_daemon": {
       "alive": true,
-      "status": "sleeping",
-      "age_seconds": 0.9716796875
+      "status": "running",
+      "age_seconds": 0.921154260635376
     },
     "coordinator_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 29.949899673461914
+      "age_seconds": 29.907917261123657
     },
     "cyber_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 11.707252025604248
+      "age_seconds": 11.653925895690918
     },
     "efficiency_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 8.690072059631348
+      "age_seconds": 8.64215898513794
     },
     "media_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.626317977905273
+      "age_seconds": 5.571670770645142
     },
     "marketing_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 17.56357192993164
+      "age_seconds": 17.52057385444641
     },
     "feedback_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 14.48203992843628
+      "age_seconds": 14.42063593864441
     },
     "meta_auditor_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 11.446992874145508
+      "age_seconds": 11.388221740722656
     },
     "swot_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 23.43326497077942
+      "age_seconds": 23.413238048553467
     },
     "website_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 10.790318965911865
+      "age_seconds": 10.730528116226196
     },
     "industry_radar_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 29.173959016799927
+      "age_seconds": 29.123981952667236
     },
     "model_optimizer_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 26.164470911026
+      "age_seconds": 26.11221194267273
     },
     "cost_efficiency_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 23.137918949127197
+      "age_seconds": 23.083098888397217
     },
     "revenue_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.024441957473755
+      "age_seconds": 4.975940942764282
     },
     "growth_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 1.9447710514068604
+      "age_seconds": 1.8874311447143555
     },
     "competitive_dominance_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 22.775110244750977
+      "age_seconds": 22.741265058517456
     },
     "self_expansion_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 17.27769112586975
+      "age_seconds": 17.22645616531372
     },
     "super_intelligence_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 20.323721170425415
+      "age_seconds": 20.274686098098755
     }
   },
   "queue": {
-    "new_raw": 1,
-    "new_findings": 4,
+    "new_raw": 0,
+    "new_findings": 0,
     "research_requests": 0,
     "research_complete": 0,
     "implementation_queue": 71,
-    "implementation_complete": 59,
+    "implementation_complete": 62,
     "implementation_failed": 6,
     "priority_updates": 0,
     "last_updated": 0
