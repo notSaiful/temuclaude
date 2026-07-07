@@ -1,118 +1,6 @@
 {
   "events": [
     {
-      "id": "evt_1783440786755_media_daemon",
-      "timestamp": "2026-07-07T21:43:06.755953",
-      "daemon": "media_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783440787375_distiller_daemon",
-      "timestamp": "2026-07-07T21:43:07.375967",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783440803714_watchdog",
-      "timestamp": "2026-07-07T21:43:23.714801",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "marketing_daemon: no PID file, restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783440806746_watchdog",
-      "timestamp": "2026-07-07T21:43:26.746848",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "feedback_daemon: no PID file, restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783440808453_feedback_daemon",
-      "timestamp": "2026-07-07T21:43:28.453093",
-      "daemon": "feedback_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.6s",
-      "extra": {
-        "duration": 0.61
-      }
-    },
-    {
-      "id": "evt_1783440809792_watchdog",
-      "timestamp": "2026-07-07T21:43:29.792667",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "meta_auditor_daemon: no PID file, restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783440814348_marketing_daemon",
-      "timestamp": "2026-07-07T21:43:34.348649",
-      "daemon": "marketing_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 9.5s",
-      "extra": {
-        "duration": 9.55
-      }
-    },
-    {
-      "id": "evt_1783440817378_distiller_daemon",
-      "timestamp": "2026-07-07T21:43:37.378952",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783440821403_integrator_daemon",
-      "timestamp": "2026-07-07T21:43:41.403870",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783440822439_coordinator_daemon",
-      "timestamp": "2026-07-07T21:43:42.439441",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783440827852_watchdog",
-      "timestamp": "2026-07-07T21:43:47.852624",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "swot_daemon: no PID file, restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783440828938_swot_daemon",
-      "timestamp": "2026-07-07T21:43:48.938407",
-      "daemon": "swot_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
       "id": "evt_1783440830895_watchdog",
       "timestamp": "2026-07-07T21:43:50.895881",
       "daemon": "watchdog",
@@ -1965,7 +1853,127 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783442962167_integrator_daemon",
+      "timestamp": "2026-07-07T22:19:22.167653",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 10.9s",
+      "extra": {
+        "duration": 10.87
+      }
+    },
+    {
+      "id": "evt_1783442977910_distiller_daemon",
+      "timestamp": "2026-07-07T22:19:37.910025",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783442982702_coordinator_daemon",
+      "timestamp": "2026-07-07T22:19:42.702118",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.04
+      }
+    },
+    {
+      "id": "evt_1783443007925_distiller_daemon",
+      "timestamp": "2026-07-07T22:20:07.925562",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783443037941_distiller_daemon",
+      "timestamp": "2026-07-07T22:20:37.941225",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783443042713_coordinator_daemon",
+      "timestamp": "2026-07-07T22:20:42.713712",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.04
+      }
+    },
+    {
+      "id": "evt_1783443067958_distiller_daemon",
+      "timestamp": "2026-07-07T22:21:07.958563",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783443097971_distiller_daemon",
+      "timestamp": "2026-07-07T22:21:37.971134",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783443098417_research_daemon_1",
+      "timestamp": "2026-07-07T22:21:38.417057",
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783443099428_research_daemon_2",
+      "timestamp": "2026-07-07T22:21:39.428308",
+      "daemon": "research_daemon_2",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783443100437_research_daemon_3",
+      "timestamp": "2026-07-07T22:21:40.437024",
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783443102723_coordinator_daemon",
+      "timestamp": "2026-07-07T22:21:42.723439",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.04
+      }
     }
   ],
-  "last_update": "2026-07-07T22:19:07.894699"
+  "last_update": "2026-07-07T22:21:42.723449"
 }
