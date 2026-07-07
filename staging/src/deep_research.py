@@ -736,3 +736,47 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
             "researchers evaluating these systems for production deployment."
         )},
     ]
+
+from typing import Optional, Callable, Awaitable, List, Dict
+
+
+def build_awq_research_prompt(topic: str, focus_areas: Optional[List[str]] = None) -> List[Dict]:
+    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization) topics.
+    
+    Args:
+        topic: The AWQ-related research topic (e.g., "AWQ quantization for LLM inference")
+        focus_areas: Optional list of specific areas to focus on (e.g., ["kernel optimization", "accuracy preservation", "hardware support"])
+    
+    Returns:
+        List of message dicts for the research planner
+    """
+    if focus_areas is None:
+        focus_areas = [
+            "quantization algorithm and activation-aware scaling",
+            "comparison with GPTQ, SmoothQuant, and RTN baselines",
+            "kernel implementation and GPU/CPU optimization",
+            "accuracy evaluation on benchmarks (MMLU, GSM8K, HumanEval)",
+            "integration with inference engines (vLLM, TensorRT-LLM, llama.cpp)",
+            "memory bandwidth and latency analysis",
+            "deployment considerations for edge and cloud"
+        ]
+    
+    focus_text = "\n".join(f"  - {area}" for area in focus_areas)
+    
+    return [
+        {"role": "system", "content": (
+            "You are a research planner specializing in LLM quantization techniques. "
+            "Create a comprehensive research outline for AWQ (Activation-aware Weight Quantization) "
+            "with at least 6 major sections. Each section should have 3-5 subsections. "
+            "Cover: theoretical foundations, algorithmic innovations, implementation details, "
+            "empirical evaluation, systems integration, and future research directions. "
+            "Include specific technical details about weight-only quantization, "
+            "activation outlier handling, and kernel-level optimizations. "
+            "Output as a numbered list of sections with subsections."
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n\n"
+            f"Key focus areas to cover:\n{focus_text}\n\n"
+            "Create a detailed research outline optimized for AWQ quantization research."
+        )},
+    ]
