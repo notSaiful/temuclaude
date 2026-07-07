@@ -466,3 +466,46 @@ def select_model_for_section(
         "rationale": rationale,
         "fallback_model": fallback_model,
     }
+
+def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
+    """Build a prompt to deep-research an efficiency finding (e.g., AWQ, vLLM)
+    and classify it under the quality guardrail system.
+
+    The prompt instructs the LLM to:
+    1. Research the specific technique, paper, or repo
+    2. Quantify speedup, memory/compute savings, and quality impact
+    3. Classify as LOSSLESS / QUALITY-PRESERVING / PARETO-OPTIMAL / REJECTED
+    """
+    technique = finding.get("title", topic)
+    finding_type = finding.get("type", "unknown")
+    keywords = finding.get("keywords", [])
+    keywords_str = ", ".join(keywords) if keywords else "N/A"
+
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM inference efficiency. "
+            "Your task is to research a specific efficiency technique and produce a "
+            "rigorous analysis covering ALL THREE impact dimensions:\n"
+            "1. SPEEDUP — measured or estimated inference speed improvement (e.g., tokens/sec, latency reduction)\n"
+            "2. SAVINGS — memory footprint reduction, compute cost savings, or hardware requirements lowered\n"
+            "3. QUALITY LOSS — any degradation in output quality (perplexity increase, accuracy drop, etc.)\n\n"
+            "After analysis, you MUST classify the technique into exactly one category:\n"
+            "  - LOSSLESS: No measurable quality degradation; pure speed/efficiency gain\n"
+            "  - QUALITY-PRESERVING: Negligible quality loss (<1% accuracy/perplexity delta) with significant speedup\n"
+            "  - PARETO-OPTIMAL: Meaningful quality loss but proportional or greater efficiency gain; acceptable tradeoff\n"
+            "  - REJECTED: Quality loss outweighs efficiency benefits; not worth adopting\n\n"
+            "Cite specific papers, benchmarks, and repository data where available. "
+            "Write at least 1500 words. Structure your response as:\n"
+            "## Technique Overview\n## Speedup Analysis\n## Savings Analysis\n## Quality Impact Analysis\n## Benchmark Comparison\n## Classification: <CATEGORY>\n## Implementation Recommendations"
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {technique}\n"
+            f"Finding Type: {finding_type}\n"
+            f"Keywords: {keywords_str}\n"
+            f"Topic Context: {topic}\n\n"
+            "Conduct a comprehensive efficiency analysis of this technique. "
+            "Compare against known alternatives (e.g., if researching AWQ, compare "
+            "against GPTQ, bitsandbytes, and unquantized baselines). "
+            "Provide concrete numbers wherever possible and conclude with the classification."
+        )},
+    ]

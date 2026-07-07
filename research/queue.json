@@ -1,9 +1,24 @@
 {
   "new_raw": [],
-  "new_findings": [],
+  "new_findings": [
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_implementation_quality.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T092547_inference_speed.json"
+  ],
   "research_requests": [],
   "research_complete": [],
-  "implementation_queue": [],
+  "implementation_queue": [
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092855.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092855.md"
+  ],
   "implementation_complete": [
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260706T210343.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260706T210343.md",
@@ -57,5 +72,5 @@
     "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260706T181605.md"
   ],
   "priority_updates": [],
-  "last_updated": "2026-07-07T06:00:41.160050+00:00"
+  "last_updated": "2026-07-07T09:28:59.306628+00:00"
 }

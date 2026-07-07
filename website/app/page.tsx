@@ -3,6 +3,7 @@
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
+import { MagneticButton } from '@/components/MagneticButton';
 
 export default function HomePage() {
   return (
@@ -15,10 +16,12 @@ export default function HomePage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `
+                radial-gradient(circle at 1px 1px, rgba(26,24,22,0.04) 1px, transparent 0),
                 radial-gradient(ellipse 70% 50% at 70% 10%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
                 radial-gradient(ellipse 50% 40% at 20% 30%, rgba(120, 140, 93, 0.06) 0%, transparent 50%),
                 radial-gradient(ellipse 40% 30% at 90% 60%, rgba(196, 102, 134, 0.04) 0%, transparent 50%)
               `,
+              backgroundSize: '24px 24px, 100% 100%, 100% 100%, 100% 100%',
             }}
           />
           <div className="container-max relative">
