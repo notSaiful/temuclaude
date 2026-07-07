@@ -896,3 +896,42 @@ def queue_awq_research_task(research_queue: asyncio.Queue, priority: int = 10) -
         },
     }
     research_queue.put_nowait(task)
+
+def build_efficiency_finding_prompt(finding: Dict) -> List[Dict]:
+    """Build a deep research prompt for an efficiency finding (e.g., AWQ, vLLM).
+
+    Instructs the LLM to research the specific technique, quantify speedup,
+    cost savings, and quality loss, then classify under the quality guardrail.
+    """
+    title = finding.get("title", "Unknown Efficiency Finding")
+    description = finding.get("description", finding.get("summary", ""))
+    keywords = finding.get("keywords", [])
+    keywords_str = ", ".join(keywords) if keywords else "N/A"
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM inference efficiency. "
+            "Research the specified technique thoroughly. You MUST quantify ALL THREE "
+            "of the following metrics where data is available:\n"
+            "1. SPEEDUP — throughput or latency improvement (e.g., tokens/sec, % faster)\n"
+            "2. SAVINGS — memory, VRAM, or cost reduction (e.g., GB saved, % less memory)\n"
+            "3. QUALITY LOSS — any degradation in output quality (perplexity, accuracy, "
+            "task benchmarks). If quality is preserved, state 'LOSSLESS'.\n\n"
+            "After analysis, classify the finding into exactly one category:\n"
+            "- LOSSLESS: no measurable quality loss, pure speed/memory gain\n"
+            "- QUALITY-PRESERVING: negligible quality loss within noise threshold\n"
+            "- PARETO-OPTIMAL: meaningful tradeoff (some quality loss for large gains)\n"
+            "- REJECTED: quality loss outweighs efficiency gains or technique is "
+            "inapplicable to this system\n\n"
+            "Output a structured JSON object with keys: technique, speedup, savings, "
+            "quality_loss, classification, evidence, recommendation, implementation_notes."
+        )},
+        {"role": "user", "content": (
+            f"Efficiency Finding: {title}\n"
+            f"Description: {description}\n"
+            f"Keywords: {keywords_str}\n\n"
+            "Conduct deep research on this technique. Compare against alternatives "
+            "(e.g., vLLM, GPTQ, bitsandbytes). Provide concrete numbers from papers, "
+            "benchmarks, or repos. End with your classification and a clear "
+            "recommendation on whether to integrate into src/efficiency/."
+        )},
+    ]
