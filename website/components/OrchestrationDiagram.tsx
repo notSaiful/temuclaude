@@ -37,7 +37,7 @@ export function OrchestrationDiagram() {
             y1={line.y1}
             x2={line.x2}
             y2={line.y2}
-            stroke="#E8643C"
+            stroke="#D4621F"
             strokeWidth="2"
             opacity="0.3"
             className={visible ? 'connection-draw' : ''}
@@ -100,8 +100,8 @@ export function OrchestrationDiagram() {
             transition: 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1) 1s',
           }}
         >
-          <circle cx="300" cy="200" r="35" fill="#E8643C" className="node-pulse" />
-          <circle cx="300" cy="200" r="35" fill="none" stroke="#E8643C" strokeWidth="2" opacity="0.3" />
+          <circle cx="300" cy="200" r="35" fill="#D4621F" className="node-pulse" />
+          <circle cx="300" cy="200" r="35" fill="none" stroke="#D4621F" strokeWidth="2" opacity="0.3" />
           <text
             x="300"
             y="205"
@@ -117,11 +117,11 @@ export function OrchestrationDiagram() {
 
         {/* Data pulse particles */}
         {visible && [
-          { path: 'M 80 100 L 300 200', delay: 1.5, color: '#E8643C' },
-          { path: 'M 200 60 L 300 200', delay: 1.7, color: '#E8643C' },
-          { path: 'M 300 40 L 300 200', delay: 1.9, color: '#E8643C' },
-          { path: 'M 400 60 L 300 200', delay: 2.1, color: '#E8643C' },
-          { path: 'M 520 100 L 300 200', delay: 2.3, color: '#E8643C' },
+          { path: 'M 80 100 L 300 200', delay: 1.5, color: '#D4621F' },
+          { path: 'M 200 60 L 300 200', delay: 1.7, color: '#D4621F' },
+          { path: 'M 300 40 L 300 200', delay: 1.9, color: '#D4621F' },
+          { path: 'M 400 60 L 300 200', delay: 2.1, color: '#D4621F' },
+          { path: 'M 520 100 L 300 200', delay: 2.3, color: '#D4621F' },
         ].map((pulse, i) => (
           <circle key={i} r="4" fill={pulse.color}>
             <animateMotion
@@ -146,7 +146,7 @@ export function OrchestrationDiagram() {
           y1="235"
           x2="300"
           y2="340"
-          stroke="#E8643C"
+          stroke="#D4621F"
           strokeWidth="2"
           opacity="0.3"
           strokeDasharray="5,5"

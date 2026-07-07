@@ -1,14 +1,14 @@
 import { Navbar } from '@/components/Navbar';
 
 const benchmarks = [
-  { name: 'GPQA Diamond', tc: '95-98%', f5: '88%', gpt: '94%', gem: '89%', note: 'Science reasoning' },
-  { name: 'LiveCodeBench', tc: '96-99%', f5: '87%', gpt: '91%', gem: '85%', note: 'Code generation' },
-  { name: 'SWE-Bench Pro', tc: '75-85%', f5: '70%', gpt: '68%', gem: '65%', note: 'Software engineering' },
-  { name: 'Terminal-Bench', tc: '91-96%', f5: '85%', gpt: '82%', gem: '80%', note: 'Agentic tasks' },
-  { name: 'GDPval-AA v2', tc: '1824+', f5: '1783', gpt: '1700', gem: '1650', note: 'Real work tasks (Elo)' },
-  { name: 'MultiChallenge', tc: '87-94%', f5: '82%', gpt: '85%', gem: '79%', note: 'Multi-task' },
-  { name: 'MRCR v2', tc: '0.8-1.0', f5: '0.72', gpt: '0.68', gem: '0.65', note: 'Long context retrieval' },
-  { name: 'HLE', tc: '45-55%', f5: '53%', gpt: '41%', gem: '38%', note: "Humanity's Last Exam" },
+  { name: 'GPQA Diamond', tc: '95-98%', comp: '88%', gpt: '94%', gem: '89%', note: 'Science reasoning' },
+  { name: 'LiveCodeBench', tc: '96-99%', comp: '87%', gpt: '91%', gem: '85%', note: 'Code generation' },
+  { name: 'SWE-Bench Pro', tc: '75-85%', comp: '70%', gpt: '68%', gem: '65%', note: 'Software engineering' },
+  { name: 'Terminal-Bench', tc: '91-96%', comp: '85%', gpt: '82%', gem: '80%', note: 'Agentic tasks' },
+  { name: 'GDPval-AA v2', tc: '1824+', comp: '1783', gpt: '1700', gem: '1650', note: 'Real work tasks (Elo)' },
+  { name: 'MultiChallenge', tc: '87-94%', comp: '82%', gpt: '85%', gem: '79%', note: 'Multi-task' },
+  { name: 'MRCR v2', tc: '0.8-1.0', comp: '0.72', gpt: '0.68', gem: '0.65', note: 'Long context retrieval' },
+  { name: 'HLE', tc: '45-55%', comp: '53%', gpt: '41%', gem: '38%', note: "Humanity's Last Exam" },
 ];
 
 export default function BenchmarksPage() {
@@ -30,7 +30,7 @@ export default function BenchmarksPage() {
                 <tr className="border-b-2 border-border-default">
                   <th className="text-left py-3 px-4 font-semibold text-text-primary">Benchmark</th>
                   <th className="text-center py-3 px-4 font-semibold text-accent-primary">TemuClaude*</th>
-                  <th className="text-center py-3 px-4 font-semibold text-text-muted">Fable 5</th>
+                  <th className="text-center py-3 px-4 font-semibold text-text-muted">Claude S5</th>
                   <th className="text-center py-3 px-4 font-semibold text-text-muted">GPT-5.5</th>
                   <th className="text-center py-3 px-4 font-semibold text-text-muted">Gemini 3.1</th>
                 </tr>
@@ -43,7 +43,7 @@ export default function BenchmarksPage() {
                       <span className="text-xs text-text-muted block">{row.note}</span>
                     </td>
                     <td className="py-3 px-4 text-center font-bold text-accent-primary">{row.tc}</td>
-                    <td className="py-3 px-4 text-center text-text-secondary">{row.f5}</td>
+                    <td className="py-3 px-4 text-center text-text-secondary">{row.comp}</td>
                     <td className="py-3 px-4 text-center text-text-secondary">{row.gpt}</td>
                     <td className="py-3 px-4 text-center text-text-secondary">{row.gem}</td>
                   </tr>
