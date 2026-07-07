@@ -1086,3 +1086,45 @@ def classify_awq_efficiency_finding(
         "config_flag": "enable_awq_quantization" if implement else None,
         "default_enabled": classification in ("LOSSLESS", "QUALITY-PRESERVING"),
     }
+
+def build_awq_vllm_comparison_prompt() -> List[Dict]:
+    """Build a specialized research prompt for AWQ vs vLLM quantization comparison.
+    
+    AWQ (Activation-aware Weight Quantization) is a model quantization technique
+    that competes with vLLM's quantization approaches. This prompt guides the
+    research agent to produce an implementation-ready comparison covering
+    architecture, performance, memory, accuracy, and deployment considerations.
+    """
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM inference "
+            "optimization and model quantization. Produce a comprehensive, "
+            "implementation-ready comparison between AWQ (Activation-aware "
+            "Weight Quantization) and vLLM's quantization and serving stack. "
+            "Cover the following dimensions with concrete data, benchmarks, "
+            "and code-level details: "
+            "1) Quantization algorithm internals (how AWQ selects salient "
+            "channels via activation magnitudes vs vLLM's supported methods "
+            "such as GPTQ, AWQ integration, and bitsandbytes); "
+            "2) Memory footprint and KV-cache handling; "
+            "3) Throughput and latency benchmarks on common models "
+            "(Llama-2 7B/13B/70B, Mistral 7B, Mixtral); "
+            "4) Accuracy preservation (perplexity, MMLU, HumanEval) at "
+            "4-bit and 8-bit configurations; "
+            "5) Hardware compatibility (NVIDIA Ampere/Hopper, AMD, CPU); "
+            "6) Deployment ergonomics: integration with Hugging Face "
+            "Transformers, vLLM engine, TensorRT-LLM, and exllamav2; "
+            "7) When to choose AWQ-native serving vs vLLM with AWQ weights; "
+            "8) Known limitations, community support, and roadmap. "
+            "Include code snippets for loading an AWQ-quantized model in "
+            "both the AutoAWQ library and vLLM. Cite sources with URLs."
+        )},
+        {"role": "user", "content": (
+            "Research and produce an implementation-ready report comparing "
+            "AWQ quantization with vLLM as inference engines. Include "
+            "practical guidance for integrating AWQ-quantized models into "
+            "a Python-based AI orchestration engine, including pip "
+            "dependencies, model loading code, and a benchmark harness "
+            "snippet."
+        )},
+    ]
