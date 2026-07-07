@@ -24,11 +24,11 @@ export const maxDuration = 120;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Model pool
-const ORCHESTRATOR = 'z-ai/glm-5.2';           // IQ 51 — proposer + QA judge
-const REASONING_MODEL = 'deepseek/deepseek-v4-pro';  // IQ 44 — proposer + aggregator + self-consistency
-const SPECIALIST_MODEL = 'google/gemini-3.5-flash';   // IQ 50 — proposer + cross-review
-const QA_MODEL = 'z-ai/glm-5.2';               // IQ 51 — STRONG QA judge (not weak Nemotron)
+// Model pool — role assignments based on MoA research principles
+const ORCHESTRATOR = 'z-ai/glm-5.2';           // IQ 51 — proposer + AGGREGATOR (strongest synthesizes)
+const REASONING_MODEL = 'deepseek/deepseek-v4-pro';  // IQ 44 — proposer + self-consistency + reflexion
+const SPECIALIST_MODEL = 'google/gemini-3.5-flash';   // IQ 50 — proposer + cross-review + QA JUDGE (independent)
+const QA_MODEL = 'google/gemini-3.5-flash';    // IQ 50 — INDEPENDENT QA judge (not a proposer, no bias)
 const QA_MODEL_BACKUP = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // Fallback only
 const FRONTIER_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — hardest 2%
 
@@ -133,6 +133,49 @@ function classifyDifficulty(text: string): 'trivial' | 'medium' | 'hard' {
   if (score >= 7) return 'hard';
   if (score >= 3) return 'medium';
   return 'trivial';
+}
+
+/**
+ * Budget Forcing (s1 paper, arXiv:2501.19393)
+ * If the answer is suspiciously short for a hard question, append "Wait"
+ * to force the model to continue reasoning. Improves hard reasoning by 10-20%.
+ */
+async function budgetForcing(
+  question: string,
+  answer: string,
+  model: string,
+  maxTokens: number,
+): Promise<{ content: string; tokens: number; forced: boolean }> {
+  // Check if answer is suspiciously short for a hard question
+  const answerWords = answer.split(/\s+/).length;
+  const questionWords = question.split(/\s+/).length;
+  const isHard = questionWords > 30 || /prove|derive|theorem|explain|analyze|compare|design|implement/i.test(question);
+
+  if (!isHard || answerWords > 50) {
+    return { content: answer, tokens: 0, forced: false };
+  }
+
+  // Append "Wait" and let model continue
+  const messages: ChatMessage[] = [
+    {
+      role: 'user',
+      content: question,
+    },
+    {
+      role: 'assistant',
+      content: answer + '\n\nWait, let me think about this more carefully.',
+    },
+    {
+      role: 'user',
+      content: 'Continue and provide the complete answer.',
+    },
+  ];
+
+  const result = await callModel(model, messages, 0.5, maxTokens);
+  if (result.success && result.content && result.content.length > answer.length) {
+    return { content: result.content, tokens: result.tokens, forced: true };
+  }
+  return { content: answer, tokens: result.tokens, forced: false };
 }
 
 function isMathQuestion(text: string): boolean {
@@ -673,7 +716,7 @@ export async function POST(request: NextRequest) {
             latency_ms: 55000,
             techniques: ['timeout-fallback'],
           });
-        }, 50000); // Start fallback at 50s to leave 10s for the fallback call
+        }, 45000); // Start fallback at 45s — leaves 15s for fallback call, well within AA's 60s
       }
     );
 
