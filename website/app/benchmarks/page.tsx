@@ -85,7 +85,7 @@ export default function BenchmarksPage() {
             </div>
           </section>
 
-          <a href="https://github.com/notSaiful/temuclaude-research" className="btn-secondary" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/notSaiful/temuclaude" className="btn-secondary" target="_blank" rel="noopener noreferrer">
             View Full Results on GitHub →
           </a>
         </div>

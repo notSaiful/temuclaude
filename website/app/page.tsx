@@ -406,7 +406,7 @@ export default function HomePage() {
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
                 <ul className="space-y-2">
-                  <li><a href="https://github.com/notSaiful/temuclaude-research" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                  <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                 </ul>
               </div>
               <div>

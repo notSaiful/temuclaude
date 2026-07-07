@@ -446,7 +446,7 @@ OPENROUTER_API_KEY=sk-or-v1-xxx
 AIML_API_KEY=xxx
 TEMUCLAUDE_MASTER_KEY=xxx
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=temuclaude.com
-NEXT_PUBLIC_GITHUB_REPO=notSaiful/temuclaude-research
+NEXT_PUBLIC_GITHUB_REPO=notSaiful/temuclaude
 ```
 
 ### Domain Setup

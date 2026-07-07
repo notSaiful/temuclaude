@@ -283,7 +283,7 @@ Layer 3: Aggregation
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reproducibility</h2>
               <p className="text-text-secondary mb-4">Full benchmark scripts are available on GitHub (MIT licensed). Run them yourself:</p>
               <CodeBlock lang="bash" code={`# Clone the repo
-git clone https://github.com/notSaiful/temuclaude-research.git
+git clone https://github.com/notSaiful/temuclaude.git
 cd temuclaude-research
 
 # Install dependencies
@@ -294,7 +294,7 @@ python benchmarks/run_temuclaude.py --dataset hle --sample 100
 
 # Run on GPQA Diamond
 python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
-              <p className="text-sm text-text-secondary"><a href="https://github.com/notSaiful/temuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">View full results on GitHub →</a></p>
+              <p className="text-sm text-text-secondary"><a href="https://github.com/notSaiful/temuclaude" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">View full results on GitHub →</a></p>
             </section>
 
             <section id="projected-scores" className="mb-12">
@@ -480,7 +480,7 @@ fly secrets set OPENROUTER_API_KEY=your-key`} />
               </div>
             </section>
 
-            <p className="text-sm text-text-muted mt-12 mb-6"><a href="https://github.com/notSaiful/temuclaude-research" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Edit this page on GitHub →</a> · MIT Licensed</p>
+            <p className="text-sm text-text-muted mt-12 mb-6"><a href="https://github.com/notSaiful/temuclaude" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Edit this page on GitHub →</a> · MIT Licensed</p>
           </div>
         </main>
       </div>
