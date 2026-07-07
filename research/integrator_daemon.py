@@ -109,8 +109,9 @@ class IntegratorDaemon(DaemonBase):
                 
                 result = subprocess.run([
                     sys.executable,
-                    "/Users/saiful/temuclaude/research/scripts/auto_integrator.py"
-                ], capture_output=True, text=True, timeout=1200, cwd=str(STAGING_DIR))  # Run in staging
+                    "/Users/saiful/temuclaude/research/scripts/auto_integrator_v2.py",
+                    finding_file
+                ], capture_output=True, text=True, timeout=1200, cwd=str(STAGING_DIR))
                 
                 self.logger.info(f"Auto-integrator output (in staging): {result.stdout[:500]}")
                 
