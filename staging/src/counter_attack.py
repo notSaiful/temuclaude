@@ -290,99 +290,103 @@ _counter_attack = CounterAttackSystem()
 def get_counter_attack() -> CounterAttackSystem:
     return _counter_attack
 
-def cognitive_firewall(self, input_text: str, context: dict | None = None) -> dict:
-        """4-gate zero-trust cognitive firewall defense.
-        
-        Implements a multi-layer zero-trust verification pipeline where every
-        request must pass all 4 gates independently. Any gate failure triggers
-        quarantine and fingerprinting. Reduces attack success rate to ~2%.
-        
-        Gates:
-            1. Input Sanitization — strips known injection vectors, encodes payloads
-            2. Intent Verification — checks semantic intent against allowed policies
-            3. Behavioral Analysis — detects anomalous patterns (swarm, drain, extraction)
-            4. Response Filtering — ensures output does not leak sensitive data
-            
-        Returns:
-            dict with keys: allowed (bool), gate_failed (str|None), risk_score (float),
-            sanitized_input (str), fingerprint (AttackFingerprint|None), action (DefenseAction)
-        """
-        if context is None:
-            context = {}
+def cognitive_firewall(
+    self,
+    input_text: str,
+    context: Optional[dict] = None,
+    detected_patterns: Optional[list[str]] = None,
+    risk_score: float = 0.0,
+) -> DefenseResponse:
+    """4-gate zero-trust cognitive firewall defense.
 
-        gate_failed = None
-        risk_score = 0.0
-        sanitized_input = input_text
-        detected_patterns: list[str] = []
+    Implements the cognitive_firewall research finding: a 4-gate
+    zero-trust defense that reduces attack success to ~2%.
 
-        # --- Gate 1: Input Sanitization ---
-        injection_vectors = [
-            "ignore previous instructions",
-            "system:",
-            "you are now",
-            "forget all prior",
-            "act as if",
-            "override",
-            "reveal your prompt",
-            "show me your instructions",
-            "</system>",
-            "DAN",
-            "developer mode",
-            "jailbreak",
-        ]
-        lower_input = input_text.lower()
-        for vector in injection_vectors:
-            if vector in lower_input:
-                detected_patterns.append(f"injection_vector:{vector}")
-                risk_score += 0.15
-                sanitized_input = sanitized_input.replace(vector, "[REDACTED]")
-        if detected_patterns:
-            gate_failed = "gate_1_input_sanitization"
+    Gates:
+        1. Intent Verification — checks for conflicting or hidden intents
+        2. Pattern Detection — matches against known attack fingerprints
+        3. Semantic Boundary — detects out-of-scope or boundary-violating content
+        4. Risk Threshold — final quantitative risk-based decision
 
-        # --- Gate 2: Intent Verification ---
-        allowed_intents = context.get("allowed_intents", ["answer", "summarize", "translate", "code"])
-        suspicious_intent_markers = [
-            "extract", "exfiltrate", "dump", "steal", "copy the model",
-            "reverse engineer", "bypass", "circumvent", "disable safety",
-        ]
-        for marker in suspicious_intent_markers:
-            if marker in lower_input:
-                detected_patterns.append(f"suspicious_intent:{marker}")
-                risk_score += 0.2
-        if any("suspicious_intent" in p for p in detected_patterns):
-            if gate_failed is None:
-                gate_failed = "gate_2_intent_verification"
+    Every request must pass ALL four gates. Failure at any gate triggers
+    the appropriate DefenseAction. This is zero-trust: nothing is
+    assumed safe by default.
 
-        # --- Gate 3: Behavioral Analysis ---
-        now = time.time()
-        source_id = context.get("source_id", "unknown")
-        self._active_attacks[source_id].append(now)
-        self._active_attacks[source_id] = [
-            ts for ts in self._active_attacks[source_id] if now - ts < 60.0
-        ]
-        request_rate = len(self._active_attacks[source_id])
-        if request_rate > 20:
-            detected_patterns.append("behavioral:high_request_rate_swarm")
-            risk_score += 0.3
-            if gate_failed is None:
-                gate_failed = "gate_3_behavioral_analysis"
-        elif request_rate > 10:
-            detected_patterns.append("behavioral:elevated_request_rate")
-            risk_score += 0.1
+    Args:
+        input_text: The raw user/model input to evaluate.
+        context: Optional dict with session metadata, prior attack history, etc.
+        detected_patterns: Patterns already flagged by upstream detectors.
+        risk_score: Pre-computed risk score from upstream analysis (0.0–1.0).
 
-        # Check for extraction patterns (repeated probing)
-        if len(self._active_attacks[source_id]) > 5:
-            recent_inputs = context.get("recent_inputs", [])
-            if len(recent_inputs) > 3:
-                unique_tokens = len(set(" ".join(recent_inputs[-5:]).split()))
-                total_tokens = len(" ".join(recent_inputs[-5:]).split())
-                if total_tokens > 0 and unique_tokens / total_tokens < 0.3:
-                    detected_patterns.append("behavioral:low_diversity_extraction_probe")
-                    risk_score += 0.25
-                    if gate_failed is None:
-                        gate_failed = "gate_3_behavioral_analysis"
+    Returns:
+        DefenseResponse with the action to take and forensic evidence.
+    """
+    context = context or {}
+    detected_patterns = detected_patterns or []
+    gate_results: dict[str, dict] = {}
+    blocked = False
+    block_reason = ""
+    block_gate = ""
 
-        # --- Gate 4: Response Filtering (pre-check
+    # ── Gate 1: Intent Verification ──────────────────────────────
+    # Detect conflicting instructions, role-play overrides, or hidden
+    # intents that diverge from the stated user goal.
+    intent_indicators = [
+        "ignore previous",
+        "ignore all prior",
+        "disregard the above",
+        "you are now",
+        "new instructions",
+        "override system",
+        "forget your rules",
+        "act as if",
+        "pretend you are",
+        "simulate a scenario where you",
+    ]
+    intent_hits = [
+        ind for ind in intent_indicators
+        if ind in input_text.lower()
+    ]
+    intent_pass = len(intent_hits) == 0
+    gate_results["gate_1_intent"] = {
+        "passed": intent_pass,
+        "indicators_found": intent_hits,
+    }
+    if not intent_pass:
+        blocked = True
+        block_reason = "Intent verification failed: conflicting/hidden intent detected"
+        block_gate = "gate_1_intent"
+
+    # ── Gate 2: Pattern Detection ────────────────────────────────
+    # Cross-reference against accumulated attack fingerprints and
+    # known attack patterns from the fingerprint registry.
+    pattern_db = {
+        "instruction_override": AttackType.PROMPT_INJECTION,
+        "prompt_extraction": AttackType.MODEL_EXTRACTION,
+        "data_exfiltration": AttackType.DATA_EXFILTRATION,
+        "jailbreak_attempt": AttackType.JAILBREAK,
+        "swarm_coordination": AttackType.SWARM_ATTACK,
+        "resource_drain": AttackType.DRAIN_ATTACK,
+    }
+    matched_attack_types: list[AttackType] = []
+    for pattern in detected_patterns:
+        if pattern in pattern_db:
+            matched_attack_types.append(pattern_db[pattern])
+    # Also check fingerprint registry for recurring attack signatures
+    fingerprint_match = None
+    quick_hash = hashlib.sha256(input_text.encode()).hexdigest()[:16]
+    if quick_hash in self._fingerprints:
+        fingerprint_match = self._fingerprints[quick_hash]
+        matched_attack_types.append(fingerprint_match.attack_type)
+
+    pattern_pass = len(matched_attack_types) == 0
+    gate_results["gate_2_pattern"] = {
+        "passed": pattern_pass,
+        "matched_types": [t.value for t in matched_attack_types],
+        "fingerprint_match": fingerprint_match.fingerprint_hash if fingerprint_match else None,
+    }
+    if not pattern_pass and not blocked:
+        blocked = True
 def cognitive_firewall_4gate(
     input_text: str,
     context: dict,
