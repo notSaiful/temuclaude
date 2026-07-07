@@ -745,7 +745,7 @@ const s: Record<string, React.CSSProperties> = {
   // Daemons tab
   daemonGroup: { marginBottom: '24px' },
   groupTitle: { fontSize: '13px', fontWeight: 600, color: '#6b6b7b', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '12px' },
-  daemonGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px',  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' },
+  daemonGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' },
   daemonCard: { display: 'flex', alignItems: 'center', gap: '12px', padding: '14px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', transition: 'all 0.2s' },
   daemonIconBox: { width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)' },
   daemonText: { flex: 1, minWidth: 0 },
