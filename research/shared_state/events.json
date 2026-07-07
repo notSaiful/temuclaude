@@ -95,7 +95,31 @@
       "type": "restart",
       "message": "integrator_daemon: no PID file, restarting",
       "extra": {}
+    },
+    {
+      "id": "evt_1783405065990_watchdog",
+      "timestamp": "2026-07-07T11:47:45.990777",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783405098059_watchdog",
+      "timestamp": "2026-07-07T11:48:18.059512",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783405130127_watchdog",
+      "timestamp": "2026-07-07T11:48:50.127190",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "integrator_daemon: no PID file, restarting",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T11:47:00.909879"
+  "last_update": "2026-07-07T11:48:50.127200"
 }

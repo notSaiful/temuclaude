@@ -220,5 +220,42 @@
         "status": "ok"
       }
     }
+  },
+  {
+    "timestamp": "2026-07-07T06:24:33.056061+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-07T06:24:14.352212+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.34,
+        "status": "ok"
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-07T06:24:15.704398+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 13.63,
+        "status": "ok"
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-07T06:24:29.332941+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 1.67,
+        "status": "ok"
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-07T06:24:31.004733+00:00",
+        "answer": "391",
+        "correct": true,
+        "latency_s": 2.05,
+        "status": "ok"
+      }
+    }
   }
 ]
