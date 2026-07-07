@@ -70,7 +70,15 @@ def get_daemon_statuses():
         hb_age = None
         if hb and hb.get('timestamp'):
             try:
-                hb_age = int((now - datetime.fromisoformat(hb['timestamp'])).total_seconds())
+                from datetime import timezone
+                hb_dt = datetime.fromisoformat(hb['timestamp'])
+                # Make naive if it has tz (compare with UTC now)
+                if hb_dt.tzinfo is not None:
+                    now_utc = datetime.now(timezone.utc)
+                    hb_age = int((now_utc - hb_dt).total_seconds())
+                else:
+                    # Heartbeat is naive — compare with local now
+                    hb_age = int((now - hb_dt).total_seconds())
             except:
                 pass
 
