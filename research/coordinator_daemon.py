@@ -44,6 +44,7 @@ DAEMON_SCRIPTS = {
     "competitive_dominance_daemon": "research/competitive_dominance_daemon.py",
     "self_expansion_daemon": "research/self_expansion_daemon.py",
     "super_intelligence_daemon": "research/super_intelligence_daemon.py",
+    "daemon_evolution_daemon": "research/daemon_evolution_daemon.py",
 }
 
 # Per-daemon stale thresholds (seconds) — each daemon has different expected cycle duration
@@ -70,6 +71,7 @@ DAEMON_STALE_THRESHOLD = {
     "competitive_dominance_daemon": 7200, # 2hr (runs every 4h)
     "self_expansion_daemon": 43200, # 12hr (runs every 12h)
     "super_intelligence_daemon": 7200, # 2hr (runs every 6h)
+    "daemon_evolution_daemon": 25200, # 7hr (runs every 6h, evolution cycle takes time)
 }
 PRIORITIES_FILE = Path("/Users/saiful/temuclaude/research/priorities.json")
 METRICS_FILE = Path("/Users/saiful/temuclaude/research/daemon_metrics.json")

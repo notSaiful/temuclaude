@@ -30,7 +30,7 @@ BENCHMARK_QUESTIONS = [
 
 MODELS = [
     {"name": "glm-5.2", "id": "z-ai/glm-5.2"},
-    {"name": "deepseek-v4-pro", "id": "deepseek/deepseek-chat-v4-pro"},
+    {"name": "deepseek-v4-pro", "id": "deepseek/deepseek-v4-pro"},
     {"name": "gemini-3-flash", "id": "google/gemini-3.5-flash"},
     {"name": "nemotron-3-ultra", "id": "nvidia/nemotron-3-ultra-550b-a55b:free"},
 ]

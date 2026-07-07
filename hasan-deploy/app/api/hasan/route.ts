@@ -41,17 +41,31 @@ export async function GET() {
     const synced = await readJson(SYNC_FILE);
     if (synced && synced.timestamp) {
       const age = Date.now() - new Date(synced.timestamp).getTime();
+      // Read evolution data
+      let evolution: any = null;
+      try {
+        const evoLog = await readJson(path.join(RESEARCH_DIR, 'evolution_log.json'));
+        const registry = await readJson(path.join(RESEARCH_DIR, 'daemon_registry.json'));
+        if (evoLog && Array.isArray(evoLog) && evoLog.length > 0) {
+          evolution = {
+            lastCycle: evoLog[evoLog.length - 1],
+            recentCycles: evoLog.slice(-5),
+            pendingChanges: (registry?.changes || []).filter((c: any) => c.status === 'staged' || c.status === 'proposed'),
+          };
+        }
+      } catch {}
+      const enrich = (d: any) => ({ ...d, evolution });
       if (age < 30000) {
-        return NextResponse.json({ ...synced, dataSource: 'sync-fresh', syncAge: Math.floor(age / 1000) });
+        return NextResponse.json({ ...enrich(synced), dataSource: 'sync-fresh', syncAge: Math.floor(age / 1000) });
       }
       if (synced.daemons) {
-        return NextResponse.json({ ...synced, dataSource: 'sync-stale', syncAge: Math.floor(age / 1000) });
+        return NextResponse.json({ ...enrich(synced), dataSource: 'sync-stale', syncAge: Math.floor(age / 1000) });
       }
     }
 
     // 3. Try local daemon files (only works locally)
     try {
-      const daemons = ['scout_daemon','distiller_daemon','research_daemon_1','research_daemon_2','research_daemon_3','integrator_daemon','coordinator_daemon','cyber_daemon','efficiency_daemon','media_daemon','marketing_daemon','feedback_daemon','meta_auditor_daemon','swot_daemon','website_daemon','industry_radar_daemon','model_optimizer_daemon','cost_efficiency_daemon','revenue_daemon','growth_daemon','competitive_dominance_daemon','self_expansion_daemon','super_intelligence_daemon'];
+      const daemons = ['scout_daemon','distiller_daemon','research_daemon_1','research_daemon_2','research_daemon_3','integrator_daemon','coordinator_daemon','cyber_daemon','efficiency_daemon','media_daemon','marketing_daemon','feedback_daemon','meta_auditor_daemon','swot_daemon','website_daemon','industry_radar_daemon','model_optimizer_daemon','cost_efficiency_daemon','revenue_daemon','growth_daemon','competitive_dominance_daemon','self_expansion_daemon','super_intelligence_daemon','daemon_evolution_daemon'];
       let alive = 0;
       const list = [];
       for (const name of daemons) {
@@ -66,8 +80,8 @@ export async function GET() {
         return NextResponse.json({
           timestamp: new Date().toISOString(),
           system: 'hasan',
-          status: alive === 23 ? 'all_systems_nominal' : 'partial',
-          daemons: { total: 23, alive, list },
+          status: alive === 24 ? 'all_systems_nominal' : 'partial',
+          daemons: { total: 24, alive, list },
           queue: { newRaw: 0, newFindings: 0, implementationQueue: 0, implementationFailed: 0 },
           sharedMemory: { daemons: 0, recentEvents: [], knowledgeFacts: 0 },
           swot: null, radar: null,
