@@ -1,0 +1,194 @@
+{
+  "distilled_at": "20260707T055847",
+  "total_raw_files": 14,
+  "total_findings": 6,
+  "new_findings": 6,
+  "already_distilled": 326,
+  "by_type": {
+    "github_repo": 6
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1289193000",
+      "name": "jihkyuo/docsherpa",
+      "url": "https://github.com/jihkyuo/docsherpa",
+      "description": "Build and grow an agent-readable documentation architecture \u2014 a Claude Code plugin.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T05:49:25Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1289193000"
+    },
+    {
+      "type": "github_repo",
+      "id": "1197226849",
+      "name": "Windy3f3f3f3f/how-claude-code-works",
+      "url": "https://github.com/Windy3f3f3f3f/how-claude-code-works",
+      "description": "Deep dive into Claude Code internals \u2014 architecture, agent loop, context engineering, and more. / \u6df1\u5165\u89e3\u6790 Claude Code \u6e90\u7801\uff1a\u67b6\u6784\u3001Agent \u5faa\u73af\u3001\u4e0a\u4e0b\u6587\u5de5\u7a0b\u3001\u5de5\u5177\u7cfb\u7edf\u7b49",
+      "stars": 3055,
+      "language": null,
+      "updated_at": "2026-07-07T05:42:56Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1197226849"
+    },
+    {
+      "type": "github_repo",
+      "id": "1203339756",
+      "name": "windyroad/agent-plugins",
+      "url": "https://github.com/windyroad/agent-plugins",
+      "description": "Claude Code plugins for architecture governance, risk management, TDD, and delivery quality by Windy Road Technology",
+      "stars": 2,
+      "language": "Shell",
+      "updated_at": "2026-07-07T04:58:14Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1203339756"
+    },
+    {
+      "type": "github_repo",
+      "id": "1256873713",
+      "name": "nghiack7/claude-skills",
+      "url": "https://github.com/nghiack7/claude-skills",
+      "description": "89 curated Agent Skills for Claude Code \u2014 engineering, cloud/devops, data, architecture, product & writing. Bilingual (EN/VI) triggers, MIT licensed.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T04:06:40Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1256873713"
+    },
+    {
+      "type": "github_repo",
+      "id": "1210017416",
+      "name": "gabrielfst30/super-gabriel-claude-toolkit",
+      "url": "https://github.com/gabrielfst30/super-gabriel-claude-toolkit",
+      "description": "Reusable collection of Claude Code agents and skills for structured software development workflows. Project-agnostic \u2014 plug into any codebase with a CLAUDE.md.",
+      "stars": 4,
+      "language": null,
+      "updated_at": "2026-07-07T04:02:46Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1210017416"
+    },
+    {
+      "type": "github_repo",
+      "id": "1291810728",
+      "name": "Kayden514/debateguard",
+      "url": "https://github.com/Kayden514/debateguard",
+      "description": "Heterogeneous small-model committee guardrail for LLM jailbreak defense (research code)",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T05:38:40Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "debate"
+      ],
+      "dedup_key": "github_repo:1291810728"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1289193000",
+      "name": "jihkyuo/docsherpa",
+      "url": "https://github.com/jihkyuo/docsherpa",
+      "description": "Build and grow an agent-readable documentation architecture \u2014 a Claude Code plugin.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T05:49:25Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1289193000"
+    },
+    {
+      "type": "github_repo",
+      "id": "1197226849",
+      "name": "Windy3f3f3f3f/how-claude-code-works",
+      "url": "https://github.com/Windy3f3f3f3f/how-claude-code-works",
+      "description": "Deep dive into Claude Code internals \u2014 architecture, agent loop, context engineering, and more. / \u6df1\u5165\u89e3\u6790 Claude Code \u6e90\u7801\uff1a\u67b6\u6784\u3001Agent \u5faa\u73af\u3001\u4e0a\u4e0b\u6587\u5de5\u7a0b\u3001\u5de5\u5177\u7cfb\u7edf\u7b49",
+      "stars": 3055,
+      "language": null,
+      "updated_at": "2026-07-07T05:42:56Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1197226849"
+    },
+    {
+      "type": "github_repo",
+      "id": "1203339756",
+      "name": "windyroad/agent-plugins",
+      "url": "https://github.com/windyroad/agent-plugins",
+      "description": "Claude Code plugins for architecture governance, risk management, TDD, and delivery quality by Windy Road Technology",
+      "stars": 2,
+      "language": "Shell",
+      "updated_at": "2026-07-07T04:58:14Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1203339756"
+    },
+    {
+      "type": "github_repo",
+      "id": "1256873713",
+      "name": "nghiack7/claude-skills",
+      "url": "https://github.com/nghiack7/claude-skills",
+      "description": "89 curated Agent Skills for Claude Code \u2014 engineering, cloud/devops, data, architecture, product & writing. Bilingual (EN/VI) triggers, MIT licensed.",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T04:06:40Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1256873713"
+    },
+    {
+      "type": "github_repo",
+      "id": "1210017416",
+      "name": "gabrielfst30/super-gabriel-claude-toolkit",
+      "url": "https://github.com/gabrielfst30/super-gabriel-claude-toolkit",
+      "description": "Reusable collection of Claude Code agents and skills for structured software development workflows. Project-agnostic \u2014 plug into any codebase with a CLAUDE.md.",
+      "stars": 4,
+      "language": null,
+      "updated_at": "2026-07-07T04:02:46Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1210017416"
+    },
+    {
+      "type": "github_repo",
+      "id": "1291810728",
+      "name": "Kayden514/debateguard",
+      "url": "https://github.com/Kayden514/debateguard",
+      "description": "Heterogeneous small-model committee guardrail for LLM jailbreak defense (research code)",
+      "stars": 0,
+      "language": "Python",
+      "updated_at": "2026-07-07T05:38:40Z",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "debate"
+      ],
+      "dedup_key": "github_repo:1291810728"
+    }
+  ]
+}
