@@ -591,3 +591,37 @@ def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_a
             "section on practical deployment recommendations."
         )},
     ]
+
+def build_quantization_research_prompt(topic: str, competitor: str = "vLLM") -> List[Dict]:
+    """Build a specialized research prompt for LLM quantization and inference optimization topics
+    such as AWQ, GPTQ, SmoothQuant, and their competitors like vLLM, TGI, or TensorRT-LLM.
+    
+    Pre-populates subsections with domain-relevant areas to ensure comprehensive coverage
+    of quantization techniques, performance benchmarks, and deployment considerations.
+    """
+    quantization_subsections = [
+        "Background and motivation: why LLM quantization matters (memory, cost, latency)",
+        "Core algorithm: activation-aware weight quantization methodology and key innovations",
+        "Comparison with alternative quantization methods (GPTQ, SmoothQuant, bitsandbytes, GGUF)",
+        f"Competitor analysis: {competitor} and other inference engines (TGI, TensorRT-LLM, llama.cpp)",
+        "Performance benchmarks: throughput, latency, memory footprint, accuracy retention",
+        "Hardware compatibility: GPU types, CPU offloading, edge deployment scenarios",
+        "Integration and deployment: supported model architectures, serving frameworks, APIs",
+        "Limitations, open issues, and future research directions",
+    ]
+    sub_text = "\n".join(f"  - {s}" for s in quantization_subsections)
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM inference optimization and "
+            "model quantization. Write a comprehensive, technically accurate research section. "
+            "Include specific numbers, benchmark results, and citations where possible. "
+            "Compare methodologies rigorously. Write at least 2000 words for this section."
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n"
+            f"Competitor / Comparison Target: {competitor}\n"
+            f"Subsections to cover:\n{sub_text}\n\n"
+            "Write this section in full with technical depth, including any known "
+            "benchmark numbers, model compatibility tables, and deployment trade-offs."
+        )},
+    ]

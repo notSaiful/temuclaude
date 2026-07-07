@@ -1,0 +1,9 @@
+{
+  "id": "swot_20260707T094522_implementation_quality",
+  "source": "swot_analysis",
+  "severity": "MEDIUM",
+  "action": "Implementation fail rate 89% \u2014 improve integrator",
+  "area": "implementation_quality",
+  "title": "Implementation fail rate 89% \u2014 improve integrator",
+  "timestamp": "2026-07-07T09:45:22.527436+00:00"
+}
