@@ -33,8 +33,8 @@ export default function HomePage() {
                 </div>
 
                 <h1
-                  className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-text-primary leading-[1.02] mb-6 animate-fade-in-up text-balance"
-                  style={{ animationDelay: '100ms', letterSpacing: '-0.05em', fontWeight: 300 }}
+                  className="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tight text-text-primary leading-[1.05] mb-6 animate-fade-in-up text-balance"
+                  style={{ animationDelay: '100ms', fontWeight: 300, letterSpacing: '-0.03em' }}
                 >
                   Frontier-quality AI.<br />
                   <span className="text-accent-primary">Fraction of the cost.</span><br />
@@ -102,7 +102,7 @@ export default function HomePage() {
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
                 Built for builders
               </h2>
               <p className="text-text-secondary">
@@ -233,7 +233,7 @@ export default function HomePage() {
         <section className="py-24 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
                 How it works
               </h2>
               <p className="text-text-secondary">
@@ -290,7 +290,7 @@ export default function HomePage() {
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
                 8 models. You never pick.
               </h2>
               <p className="text-text-secondary">
@@ -337,7 +337,7 @@ export default function HomePage() {
         <section className="py-24 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
                 Benchmarks
               </h2>
               <p className="text-text-secondary">
@@ -385,7 +385,7 @@ export default function HomePage() {
         {/* ━━ Pricing CTA ━━ */}
         <section className="py-20 px-6 bg-bg-secondary">
           <div className="container-max text-center">
-            <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+            <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
               $0.50 per million tokens.<br />That's it.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
