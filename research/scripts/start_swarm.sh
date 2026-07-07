@@ -8,6 +8,14 @@ TEMUCLAUDE_DIR="${TEMUCLAUDE_DIR:-/Users/saiful/temuclaude}"
 RESEARCH_DIR="$TEMUCLAUDE_DIR/research"
 STATE_DIR="${DAEMON_STATE_DIR:-/tmp/temuclaude_daemons}"
 
+# Load .env file so daemons have access to API keys
+if [ -f "$TEMUCLAUDE_DIR/.env" ]; then
+    echo "Loading .env..."
+    set -a
+    source "$TEMUCLAUDE_DIR/.env"
+    set +a
+fi
+
 echo "=== Starting Temuclaude Autonomous Swarm (23 daemons) ==="
 echo "Time: $(date)"
 echo ""

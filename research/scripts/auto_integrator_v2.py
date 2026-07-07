@@ -29,10 +29,15 @@ OLLAMA_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_CLOUD_URL = os.environ.get("OLLAMA_CLOUD_URL", "https://ollama.com:443")
 OLLAMA_CLOUD_KEY = os.environ.get("OLLAMA_CLOUD_KEY", "")
 
+# OpenRouter API (fallback when Ollama is rate-limited)
+OR_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+OR_URL = "https://openrouter.ai/api/v1/chat/completions"
+OR_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"  # Free model for integration
+
 
 def call_llm(prompt, max_tokens=2000):
-    """Call Ollama to generate code. Uses cloud API first, then local."""
-    # Try cloud first
+    """Call LLM to generate code. Tries Ollama cloud → local → OpenRouter free."""
+    # Try Ollama cloud first
     if OLLAMA_CLOUD_KEY:
         try:
             import urllib.request
@@ -60,7 +65,7 @@ def call_llm(prompt, max_tokens=2000):
         except Exception as e:
             print(f"  Cloud LLM failed: {e}")
 
-    # Try local
+    # Try local Ollama
     try:
         import urllib.request
         req = urllib.request.Request(
@@ -79,9 +84,36 @@ def call_llm(prompt, max_tokens=2000):
             content = data.get("message", {}).get("content", "")
             if not content and data.get("message", {}).get("thinking"):
                 content = data["message"]["thinking"]
-            return content
+            if content:
+                return content
     except Exception as e:
         print(f"  Local LLM failed: {e}")
+
+    # Try OpenRouter free model (Nemotron)
+    if OR_KEY:
+        try:
+            import urllib.request
+            req = urllib.request.Request(
+                OR_URL,
+                data=json.dumps({
+                    "model": OR_MODEL,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.2,
+                    "max_tokens": max_tokens,
+                }).encode('utf-8'),
+                headers={
+                    "Authorization": f"Bearer {OR_KEY}",
+                    "Content-Type": "application/json",
+                },
+                method='POST',
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+                content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                if content:
+                    return content
+        except Exception as e:
+            print(f"  OpenRouter LLM failed: {e}")
 
     return ""
 
