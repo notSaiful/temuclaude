@@ -731,8 +731,8 @@ def parse_markdown_content(filepath):
         # Clean up the tweet text
         # Remove markdown formatting that doesn't work on Twitter
         body = body.replace("**", "")
-        body = body.replace("[link]", "https://github.com/notSaiful/temuclaude-research")
-        body = body.replace("[GitHub link]", "https://github.com/notSaiful/temuclaude-research")
+        body = body.replace("[link]", "https://github.com/notSaiful/temuclaude")
+        body = body.replace("[GitHub link]", "https://github.com/notSaiful/temuclaude")
         
         tweets.append(body)
     
@@ -1375,7 +1375,7 @@ Watch what happens when I ask 3 AI models the same question 👇
 
 That's Temuclaude. Open-source. Free with Ollama. Built by one developer.
 
-GitHub: https://github.com/notSaiful/temuclaude-research
+GitHub: https://github.com/notSaiful/temuclaude
 ```
 
 **Step 2: Prepare Hacker News Show HN post**
@@ -1399,7 +1399,7 @@ It runs on Ollama (free, unlimited, local) or OpenRouter (production, pay-per-to
 
 Benchmark results: [link to results]
 
-GitHub: https://github.com/notSaiful/temuclaude-research
+GitHub: https://github.com/notSaiful/temuclaude
 
 I'm a developer in India who built this solo. No funding, no team. Just a belief that one model isn't enough and AI infrastructure should be free.
 

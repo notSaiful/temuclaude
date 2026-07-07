@@ -93,7 +93,7 @@ Final Answer
 
 ```bash
 # Clone
-git clone https://github.com/notSaiful/temuclaude-research.git
+git clone https://github.com/notSaiful/temuclaude.git
 cd temuclaude-research/website
 
 # Install
