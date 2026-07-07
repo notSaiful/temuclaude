@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TemuClaude — Hero Variants</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e8e8f0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Design tokens (from temuclaude site) ── */
+  :root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #141414;
+    --bg-dark: #0f0f0f;
+    --text-primary: #e8e8f0;
+    --text-secondary: #a0a0b0;
+    --text-muted: #606070;
+    --text-inverse: #e8e8f0;
+    --border-default: #2a2a2a;
+    --border-subtle: #1a1a1a;
+    --accent-primary: #D97757;
+    --accent-olive: #788C5D;
+    --accent-fig: #C46686;
+    --accent-amber: #E8B547;
+  }
+
+  /* ── Page layout ── */
+  .page-header {
+    text-align: center;
+    padding: 48px 20px 24px;
+  }
+  .page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  .page-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .variant-label {
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .variant-label .sub {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ── Hero section (matches site) ── */
+  .hero {
+    position: relative;
+    padding: 48px 24px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 70% 50% at 70% 10%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 20% 30%, rgba(120, 140, 93, 0.06) 0%, transparent 50%);
+  }
+  .hero-inner {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+  .hero-left { max-width: 420px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(217, 119, 87, 0.1);
+    border: 1px solid rgba(217, 119, 87, 0.2);
+    font-size: 12px;
+    color: var(--accent-primary);
+    margin-bottom: 20px;
+  }
+  .badge .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-olive);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero-title {
+    font-size: 42px;
+    font-weight: 300;
+    letter-spacing: -0.05em;
+    line-height: 1.02;
+    margin-bottom: 16px;
+  }
+  .hero-title .accent { color: var(--accent-primary); }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .code-snippet {
+    background: var(--bg-dark);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    margin-bottom: 16px;
+    max-width: 360px;
+    overflow-x: auto;
+  }
+  .code-snippet .cm { color: var(--text-muted); }
+  .code-snippet .kw { color: var(--accent-olive); }
+  .code-snippet .fl { color: var(--accent-fig); }
+  .code-snippet .st { color: var(--accent-amber); }
+  .btn-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: var(--accent-primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .price-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .price-row strong { color: var(--text-primary); }
+  .price-row .sep { color: var(--border-default); }
+
+  .hero-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     VARIANT A: Animated Fusion Pipeline
+     ═══════════════════════════════════════════════════════ */
+  .fusion-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .fusion-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 14px;
+  }
+  .fusion-header .dots { display: flex; gap: 5px; }
+  .fusion-header .dots span {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .fusion-header .dots span:nth-child(1) { background: #ff5f57; }
+  .fusion-header .dots span:nth-child(2) { background: #febc2e; }
+  .fusion-header .dots span:nth-child(3) { background: #28c840; }
+  .fusion-header .title {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+  .fusion-question {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+    padding: 8px 10px;
+    background: var(--bg-dark);
+    border-radius: 6px;
+    border-left: 2px solid var(--accent-primary);
+  }
+  .fusion-models {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .fusion-model {
+    flex: 1;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 6px;
+    font-size: 10px;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-dark);
+  }
+  .fusion-model .name {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .fusion-model .bar {
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-default);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .fusion-model .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    width: 0;
+    animation: fillBar 2s ease-in-out infinite;
+  }
+  .fusion-model:nth-child(1) .name { color: var(--accent-olive); }
+  .fusion-model:nth-child(1) .bar-fill { background: var(--accent-olive); animation-delay: 0s; }
+  .fusion-model:nth-child(2) .name { color: var(--accent-fig); }
+  .fusion-model:nth-child(2) .bar-fill { background: var(--accent-fig); animation-delay: 0.3s; }
+  .fusion-model:nth-child(3) .name { color: var(--accent-amber); }
+  .fusion-model:nth-child(3) .bar-fill { background: var(--accent-amber); animation-delay: 0.6s; }
+  @keyframes fillBar {
+    0% { width: 0; }
+    50% { width: 85%; }
+    100% { width: 100%; }
+  }
+  .fusion-arrow {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .fusion-answer {
+    padding: 10px 12px;
+    background: rgba(217, 119, 87, 0.08);
+    border: 1px solid rgba(217, 119, 87, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .fusion-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .fusion-meta span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .fusion-meta .score { color: var(--accent-olive); }
+  .fusion-meta .cost { color: var(--accent-amber); }
+  .fusion-meta .tech { color: var(--accent-fig); }
+
+  /* ═══════════════════════════════════════════════════════
+     VARIANT B: Terminal Response Card
+     ═══════════════════════════════════════════════════════ */
+  .terminal-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-default);
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .terminal-header .dots { display: flex; gap: 5px; }
+  .terminal-header .dots span {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .terminal-header .dots span:nth-child(1) { background: #ff5f57; }
+  .terminal-header .dots span:nth-child(2) { background: #febc2e; }
+  .terminal-header .dots span:nth-child(3) { background: #28c840; }
+  .terminal-header .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+  .terminal-body {
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .terminal-body .ln { display: flex; gap: 0; }
+  .terminal-body .key { color: var(--accent-fig); min-width: 90px; }
+  .terminal-body .val { color: var(--text-primary); }
+  .terminal-body .arr { color: var(--text-muted); margin-right: 4px; }
+  .terminal-body .br { color: var(--text-muted); }
+  .terminal-body .str { color: var(--accent-amber); }
+  .terminal-body .num { color: var(--accent-olive); }
+  .terminal-body .cmt { color: var(--text-muted); font-style: italic; }
+  .terminal-body .section {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .terminal-body .answer-text {
+    color: var(--text-primary);
+    padding: 8px 10px;
+    background: rgba(217, 119, 87, 0.06);
+    border-radius: 4px;
+    border-left: 2px solid var(--accent-primary);
+    margin: 6px 0;
+    font-size: 11px;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     VARIANT C: The Spark (all-orange, larger, pulse)
+     ═══════════════════════════════════════════════════════ */
+  .spark-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .spark-svg {
+    animation: sparkPulse 3s ease-in-out infinite;
+  }
+  @keyframes sparkPulse {
+    0%, 100% { transform: scale(1); opacity: 0.95; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+  .spark-caption {
+    text-align: center;
+  }
+  .spark-caption .tagline {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .spark-caption .sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .hero-title { font-size: 34px; }
+  }
+
+  /* ── Pick bar ── */
+  .pick-bar {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-default);
+  }
+  .pick-bar .pick-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>TemuClaude Hero — 3 Variants</h1>
+  <p>Same left side. Different right side. Pick one.</p>
+</div>
+
+<!-- ════════════ VARIANT A: Fusion Pipeline ════════════ -->
+<div class="variant-label">
+  A · Animated Fusion Pipeline
+  <span class="sub">Question → 3 models in parallel → 1 fused answer + metadata</span>
+</div>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="badge">
+        <span class="dot"></span>
+        One API · 8 models · MIT licensed
+      </div>
+      <h1 class="hero-title">
+        Frontier-quality AI.<br>
+        <span class="accent">Fraction of the cost.</span><br>
+        One API call.
+      </h1>
+      <p class="hero-sub">
+        TemuClaude runs 8 AI models in parallel, fuses their best answers,
+        verifies math with code execution, and self-checks every response.
+      </p>
+      <div class="code-snippet">
+        <div class="cm"># One request. One answer. No model selection.</div>
+        <div><span class="kw">curl</span> <span class="fl">-X POST</span> temuclaude.com/api/chat \</div>
+        <div>&nbsp;&nbsp;-d <span class="st">'{"messages":[{"role":"user","content":"hi"}]}'</span></div>
+      </div>
+      <div class="btn-row">
+        <a href="#" class="btn-accent">Try Free — 20 queries/day →</a>
+        <a href="#" class="btn-secondary">View Pricing</a>
+      </div>
+      <div class="price-row">
+        <span><strong>$0.50</strong> /MTok input</span>
+        <span class="sep">·</span>
+        <span><strong>$2.00</strong> /MTok output</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="fusion-card">
+        <div class="fusion-header">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="title">temuclaude — live fusion</span>
+        </div>
+        <div class="fusion-question">
+          "Prove that the sum of two odd numbers is even."
+        </div>
+        <div class="fusion-models">
+          <div class="fusion-model">
+            <div class="name">GLM-5.2</div>
+            <div class="bar"><div class="bar-fill"></div></div>
+          </div>
+          <div class="fusion-model">
+            <div class="name">DeepSeek</div>
+            <div class="bar"><div class="bar-fill"></div></div>
+          </div>
+          <div class="fusion-model">
+            <div class="name">Gemini 3</div>
+            <div class="bar"><div class="bar-fill"></div></div>
+          </div>
+        </div>
+        <div class="fusion-arrow">↓ fusion ↓</div>
+        <div class="fusion-answer">
+          Let a = 2k+1, b = 2m+1. Then a+b = 2(k+m+1), which is even. ∎
+        </div>
+        <div class="fusion-meta">
+          <span class="score">✓ QA 9.4</span>
+          <span class="cost">$0.012</span>
+          <span class="tech">moa-3-layer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ VARIANT B: Terminal Response ════════════ -->
+<div class="variant-label">
+  B · Terminal Response Card
+  <span class="sub">Real orchestration JSON — devs see exactly what comes back</span>
+</div>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="badge">
+        <span class="dot"></span>
+        One API · 8 models · MIT licensed
+      </div>
+      <h1 class="hero-title">
+        Frontier-quality AI.<br>
+        <span class="accent">Fraction of the cost.</span><br>
+        One API call.
+      </h1>
+      <p class="hero-sub">
+        TemuClaude runs 8 AI models in parallel, fuses their best answers,
+        verifies math with code execution, and self-checks every response.
+      </p>
+      <div class="code-snippet">
+        <div class="cm"># One request. One answer. No model selection.</div>
+        <div><span class="kw">curl</span> <span class="fl">-X POST</span> temuclaude.com/api/chat \</div>
+        <div>&nbsp;&nbsp;-d <span class="st">'{"messages":[{"role":"user","content":"hi"}]}'</span></div>
+      </div>
+      <div class="btn-row">
+        <a href="#" class="btn-accent">Try Free — 20 queries/day →</a>
+        <a href="#" class="btn-secondary">View Pricing</a>
+      </div>
+      <div class="price-row">
+        <span><strong>$0.50</strong> /MTok input</span>
+        <span class="sep">·</span>
+        <span><strong>$2.00</strong> /MTok output</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <span class="label">POST /api/chat — response</span>
+        </div>
+        <div class="terminal-body">
+          <div class="answer-text">
+            The sum of two odd numbers is always even. Given a=2k+1 and b=2m+1, their sum a+b = 2(k+m+1), which is divisible by 2.
+          </div>
+          <div class="section">
+            <div class="ln"><span class="key">"orchestration"</span><span class="arr">:</span><span class="br">{</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"taskType"</span><span class="arr">:</span><span class="str">"math"</span><span class="br">,</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"tier"</span><span class="arr">:</span><span class="str">"hard"</span><span class="br">,</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"models"</span><span class="arr">:</span><span class="br">[</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"glm-5.2",</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"deepseek-v4-pro",</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"gemini-3-flash"</span></div>
+            <div class="ln"><span class="br">&nbsp;&nbsp;]</span><span class="br">,</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"qaScore"</span><span class="arr">:</span><span class="num">9.4</span><span class="br">,</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"cost"</span><span class="arr">:</span><span class="str">"$0.012"</span><span class="br">,</span></div>
+            <div class="ln"><span class="key">&nbsp;&nbsp;"techniques"</span><span class="arr">:</span><span class="br">[</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"moa-3-layer",</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"code-verification",</span></div>
+            <div class="ln"><span class="val">&nbsp;&nbsp;&nbsp;&nbsp;"reflexion"</span></div>
+            <div class="ln"><span class="br">&nbsp;&nbsp;]</span></div>
+            <div class="ln"><span class="br">}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ VARIANT C: The Spark ════════════ -->
+<div class="variant-label">
+  C · The Spark (All-Orange, Larger, Subtle Pulse)
+  <span class="sub">Brand logo — small input, frontier output</span>
+</div>
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="badge">
+        <span class="dot"></span>
+        One API · 8 models · MIT licensed
+      </div>
+      <h1 class="hero-title">
+        Frontier-quality AI.<br>
+        <span class="accent">Fraction of the cost.</span><br>
+        One API call.
+      </h1>
+      <p class="hero-sub">
+        TemuClaude runs 8 AI models in parallel, fuses their best answers,
+        verifies math with code execution, and self-checks every response.
+      </p>
+      <div class="code-snippet">
+        <div class="cm"># One request. One answer. No model selection.</div>
+        <div><span class="kw">curl</span> <span class="fl">-X POST</span> temuclaude.com/api/chat \</div>
+        <div>&nbsp;&nbsp;-d <span class="st">'{"messages":[{"role":"user","content":"hi"}]}'</span></div>
+      </div>
+      <div class="btn-row">
+        <a href="#" class="btn-accent">Try Free — 20 queries/day →</a>
+        <a href="#" class="btn-secondary">View Pricing</a>
+      </div>
+      <div class="price-row">
+        <span><strong>$0.50</strong> /MTok input</span>
+        <span class="sep">·</span>
+        <span><strong>$2.00</strong> /MTok output</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="spark-wrap">
+        <svg class="spark-svg" width="220" height="220" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="8" fill="#D97757"/>
+          <line x1="50" y1="50" x2="50" y2="10" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="78" y2="22" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="90" y2="50" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="78" y2="78" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="50" y2="90" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="22" y2="78" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="10" y2="50" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="50" y1="50" x2="22" y2="22" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="spark-caption">
+          <div class="tagline">Small input. Frontier output.</div>
+          <div class="sub">8 models fused · 1 answer · MIT licensed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="pick-bar">
+  <span class="pick-label">Open this file in your browser to compare all 3 side by side →</span>
+</div>
+
+</body>
+</html>

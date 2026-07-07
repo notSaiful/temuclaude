@@ -1,38 +1,40 @@
-# Temuclaude
+# TemuClaude
 
-> One question. Many minds. One superior answer. Frontier-level intelligence at 25x lower cost.
+> One question. Eight minds. One superior answer.
 
-## What is Temuclaude?
+Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates 8 AI models in parallel, fuses their best answers, verifies math with code execution, and self-checks every response. You get one answer — smarter than any single model, at 6-25x lower cost.
 
-Temuclaude is an AI orchestration platform that routes your queries to 8 AI models simultaneously, fuses their responses, verifies with code, and quality-checks with self-QA. The result: answers that beat frontier models (Fable 5, GPT-5.5, Gemini 3.1 Pro) at 25x lower cost.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Website](https://img.shields.io/website?url=https://temuclaude.com)](https://temuclaude.com)
+[![GitHub stars](https://img.shields.io/github/stars/notSaiful/temuclaude)](https://github.com/notSaiful/temuclaude)
 
-## Live Demo
+## Live
 
-- **Website**: https://website-gamma-six-86.vercel.app
-- **Playground**: https://website-gamma-six-86.vercel.app/playground
-- **Pricing**: https://website-gamma-six-86.vercel.app/pricing
-- **Models**: https://website-gamma-six-86.vercel.app/models
-- **Docs**: https://website-gamma-six-86.vercel.app/docs
-- **Benchmarks**: https://website-gamma-six-86.vercel.app/benchmarks
+- **Website**: https://temuclaude.com
+- **Playground**: https://temuclaude.com/playground
+- **Pricing**: https://temuclaude.com/pricing
+- **Docs**: https://temuclaude.com/docs
+- **Benchmarks**: https://temuclaude.com/benchmarks
+- **Models**: https://temuclaude.com/models
 
 ## Model Pool (8 models)
 
-| Model | Role | IQ | Price ($/1M) |
-|-------|------|-----|-------------|
-| GLM-5.2 | Orchestrator | 51 | $0.58 / $2.19 |
-| DeepSeek V4 Pro | Hard Reasoning | 44 | $2.72 / $10.88 |
-| Hy3 Preview | Trivial Router | — | $0.063 / $0.21 |
-| MiMo-V2.5 | Multimodal | 40 | $0.105 / $0.28 |
-| Gemini 3 Flash | Legal/Health | 50 | $0.50 / $3.00 |
-| MiniMax M3 | Vision + Creative | 44 | $2.04 / $8.16 |
-| Claude Sonnet 5 | Frontier Fallback | 53 | $3.00 / $15.00 |
-| Nemotron 3 Ultra | QA Gate (Free) | 38 | FREE |
+| Model | Role | IQ | Context |
+|-------|------|-----|---------|
+| GLM-5.2 | Orchestrator + Aggregator | 51 | 1M |
+| DeepSeek V4 Pro | Hard Reasoning + Math | 44 | 1M |
+| Hy3 Preview | Trivial Router (cheapest) | — | 262K |
+| Gemini 3 Flash | Legal + Health | 50 | 1M |
+| MiniMax M3 | Vision + Creative | 44 | 1M |
+| MiMo-V2.5 | Multimodal | 40 | 1M |
+| Claude Sonnet 5 | Frontier Fallback (2%) | 53 | 1M |
+| Nemotron 3 Ultra | QA Gate (FREE) | 38 | 128K |
 
 ## Pricing
 
 | Plan | Price | Queries | API |
 |------|-------|---------|-----|
-| Free | $0 | 100/day | No |
+| Free | $0 | 20/day | Playground |
 | Developer | $15/mo | 50,000/mo | Yes |
 | Pro | $49/mo | 500,000/mo | Yes |
 | Pay-as-you-go | $0.50/$2.00 per 1M tokens | — | Yes |
@@ -40,15 +42,16 @@ Temuclaude is an AI orchestration platform that routes your queries to 8 AI mode
 
 ## vs Frontier Models
 
-| Model | Input $/1M | Output $/1M | vs Temuclaude |
+| Model | Input $/1M | Output $/1M | vs TemuClaude |
 |-------|-----------|------------|-------------|
-| Claude Fable 5 | $10.00 | $50.00 | 25x more expensive |
-| GPT-5.5 | $5.00 | $30.00 | 15x more expensive |
-| Claude Opus 4.8 | $5.00 | $25.00 | 12.5x more expensive |
-| Claude Sonnet 5 | $3.00 | $15.00 | 7.5x more expensive |
-| Gemini 3.1 Pro | Free | $12.00 | 6x more expensive (output) |
-| GLM-5.2 | $1.40 | $4.40 | 2.2x more expensive |
-| **Temuclaude** | **$0.50** | **$2.00** | **—** |
+| Claude Fable 5 | $10.00 | $50.00 | 20-25x more |
+| GPT-5.5 | $5.00 | $30.00 | 10-15x more |
+| Claude Sonnet 5 | $3.00 | $15.00 | 6-7.5x more |
+| Gemini 3.5 Flash | $1.50 | $9.00 | 3-4.5x more |
+| GLM-5.2 | $1.40 | $4.40 | 2.2-2.8x more |
+| **TemuClaude** | **$0.50** | **$2.00** | **—** |
+
+Blended cost: ~$0.05/MTok (60% free models + 30% cheap + 10% premium).
 
 ## Architecture
 
@@ -58,10 +61,10 @@ User Query
 Classify (task type + difficulty)
     ↓
 ┌──────────────────────────────────────────┐
-│  TRIVIAL (60%)  → Hy3 Preview (cheapest)  │
-│  MEDIUM (25%)   → Specialist routing      │
-│  HARD (13%)     → 10-layer fusion stack   │
-│  FRONTIER (2%)  → Claude Sonnet 5 (IQ 53) │
+│  TRIVIAL (60%)  → Hy3 Preview (cheapest) │
+│  MEDIUM (30%)   → Specialist routing     │
+│  HARD (10%)     → 10-layer fusion stack  │
+│  FRONTIER (2%)  → Claude Sonnet 5        │
 └──────────────────────────────────────────┘
     ↓
 10-Layer Stack (hard queries):
@@ -69,45 +72,45 @@ Classify (task type + difficulty)
 2. MoA 3-layer (propose → cross-review → aggregate)
 3. Self-consistency (N samples, PRM-weighted voting)
 4. Code verification (sandboxed execution)
-5. USVA 4-rubric QA gate
+5. USVA 5-rubric QA gate
 6. Reflexion (retry with feedback)
 7. s1 budget forcing (extend short responses)
 8. Step-level code verification (rStar-Math)
 9. Z3/SMT logical verification
 10. Frontier fallback (Claude Sonnet 5 if QA < 0.75)
     ↓
-Final Answer
+Final Answer + Full Orchestration Metadata
 ```
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15, React 19, Tailwind CSS, Framer Motion
+- **Frontend**: Next.js 15, React 19, Tailwind CSS
 - **Backend**: Next.js API Routes (Node.js runtime)
-- **Database**: JSON file store (upgrading to Postgres)
-- **Payments**: Razorpay (subscriptions, pay-as-you-go)
 - **AI Models**: OpenRouter (8-model pool)
-- **Hosting**: Vercel
-- **CI/CD**: GitHub Actions
+- **Email**: Resend (automated transactional + marketing)
+- **Payments**: Razorpay (subscriptions, pay-as-you-go)
+- **Hosting**: Vercel (Mumbai region)
+- **Autonomous System**: Hasan (23-daemon research swarm)
 
 ## Development
 
 ```bash
 # Clone
 git clone https://github.com/notSaiful/temuclaude.git
-cd temuclaude-research/website
+cd temuclaude/website
 
 # Install
 npm install
 
 # Environment
 cp .env.example .env
-# Add your Razorpay and OpenRouter keys to .env
+# Add OPENROUTER_API_KEY and RESEND_API_KEY to .env
 
 # Run dev server
-node node_modules/.bin/next dev -p 3001
+npm run dev
 
 # Build
-npx next build
+npm run build
 ```
 
 ## Project Structure
@@ -116,33 +119,36 @@ npx next build
 temuclaude/
 ├── website/                 # Next.js app (production)
 │   ├── app/
-│   │   ├── api/             # API routes (payments, usage, keys, chat)
+│   │   ├── api/             # API routes (chat, email, payments, usage)
 │   │   ├── pricing/         # Pricing page
 │   │   ├── playground/      # Playground with usage tracking
 │   │   ├── models/          # 8-model pool display
-│   │   ├── terms/            # Terms of Service
-│   │   ├── privacy/          # Privacy Policy
-│   │   └── refunds/          # Refund Policy
-│   ├── lib/                 # Shared code (plans, db, razorpay)
+│   │   ├── docs/            # Full documentation
+│   │   ├── benchmarks/      # Benchmark results
+│   │   ├── terms/           # Terms of Service
+│   │   ├── privacy/         # Privacy Policy
+│   │   └── refunds/         # Refund Policy
+│   ├── lib/                 # Shared code (email, plans, db)
 │   └── components/          # React components
 ├── src/                     # Python orchestrator (core engine)
 ├── benchmarks/              # Benchmark framework
 ├── tests/                   # Test suites
-└── research/                # Research swarm
+└── research/                # Hasan autonomous research swarm
 ```
 
 ## Status
 
-- **Phase 1-5**: Complete (Python orchestrator, 16 techniques, 84+ tests)
-- **Phase 6**: In progress (website, payments, launch)
-- **Live**: https://website-gamma-six-86.vercel.app
+- **Website**: Live at temuclaude.com
+- **Models**: 8 models deployed via OpenRouter
+- **Legal**: Terms, Privacy, Refunds all live
+- **Email**: 8 automated email types via Resend
 - **Build**: Passing
-- **CI/CD**: GitHub Actions → Vercel
+- **Tests**: 472+ passing
 
 ## Author
 
-Mohammad Saiful Haque (Ggs) — built with Hermes Agent. One developer in Nagpur, India, proving that orchestrated models beat any single model at a fraction of the cost.
+Mohammad Saiful Haque — built with Hermes Agent. One developer in Nagpur, India, proving that orchestrated models beat any single model at a fraction of the cost. 25% of profit goes to charity.
 
 ## License
 
-All Rights Reserved © 2026 Temuclaude
+MIT Licensed — see [LICENSE](LICENSE)

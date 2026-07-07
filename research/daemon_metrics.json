@@ -1,120 +1,120 @@
 {
-  "timestamp": "2026-07-07T07:08:08.728147+00:00",
+  "timestamp": "2026-07-07T07:46:08.913952+00:00",
   "daemons": {
     "scout_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 26.619271755218506
+      "age_seconds": 26.311517000198364
     },
     "distiller_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 20.732750177383423
+      "age_seconds": 20.518252849578857
     },
     "research_daemon_1": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 16.193490982055664
+      "age_seconds": 15.079702854156494
     },
     "research_daemon_2": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 14.172899007797241
+      "age_seconds": 13.975469827651978
     },
     "research_daemon_3": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 11.894726037979126
+      "age_seconds": 11.640346765518188
     },
     "integrator_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.366886854171753
+      "age_seconds": 2.731513738632202
     },
     "coordinator_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 28.94246816635132
+      "age_seconds": 28.77874183654785
     },
     "cyber_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 9.50215220451355
+      "age_seconds": 9.274649143218994
     },
     "efficiency_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 7.96781587600708
+      "age_seconds": 7.730554103851318
     },
     "media_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 28.954737901687622
+      "age_seconds": 28.793869972229004
     },
     "marketing_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.832444906234741
+      "age_seconds": 2.738495111465454
     },
     "feedback_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 3.807748794555664
+      "age_seconds": 2.7384839057922363
     },
     "meta_auditor_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 16.923264026641846
+      "age_seconds": 15.081162929534912
     },
     "swot_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 14.645188093185425
+      "age_seconds": 14.307031869888306
     },
     "website_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 24.607542037963867
+      "age_seconds": 23.55530285835266
     },
     "industry_radar_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 24.65627384185791
+      "age_seconds": 23.539396047592163
     },
     "model_optimizer_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 21.075188875198364
+      "age_seconds": 20.802132844924927
     },
     "cost_efficiency_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 4.768873929977417
+      "age_seconds": 2.7368710041046143
     },
     "revenue_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.750090837478638
+      "age_seconds": 2.7426419258117676
     },
     "growth_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 0.7257180213928223
+      "age_seconds": 0.4745190143585205
     },
     "competitive_dominance_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 28.95518708229065
+      "age_seconds": 28.763023138046265
     },
     "self_expansion_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 25.894197940826416
+      "age_seconds": 25.634791135787964
     },
     "super_intelligence_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 12.830408096313477
+      "age_seconds": 12.076431035995483
     }
   },
   "queue": {

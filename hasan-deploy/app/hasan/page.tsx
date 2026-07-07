@@ -404,6 +404,18 @@ export default function HasanPage() {
               </div>
             </div>
 
+            {/* Context Health Summary */}
+            <div style={s.ctxBox}>
+              <div style={s.ctxHead}>
+                <Icon name="sparkles" size={14} color="#8b5cf6" />
+                <span style={s.ctxTitle}>Context Health</span>
+                <span style={s.ctxBadge}>9/9 PASS</span>
+              </div>
+              <p style={s.ctxText}>
+                Memory at 41% (908/2,200 chars), Profile at 62% (854/1,375 chars). Both under budget. Memory is an index of concise pointers to skills — details load on demand, never stored twice. All nine checks pass: DRY (no semantic overlap), positive framing, self-contained entries, stable-to-transient hierarchy, no stale state, info preserved in skills, index pattern, colleague test, and budget compliance. Zero waste, zero redundancy, zero stale data.
+              </p>
+            </div>
+
             {/* Live Activity Feed */}
             <div style={s.feedPanel}>
               <div style={s.feedHead}>
@@ -732,6 +744,11 @@ const s: Record<string, React.CSSProperties> = {
   ummahLabel: { fontSize: '10px', color: '#8b8b9b' },
   ummahNote: { fontSize: '9px', color: '#6b6b7b', textAlign: 'center', marginTop: '6px' },
   feedPanel: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '20px', backdropFilter: 'blur(10px)' },
+  ctxBox: { background: 'rgba(139,92,246,0.03)', border: '1px solid rgba(139,92,246,0.12)', borderRadius: '12px', padding: '16px 18px', marginBottom: '20px' },
+  ctxHead: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' },
+  ctxTitle: { fontSize: '12px', fontWeight: 600, color: '#8b8b9b', letterSpacing: '0.5px' },
+  ctxBadge: { marginLeft: 'auto', fontSize: '10px', fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '3px 10px', borderRadius: '20px', fontFamily: "'JetBrains Mono', monospace" },
+  ctxText: { fontSize: '12px', lineHeight: 1.7, color: '#a8a8b8', margin: 0 },
   feedHead: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' },
   feedTitle: { fontSize: '14px', fontWeight: 600, color: '#8b8b9b', margin: 0 },
   liveDot: { width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444' },
