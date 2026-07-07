@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
@@ -37,59 +38,306 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+/** Aurora glow that drifts on scroll — gives the hero atmosphere */
+function AuroraGlow() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  });
+  const y1 = useTransform(scrollYProgress, [0, 1], ['0%', '60%']);
+  const y2 = useTransform(scrollYProgress, [0, 1], ['0%', '-40%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  return (
+    <div ref={ref} className="absolute inset-0 pointer-events-none overflow-hidden">
+      <motion.div
+        style={{ y: y1, opacity }}
+        className="absolute -top-20 -right-20 w-[600px] h-[600px] rounded-full"
+        animate={{
+          scale: [1, 1.1, 1],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <div className="w-full h-full rounded-full" style={{ background: 'radial-gradient(circle, rgba(226,88,34,0.12) 0%, transparent 70%)' }} />
+      </motion.div>
+      <motion.div
+        style={{ y: y2, opacity }}
+        className="absolute top-40 -left-20 w-[500px] h-[500px] rounded-full"
+        animate={{
+          scale: [1, 1.15, 1],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      >
+        <div className="w-full h-full rounded-full" style={{ background: 'radial-gradient(circle, rgba(120,140,93,0.10) 0%, transparent 70%)' }} />
+      </motion.div>
+    </div>
+  );
+}
+
+/** Floating model orbs — visual representation of the 8 models orbiting */
+function FloatingOrbs() {
+  const models = [
+    { name: 'GLM', color: '#E25822', x: '5%', y: '15%', delay: 0, size: 44 },
+    { name: 'DS', color: '#788C5D', x: '88%', y: '10%', delay: 0.3, size: 38 },
+    { name: 'Gem', color: '#C46686', x: '92%', y: '70%', delay: 0.6, size: 36 },
+    { name: 'MM', color: '#E8B547', x: '3%', y: '75%', delay: 0.9, size: 40 },
+    { name: 'Nem', color: '#8E8B85', x: '50%', y: '5%', delay: 1.2, size: 32 },
+    { name: 'Hy3', color: '#D4A574', x: '75%', y: '85%', delay: 1.5, size: 34 },
+  ];
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden hidden lg:block">
+      {models.map((m, i) => (
+        <motion.div
+          key={i}
+          className="absolute flex items-center justify-center rounded-full font-mono text-[10px] font-semibold"
+          style={{
+            left: m.x,
+            top: m.y,
+            width: m.size,
+            height: m.size,
+            background: `${m.color}15`,
+            border: `1px solid ${m.color}30`,
+            color: m.color,
+          }}
+          animate={{
+            y: [0, -12, 0],
+            opacity: [0.4, 0.7, 0.4],
+          }}
+          transition={{
+            duration: 4 + i,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: m.delay,
+          }}
+        >
+          {m.name}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/** Pinned scroll section — the pipeline story unfolds as you scroll */
+function PipelineStory() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end end'],
+  });
+
+  const steps = [
+    { num: '01', title: 'You ask', desc: 'One API call. No model selection. Just your question.', color: '#E25822' },
+    { num: '02', title: 'We route', desc: 'Query classification picks the best models for your task type.', color: '#C46686' },
+    { num: '03', title: 'They answer in parallel', desc: '3 models generate independently. Each sees the others and refines.', color: '#788C5D' },
+    { num: '04', title: 'We fuse', desc: 'Dynamic aggregator synthesizes the best parts into one answer.', color: '#E8B547' },
+    { num: '05', title: 'We verify', desc: 'Math is checked with code execution. Quality scored on 5 rubrics.', color: '#E25822' },
+    { num: '06', title: 'You get one answer', desc: 'Plus full metadata: which models, cost, quality score, techniques.', color: '#1A1816' },
+  ];
+
+  return (
+    <section ref={ref} className="relative" style={{ height: `${steps.length * 60}vh` }}>
+      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
+        <div className="container-max w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: step text */}
+            <div>
+              <div className="mb-8">
+                <span className="text-xs font-mono text-text-muted uppercase tracking-wider">The Pipeline</span>
+              </div>
+              {steps.map((step, i) => {
+                const start = i / steps.length;
+                const end = (i + 1) / steps.length;
+                const opacity = useTransform(scrollYProgress, [start - 0.05, start, end, end + 0.05], [0, 1, 1, 0]);
+                const y = useTransform(scrollYProgress, [start - 0.05, start, end, end + 0.05], [30, 0, 0, -30]);
+                return (
+                  <motion.div
+                    key={i}
+                    style={{ opacity, y }}
+                    className="absolute"
+                  >
+                    <div
+                      className="text-5xl font-serif mb-3"
+                      style={{ fontWeight: 300, color: step.color, letterSpacing: '-0.04em' }}
+                    >
+                      {step.num}
+                    </div>
+                    <h3 className="text-2xl font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>
+                      {step.title}
+                    </h3>
+                    <p className="text-text-secondary max-w-md leading-relaxed">{step.desc}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Right: visual pipeline */}
+            <div className="relative h-[400px] flex items-center justify-center">
+              <svg width="100%" height="100%" viewBox="0 0 400 400" className="absolute inset-0">
+                {/* Connection lines */}
+                {steps.slice(0, -1).map((_, i) => {
+                  const angle = (i / (steps.length - 1)) * Math.PI * 2 - Math.PI / 2;
+                  const nextAngle = ((i + 1) / (steps.length - 1)) * Math.PI * 2 - Math.PI / 2;
+                  const r = 140;
+                  const x1 = 200 + r * Math.cos(angle);
+                  const y1 = 200 + r * Math.sin(angle);
+                  const x2 = 200 + r * Math.cos(nextAngle);
+                  const y2 = 200 + r * Math.sin(nextAngle);
+                  return (
+                    <motion.line
+                      key={i}
+                      x1={x1} y1={y1} x2={x2} y2={y2}
+                      stroke="#E25822"
+                      strokeWidth="1"
+                      strokeDasharray="4 4"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 0.2 }}
+                      transition={{ duration: 0.5, delay: i * 0.1 }}
+                    />
+                  );
+                })}
+                {/* Nodes */}
+                {steps.map((step, i) => {
+                  const angle = (i / (steps.length - 1)) * Math.PI * 2 - Math.PI / 2;
+                  const r = 140;
+                  const x = 200 + r * Math.cos(angle);
+                  const y = 200 + r * Math.sin(angle);
+                  return (
+                    <motion.circle
+                      key={i}
+                      cx={x} cy={y} r="24"
+                      fill={step.color}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                    />
+                  );
+                })}
+                {/* Center hub */}
+                <circle cx="200" cy="200" r="32" fill="#1A1816" />
+                <text x="200" y="205" textAnchor="middle" fill="#FAF8F5" fontSize="12" fontFamily="monospace">fuse</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** CTA section with dramatic finish */
+function CtaSection() {
+  return (
+    <section className="relative py-32 px-6 overflow-hidden">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 80% at 50% 50%, rgba(226,88,34,0.08) 0%, transparent 70%)',
+        }}
+      />
+      <div className="container-max relative text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
+        >
+          <h2 className="text-4xl md:text-6xl font-serif text-text-primary mb-6 text-balance" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+            Stop choosing models.<br />
+            <span className="text-accent-primary">Start getting answers.</span>
+          </h2>
+          <p className="text-lg text-text-secondary mb-10 max-w-xl mx-auto">
+            20 free queries per day. No signup. No credit card. Just one API call.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <MagneticButton href="/playground" className="btn-accent text-base px-8 py-3">
+              Try Free Now
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+            </MagneticButton>
+            <a href="https://github.com/notSaiful/temuclaude" target="_blank" rel="noopener noreferrer" className="btn-secondary text-base px-8 py-3">
+              Star on GitHub
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const heroY = useTransform(heroScroll, [0, 1], ['0%', '30%']);
+  const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
+  const heroScale = useTransform(heroScroll, [0, 1], [1, 0.95]);
+
   return (
     <>
       <Navbar />
       <ScrollProgress />
       <main id="main-content">
-        {/* ━━ Hero ━━ */}
-        <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+        {/* ━━ Hero — cinematic with parallax + floating orbs ━━ */}
+        <section ref={heroRef} className="relative min-h-screen pt-32 pb-24 px-6 overflow-hidden flex items-center">
+          {/* Dot grid + aurora glows */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: `
-                radial-gradient(circle at 1px 1px, rgba(26,24,22,0.04) 1px, transparent 0),
-                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(120, 140, 93, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(196, 102, 134, 0.04) 0%, transparent 50%)
-              `,
-              backgroundSize: '24px 24px, 100% 100%, 100% 100%, 100% 100%',
+              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(26,24,22,0.04) 1px, transparent 0)`,
+              backgroundSize: '24px 24px',
             }}
           />
-          <div className="container-max relative">
+          <AuroraGlow />
+          <FloatingOrbs />
+
+          <motion.div
+            style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+            className="container-max relative z-10"
+          >
             <div className="grid lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7">
-                <div
-                  className="inline-flex items-center gap-2 badge-accent mb-6 animate-fade-in-up"
-                  style={{ animationDelay: '0ms' }}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+                  className="inline-flex items-center gap-2 badge-accent mb-6"
                 >
                   <span className="w-2 h-2 rounded-full bg-accent-olive animate-pulse-soft" />
                   One API · 8 models · MIT licensed
-                </div>
+                </motion.div>
 
-                <h1
-                  className="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tight text-text-primary leading-[1.05] mb-6 animate-fade-in-up text-balance"
-                  style={{ animationDelay: '100ms', fontWeight: 300, letterSpacing: '-0.03em' }}
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 1, 0.5, 1] }}
+                  className="text-5xl md:text-6xl lg:text-7xl font-serif tracking-tight text-text-primary leading-[1.02] mb-6 text-balance"
+                  style={{ fontWeight: 300, letterSpacing: '-0.035em' }}
                 >
                   Frontier-quality AI.<br />
                   <span className="text-accent-primary">Fraction of the cost.</span><br />
                   One API call.
-                </h1>
+                </motion.h1>
 
-                <p
-                  className="text-lg text-text-secondary mb-8 max-w-lg leading-relaxed animate-fade-in-up"
-                  style={{ animationDelay: '300ms' }}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                  className="text-lg text-text-secondary mb-8 max-w-lg leading-relaxed"
                 >
                   TemuClaude runs 8 AI models in parallel, fuses their best answers,
                   verifies math with code execution, and self-checks every response.
                   You get one answer — smarter than any single model, at a fraction of the cost.
-                </p>
+                </motion.p>
 
-                {/* Code snippet — shows devs exactly how to use it */}
-                <div
-                  className="mb-6 animate-fade-in-up"
-                  style={{ animationDelay: '450ms' }}
+                {/* Code snippet */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.45, ease: [0.25, 1, 0.5, 1] }}
+                  className="mb-6"
                 >
                   <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden group relative">
                     <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5">
@@ -103,14 +351,16 @@ export default function HomePage() {
                       <div className="text-text-muted text-xs mb-2"># One request. One answer. No model selection.</div>
                       <div><span className="text-accent-olive">curl</span> <span className="text-accent-fig">-X POST</span> temuclaude.com/api/chat \</div>
                       <div className="pl-4">-H <span className="text-accent-amber">"Content-Type: application/json"</span> \</div>
-                      <div className="pl-4">-d <span className="text-accent-amber">'{"{"}"messages":[{"{"}"role":"user","content":"hi"{"}"}]{"}"}'</span></div>
+                      <div className="pl-4">-d <span className="text-accent-amber">{'{"messages":[{"role":"user","content":"hi"}]}'}</span></div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                <div
-                  className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up"
-                  style={{ animationDelay: '500ms' }}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.55, ease: [0.25, 1, 0.5, 1] }}
+                  className="flex flex-col sm:flex-row gap-3 mb-6"
                 >
                   <MagneticButton href="/playground" className="btn-accent">
                     Try Free — 20 queries/day
@@ -119,31 +369,86 @@ export default function HomePage() {
                   <a href="/pricing" className="btn-secondary">
                     View Pricing
                   </a>
-                </div>
+                </motion.div>
 
-                <div
-                  className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted animate-fade-in-up"
-                  style={{ animationDelay: '700ms' }}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                  className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted"
                 >
                   <span><strong className="text-text-primary">$0.50</strong> /MTok input</span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">$2.00</strong> /MTok output</span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">No signup</strong> to try</span>
-                </div>
+                </motion.div>
               </div>
 
-              <div
-                className="lg:col-span-5 animate-fade-in-up flex items-center justify-center"
-                style={{ animationDelay: '400ms' }}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                className="lg:col-span-5 flex items-center justify-center"
               >
                 <FusionPipeline />
-              </div>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="flex flex-col items-center gap-1"
+            >
+              <span className="text-xs text-text-muted font-mono">scroll</span>
+              <svg width="14" height="20" viewBox="0 0 14 20" fill="none" stroke="#8E8B85" strokeWidth="1.5">
+                <rect x="1" y="1" width="12" height="18" rx="6" />
+                <motion.circle
+                  cx="7" cy="6" r="2" fill="#E25822"
+                  animate={{ cy: [6, 12, 6] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </svg>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ━━ Social Proof strip — instant credibility ━━ */}
+        <section className="py-16 px-6 border-y border-border-subtle">
+          <div className="container-max">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { value: 472, label: 'tests passing', color: '#788C5D', decimals: 0 },
+                { value: 8, label: 'models fused', color: '#E25822', decimals: 0 },
+                { value: 10, label: 'quality layers', color: '#C46686', decimals: 0 },
+                { value: 0.05, label: 'per M cached tokens', color: '#E8B547', decimals: 2, prefix: '$' },
+              ].map((stat, i) => (
+                <div key={i} className="text-center">
+                  <div
+                    className="text-3xl md:text-4xl font-serif mb-1"
+                    style={{ fontWeight: 300, letterSpacing: '-0.02em', color: stat.color }}
+                  >
+                    <CountUp value={stat.value} prefix={stat.prefix || ''} decimals={stat.decimals} />
+                  </div>
+                  <div className="text-xs md:text-sm text-text-muted">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* ━━ Why TemuClaude — for vibe coders ━━ */}
+        {/* ━━ Pipeline Story — pinned scroll, cinematic ━━ */}
+        <PipelineStory />
+
+        {/* ━━ Why TemuClaude — bento grid ━━ */}
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
@@ -159,7 +464,6 @@ export default function HomePage() {
             </div>
 
             <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)]">
-              {/* Large card — Fusion (2x2) */}
               <StaggerItem>
                 <div className="card lg:col-span-2 lg:row-span-2 h-full" style={{ padding: '32px' }}>
                   <div className="flex items-center gap-2 mb-4">
@@ -191,7 +495,6 @@ export default function HomePage() {
                 </div>
               </StaggerItem>
 
-              {/* Code Verification (1x1) */}
               <StaggerItem>
                 <div className="card h-full">
                   <div className="flex items-center gap-2 mb-3">
@@ -209,7 +512,6 @@ export default function HomePage() {
                 </div>
               </StaggerItem>
 
-              {/* Self-QA (1x1) */}
               <StaggerItem>
                 <div className="card h-full">
                   <div className="flex items-center gap-2 mb-3">
@@ -227,7 +529,6 @@ export default function HomePage() {
                 </div>
               </StaggerItem>
 
-              {/* Cost — wide (2x1) */}
               <StaggerItem>
                 <div className="card lg:col-span-2 h-full">
                   <div className="flex items-center gap-4">
@@ -256,7 +557,6 @@ export default function HomePage() {
                 </div>
               </StaggerItem>
 
-              {/* Charity (1x1) — olive gradient */}
               <StaggerItem>
                 <div className="card h-full" style={{ background: 'linear-gradient(135deg, #788C5D 0%, #5D7048 100%)', color: '#fff', borderColor: 'transparent' }}>
                   <h3 className="text-base font-serif mb-2" style={{ fontWeight: 400 }}>25% of profit → charity</h3>
@@ -267,7 +567,6 @@ export default function HomePage() {
                 </div>
               </StaggerItem>
 
-              {/* Open Source (1x1) */}
               <StaggerItem>
                 <div className="card h-full">
                   <div className="flex items-center gap-2 mb-3">
@@ -288,35 +587,15 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ━━ Social Proof ━━ */}
-        <section className="py-20 px-6">
+        {/* ━━ GitHub badge ━━ */}
+        <section className="py-12 px-6">
           <div className="container-max">
-            {/* Stats strip */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-              {[
-                { value: 472, label: 'tests passing', color: '#788C5D', decimals: 0 },
-                { value: 8, label: 'models fused', color: '#E25822', decimals: 0 },
-                { value: 0.05, label: 'per M cached tokens', color: '#E8B547', decimals: 2, prefix: '$' },
-              ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div
-                    className="text-4xl md:text-5xl font-serif mb-2"
-                    style={{ fontWeight: 300, letterSpacing: '-0.02em', color: stat.color }}
-                  >
-                    <CountUp value={stat.value} prefix={stat.prefix || ''} decimals={stat.decimals} />
-                  </div>
-                  <div className="text-sm text-text-muted">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* GitHub badge */}
-            <div className="flex justify-center mb-12">
+            <div className="flex justify-center">
               <a
                 href="https://github.com/notSaiful/temuclaude"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-border-default hover:border-accent-primary transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm border border-border-default hover:border-accent-primary transition-all hover:shadow-md"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-text-primary">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.605-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
@@ -331,65 +610,6 @@ export default function HomePage() {
 
         {/* ━━ Testimonials ━━ */}
         <Testimonials />
-
-        {/* ━━ How It Works — simplified for builders ━━ */}
-        <section className="py-24 px-6">
-          <div className="container-max">
-            <div className="mb-12 max-w-2xl">
-              <ScrollRevealText
-                text="How it works"
-                className="text-3xl md:text-4xl font-serif text-text-primary mb-3"
-                style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
-              />
-              <p className="text-text-secondary">
-                You send one request. TemuClaude does the rest — and shows you exactly what happened.
-              </p>
-            </div>
-
-            <StaggerReveal className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  num: '01',
-                  title: 'You send a question',
-                  desc: 'One API call. No model selection, no parameters, no temperature tuning. Just your question.',
-                },
-                {
-                  num: '02',
-                  title: 'TemuClaude routes & fuses',
-                  desc: 'It classifies your question, picks the best models, runs them in parallel, cross-reviews, and synthesizes the best answer. 10 quality layers for hard questions.',
-                },
-                {
-                  num: '03',
-                  title: 'You get one answer',
-                  desc: 'Plus a full breakdown: which models ran, how long each took, the quality score, and which techniques were used. Full transparency.',
-                },
-              ].map((step, i) => (
-                <StaggerItem key={i}>
-                  <div className="card h-full">
-                    <div className="text-2xl font-light text-accent-primary mb-3" style={{ fontWeight: 300 }}>{step.num}</div>
-                    <h3 className="text-lg font-semibold text-text-primary mb-2">{step.title}</h3>
-                    <p className="text-sm text-text-secondary leading-relaxed">{step.desc}</p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerReveal>
-
-            {/* Orchestration metadata example */}
-            <div className="mt-12 max-w-2xl mx-auto">
-              <p className="text-sm text-text-muted mb-3 text-center">Every response includes full orchestration metadata:</p>
-              <div className="bg-bg-dark rounded-md p-4 font-mono text-sm overflow-x-auto">
-                <div className="text-text-muted text-xs mb-2">// Returned with every answer</div>
-                <div className="text-accent-olive">"orchestration"</div>
-                <div className="pl-4 text-accent-fig">"taskType"</div><div className="pl-8 text-text-inverse">"math"</div>
-                <div className="pl-4 text-accent-fig">"tier"</div><div className="pl-8 text-text-inverse">"hard"</div>
-                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-3-flash"]</div>
-                <div className="pl-4 text-accent-fig">"qaScore"</div><div className="pl-8 text-text-inverse">9.2</div>
-                <div className="pl-4 text-accent-fig">"cost"</div><div className="pl-8 text-text-inverse">"$0.015"</div>
-                <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-3-layer", "code-verification", "reflexion"]</div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ━━ Model Pool ━━ */}
         <section className="py-24 px-6 bg-bg-secondary">
@@ -494,10 +714,12 @@ export default function HomePage() {
         {/* ━━ Pricing ━━ */}
         <PricingSection />
 
+        {/* ━━ Final CTA ━━ */}
+        <CtaSection />
+
         {/* ━━ Footer ━━ */}
         <footer className="py-16 px-6 border-t border-border-subtle bg-bg-secondary">
           <div className="container-max">
-            {/* Top: logo + tagline */}
             <div className="flex flex-col items-center gap-3 mb-10">
               <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
                 <circle cx="50" cy="50" r="9" fill="#E25822"/>
@@ -516,7 +738,6 @@ export default function HomePage() {
               <p className="text-sm text-text-muted">Small input. Frontier output.</p>
             </div>
 
-            {/* Middle: link columns */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               <div>
                 <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Product</h4>
@@ -550,7 +771,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Bottom: built by */}
             <div className="pt-8 border-t border-border-subtle flex flex-col items-center gap-3">
               <p className="text-sm text-text-muted">
                 Built by Mohammad Saiful Haque · MIT Licensed
