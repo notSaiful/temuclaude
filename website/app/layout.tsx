@@ -43,10 +43,10 @@ export const metadata: Metadata = {
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Temuclaude',
+  name: 'TemuClaude',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
-  description: 'Multi-model AI orchestration platform that beats frontier models at 28x lower cost.',
+  description: 'Multi-model AI orchestration platform. 8 frontier models, 10-layer quality pipeline, 25x cheaper than frontier models. Open source.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   url: 'https://temuclaude.com',
 };
