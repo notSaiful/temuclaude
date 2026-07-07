@@ -711,3 +711,35 @@ def build_technical_comparison_prompt(topic: str, competitors: List[str], num_se
             "Create a detailed technical comparison research outline."
         )},
     ]
+
+def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], num_sections: int = 7) -> List[Dict]:
+    """Build a specialized research outline prompt for technical competitive analysis
+    (e.g., AWQ vs vLLM quantization/inference engine comparison).
+    
+    Produces a more structured outline than the generic planner, with sections
+    tailored to benchmarking, architecture, and deployment tradeoffs.
+    """
+    competitor_text = ", ".join(competitors) if competitors else "relevant alternatives"
+    return [
+        {"role": "system", "content": (
+            "You are a technical research planner specializing in ML infrastructure "
+            "and LLM inference systems. Create a comprehensive research outline "
+            f"with at least {num_sections} major sections for a technical comparison. "
+            "Include these mandatory sections when applicable: "
+            "(1) Background & Problem Statement, "
+            "(2) Architecture & Core Algorithms, "
+            "(3) Quantization / Optimization Techniques, "
+            "(4) Performance Benchmarks & Throughput Metrics, "
+            "(5) Memory & Hardware Requirements, "
+            "(6) Deployment & Ecosystem Comparison, "
+            "(7) Tradeoffs, Limitations, and Future Directions. "
+            "Each section should have 3-5 subsections with specific technical focus. "
+            "Output as a numbered list of sections with subsections."
+        )},
+        {"role": "user", "content": (
+            f"Topic: {topic}\n"
+            f"Technologies to compare: {competitor_text}\n\n"
+            "Create a technical research outline suitable for engineers and "
+            "researchers evaluating these systems for production deployment."
+        )},
+    ]
