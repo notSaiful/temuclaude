@@ -1,9 +1,12 @@
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <line x1="25" y1="55" x2="100" y2="85" stroke="#1A1816" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
-  <line x1="55" y1="30" x2="100" y2="85" stroke="#1A1816" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
-  <line x1="100" y1="20" x2="100" y2="85" stroke="#1A1816" stroke-width="7" stroke-linecap="round"/>
-  <line x1="145" y1="30" x2="100" y2="85" stroke="#1A1816" stroke-width="7" stroke-linecap="round" opacity="0.5"/>
-  <line x1="175" y1="55" x2="100" y2="85" stroke="#1A1816" stroke-width="7" stroke-linecap="round" opacity="0.3"/>
-  <rect x="90" y="85" width="20" height="95" rx="5" fill="#1A1816"/>
-  <circle cx="100" cy="85" r="6" fill="#1A1816"/>
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- The Spark: black version for light backgrounds -->
+  <circle cx="50" cy="50" r="10" fill="#1A1816"/>
+  <line x1="50" y1="50" x2="50" y2="12" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="77" y2="23" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="88" y2="50" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="77" y2="77" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="50" y2="88" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="23" y2="77" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="12" y2="50" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
+  <line x1="50" y1="50" x2="23" y2="23" stroke="#1A1816" stroke-width="4" stroke-linecap="round"/>
 </svg>

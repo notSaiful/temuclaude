@@ -13,12 +13,12 @@ let memPowerState: any = null;
 
 export async function POST(req: NextRequest) {
   try {
-    const { action } = await req.json();
+    const body = await req.json();
+    const action = body.action;
     
     if (action === 'sync') {
       // Sync daemon pushes power state
-      const data = await req.json();
-      memPowerState = data.powerState;
+      memPowerState = body.powerState;
       return NextResponse.json({ success: true });
     }
     

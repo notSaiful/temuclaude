@@ -21,7 +21,7 @@ module.exports = {
           inverse: '#FAF8F5',
         },
         accent: {
-          primary: '#D97757',
+          primary: '#E8643C',
           hover: '#C56547',
           light: '#F0D5C8',
           fig: '#C46686',
