@@ -407,98 +407,60 @@ def build_media_generation_research_prompt(
             "for the Temuclaude media generation pipeline."
         )},
     ]
-def select_model_for_section(
-    section_title: str,
-    subsections: List[str],
-    topic: str,
-    complexity_threshold: float = 0.5,
-    cheap_model: str = "gpt-4o-mini",
-    expensive_model: str = "gpt-4o",
-    fallback_model: str = "gpt-4o",
-) -> Dict:
+def select_model_for_section(section_title: str, subsections: List[str], topic: str, cascade_config: Optional[Dict] = None) -> str:
     """
-    RouteLLM-style cascade routing for deep research sections.
-
-    Estimates section complexity using lightweight heuristics and selects
-    the appropriate model tier. Simple sections (background, definitions)
-    go to the cheap model; complex sections (analysis, debates, synthesis)
-    go to the expensive model. This preserves quality while cutting cost
-    on the majority of sections that don't require frontier reasoning.
-
-    Returns a dict with:
-        - model: selected model name
-        - complexity: estimated complexity score (0.0–1.0)
-        - rationale: human-readable reason for the routing decision
+    RouteLLM cascade routing for deep research sections.
+    Assesses section complexity and routes to appropriate model tier,
+    achieving cost savings while preserving quality.
+    
+    Cascade tiers:
+    - 'cheap': fast, inexpensive model for straightforward sections
+    - 'medium': balanced model for moderate complexity
+    - 'expensive': full-capability model for complex/technical sections
+    
+    Quality is preserved by escalating to higher tiers when complexity
+    indicators are detected.
     """
-    # Heuristic complexity signals
-    complexity_signals = {
-        "background": 0.15,
-        "introduction": 0.20,
-        "overview": 0.20,
-        "definition": 0.15,
-        "history": 0.25,
-        "current state": 0.35,
-        "key findings": 0.55,
-        "results": 0.55,
-        "analysis": 0.75,
-        "debates": 0.80,
-        "controversy": 0.85,
-        "future directions": 0.65,
-        "implications": 0.70,
-        "limitations": 0.60,
-        "methodology": 0.65,
-        "comparison": 0.60,
-        "synthesis": 0.85,
-        "conclusion": 0.40,
-        "summary": 0.30,
-    }
-
-    title_lower = section_title.lower()
-    combined_text = title_lower + " " + " ".join(s.lower() for s in subsections)
-
-    # Base complexity from keyword matching
-    matched_scores = []
-    for keyword, score in complexity_signals.items():
-        if keyword in combined_text:
-            matched_scores.append(score)
-
-    if matched_scores:
-        complexity = sum(matched_scores) / len(matched_scores)
+    if cascade_config is None:
+        cascade_config = {
+            "cheap_model": "llama-3.1-8b-instruct",
+            "medium_model": "llama-3.1-70b-instruct",
+            "expensive_model": "gpt-4o",
+            "complexity_keywords": {
+                "high": [
+                    "algorithm", "mathematical", "theorem", "proof", "derivation",
+                    "quantum", "neural", "architecture", "optimization", "formal",
+                    "statistical", "differential", "topology", "cryptograph",
+                    "complexity theory", "formal verification", "benchmark",
+                ],
+                "medium": [
+                    "analysis", "comparison", "evaluation", "framework",
+                    "methodology", "systematic", "empirical", "experiment",
+                    "performance", "trade-off", "implementation", "pipeline",
+                ],
+            },
+            "high_complexity_threshold": 2,
+            "medium_complexity_threshold": 1,
+            "max_subsections_for_cheap": 3,
+        }
+    
+    combined_text = (section_title + " " + " ".join(subsections) + " " + topic).lower()
+    
+    high_keywords = cascade_config.get("complexity_keywords", {}).get("high", [])
+    medium_keywords = cascade_config.get("complexity_keywords", {}).get("medium", [])
+    
+    high_count = sum(1 for kw in high_keywords if kw in combined_text)
+    medium_count = sum(1 for kw in medium_keywords if kw in combined_text)
+    
+    num_subsections = len(subsections)
+    subsection_complexity = num_subsections > cascade_config.get("max_subsections_for_cheap", 3)
+    
+    if high_count >= cascade_config.get("high_complexity_threshold", 2):
+        return cascade_config["expensive_model"]
+    elif high_count >= 1 or medium_count >= cascade_config.get("medium_complexity_threshold", 1) or subsection_complexity:
+        return cascade_config["medium_model"]
     else:
-        complexity = 0.40  # default moderate
-
-    # Boost complexity for sections with many subsections (more ground to cover)
-    if len(subsections) >= 5:
-        complexity = min(1.0, complexity + 0.10)
-
-    # Boost complexity if the topic itself looks technical
-    technical_markers = ["algorithm", "neural", "quantum", "optimization",
-                         "theorem", "architecture", "protocol", "cryptograph"]
-    topic_lower = topic.lower()
-    if any(marker in topic_lower for marker in technical_markers):
-        complexity = min(1.0, complexity + 0.10)
-
-    # Routing decision
-    if complexity >= complexity_threshold:
-        model = expensive_model
-        rationale = (
-            f"High complexity ({complexity:.2f} >= {complexity_threshold}) — "
-            f"using expensive model for quality preservation."
-        )
-    else:
-        model = cheap_model
-        rationale = (
-            f"Low complexity ({complexity:.2f} < {complexity_threshold}) — "
-            f"routing to cheap model for cost savings."
-        )
-
-    return {
-        "model": model,
-        "complexity": round(complexity, 3),
-        "rationale": rationale,
-        "fallback_model": fallback_model,
-    }
-
+        return cascade_config["cheap_model"]
 def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
     """Build a prompt to deep-research an efficiency finding (e.g., AWQ, vLLM)
     and classify it under the quality guardrail system.
