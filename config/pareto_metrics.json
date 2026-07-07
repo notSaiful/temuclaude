@@ -1,60 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-06T21:42:13.122615+00:00",
-      "tier": "medium",
-      "tokens_used": 2,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
-      "timestamp": "2026-07-06T21:42:29.608775+00:00",
-      "tier": "trivial",
-      "tokens_used": 1,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
-    },
-    {
-      "timestamp": "2026-07-06T21:42:36.811389+00:00",
-      "tier": "medium",
-      "tokens_used": 1,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "math",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+s1_budget_forcing"
-    },
-    {
-      "timestamp": "2026-07-06T21:42:41.693234+00:00",
-      "tier": "trivial",
-      "tokens_used": 8,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "knowledge",
-      "strategy": "direct_frontier_deepseek_v4_pro+trivial"
-    },
-    {
-      "timestamp": "2026-07-06T21:43:26.706826+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T21:43:26.707272+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-06T21:43:26.707700+00:00",
       "tier": "hard",
       "tokens_used": 8192,
@@ -899,33 +845,87 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:44:27.373294+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:44:27.373818+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:44:27.374265+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:45:09.185733+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:45:09.186238+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T09:45:09.186710+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
     }
   ],
-  "total_queries": 360,
-  "total_tokens_used": 963758,
-  "total_tokens_baseline": 2949120,
-  "correct": 150,
-  "incorrect": 75,
+  "total_queries": 366,
+  "total_tokens_used": 989334,
+  "total_tokens_baseline": 2998272,
+  "correct": 154,
+  "incorrect": 77,
   "unknown": 135,
   "tier_stats": {
     "trivial": {
-      "count": 128,
-      "tokens": 38678,
-      "baseline": 1048576,
-      "correct": 75
+      "count": 130,
+      "tokens": 39678,
+      "baseline": 1064960,
+      "correct": 77
     },
     "medium": {
-      "count": 153,
-      "tokens": 310343,
-      "baseline": 1253376,
-      "correct": 75
+      "count": 155,
+      "tokens": 318535,
+      "baseline": 1269760,
+      "correct": 77
     },
     "hard": {
-      "count": 79,
-      "tokens": 614737,
-      "baseline": 647168,
+      "count": 81,
+      "tokens": 631121,
+      "baseline": 663552,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-07T09:25:49.495515+00:00"
+  "last_updated": "2026-07-07T09:45:09.186719+00:00"
 }

@@ -551,3 +551,43 @@ def classify_efficiency_finding(technique_name: str, speedup_factor: float,
         return "PARETO-OPTIMAL"
     else:
         return "REJECTED"
+
+def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
+    """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
+    
+    Generates a structured research plan tailored to comparing ML inference/quantization
+    technologies, covering architecture, performance benchmarks, deployment, and ecosystem.
+    """
+    if focus_areas is None:
+        focus_areas = [
+            "Architecture & Core Design",
+            "Quantization Methodology",
+            "Performance Benchmarks (throughput, latency, memory)",
+            "Hardware Compatibility & Deployment",
+            "Ease of Integration & API Design",
+            "Community & Ecosystem Maturity",
+            "Limitations & Trade-offs",
+            "Future Roadmap & Industry Adoption",
+        ]
+    competitors_text = ", ".join(competitors)
+    focus_text = "\n".join(f"  {i+1}. {area}" for i, area in enumerate(focus_areas))
+    return [
+        {"role": "system", "content": (
+            "You are a competitive intelligence research planner specializing in "
+            "ML inference and model quantization technologies. Create a detailed "
+            "research outline that systematically compares the specified technologies. "
+            "For each focus area, define 3-5 subsections with specific metrics, "
+            "benchmarks, or qualitative criteria to evaluate. Prioritize verifiable "
+            "data: published benchmarks, GitHub metrics, paper citations, and "
+            "production deployment reports. Flag areas where public data is scarce "
+            "so the research agent can search deeper."
+        )},
+        {"role": "user", "content": (
+            f"Topic: {topic}\n"
+            f"Technologies to compare: {competitors_text}\n\n"
+            f"Suggested focus areas:\n{focus_text}\n\n"
+            "Create a comprehensive competitor analysis research outline. "
+            "Include a section on quantitative benchmark comparison and a "
+            "section on practical deployment recommendations."
+        )},
+    ]
