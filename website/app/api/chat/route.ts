@@ -13,7 +13,7 @@ const POOL = {
   reasoning: 'deepseek/deepseek-v4-pro',   // IQ 44 — #1 Finance, hard math/coding
   fastRoute: 'tencent/hy3-preview',        // Cheapest on OpenRouter ($0.063/$0.21), #6 Academia
   multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal, cheaper than Flash, image+video
-  specialist: 'google/gemini-3-flash-preview', // IQ 50 — #1 Legal, #2 Health, multimodal
+  specialist: 'google/gemini-3.5-flash', // IQ 50 — #1 Legal, #2 Health, multimodal
   vision: 'minimax/minimax-m3',            // IQ 44 — best vision + creative + generation
   frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — highest available, used for hardest 2% (used for hardest 2%)
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free', // Free — QA gate + verification

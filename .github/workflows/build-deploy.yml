@@ -1,0 +1,86 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+      
+      - name: Install dependencies
+        run: cd website && npm ci
+      
+      - name: TypeScript check
+        run: cd website && npx tsc --noEmit
+      
+      - name: Build
+        run: cd website && npm run build
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      
+      - name: Check for banned words
+        run: |
+          cd website
+          # Check for old branding
+          if grep -r "Temuclaude" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v "temuclaude.com" | grep -v "node_modules"; then
+            echo "Found 'Temuclaude' (should be 'TemuClaude')"
+            exit 1
+          fi
+          # Check for Fable references
+          if grep -ri "Fable" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found 'Fable' reference"
+            exit 1
+          fi
+          # Check for Islam references in public copy
+          if grep -riE "ummah|islam|muslim|palestine|prophet|muhammad|quran" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules | grep -v "email.ts"; then
+            echo "Found religion reference in public copy"
+            exit 1
+          fi
+          # Check for false claims
+          if grep -r "100 queries" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found '100 queries' (should be 20)"
+            exit 1
+          fi
+          if grep -r "SOC2" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found 'SOC2' false claim"
+            exit 1
+          fi
+          echo "All checks passed"
+
+  deploy:
+    name: Deploy to Vercel
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+      
+      - name: Deploy
+        run: |
+          cd website
+          vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
