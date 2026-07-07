@@ -1,10 +1,10 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/api/hasan/identity/route": "app/api/hasan/identity/route.js",
-  "/api/hasan/power/route": "app/api/hasan/power/route.js",
-  "/api/hasan/sync/route": "app/api/hasan/sync/route.js",
-  "/api/hasan/deploy/route": "app/api/hasan/deploy/route.js",
-  "/api/hasan/route": "app/api/hasan/route.js",
   "/api/hasan/chat/route": "app/api/hasan/chat/route.js",
+  "/api/hasan/power/route": "app/api/hasan/power/route.js",
+  "/api/hasan/identity/route": "app/api/hasan/identity/route.js",
+  "/api/hasan/deploy/route": "app/api/hasan/deploy/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/hasan/sync/route": "app/api/hasan/sync/route.js",
+  "/api/hasan/route": "app/api/hasan/route.js",
   "/hasan/page": "app/hasan/page.js"
 }
