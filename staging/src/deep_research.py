@@ -571,41 +571,43 @@ def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_a
             "a recommendation matrix summarizing best-fit use cases."
         )},
     ]
-def build_quantization_research_prompt(topic: str, competitors: Optional[List[str]] = None) -> List[Dict]:
-    """Build a specialized research prompt for model quantization and inference
-    optimization topics such as AWQ, GPTQ, vLLM, and related technologies.
-
-    This prompt guides the research agent to cover quantization algorithms,
-    performance benchmarks, hardware compatibility, deployment considerations,
-    and competitive analysis between inference engines.
+def build_quantization_research_prompt(topic: str, focus_methods: Optional[List[str]] = None) -> List[Dict]:
+    """Build a specialized research prompt for LLM quantization techniques.
+    
+    Focuses on methods like AWQ (Activation-aware Weight Quantization),
+    GPTQ, and competitors such as vLLM. Includes technical dimensions
+    relevant to quantization: accuracy retention, memory footprint,
+    inference speed, hardware compatibility, and deployment tradeoffs.
     """
-    if competitors is None:
-        competitors = ["vLLM", "GPTQ", "llama.cpp", "TensorRT-LLM"]
-
-    competitor_text = ", ".join(competitors)
+    methods = focus_methods or ["AWQ", "GPTQ", "SmoothQuant", "vLLM (engine)", "llama.cpp"]
+    methods_text = ", ".join(methods)
     return [
         {"role": "system", "content": (
             "You are a deep research agent specializing in LLM quantization and "
-            "inference optimization. You have expert knowledge of techniques such "
-            "as AWQ (Activation-aware Weight Quantization), GPTQ, SmoothQuant, and "
-            "inference engines like vLLM, TensorRT-LLM, and llama.cpp. "
-            "Produce a comprehensive, technically accurate research section. "
-            "Cover: (1) the quantization algorithm and how it works internally, "
-            "(2) accuracy preservation vs speed tradeoffs, "
-            "(3) hardware/backend support (CUDA, Triton, etc.), "
-            "(4) benchmark comparisons against competitors, "
-            "(5) deployment and integration considerations, "
-            "(6) limitations and open problems. "
-            "Use precise technical language, cite specific numbers where available, "
-            "and write in prose form (not bullet lists). "
-            "Target at least 2000 words."
+            "inference optimization. Produce a technically rigorous report covering: "
+            "(1) algorithmic foundations of each quantization method, including how "
+            "AWQ uses activation-aware salient channel detection vs GPTQ's "
+            "second-order Hessian-based weight correction; "
+            "(2) benchmark comparisons — perplexity degradation, zero-shot accuracy, "
+            "and throughput (tokens/sec) across model sizes (7B, 13B, 70B); "
+            "(3) memory savings (e.g., 4-bit AWQ reducing a 13B model from ~26GB "
+            "FP16 to ~7-8GB) and GPU memory bandwidth implications; "
+            "(4) hardware and backend support — CUDA kernels, CPU offloading, "
+            "Apple Silicon, and integration with serving engines like vLLM, "
+            "TGI, and llama.cpp; "
+            "(5) deployment tradeoffs: when to choose AWQ over GPTQ, "
+            "compatibility with KV-cache quantization, and batching behavior; "
+            "(6) recent developments and open research questions. "
+            "Use prose, cite specific papers (e.g., Lin et al. 2023 for AWQ, "
+            "Frantar et al. 2022 for GPTQ), and include quantitative data where "
+            "available. Write at least 2000 words."
         )},
         {"role": "user", "content": (
-            f"Research Topic: {topic}\n\n"
-            f"Compare and analyze against these competitors/alternatives: {competitor_text}\n\n"
-            "Provide a thorough technical deep dive covering the quantization method, "
-            "its implementation details, performance characteristics, and how it "
-            "compares to competing approaches in the LLM serving ecosystem."
+            f"Research Topic: {topic}\n"
+            f"Quantization methods to cover: {methods_text}\n\n"
+            "Produce a comprehensive technical report comparing these approaches, "
+            "with emphasis on AWQ and its competitive positioning against vLLM "
+            "and other inference engines."
         )},
     ]
 def build_media_research_prompt(topic: str, mission: str = "BEAT FRONTIERS", 
