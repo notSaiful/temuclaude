@@ -117,12 +117,16 @@ def get_queue():
 def get_swot():
     try:
         content = (RESEARCH_DIR / 'swot_reports' / 'CURRENT_SWOT.md').read_text()
-        import re
-        strengths = len(re.findall(r'(?<=^- )', content.split('## Weaknesses')[0].split('## Strengths')[1] if '## Strengths' in content else ''))
-        weaknesses = len(re.findall(r'(?<=^- )', content.split('## Opportunities')[0].split('## Weaknesses')[1] if '## Weaknesses' in content else ''))
-        opportunities = len(re.findall(r'(?<=^- )', content.split('## Threats')[0].split('## Opportunities')[1] if '## Opportunities' in content else ''))
-        threats = len(re.findall(r'(?<=^- )', content.split('## Threats')[1] if '## Threats' in content else ''))
-        return {'strengths': strengths, 'weaknesses': weaknesses, 'opportunities': opportunities, 'threats': threats}
+        sections = {'strengths': 0, 'weaknesses': 0, 'opportunities': 0, 'threats': 0}
+        current = None
+        for line in content.split('\n'):
+            if line.startswith('## '):
+                name = line.replace('## ', '').strip().split()[0].lower()
+                if name in sections:
+                    current = name
+            elif line.startswith('- ') and current:
+                sections[current] += 1
+        return sections
     except:
         return None
 

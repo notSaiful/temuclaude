@@ -16,6 +16,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from abc import ABC, abstractmethod
+import sys as _sys; _sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
+import share_intelligence as _si
 
 DAEMON_STATE_DIR = Path("/tmp/temuclaude_daemons")
 DAEMON_STATE_DIR.mkdir(exist_ok=True)

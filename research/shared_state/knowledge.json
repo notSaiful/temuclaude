@@ -7,7 +7,18 @@
     "test": {
       "value": "value",
       "timestamp": "2026-07-06T18:02:36.132421+00:00"
+    },
+    "swarm_health": {
+      "value": {
+        "alive": 23,
+        "total": 23,
+        "timestamp": "2026-07-07T10:45:57.936065"
+      },
+      "daemon": "watchdog",
+      "category": "system",
+      "timestamp": "2026-07-07T10:45:57.936124"
     }
   },
-  "last_updated": "2026-07-06T18:02:36.132533+00:00"
+  "last_updated": "2026-07-06T18:02:36.132533+00:00",
+  "last_update": "2026-07-07T10:45:57.936127"
 }

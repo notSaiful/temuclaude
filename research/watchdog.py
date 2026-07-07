@@ -18,6 +18,11 @@ import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Shared intelligence
+import sys
+sys.path.insert(0, str(Path(__file__).parent))
+import share_intelligence as si
+
 STATE_DIR = Path('/tmp/temuclaude_daemons')
 RESEARCH_DIR = Path('/Users/saiful/temuclaude/research')
 TEMUCLAUDE_DIR = Path('/Users/saiful/temuclaude')
@@ -182,19 +187,37 @@ def health_check():
                 pass
 
         if pid and is_process_alive(pid):
-            # Process alive — check heartbeat freshness
+            # Process alive — update shared swarm state
+            try:
+                si.update_state(name, 'alive', {'pid': pid})
+            except: pass
+            # Check heartbeat freshness
             hb_age = get_heartbeat_age(name)
             if hb_age is not None and hb_age > STALE_THRESHOLD:
                 log('WARNING', f'{name}: heartbeat stale ({int(hb_age)}s), restarting')
+                try:
+                    si.broadcast('watchdog', 'restart', f'{name}: stale heartbeat ({int(hb_age)}s), restarting')
+                except: pass
                 if restart_daemon(name, script, args, f'stale heartbeat ({int(hb_age)}s)'):
                     restarted += 1
-            # else: healthy
         else:
             # Process dead or no PID file
             reason = 'no PID file' if not pid else f'process dead (pid {pid})'
             log('WARNING', f'{name}: {reason}, restarting')
+            try:
+                si.broadcast('watchdog', 'restart', f'{name}: {reason}, restarting')
+            except: pass
             if restart_daemon(name, script, args, reason):
                 restarted += 1
+
+    # Share swarm health with all daemons and chat
+    try:
+        si.learn('swarm_health', {
+            'alive': sum(1 for n, _, _ in DAEMONS if (STATE_DIR / f'{n}.pid').exists() and is_process_alive(int((STATE_DIR / f'{n}.pid').read_text().strip() or 0))),
+            'total': len(DAEMONS),
+            'timestamp': datetime.now().isoformat(),
+        }, daemon='watchdog', category='system')
+    except: pass
 
     return restarted
 
@@ -210,6 +233,10 @@ def main():
 
     # Write our PID
     WATCHDOG_PID_FILE.write_text(str(os.getpid()))
+    try:
+        si.init()
+    except:
+        pass
     log('INFO', f'Hasan watchdog started (pid {os.getpid()})')
     log('INFO', f'Monitoring {len(DAEMONS)} daemons every {HEALTH_CHECK_INTERVAL}s')
     write_heartbeat('running')

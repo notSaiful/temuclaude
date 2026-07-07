@@ -21,7 +21,7 @@ class RevenueDaemon(DaemonBase):
     def run_once(self) -> bool:
         revenue = self._compute_revenue()
         costs = self._compute_costs()
-        pricing = get_tier_pricing(costs / max(1, 1))
+        pricing = get_tier_pricing()
         allocation = compute_fund_allocation(revenue, costs)
         if allocation.get("fund_total", 0) > 0:
             update_fund_ledger(allocation)

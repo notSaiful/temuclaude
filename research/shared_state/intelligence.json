@@ -8,6 +8,11 @@
       "daemon": "watchdog",
       "type": "system",
       "message": "Shared intelligence hub initialized"
+    },
+    {
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized"
     }
   ],
   "knowledge_count": 2,
