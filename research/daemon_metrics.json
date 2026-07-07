@@ -1,129 +1,129 @@
 {
-  "timestamp": "2026-07-07T01:06:21.121416+00:00",
+  "timestamp": "2026-07-07T01:22:22.587439+00:00",
   "daemons": {
     "scout_daemon": {
       "alive": true,
       "status": "running",
-      "age_seconds": 0.9750800132751465
+      "age_seconds": 0.9694979190826416
     },
     "distiller_daemon": {
       "alive": true,
       "status": "running",
-      "age_seconds": 13.860314846038818
+      "age_seconds": 13.85825800895691
     },
     "research_daemon_1": {
       "alive": true,
-      "status": "running",
-      "age_seconds": 11.837360143661499
+      "status": "sleeping",
+      "age_seconds": 11.831457138061523
     },
     "research_daemon_2": {
       "alive": true,
-      "status": "running",
-      "age_seconds": 9.844555139541626
+      "status": "sleeping",
+      "age_seconds": 9.833095788955688
     },
     "research_daemon_3": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.977488040924072
     },
     "integrator_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.992362022399902
     },
     "coordinator_daemon": {
       "alive": true,
-      "status": "running",
-      "age_seconds": 3.212146043777466
+      "status": "sleeping",
+      "age_seconds": 3.2123169898986816
     },
     "cyber_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.992472887039185
     },
     "efficiency_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.992456912994385
     },
     "media_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.992336988449097
     },
     "marketing_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 10.198431968688965
+      "age_seconds": 10.192336082458496
     },
     "feedback_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 8.206055879592896
+      "age_seconds": 8.20416808128357
     },
     "meta_auditor_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 21.16543984413147
+      "age_seconds": 21.15540599822998
     },
     "swot_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 19.194166898727417
+      "age_seconds": 19.19044303894043
     },
     "website_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "sleeping",
+      "age_seconds": 29.977545976638794
     },
     "industry_radar_daemon": {
-      "alive": false,
-      "status": "dead",
-      "age_seconds": null
+      "alive": true,
+      "status": "running",
+      "age_seconds": 29.95066809654236
     },
     "model_optimizer_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 26.135706186294556
+      "age_seconds": 26.12618923187256
     },
     "cost_efficiency_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 9.089692115783691
+      "age_seconds": 9.079228162765503
     },
     "revenue_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 7.103814125061035
+      "age_seconds": 7.093470096588135
     },
     "growth_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 5.087661027908325
+      "age_seconds": 5.081268072128296
     },
     "competitive_dominance_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 4.29222297668457
+      "age_seconds": 4.279834985733032
     },
     "self_expansion_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 0.14706206321716309
+      "age_seconds": 0.13899993896484375
     },
     "super_intelligence_daemon": {
       "alive": true,
       "status": "sleeping",
-      "age_seconds": 17.169414043426514
+      "age_seconds": 17.164669036865234
     }
   },
   "queue": {
     "new_raw": 0,
-    "new_findings": 10,
+    "new_findings": 3,
     "research_requests": 0,
     "research_complete": 0,
-    "implementation_queue": 24,
-    "implementation_complete": 5,
+    "implementation_queue": 28,
+    "implementation_complete": 6,
     "implementation_failed": 3,
     "priority_updates": 0,
     "last_updated": 0

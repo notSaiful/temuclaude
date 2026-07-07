@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-07T01:22:22.611093+00:00",
+  "total_signals": 4,
+  "top_signals": [
+    {
+      "title": "GLM 5.2 and the coming AI margin collapse",
+      "source": "hackernews",
+      "score": 14.3,
+      "url": "https://martinalderson.com/posts/the-upcoming-ai-margin-collapse-part-1-glm-5-2/"
+    },
+    {
+      "title": "Ternlight \u2013 7 MB embedding model that runs in browser (WASM)",
+      "source": "hackernews",
+      "score": 6.0,
+      "url": "https://ternlight-demo.vercel.app/"
+    },
+    {
+      "title": "AI: The ROI Runway Could Be Long Outside the Tech Sector",
+      "source": "hackernews",
+      "score": 5.1,
+      "url": "https://www.apollo.com/wealth/insights-news/insights/daily-spark/ai-the-roi-runway-could-be-long-outside-the-tech-sector"
+    },
+    {
+      "title": "NSA and IETF: Fairness",
+      "source": "hackernews",
+      "score": 1.9,
+      "url": "https://blog.cr.yp.to/20260706-fairness.html"
+    }
+  ]
+}
