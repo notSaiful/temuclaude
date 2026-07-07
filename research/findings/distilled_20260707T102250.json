@@ -1,0 +1,72 @@
+{
+  "distilled_at": "20260707T102250",
+  "total_raw_files": 18,
+  "total_findings": 1,
+  "new_findings": 1,
+  "already_distilled": 336,
+  "by_type": {
+    "hf_model": 1
+  },
+  "top_findings": [
+    {
+      "type": "hf_model",
+      "id": "BSC-LT/catalan-verification-model-pkt-a",
+      "downloads": 17,
+      "likes": 0,
+      "tags": [
+        "nemo",
+        "audio",
+        "automatic-speech-recognition",
+        "spanish",
+        "parakeet-rnnt-1.1b",
+        "NeMo",
+        "Projecte-AINA",
+        "Barcelona-Supercomputing-Center",
+        "BSC",
+        "EuroHPC",
+        "ca",
+        "dataset:langtech-veu/catalan-verification-model-pkt-a",
+        "license:apache-2.0",
+        "model-index",
+        "region:us"
+      ],
+      "pipeline_tag": "automatic-speech-recognition",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:BSC-LT/catalan-verification-model-pkt-a"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "hf_model",
+      "id": "BSC-LT/catalan-verification-model-pkt-a",
+      "downloads": 17,
+      "likes": 0,
+      "tags": [
+        "nemo",
+        "audio",
+        "automatic-speech-recognition",
+        "spanish",
+        "parakeet-rnnt-1.1b",
+        "NeMo",
+        "Projecte-AINA",
+        "Barcelona-Supercomputing-Center",
+        "BSC",
+        "EuroHPC",
+        "ca",
+        "dataset:langtech-veu/catalan-verification-model-pkt-a",
+        "license:apache-2.0",
+        "model-index",
+        "region:us"
+      ],
+      "pipeline_tag": "automatic-speech-recognition",
+      "relevance_score": 8,
+      "matched_keywords": [
+        "verification"
+      ],
+      "dedup_key": "hf_model:BSC-LT/catalan-verification-model-pkt-a"
+    }
+  ]
+}

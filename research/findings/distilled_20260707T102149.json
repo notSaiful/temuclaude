@@ -1,0 +1,78 @@
+{
+  "distilled_at": "20260707T102149",
+  "total_raw_files": 17,
+  "total_findings": 2,
+  "new_findings": 2,
+  "already_distilled": 334,
+  "by_type": {
+    "github_repo": 2
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1269222100",
+      "name": "sarfaraz-munir/Claude-Code-Cyber-agents",
+      "url": "https://github.com/sarfaraz-munir/Claude-Code-Cyber-agents",
+      "description": "Hierarchical CISO AI agent swarm for Claude Code \u2014 10 specialist agents covering   risk governance, compliance, threat intelligence, vulnerability management, incident response, and AI security (OWASP LLM Top 10 / MITRE ATLAS). Includes MCP tools,   Claude Code skills etc.",
+      "stars": 0,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T10:01:36Z",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "swarm",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1269222100"
+    },
+    {
+      "type": "github_repo",
+      "id": "1286988901",
+      "name": "AlizHarb/agent-skills",
+      "url": "https://github.com/AlizHarb/agent-skills",
+      "description": "A growing collection of high-quality Agent Skills for AI coding assistants. Enhance Codex, Claude Code, Cursor, Gemini CLI, and compatible agents with specialized knowledge for Laravel, software architecture, debugging, testing, security, code quality, documentation, and engineering best practices.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-07T09:53:00Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "codex"
+      ],
+      "dedup_key": "github_repo:1286988901"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1269222100",
+      "name": "sarfaraz-munir/Claude-Code-Cyber-agents",
+      "url": "https://github.com/sarfaraz-munir/Claude-Code-Cyber-agents",
+      "description": "Hierarchical CISO AI agent swarm for Claude Code \u2014 10 specialist agents covering   risk governance, compliance, threat intelligence, vulnerability management, incident response, and AI security (OWASP LLM Top 10 / MITRE ATLAS). Includes MCP tools,   Claude Code skills etc.",
+      "stars": 0,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T10:01:36Z",
+      "relevance_score": 16,
+      "matched_keywords": [
+        "swarm",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1269222100"
+    },
+    {
+      "type": "github_repo",
+      "id": "1286988901",
+      "name": "AlizHarb/agent-skills",
+      "url": "https://github.com/AlizHarb/agent-skills",
+      "description": "A growing collection of high-quality Agent Skills for AI coding assistants. Enhance Codex, Claude Code, Cursor, Gemini CLI, and compatible agents with specialized knowledge for Laravel, software architecture, debugging, testing, security, code quality, documentation, and engineering best practices.",
+      "stars": 1,
+      "language": null,
+      "updated_at": "2026-07-07T09:53:00Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "claude code",
+        "codex"
+      ],
+      "dedup_key": "github_repo:1286988901"
+    }
+  ]
+}

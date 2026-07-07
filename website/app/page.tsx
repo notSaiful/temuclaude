@@ -336,9 +336,11 @@ export default function HomePage() {
         <section className="py-24 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                How it works
-              </h2>
+              <ScrollRevealText
+                text="How it works"
+                className="text-3xl md:text-4xl font-serif text-text-primary mb-3"
+                style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
+              />
               <p className="text-text-secondary">
                 You send one request. TemuClaude does the rest — and shows you exactly what happened.
               </p>
@@ -393,9 +395,11 @@ export default function HomePage() {
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                8 models. You never pick.
-              </h2>
+              <ScrollRevealText
+                text="8 models. You never pick."
+                className="text-3xl md:text-4xl font-serif text-text-primary mb-3"
+                style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
+              />
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
                 Easy questions cost $0. Hard ones get the full fusion pipeline.
@@ -440,9 +444,11 @@ export default function HomePage() {
         <section className="py-24 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                Benchmarks
-              </h2>
+              <ScrollRevealText
+                text="Benchmarks"
+                className="text-3xl md:text-4xl font-serif text-text-primary mb-3"
+                style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
+              />
               <p className="text-text-secondary">
                 Projected from research analysis. Live results coming after third-party verification.
                 We show projected scores because we believe in honesty over hype.
