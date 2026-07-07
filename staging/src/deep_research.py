@@ -701,41 +701,33 @@ from typing import Optional, Callable, Awaitable, List, Dict
 
 
 def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM") -> List[Dict]:
-    """Build a specialized research prompt for AWQ quantization research.
-    
-    Focuses on AWQ as a competitor to vLLM, covering quantization techniques,
-    performance benchmarks, memory efficiency, deployment considerations,
-    and integration patterns for AI orchestration engines.
-    """
+    """Build a specialized research prompt for AWQ quantization technique analysis."""
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference optimization "
-            "and quantization techniques. Research AWQ (Activation-aware Weight "
-            "Quantization) as a competitor to vLLM. Cover: (1) AWQ algorithm "
-            "fundamentals—how activation-aware weight quantization preserves "
-            "significant weights, (2) performance benchmarks vs vLLM (throughput, "
-            "latency, memory footprint), (3) supported model architectures and "
-            "hardware backends (CUDA, Triton kernels), (4) integration with "
-            "HuggingFace Transformers and other serving frameworks, (5) deployment "
-            "considerations for AI orchestration engines, (6) limitations and "
-            "trade-offs (accuracy degradation, bit-width options 4-bit/8-bit), "
-            "(7) community adoption and ecosystem maturity. Include specific "
-            "benchmark numbers, GitHub repository details, and citation-worthy "
-            "sources. Write at least 2000 words."
+            "You are a deep research agent specializing in LLM quantization techniques. "
+            "Focus on AWQ (Activation-aware Weight Quantization) as a competitor to vLLM's quantization approaches. "
+            "Cover: 1) AWQ algorithm fundamentals and activation-aware scaling, "
+            "2) Comparison with vLLM's AWQ implementation and GPTQ, "
+            "3) Performance benchmarks (latency, throughput, memory, accuracy), "
+            "4) Hardware support (GPU kernels, CUDA graphs, tensor cores), "
+            "5) Integration patterns for inference engines, "
+            "6) Production deployment considerations. "
+            "Write at least 2000 words with technical depth and citations."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n\n"
-            "Produce a comprehensive technical analysis of AWQ quantization, "
-            "comparing it directly with vLLM's approach. Include:\n"
-            "- The AWQ paper (Lin et al.) key contributions\n"
-            "- Quantization error reduction techniques (per-channel scaling, "
-            "group-wise quantization)\n"
-            "- Inference speed comparisons on common models (Llama, Mistral, etc.)\n"
-            "- Memory savings and KV-cache implications\n"
-            "- How AWQ could be integrated into an AI orchestration engine like "
-            "Temuclaude for cost-efficient model serving\n"
-            "- Code examples for loading AWQ-quantized models\n"
-            "Cite sources with URLs where possible."
+            "Produce a comprehensive technical analysis covering:\n"
+            "- AWQ paper methodology (Lin et al., 2023) and key innovations\n"
+            "- vLLM's AWQ kernel implementation vs. original AWQ repo\n"
+            "- Quantization granularity: per-channel vs per-group vs per-token\n"
+            "- Calibration data requirements and sensitivity analysis\n"
+            "- Kernel fusion opportunities (GEMM + dequant + activation)\n"
+            "- Memory bandwidth vs compute tradeoffs at 4-bit/3-bit\n"
+            "- Accuracy recovery techniques (GPTQ-style, AWQ-style, learned rounding)\n"
+            "- Benchmark methodology: MMLU, GSM8K, HumanEval, MT-Bench\n"
+            "- Real-world serving metrics: TTFT, TPOT, batch throughput\n"
+            "- Integration with PagedAttention, continuous batching, prefix caching\n"
+            "Include specific numbers, kernel launch configs, and code-level insights."
         )},
     ]
 def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
