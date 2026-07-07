@@ -593,40 +593,34 @@ def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_a
         )},
     ]
 
-def build_quantization_research_prompt(topic: str, competitor: str = "vLLM") -> List[Dict]:
-    """Build a specialized research prompt for LLM quantization and inference optimization topics
-    such as AWQ, GPTQ, SmoothQuant, and their competitors like vLLM, TGI, or TensorRT-LLM.
+def build_quantization_research_prompt(topic: str, num_sections: int = 7) -> List[Dict]:
+    """Build a specialized research outline prompt for LLM quantization and inference optimization topics.
     
-    Pre-populates subsections with domain-relevant areas to ensure comprehensive coverage
-    of quantization techniques, performance benchmarks, and deployment considerations.
+    Tailored for researching techniques like AWQ, GPTQ, vLLM, and related
+    model serving technologies. Ensures coverage of quantization methods,
+    performance benchmarks, hardware compatibility, and deployment trade-offs.
     """
-    quantization_subsections = [
-        "Background and motivation: why LLM quantization matters (memory, cost, latency)",
-        "Core algorithm: activation-aware weight quantization methodology and key innovations",
-        "Comparison with alternative quantization methods (GPTQ, SmoothQuant, bitsandbytes, GGUF)",
-        f"Competitor analysis: {competitor} and other inference engines (TGI, TensorRT-LLM, llama.cpp)",
-        "Performance benchmarks: throughput, latency, memory footprint, accuracy retention",
-        "Hardware compatibility: GPU types, CPU offloading, edge deployment scenarios",
-        "Integration and deployment: supported model architectures, serving frameworks, APIs",
-        "Limitations, open issues, and future research directions",
-    ]
-    sub_text = "\n".join(f"  - {s}" for s in quantization_subsections)
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference optimization and "
-            "model quantization. Write a comprehensive, technically accurate research section. "
-            "Include specific numbers, benchmark results, and citations where possible. "
-            "Compare methodologies rigorously. Write at least 2000 words for this section."
+            "You are a research planner specializing in LLM inference optimization "
+            "and model quantization. Create a comprehensive research outline with "
+            f"at least {num_sections} major sections. The outline must cover: "
+            "(1) background on model quantization and activation-aware methods, "
+            "(2) technical architecture of the target method (e.g., AWQ's salient "
+            "weight detection and scaling), (3) comparison with competing inference "
+            "engines (e.g., vLLM, TensorRT-LLM, llama.cpp), (4) performance "
+            "benchmarks including throughput, latency, and memory footprint, "
+            "(5) hardware compatibility (GPU types, CPU offloading, edge devices), "
+            "(6) deployment considerations and integration patterns, "
+            "(7) limitations, open problems, and future directions. "
+            "Each section should have 3-5 subsections. Output as a numbered list."
         )},
         {"role": "user", "content": (
-            f"Research Topic: {topic}\n"
-            f"Competitor / Comparison Target: {competitor}\n"
-            f"Subsections to cover:\n{sub_text}\n\n"
-            "Write this section in full with technical depth, including any known "
-            "benchmark numbers, model compatibility tables, and deployment trade-offs."
+            f"Topic: {topic}\n\n"
+            "Create a research outline focused on quantization and inference "
+            "optimization. Ensure AWQ and vLLM are explicitly compared where relevant."
         )},
     ]
-
 def build_media_research_prompt(topic: str, mission: str = "BEAT FRONTIERS", 
                                 frontier_models: Optional[List[str]] = None,
                                 target_dir: str = "src/media/") -> List[Dict]:
