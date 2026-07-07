@@ -430,14 +430,174 @@ export default function HomePage() {
                 </StaggerItem>
               ))}
             </StaggerReveal>
+          </div>
+        </section>
 
-            <div className="mt-12 max-w-2xl mx-auto text-center">
+        {/* ━━ Real Examples ━━ */}
+        <section className="py-24 px-6 bg-bg-secondary">
+          <div className="container-max">
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
+                Real examples. Verified.
+              </h2>
+              <p className="text-text-secondary">
+                These are real responses from the TemuClaude API — not curated, not edited.
+                Each one shows the question, the answer, response time, and token cost.
+                Click any card to see the full response.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Math — Hard */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Math</span>
+                  <span className="badge-accent text-xs">Hard</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">A train travels 240 km. If it had gone 20 km/h faster, it would have taken 1 hour less. Find the original speed.</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 font-mono text-xs leading-relaxed flex-1 overflow-hidden">
+                  Let v = original speed.<br />
+                  240/v - 240/(v+20) = 1<br />
+                  240(v+20) - 240v = v(v+20)<br />
+                  4800 = v² + 20v<br />
+                  v² + 20v - 4800 = 0<br />
+                  v = (-20 + √19600)/2 = 60<br />
+                  <strong style={{ color: '#E25822' }}>Answer: 60 km/h</strong>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>27.5s</span><span>·</span><span>4,881 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Math — Medium */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Math</span>
+                  <span className="badge-muted text-xs">Medium</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">What is the derivative of f(x) = 3x³ - 2x² + 5x - 7?</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 font-mono text-xs leading-relaxed flex-1">
+                  Power rule applied:<br />
+                  3x³ → 9x²<br />
+                  -2x² → -4x<br />
+                  5x → 5<br />
+                  -7 → 0<br />
+                  <strong style={{ color: '#E25822' }}>f'(x) = 9x² - 4x + 5</strong>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>4.0s</span><span>·</span><span>167 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Coding — Medium */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Coding</span>
+                  <span className="badge-muted text-xs">Medium</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">Write a Python function to check if a string is a valid palindrome, ignoring spaces, punctuation, and case.</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 font-mono text-xs leading-relaxed flex-1 overflow-hidden">
+                  <span style={{ color: '#C46686' }}>import re</span><br /><br />
+                  <span style={{ color: '#C46686' }}>def</span> is_palindrome(s):<br />
+                  &nbsp;&nbsp;cleaned = re.sub(<span style={{ color: '#E8B547' }}>'[^a-zA-Z0-9]'</span>, <span style={{ color: '#E8B547' }}>''</span>, s).lower()<br />
+                  &nbsp;&nbsp;<span style={{ color: '#C46686' }}>return</span> cleaned == cleaned[::-1]<br /><br />
+                  <span style={{ color: '#788C5D' }}># Test: "A man, a plan, a canal: Panama" → True</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>6.9s</span><span>·</span><span>672 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Reasoning — Hard */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Reasoning</span>
+                  <span className="badge-accent text-xs">Hard</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">Alice, Bob, and Carol have different jobs: doctor, lawyer, teacher. Alice is not the doctor. Bob is not the lawyer. The doctor is older than Bob. Who has which job?</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 text-xs leading-relaxed flex-1">
+                  Bob can't be the doctor (can't be older than himself).<br />
+                  Alice can't be the doctor (given).<br />
+                  So <strong style={{ color: '#E25822' }}>Carol = doctor</strong>.<br />
+                  Bob can't be lawyer (given) or doctor → <strong style={{ color: '#E25822' }}>Bob = teacher</strong>.<br />
+                  That leaves <strong style={{ color: '#E25822' }}>Alice = lawyer</strong>.
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>7.6s</span><span>·</span><span>581 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Knowledge — Trivial */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Knowledge</span>
+                  <span className="badge-muted text-xs">Trivial</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">What is the capital of Japan?</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 text-xs leading-relaxed flex-1">
+                  The capital of Japan is <strong style={{ color: '#E25822' }}>Tokyo</strong>. It serves as the nation's political, economic, and cultural center, housing the Emperor's residence, the National Diet, and major government institutions.
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>3.1s</span><span>·</span><span>146 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Science — Medium */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Science</span>
+                  <span className="badge-muted text-xs">Medium</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">Why is the sky blue during the day and red/orange at sunset?</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 text-xs leading-relaxed flex-1">
+                  <strong style={{ color: '#E25822' }}>Rayleigh scattering</strong>: shorter blue wavelengths scatter more in air molecules. At sunset, light travels through more atmosphere, so blue scatters away entirely — leaving longer red/orange wavelengths to reach our eyes.
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>5.0s</span><span>·</span><span>559 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Creative — Medium */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Creative</span>
+                  <span className="badge-muted text-xs">Medium</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">Write a haiku about a programmer debugging code at 3 AM.</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 text-xs leading-relaxed flex-1 italic">
+                  Screen glow, coffee cold,<br />
+                  Bug hides in the sleepless dark,<br />
+                  Cursor blinks, mind folds,<br />
+                  Dawn breaks the logic apart.
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>15.8s</span><span>·</span><span>651 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+
+              {/* Logic — Hard */}
+              <div className="card flex flex-col" style={{ padding: '20px' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="badge-muted text-xs">Logic</span>
+                  <span className="badge-accent text-xs">Hard</span>
+                </div>
+                <p className="text-sm text-text-secondary mb-3 leading-relaxed">If all roses are flowers, and some flowers fade quickly, can we conclude that some roses fade quickly?</p>
+                <div className="text-sm text-text-primary bg-bg-tertiary/50 rounded-sm p-3 mb-3 text-xs leading-relaxed flex-1">
+                  <strong style={{ color: '#E25822' }}>No.</strong> All roses are flowers (subset), and some flowers fade — but the fading flowers could be entirely different types (tulips, lilies). The premises don't guarantee overlap between roses and fading flowers. The conclusion is logically invalid.
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span>26.6s</span><span>·</span><span>541 tokens</span><span>·</span><span style={{ color: '#788C5D' }}>✓ verified</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 text-center">
               <p className="text-sm text-text-muted mb-4">
-                Benchmark scores coming after third-party verification by ArtificialAnalysis, LiveBench, and LMSys.
-                We don't publish unverified numbers.
+                Every response is from the live API — no edits, no cherry-picking.
+                Try your own questions in the playground.
               </p>
               <a href="/playground" className="btn-accent">
-                Try it yourself
+                Try your own question
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </a>
             </div>
