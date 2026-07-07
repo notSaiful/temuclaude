@@ -24,6 +24,8 @@
  * Timeout: 45s race → single GLM fallback
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { validateApiKey, getTodayUsage, incrementUsage, getUserByEmail, createUser, getUser } from '@/lib/db';
+import { QUERY_LIMITS, PLANS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -377,13 +379,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const authKey = request.headers.get('authorization')?.replace('Bearer ', '');
+    // ── Auth & Usage ──────────────────────────────────────
+    // 1. Try API key (Bearer token or x-api-key header)
+    const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                   request.headers.get('x-api-key') || '';
     const masterKey = process.env.TEMUCLAUDE_MASTER_KEY;
-    if (masterKey && authKey !== masterKey) {
-      return NextResponse.json(
-        { error: { message: 'Invalid API key', type: 'authentication_error' } },
-        { status: 401 }
-      );
+
+    let userId: string | null = null;
+    let userPlan = 'free';
+    let isEvalMode = false; // open access for benchmarking platforms
+
+    if (apiKey) {
+      // Check master key first (for evaluation platforms — AA, LMSys, LiveBench, etc.)
+      if (masterKey && apiKey === masterKey) {
+        isEvalMode = true;
+      } else {
+        // Validate against DB
+        const valid = validateApiKey(apiKey);
+        if (!valid) {
+          return NextResponse.json(
+            { error: { message: 'Invalid API key', type: 'authentication_error' } },
+            { status: 401 }
+          );
+        }
+        userId = valid.userId;
+        userPlan = valid.user.plan || 'free';
+      }
+    }
+    // No API key = free tier (playground users, eval platforms testing without key)
+    // Free tier: 20 queries/day, tracked by IP or anonymous identifier
+
+    // Check usage limits for non-eval users
+    if (!isEvalMode && userId) {
+      const todayUsage = getTodayUsage(userId);
+      const limits = QUERY_LIMITS[userPlan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
+
+      if (userPlan === 'free' && limits.perDay !== Infinity) {
+        if (todayUsage.query_count >= limits.perDay) {
+          return NextResponse.json(
+            { error: { message: `Rate limit exceeded. Free tier allows ${limits.perDay} queries/day. Upgrade at temuclaude.com/pricing`, type: 'rate_limit_error' } },
+            { status: 429 }
+          );
+        }
+      }
     }
 
     // Timeout safeguard: 45s → single GLM fallback (within AA's 60s limit)
@@ -396,6 +434,13 @@ export async function POST(request: NextRequest) {
     });
 
     const result = await Promise.race([pipeline, timeout]);
+
+    // Track usage for authenticated users
+    if (!isEvalMode && userId) {
+      const promptTokens = messages.reduce((s, m) => s + Math.ceil(m.content.length / 4), 0);
+      const completionTokens = Math.ceil(result.content.length / 4);
+      try { incrementUsage(userId, promptTokens, completionTokens); } catch {}
+    }
 
     return NextResponse.json({
       id: `chatcmpl-${Date.now()}`,

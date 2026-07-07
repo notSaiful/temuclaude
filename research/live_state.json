@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07T22:39:24.987309",
+  "timestamp": "2026-07-07T22:41:35.185210",
   "system": "hasan",
   "status": "all_systems_nominal",
   "healthScore": 100,
@@ -21,7 +21,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 17,
+        "heartbeatAge": 27,
         "extra": {
           "cycle_duration": 834.59,
           "last_run": "2026-07-07T16:25:31.102417+00:00"
@@ -34,10 +34,10 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 16,
+        "heartbeatAge": 26,
         "extra": {
           "cycle_duration": 0.0,
-          "last_run": "2026-07-07T17:08:38.416013+00:00"
+          "last_run": "2026-07-07T17:10:38.456376+00:00"
         }
       },
       {
@@ -47,7 +47,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 15,
+        "heartbeatAge": 25,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T17:06:38.476256+00:00"
@@ -60,7 +60,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 14,
+        "heartbeatAge": 24,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T17:06:39.477108+00:00"
@@ -73,7 +73,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 13,
+        "heartbeatAge": 23,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T17:06:40.499408+00:00"
@@ -86,9 +86,9 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "running",
-        "heartbeatAge": 12,
+        "heartbeatAge": 22,
         "extra": {
-          "cycle_start": 1783444127.6855621
+          "cycle_start": 1783444247.691923
         }
       },
       {
@@ -98,10 +98,10 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 11,
+        "heartbeatAge": 21,
         "extra": {
-          "cycle_duration": 0.04,
-          "last_run": "2026-07-07T17:08:42.912917+00:00"
+          "cycle_duration": 0.05,
+          "last_run": "2026-07-07T17:10:42.930817+00:00"
         }
       },
       {
@@ -111,7 +111,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 23,
+        "heartbeatAge": 3,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T17:08:00.784798+00:00"
@@ -124,7 +124,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 20,
+        "heartbeatAge": 0,
         "extra": {
           "cycle_duration": 0.01,
           "last_run": "2026-07-07T17:08:03.804225+00:00"
@@ -137,7 +137,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 17,
+        "heartbeatAge": 27,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T17:08:06.859103+00:00"
@@ -150,7 +150,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 29,
+        "heartbeatAge": 9,
         "extra": {
           "cycle_duration": 9.55,
           "last_run": "2026-07-07T16:13:34.348527+00:00"
@@ -163,7 +163,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 26,
+        "heartbeatAge": 6,
         "extra": {
           "cycle_duration": 0.61,
           "last_run": "2026-07-07T16:13:28.453054+00:00"
@@ -176,7 +176,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 23,
+        "heartbeatAge": 3,
         "extra": {
           "cycle_duration": 23.95,
           "last_run": "2026-07-07T16:43:54.788186+00:00"
@@ -189,7 +189,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 5,
+        "heartbeatAge": 15,
         "extra": {
           "cycle_duration": 0.01,
           "last_run": "2026-07-07T16:13:48.938338+00:00"
@@ -202,7 +202,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 22,
+        "heartbeatAge": 2,
         "extra": {
           "cycle_duration": 51.68,
           "last_run": "2026-07-07T16:15:53.001925+00:00"
@@ -215,7 +215,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 11,
+        "heartbeatAge": 21,
         "extra": {
           "cycle_duration": 42.25,
           "last_run": "2026-07-07T16:14:55.331085+00:00"
@@ -228,7 +228,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 8,
+        "heartbeatAge": 18,
         "extra": {
           "cycle_duration": 10.05,
           "last_run": "2026-07-07T16:14:26.117537+00:00"
@@ -241,7 +241,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 5,
+        "heartbeatAge": 15,
         "extra": {
           "cycle_duration": 0.8,
           "last_run": "2026-07-07T16:14:19.948759+00:00"
@@ -254,7 +254,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 17,
+        "heartbeatAge": 27,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T16:14:37.151105+00:00"
@@ -267,7 +267,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 14,
+        "heartbeatAge": 24,
         "extra": {
           "cycle_duration": 0.02,
           "last_run": "2026-07-07T16:14:40.208478+00:00"
@@ -280,7 +280,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 4,
+        "heartbeatAge": 14,
         "extra": {
           "cycle_duration": 37.41,
           "last_run": "2026-07-07T16:16:26.855085+00:00"
@@ -293,7 +293,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 29,
+        "heartbeatAge": 9,
         "extra": {
           "cycle_duration": 0.0,
           "last_run": "2026-07-07T16:13:55.005484+00:00"
@@ -306,7 +306,7 @@
         "healthy": true,
         "healthReason": "ok",
         "status": "sleeping",
-        "heartbeatAge": 2,
+        "heartbeatAge": 12,
         "extra": {
           "cycle_duration": 62.27,
           "last_run": "2026-07-07T16:14:54.248117+00:00"
@@ -317,82 +317,12 @@
   "queue": {
     "newRaw": 0,
     "newFindings": 0,
-    "implementationQueue": 2,
+    "implementationQueue": 1,
     "implementationFailed": 3
   },
   "sharedMemory": {
     "daemons": 200,
     "recentEvents": [
-      {
-        "id": "evt_1783444058397_distiller_daemon",
-        "timestamp": "2026-07-07T22:37:38.397791",
-        "daemon": "distiller_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.0
-        }
-      },
-      {
-        "id": "evt_1783444062902_coordinator_daemon",
-        "timestamp": "2026-07-07T22:37:42.902671",
-        "daemon": "coordinator_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.05
-        }
-      },
-      {
-        "id": "evt_1783444080785_cyber_daemon",
-        "timestamp": "2026-07-07T22:38:00.785368",
-        "daemon": "cyber_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.02
-        }
-      },
-      {
-        "id": "evt_1783444083804_efficiency_daemon",
-        "timestamp": "2026-07-07T22:38:03.804586",
-        "daemon": "efficiency_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.01
-        }
-      },
-      {
-        "id": "evt_1783444086859_media_daemon",
-        "timestamp": "2026-07-07T22:38:06.859575",
-        "daemon": "media_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.02
-        }
-      },
-      {
-        "id": "evt_1783444088410_distiller_daemon",
-        "timestamp": "2026-07-07T22:38:08.410152",
-        "daemon": "distiller_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 0.0s",
-        "extra": {
-          "duration": 0.0
-        }
-      },
-      {
-        "id": "evt_1783444091158_integrator_daemon",
-        "timestamp": "2026-07-07T22:38:11.158609",
-        "daemon": "integrator_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 83.5s",
-        "extra": {
-          "duration": 83.48
-        }
-      },
       {
         "id": "evt_1783444118417_distiller_daemon",
         "timestamp": "2026-07-07T22:38:38.417012",
@@ -422,6 +352,76 @@
         "extra": {
           "duration": 0.0
         }
+      },
+      {
+        "id": "evt_1783444169835_integrator_daemon",
+        "timestamp": "2026-07-07T22:39:29.835214",
+        "daemon": "integrator_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 42.1s",
+        "extra": {
+          "duration": 42.15
+        }
+      },
+      {
+        "id": "evt_1783444178435_distiller_daemon",
+        "timestamp": "2026-07-07T22:39:38.435194",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.0
+        }
+      },
+      {
+        "id": "evt_1783444182913_coordinator_daemon",
+        "timestamp": "2026-07-07T22:39:42.913731",
+        "daemon": "coordinator_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.04
+        }
+      },
+      {
+        "id": "evt_1783444208444_distiller_daemon",
+        "timestamp": "2026-07-07T22:40:08.444858",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.0
+        }
+      },
+      {
+        "id": "evt_1783444238457_distiller_daemon",
+        "timestamp": "2026-07-07T22:40:38.457137",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.0
+        }
+      },
+      {
+        "id": "evt_1783444242931_coordinator_daemon",
+        "timestamp": "2026-07-07T22:40:42.931091",
+        "daemon": "coordinator_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.05
+        }
+      },
+      {
+        "id": "evt_1783444268460_distiller_daemon",
+        "timestamp": "2026-07-07T22:41:08.460037",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.0
+        }
       }
     ],
     "knowledgeFacts": 3
@@ -445,19 +445,19 @@
   },
   "activity": [
     {
-      "time": "2026-07-07 22:39:20",
+      "time": "2026-07-07 22:41:32",
       "daemon": "integrator_daemon",
       "level": "INFO",
-      "message": "Attempt 2/2: deep_research_Implementation_fail_rate_89%_\u2014_improve_integrator_20260707T162639.md"
+      "message": "Attempt 2/2: deep_research_No_self-hosted_vLLM_\u2014_latency_penalty_20260707T162640.md"
     },
     {
-      "time": "2026-07-07 22:38:50",
+      "time": "2026-07-07 22:41:02",
       "daemon": "integrator_daemon",
       "level": "ERROR",
       "message": "Auto-integrator stderr:"
     },
     {
-      "time": "2026-07-07 22:38:50",
+      "time": "2026-07-07 22:41:02",
       "daemon": "integrator_daemon",
       "level": "INFO",
       "message": "Retrying in 30s..."

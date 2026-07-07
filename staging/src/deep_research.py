@@ -1471,3 +1471,37 @@ def validate_research_for_integration(report: str, topic: str, min_words: int = 
         "issues": issues,
         "metrics": metrics,
     }
+
+def get_vllm_endpoint_config() -> Optional[Dict[str, Any]]:
+    """
+    Detect and return configuration for a self-hosted vLLM endpoint.
+
+    Self-hosted vLLM eliminates the latency penalty of remote API calls
+    during deep research multi-pass pipelines (plan, research, synthesize,
+    review, expand). This function checks environment variables and returns
+    a ready-to-use config dict, or None if no vLLM endpoint is configured.
+
+    Expected environment variables:
+      VLLM_BASE_URL       - e.g. http://localhost:8000/v1
+      VLLM_API_KEY        - optional, defaults to "EMPTY" (vLLM default)
+      VLLM_MODEL          - model name served by vLLM
+      VLLM_MAX_TOKENS     - optional, defaults to 4096
+      VLLM_TEMPERATURE    - optional, defaults to 0.7
+      VLLM_TIMEOUT        - optional, defaults to 120 seconds
+
+    Returns:
+        Dict with keys: base_url, api_key, model, max_tokens,
+        temperature, timeout — or None if VLLM_BASE_URL is unset.
+    """
+    base_url = os.environ.get("VLLM_BASE_URL")
+    if not base_url:
+        return None
+
+    return {
+        "base_url": base_url.rstrip("/"),
+        "api_key": os.environ.get("VLLM_API_KEY", "EMPTY"),
+        "model": os.environ.get("VLLM_MODEL", "default"),
+        "max_tokens": int(os.environ.get("VLLM_MAX_TOKENS", "4096")),
+        "temperature": float(os.environ.get("VLLM_TEMPERATURE", "0.7")),
+        "timeout": float(os.environ.get("VLLM_TIMEOUT", "120")),
+    }

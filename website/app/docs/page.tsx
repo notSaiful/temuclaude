@@ -69,12 +69,14 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
               <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — ask anything, get a superior answer. No signup, no setup. 20 free queries/day.</p>
-              <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
-              <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/api/chat \\
+              <p className="text-sm text-text-secondary mb-2">Option 2 — API access (OpenAI-compatible):</p>
+              <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
+  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
 
-# Response: SSE stream with answer + orchestration metadata`} />
+# OpenAI-compatible — works with any OpenAI client library:
+# Python: openai.ChatCompletion.create(...)
+# JS: openai.chat.completions.create(...)`} />
               <Callout type="tip">The playground runs the full 6-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
             </section>
 
@@ -352,11 +354,24 @@ Response: SSE stream
 
             <section id="authentication" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
-              <p className="text-text-secondary mb-4">Free tier: no authentication needed. Paid plans use Bearer token:</p>
-              <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/api/chat \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
+              <p className="text-text-secondary mb-4">Free tier: no API key needed — just start calling. Paid plans use a Bearer token or x-api-key header:</p>
+              <CodeBlock lang="bash" code={`# Free tier — no key needed:
+curl -X POST https://temuclaude.com/v1/chat/completions \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
+  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'
+
+# Paid plans — use your API key:
+curl -X POST https://temuclaude.com/v1/chat/completions \\
+  -H "Authorization: Bearer tc_your_api_key" \\
+  -H "Content-Type: application/json" \\
+  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'
+
+# Or use x-api-key header:
+curl -X POST https://temuclaude.com/v1/chat/completions \\
+  -H "x-api-key: tc_your_api_key" \\
+  -H "Content-Type: application/json" \\
+  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'} />
+              <p className="text-sm text-text-secondary mt-4">Get your API key from the <a href="/pricing" className="text-accent-primary hover:underline">pricing page</a> after subscribing to a Developer or Pro plan. The API is OpenAI-compatible — works with any OpenAI client library (Python, JS, Go, etc.).</p>
             </section>
 
             <section id="rate-limits" className="mb-12">
