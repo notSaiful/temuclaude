@@ -18,13 +18,13 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://temuclaude.com'),
   title: 'TemuClaude — Multi-Model AI Orchestration | 8 Models, 10-Layer Pipeline',
-  description: 'TemuClaude orchestrates 8 frontier AI models in parallel, fuses their answers, verifies with code execution, and quality-checks every response. 25x cheaper than frontier models. Try it free.',
+  description: 'TemuClaude orchestrates 8 frontier AI models in parallel, fuses their answers, verifies with code execution, and quality-checks every response. fraction of the cost than frontier models. Try it free.',
   keywords: ['LLM orchestration', 'multi-model AI', 'Mixture of Agents', 'AI playground', 'model fusion', 'open source AI', 'frontier AI', 'cheap AI API'],
   authors: [{ name: 'Mohammad Saiful Haque' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 frontier models. 10-layer quality pipeline. 25x cheaper than Fable 5. Open source. 25% to charity.',
+    description: '8 frontier models. 10-layer quality pipeline. fraction of the cost of Claude or GPT. Open source. 25% to charity.',
     type: 'website',
     url: 'https://temuclaude.com',
     siteName: 'TemuClaude',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 10-layer pipeline. 25x cheaper. Open source. 25% to charity.',
+    description: '8 models. 10-layer pipeline. fraction of the cost. Open source. 25% to charity.',
     images: ['/og-image.png'],
     site: '@temuclaude',
   },
@@ -46,7 +46,7 @@ const structuredData = {
   name: 'TemuClaude',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
-  description: 'Multi-model AI orchestration platform. 8 frontier models, 10-layer quality pipeline, 25x cheaper than frontier models. Open source.',
+  description: 'Multi-model AI orchestration platform. 8 frontier models, 10-layer quality pipeline, fraction of the cost than frontier models. Open source.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   url: 'https://temuclaude.com',
 };

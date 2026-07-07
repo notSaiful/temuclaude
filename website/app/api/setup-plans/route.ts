@@ -14,7 +14,7 @@ export async function GET() {
 
     // Create Developer plan
     const devPlan = await createPlan({
-      name: 'Temuclaude Developer',
+      name: 'TemuClaude Developer',
       amountINR: PLANS.developer.priceINR,
       period: 'monthly',
       interval: 1,
@@ -25,7 +25,7 @@ export async function GET() {
 
     // Create Pro plan
     const proPlan = await createPlan({
-      name: 'Temuclaude Pro',
+      name: 'TemuClaude Pro',
       amountINR: PLANS.pro.priceINR,
       period: 'monthly',
       interval: 1,
@@ -36,7 +36,7 @@ export async function GET() {
 
     // Create Enterprise plan
     const entPlan = await createPlan({
-      name: 'Temuclaude Enterprise',
+      name: 'TemuClaude Enterprise',
       amountINR: PLANS.enterprise.priceINR,
       period: 'monthly',
       interval: 1,

@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
@@ -89,10 +88,18 @@ export default function HomePage() {
               </div>
 
               <div
-                className="lg:col-span-5 animate-fade-in-up"
+                className="lg:col-span-5 animate-fade-in-up flex items-center justify-center"
                 style={{ animationDelay: '400ms' }}
               >
-                <OrchestrationVisual />
+                <svg width="280" height="280" viewBox="0 0 200 200" className="opacity-90" aria-hidden="true">
+                  <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
+                  <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
+                  <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
+                  <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
+                  <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
+                  <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
+                  <circle cx="100" cy="85" r="6" fill="#D97757"/>
+                </svg>
               </div>
             </div>
           </div>
@@ -458,15 +465,6 @@ export default function HomePage() {
         </footer>
       </main>
     </>
-  );
-}
-
-/* ━━ Orchestration Visual ━━ */
-function OrchestrationVisual() {
-  return (
-    <div className="relative w-full" style={{ aspectRatio: '1.1', minHeight: '320px' }}>
-      <OrchAnim />
-    </div>
   );
 }
 

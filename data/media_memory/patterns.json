@@ -19,7 +19,7 @@
     "general_tts": {
       "alibaba/qwen3-tts-flash": {
         "wins": 0,
-        "total": 2,
+        "total": 1,
         "avg_score": 0.0,
         "win_rate": 0.0
       }
@@ -45,44 +45,22 @@
         "avg_score": 0.0,
         "win_rate": 0.0
       }
-    },
-    "general_music": {
-      "minimax/music-2.0": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      }
-    },
-    "general_image": {
-      "alibaba/z-image-turbo": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      },
-      "ltxv/ltxv-2-fast": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      }
     }
   },
   "models": {
     "alibaba/z-image-turbo": {
       "wins": 0,
-      "total": 3,
+      "total": 2,
       "avg_score": 0.0
     },
     "ltxv/ltxv-2-fast": {
       "wins": 0,
-      "total": 3,
+      "total": 2,
       "avg_score": 0.0
     },
     "alibaba/qwen3-tts-flash": {
       "wins": 0,
-      "total": 2,
+      "total": 1,
       "avg_score": 0.0
     },
     "hume/octave-2": {
@@ -99,20 +77,15 @@
       "wins": 0,
       "total": 1,
       "avg_score": 0.0
-    },
-    "minimax/music-2.0": {
-      "wins": 0,
-      "total": 1,
-      "avg_score": 0.0
     }
   },
   "overall": {
-    "total_generations": 11,
+    "total_generations": 7,
     "total_wins": 0,
     "cache_hits": 0,
-    "total_cost": 2.6015729999999997,
+    "total_cost": 1.6850839999999998,
     "avg_score": 0.0,
-    "avg_iterations": 3.5454545454545454,
-    "last_updated": 1783399204.206692
+    "avg_iterations": 3.5714285714285716,
+    "last_updated": 1783400014.22562
   }
 }

@@ -305,7 +305,7 @@ python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Benchmark</th>
                     <th className="text-center py-2 px-3 font-semibold text-accent-primary">TemuClaude*</th>
-                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Fable 5</th>
+                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Claude Sonnet 5</th>
                     <th className="text-center py-2 px-3 font-semibold text-text-muted">GPT-5.5</th>
                   </tr></thead>
                   <tbody>

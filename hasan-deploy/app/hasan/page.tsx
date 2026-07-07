@@ -41,7 +41,7 @@ interface HasanData {
   swot: { strengths: number; weaknesses: number; opportunities: number; threats: number } | null;
   radar: { totalSignals: number } | null;
   cost: { remainingCredits: number; burnRatePerDay: number; throttleLevel: string; totalSpent24h: number; totalTokens24h: number };
-  charity: { totalDistributed: number; entries: number };
+  ummah: { totalDistributed: number; entries: number };
   activity: ActivityItem[];
   identity: { verified: boolean; purpose: string; goal: string };
   stats: { sourceModules: number };
@@ -231,12 +231,12 @@ export default function HasanPage() {
     );
   }
 
-  const alive = data?.daemons.alive || 0;
-  const total = data?.daemons.total || 23;
+  const alive = data?.daemons?.alive || 0;
+  const total = data?.daemons?.total || 23;
   const online = alive > 0;
-  const throttleColor = THROTTLE_COLORS[data?.cost.throttleLevel || 'green'];
+  const throttleColor = THROTTLE_COLORS[data?.cost?.throttleLevel || 'green'];
   const daemonsByGroup: Record<string, DaemonStatus[]> = {};
-  (data?.daemons.list || []).forEach(d => {
+  (data?.daemons?.list || []).forEach(d => {
     const meta = DAEMON_META[d.name] || { label: d.name, group: 'Other', icon: '' };
     if (!daemonsByGroup[meta.group]) daemonsByGroup[meta.group] = [];
     daemonsByGroup[meta.group].push(d);
@@ -330,10 +330,10 @@ export default function HasanPage() {
               </div>
               <div style={s.bannerRight}>
                 {[
-                  { label: 'CREDITS', value: `$${(data?.cost.remainingCredits || 0).toFixed(2)}`, color: throttleColor },
-                  { label: 'BURN/DAY', value: `$${(data?.cost.burnRatePerDay || 0).toFixed(2)}`, color: '#e0e0e8' },
-                  { label: 'THROTTLE', value: (data?.cost.throttleLevel || 'green').toUpperCase(), color: throttleColor },
-                  { label: 'TOKENS 24H', value: (data?.cost.totalTokens24h || 0).toLocaleString(), color: '#e0e0e8' },
+                  { label: 'CREDITS', value: `$${(data?.cost?.remainingCredits || 0).toFixed(2)}`, color: throttleColor },
+                  { label: 'BURN/DAY', value: `$${(data?.cost?.burnRatePerDay || 0).toFixed(2)}`, color: '#e0e0e8' },
+                  { label: 'THROTTLE', value: (data?.cost?.throttleLevel || 'green').toUpperCase(), color: throttleColor },
+                  { label: 'TOKENS 24H', value: (data?.cost?.totalTokens24h || 0).toLocaleString(), color: '#e0e0e8' },
                 ].map(stat => (
                   <div key={stat.label} style={s.pill}>
                     <span style={s.pillLabel}>{stat.label}</span>
@@ -369,9 +369,9 @@ export default function HasanPage() {
               <div style={s.card}>
                 <div style={s.cardHead}><Icon name="code" size={16} color="#9ca3af" /><span style={s.cardTitle}>Pipeline Queue</span></div>
                 <div style={s.queueRow}>
-                  <div style={s.queueCell}><span style={s.queueNum}>{data?.queue.newFindings || 0}</span><span style={s.queueLabel}>Findings</span></div>
-                  <div style={s.queueCell}><span style={s.queueNum}>{data?.queue.implementationQueue || 0}</span><span style={s.queueLabel}>To Build</span></div>
-                  <div style={s.queueCell}><span style={{ ...s.queueNum, color: (data?.queue.implementationFailed || 0) > 0 ? '#ef4444' : '#e0e0e8' }}>{data?.queue.implementationFailed || 0}</span><span style={s.queueLabel}>Failed</span></div>
+                  <div style={s.queueCell}><span style={s.queueNum}>{data?.queue?.newFindings || 0}</span><span style={s.queueLabel}>Findings</span></div>
+                  <div style={s.queueCell}><span style={s.queueNum}>{data?.queue?.implementationQueue || 0}</span><span style={s.queueLabel}>To Build</span></div>
+                  <div style={s.queueCell}><span style={{ ...s.queueNum, color: (data?.queue?.implementationFailed || 0) > 0 ? '#ef4444' : '#e0e0e8' }}>{data?.queue?.implementationFailed || 0}</span><span style={s.queueLabel}>Failed</span></div>
                 </div>
               </div>
 
@@ -379,18 +379,18 @@ export default function HasanPage() {
               <div style={s.card}>
                 <div style={s.cardHead}><Icon name="cpu" size={16} color="#9ca3af" /><span style={s.cardTitle}>Memory</span></div>
                 <div style={s.memRow}>
-                  <div style={s.memCell}><span style={s.memNum}>{data?.sharedMemory.knowledgeFacts || 0}</span><span style={s.memLabel}>Shared Facts</span></div>
-                  <div style={s.memCell}><span style={s.memNum}>{data?.unlimitedMemory.sizeMB || '0'}</span><span style={s.memLabel}>Unlimited (MB)</span></div>
+                  <div style={s.memCell}><span style={s.memNum}>{data?.sharedMemory?.knowledgeFacts || 0}</span><span style={s.memLabel}>Shared Facts</span></div>
+                  <div style={s.memCell}><span style={s.memNum}>{data?.unlimitedMemory?.sizeMB || '0'}</span><span style={s.memLabel}>Unlimited (MB)</span></div>
                 </div>
               </div>
 
               {/* Charity Fund Card */}
               <div style={{ ...s.card, border: '1px solid rgba(184,146,74,0.2)' }}>
                 <div style={s.cardHead}><span style={{ ...s.cardTitle, color: '#b8924a' }}>💰 Charity Fund</span></div>
-                <div style={s.charityBox}>
-                  <span style={s.charityAmount}>${(data?.charity.totalDistributed || 0).toFixed(2)}</span>
-                  <span style={s.charityLabel}>Total Distributed</span>
-                  <span style={s.charityNote}>25% of profit → Food · Clinics · Education</span>
+                <div style={s.ummahBox}>
+                  <span style={s.ummahAmount}>${(data?.ummah?.totalDistributed || 0).toFixed(2)}</span>
+                  <span style={s.ummahLabel}>Total Distributed</span>
+                  <span style={s.ummahNote}>25% of profit → Food · Clinics · Education</span>
                 </div>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function HasanPage() {
               </div>
               <div style={s.feedList}>
                 <AnimatePresence mode="popLayout">
-                  {data?.activity.map((item, i) => (
+                  {data?.activity?.map((item, i) => (
                     <motion.div key={`${item.time}-${i}`} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
                       style={s.feedItem}>
                       <span style={s.feedTime}>{item.time.split(' ')[1]}</span>
@@ -717,10 +717,10 @@ const s: Record<string, React.CSSProperties> = {
   memCell: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
   memNum: { fontSize: '24px', fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", color: '#8b5cf6' },
   memLabel: { fontSize: '10px', color: '#6b6b7b' },
-  charityBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
-  charityAmount: { fontSize: '32px', fontWeight: 900, color: '#b8924a', fontFamily: "'JetBrains Mono', monospace" },
-  charityLabel: { fontSize: '10px', color: '#8b8b9b' },
-  charityNote: { fontSize: '9px', color: '#6b6b7b', textAlign: 'center', marginTop: '6px' },
+  ummahBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
+  ummahAmount: { fontSize: '32px', fontWeight: 900, color: '#b8924a', fontFamily: "'JetBrains Mono', monospace" },
+  ummahLabel: { fontSize: '10px', color: '#8b8b9b' },
+  ummahNote: { fontSize: '9px', color: '#6b6b7b', textAlign: 'center', marginTop: '6px' },
   feedPanel: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '20px', backdropFilter: 'blur(10px)' },
   feedHead: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' },
   feedTitle: { fontSize: '14px', fontWeight: 600, color: '#8b8b9b', margin: 0 },

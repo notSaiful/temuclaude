@@ -30,7 +30,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceINR: 0,
     priceLabel: '$0',
     period: 'forever',
-    description: 'Try Temuclaude in the playground. No signup required.',
+    description: 'Try TemuClaude in the playground. No signup required.',
     features: [
       '20 queries/day',
       'Full 10-layer orchestration',

@@ -15,12 +15,12 @@ const POOL = {
   multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal, cheaper than Flash, image+video
   specialist: 'google/gemini-3-flash-preview', // IQ 50 — #1 Legal, #2 Health, multimodal
   vision: 'minimax/minimax-m3',            // IQ 44 — best vision + creative + generation
-  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — beats Fable 5 on hard queries (used for hardest 2%)
+  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — highest available, used for hardest 2% (used for hardest 2%)
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free', // Free — QA gate + verification
 };
 
 // System prompt to force English responses
-const ENGLISH_SYSTEM = { role: 'system', content: 'You are Temuclaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' };
+const ENGLISH_SYSTEM = { role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' };
 
 type ModelResult = { name: string; content: string; latency: number; ok: boolean };
 type OrchestrationData = {
@@ -135,7 +135,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   techniques.push('structured-aggregation');
   const fusionPrompt = buildFusionPrompt(query, crossReviewResults.filter(r => r.ok));
   const aggResult = await callModel(POOL.orchestrator, [
-    { role: 'system', content: 'You are Temuclaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
+    { role: 'system', content: 'You are TemuClaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
     { role: 'user', content: fusionPrompt },
   ]);
   let finalAnswer = aggResult.ok ? aggResult.content : workingProposals[0].content;
@@ -288,7 +288,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   if (qaScore < 0.75 && needsFrontier(query, taskType)) {
     techniques.push('frontier-fallback');
     const frontierResult = await callModel(POOL.frontier, [
-      { role: 'system', content: 'You are Temuclaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
+      { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
       { role: 'user', content: `Question: ${query}\n\nPrevious best answer (scored ${qaScore.toFixed(2)}/1.0):\n${finalAnswer.substring(0, 2000)}\n\nProvide a better answer:` },
     ]);
     if (frontierResult.ok) {
@@ -343,7 +343,7 @@ async function callModel(model: string, messages: any[]): Promise<ModelResult> {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'HTTP-Referer': 'https://temuclaude.com',
-        'X-Title': 'Temuclaude',
+        'X-Title': 'TemuClaude',
       },
       body: JSON.stringify({
         model, messages: messagesWithSystem.map(m => ({ role: m.role, content: m.content })),
@@ -376,7 +376,7 @@ async function runUSVA(question: string, answer: string): Promise<number> {
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'Temuclaude' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'TemuClaude' },
       body: JSON.stringify({
         model: POOL.verifier,
         messages: [
@@ -408,7 +408,7 @@ async function verifyCode(answer: string): Promise<boolean> {
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'Temuclaude' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'HTTP-Referer': 'https://temuclaude.com', 'X-Title': 'TemuClaude' },
       body: JSON.stringify({
         model: POOL.verifier,
         messages: [
@@ -504,7 +504,7 @@ async function stepLevelVerify(query: string, answer: string): Promise<boolean> 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
           'HTTP-Referer': 'https://temuclaude.com',
-          'X-Title': 'Temuclaude',
+          'X-Title': 'TemuClaude',
         },
         body: JSON.stringify({
           model: POOL.verifier,
@@ -538,7 +538,7 @@ async function logicalVerify(answer: string): Promise<'pass' | 'contradiction' |
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
         'HTTP-Referer': 'https://temuclaude.com',
-        'X-Title': 'Temuclaude',
+        'X-Title': 'TemuClaude',
       },
       body: JSON.stringify({
         model: POOL.verifier,
