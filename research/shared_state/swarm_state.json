@@ -19,23 +19,21 @@
       }
     },
     "revenue_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T15:16:34.663318",
+      "status": "running",
+      "last_seen": "2026-07-07T15:17:12.089003",
       "extra": {
-        "pid": 23060,
-        "last_success": 1783417564.680205,
-        "cycle_duration": 0.03,
-        "last_run": "2026-07-07T09:46:04.680208+00:00"
+        "pid": 24960,
+        "last_success": 1783417632.086207,
+        "cycle_start": 1783417632.087117
       }
     },
     "growth_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T15:16:36.646718",
+      "status": "running",
+      "last_seen": "2026-07-07T15:17:09.935244",
       "extra": {
-        "pid": 23107,
-        "last_success": 1783417566.6585531,
-        "cycle_duration": 0.02,
-        "last_run": "2026-07-07T09:46:06.658560+00:00"
+        "pid": 24728,
+        "last_success": 1783417629.9332511,
+        "cycle_start": 1783417629.934718
       }
     },
     "self_expansion_daemon": {
@@ -48,20 +46,21 @@
       }
     },
     "cost_efficiency_daemon": {
-      "status": "alive",
-      "last_seen": "2026-07-07T15:16:25.644747",
+      "status": "running",
+      "last_seen": "2026-07-07T15:17:06.605555",
       "extra": {
-        "pid": 22525
+        "pid": 24662,
+        "last_success": 1783417626.596936,
+        "cycle_start": 1783417626.597246
       }
     },
     "competitive_dominance_daemon": {
-      "status": "sleeping",
-      "last_seen": "2026-07-07T15:16:38.700140",
+      "status": "running",
+      "last_seen": "2026-07-07T15:17:11.401585",
       "extra": {
-        "pid": 23141,
-        "last_success": 1783417577.148252,
-        "cycle_duration": 8.45,
-        "last_run": "2026-07-07T09:46:17.148268+00:00"
+        "pid": 24892,
+        "last_success": 1783417631.3995898,
+        "cycle_start": 1783417631.400007
       }
     },
     "super_intelligence_daemon": {
@@ -200,6 +199,6 @@
       }
     }
   },
-  "last_update": "2026-07-07T15:17:05.402785",
+  "last_update": "2026-07-07T15:17:12.089012",
   "alive_count": 23
 }
