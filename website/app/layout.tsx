@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 frontier models. 10-layer quality pipeline. 25x cheaper than Fable 5. Open source. 25% to the Ummah Fund.',
+    description: '8 frontier models. 10-layer quality pipeline. 25x cheaper than Fable 5. Open source. 25% to charity.',
     type: 'website',
     url: 'https://temuclaude.com',
     siteName: 'TemuClaude',
