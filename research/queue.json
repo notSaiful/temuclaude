@@ -1,18 +1,6 @@
 {
   "new_raw": [],
   "new_findings": [
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_implementation_quality.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094423_inference_speed.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
@@ -27,18 +15,40 @@
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_missing_feature.json",
     "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_implementation_quality.json",
-    "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_inference_speed.json"
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094522_inference_speed.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_missing_feature.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_implementation_quality.json",
+    "/Users/saiful/temuclaude/research/findings/swot_20260707T094655_inference_speed.json"
   ],
   "research_requests": [],
   "research_complete": [],
   "implementation_queue": [
-    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260707T094423.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260707T094423.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260707T094440.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094442.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094442.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094442.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260707T094444.md"
+    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260707T094444.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094651.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094651.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094653.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094655.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_No_self-hosted_vLLM_\u2014_latency_penalty_20260707T094655.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_media_s3_verifier_guided_denoising_20260707T094655.md"
   ],
   "implementation_complete": [
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260706T210343.md",
@@ -88,11 +98,12 @@
     "/Users/saiful/temuclaude/research/findings/deep_research_unknown_20260707T055850.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092854.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092855.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094420.md"
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094420.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094421.md"
   ],
   "implementation_failed": [
     "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T094419.md"
   ],
   "priority_updates": [],
-  "last_updated": "2026-07-07T09:46:22.270081+00:00"
+  "last_updated": "2026-07-07T09:46:59.808650+00:00"
 }

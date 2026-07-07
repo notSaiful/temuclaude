@@ -451,50 +451,63 @@ export default function HomePage() {
         <PricingSection />
 
         {/* ━━ Footer ━━ */}
-        <footer className="py-12 px-6 border-t border-border-subtle bg-bg-primary">
+        <footer className="py-16 px-6 border-t border-border-subtle bg-bg-secondary">
           <div className="container-max">
+            {/* Top: logo + tagline */}
+            <div className="flex flex-col items-center gap-3 mb-10">
+              <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="9" fill="#E25822"/>
+                <line x1="50" y1="50" x2="50" y2="14" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="76" y2="24" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="86" y2="50" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="76" y2="76" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="50" y2="86" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="24" y2="76" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="14" y2="50" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="24" y2="24" stroke="#E25822" strokeWidth="3" stroke-linecap="round"/>
+              </svg>
+              <div className="font-serif text-lg text-text-primary" style={{ fontWeight: 400 }}>
+                TemuClaude
+              </div>
+              <p className="text-sm text-text-muted">Small input. Frontier output.</p>
+            </div>
+
+            {/* Middle: link columns */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
               <div>
-                <h4 className="text-sm font-semibold text-text-primary mb-3">Product</h4>
+                <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Product</h4>
                 <ul className="space-y-2">
-                  <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary">Playground</a></li>
-                  <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary">Models</a></li>
-                  <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
-                  <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary">Pricing</a></li>
+                  <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Playground</a></li>
+                  <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Models</a></li>
+                  <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Benchmarks</a></li>
+                  <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Pricing</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-text-primary mb-3">Resources</h4>
+                <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Resources</h4>
                 <ul className="space-y-2">
-                  <li><a href="/docs" className="text-sm text-text-secondary hover:text-accent-primary">Documentation</a></li>
-                  <li><a href="/enterprise" className="text-sm text-text-secondary hover:text-accent-primary">Enterprise</a></li>
+                  <li><a href="/docs" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Documentation</a></li>
+                  <li><a href="/enterprise" className="text-sm text-text-secondary hover:text-accent-primary transition-colors">Enterprise</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
+                <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Connect</h4>
                 <ul className="space-y-2">
-                  <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                  <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-sm font-semibold text-text-primary mb-3">Legal</h4>
+                <h4 className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">Legal</h4>
                 <ul className="space-y-2">
-                  <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary">Terms of Service</a></li>
-                  <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary">Privacy Policy</a></li>
-                  <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary">Refund Policy</a></li>
+                  <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary transition-colors">Terms of Service</a></li>
+                  <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary transition-colors">Privacy Policy</a></li>
+                  <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary transition-colors">Refund Policy</a></li>
                 </ul>
               </div>
             </div>
+
+            {/* Bottom: built by */}
             <div className="pt-8 border-t border-border-subtle flex flex-col items-center gap-3">
-              <svg width="32" height="32" viewBox="0 0 200 200" aria-hidden="true">
-                <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
-                <circle cx="100" cy="85" r="6" fill="#D97757"/>
-              </svg>
               <p className="text-sm text-text-muted">
                 Built by Mohammad Saiful Haque · MIT Licensed
               </p>
