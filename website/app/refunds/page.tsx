@@ -2,8 +2,8 @@ import { Navbar } from '@/components/Navbar';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Refund Policy — Temuclaude',
-  description: 'Refund and cancellation policy for Temuclaude subscriptions.',
+  title: 'Refund Policy — TemuClaude',
+  description: 'Refund and cancellation policy for TemuClaude subscriptions.',
 };
 
 export default function RefundsPage() {
@@ -18,7 +18,7 @@ export default function RefundsPage() {
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">1. 30-Day Money-Back Guarantee</h2>
-              <p>We offer a 30-day money-back guarantee on all paid subscriptions. If you are not satisfied with Temuclaude within 30 days of your first payment, we will refund 100% of your subscription fee — no questions asked.</p>
+              <p>We offer a 30-day money-back guarantee on all paid subscriptions. If you are not satisfied with TemuClaude within 30 days of your first payment, we will refund 100% of your subscription fee — no questions asked.</p>
             </section>
 
             <section>

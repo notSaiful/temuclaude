@@ -72,7 +72,7 @@ function PaymentSuccessContent() {
             </svg>
           </div>
           <h1 className="text-2xl font-light text-text-primary mb-2" style={{ fontWeight: 300 }}>
-            Welcome to Temuclaude!
+            Welcome to TemuClaude!
           </h1>
           <p className="text-text-secondary mb-8">{message}</p>
           <div className="space-y-3">
