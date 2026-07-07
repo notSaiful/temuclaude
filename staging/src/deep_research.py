@@ -984,3 +984,85 @@ def select_inference_backend(
     candidates.sort(key=lambda b: (_is_self_hosted_vllm(b), _latency(b), b))
 
     return candidates[0]
+
+def classify_awq_efficiency_finding(
+    finding: Dict,
+    speedup_estimate: float,
+    memory_savings_pct: float,
+    quality_loss_pct: float,
+) -> Dict:
+    """
+    Classify an AWQ (Activation-aware Weight Quantization) efficiency finding
+    according to Temuclaude quality guardrails.
+
+    AWQ is a weight-only quantization technique that preserves activation
+    precision while quantizing weights to 4-bit, achieving significant memory
+    savings and inference speedup with minimal quality degradation. It is a
+    direct competitor to vLLM's quantization strategies.
+
+    Classification rules:
+      - LOSSLESS: speedup >= 1.5x, memory savings >= 40%, quality loss == 0%
+      - QUALITY-PRESERVING: speedup >= 1.5x, memory savings >= 40%, quality loss < 2%
+      - PARETO-OPTIMAL: speedup >= 1.2x, memory savings >= 25%, quality loss < 5%
+      - REJECTED: does not meet PARETO-OPTIMAL thresholds
+
+    Args:
+        finding: The research finding dict with keys like 'type', 'keywords'.
+        speedup_estimate: Estimated inference speedup multiplier (e.g., 2.0 = 2x).
+        memory_savings_pct: Estimated VRAM savings as a percentage (0-100).
+        quality_loss_pct: Estimated quality degradation as a percentage (0-100).
+
+    Returns:
+        Dict with classification, metrics, and implementation recommendation.
+    """
+    classification = "REJECTED"
+    rationale = "Does not meet minimum Pareto-optimal thresholds for adoption."
+
+    thresholds = [
+        ("LOSSLESS", 1.5, 40.0, 0.0),
+        ("QUALITY-PRESERVING", 1.5, 40.0, 2.0),
+        ("PARETO-OPTIMAL", 1.2, 25.0, 5.0),
+    ]
+
+    for label, min_speedup, min_savings, max_quality_loss in thresholds:
+        if (
+            speedup_estimate >= min_speedup
+            and memory_savings_pct >= min_savings
+            and quality_loss_pct <= max_quality_loss
+        ):
+            classification = label
+            if label == "LOSSLESS":
+                rationale = (
+                    "AWQ achieves significant speedup and memory savings with "
+                    "zero measurable quality loss — safe for production."
+                )
+            elif label == "QUALITY-PRESERVING":
+                rationale = (
+                    "AWQ achieves strong efficiency gains with negligible "
+                    f"quality loss ({quality_loss_pct:.2f}%) — acceptable trade-off."
+                )
+            elif label == "PARETO-OPTIMAL":
+                rationale = (
+                    "AWQ offers a favorable speed/memory vs. quality trade-off "
+                    "but quality loss is non-trivial — enable via config flag."
+                )
+            break
+
+    implement = classification != "REJECTED"
+
+    return {
+        "finding_type": "EFFICIENCY",
+        "technique": "AWQ",
+        "competitor": "vLLM",
+        "classification": classification,
+        "rationale": rationale,
+        "metrics": {
+            "speedup_estimate": speedup_estimate,
+            "memory_savings_pct": memory_savings_pct,
+            "quality_loss_pct": quality_loss_pct,
+        },
+        "implement": implement,
+        "target_path": "src/efficiency/awq_quantizer.py" if implement else None,
+        "config_flag": "enable_awq_quantization" if implement else None,
+        "default_enabled": classification in ("LOSSLESS", "QUALITY-PRESERVING"),
+    }
