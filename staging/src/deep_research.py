@@ -772,28 +772,48 @@ def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantiz
             "Write a complete, implementation-ready research report with code examples."
         )},
     ]
-def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
-    """Build a specialized prompt for researching LLM quantization and inference engine comparisons (e.g., AWQ vs vLLM)."""
-    competitor_text = ", ".join(competitors)
+def build_quantization_comparison_prompt(topic: str, competitors: List[str], num_sections: int = 7) -> List[Dict]:
+    """Build a specialized research outline prompt for quantization and inference engine comparisons.
+    
+    When the research topic involves model quantization techniques (e.g., AWQ, GPTQ, SmoothQuant)
+    or inference engine comparisons (e.g., vLLM, TensorRT-LLM, TGI), this prompt ensures
+    the outline covers technical dimensions critical to such evaluations: quantization
+    methodology, kernel optimization, memory bandwidth, throughput/latency benchmarks,
+    hardware compatibility, ease of deployment, and production readiness.
+    
+    Args:
+        topic: The research topic (e.g., "AWQ vs vLLM for efficient LLM inference")
+        competitors: List of competing technologies to compare (e.g., ["AWQ", "vLLM"])
+        num_sections: Minimum number of sections in the outline
+        
+    Returns:
+        List of message dicts suitable for an LLM chat completion call
+    """
+    competitor_text = ", ".join(competitors) if competitors else "the relevant technologies"
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference optimization and model quantization. "
-            "Research and compare quantization methods (AWQ, GPTQ, SmoothQuant, etc.) and inference engines "
-            f"({competitor_text}). Cover: quantization algorithms, memory footprint reductions, "
-            "throughput benchmarks, accuracy preservation, hardware compatibility (GPU types, CPU offloading), "
-            "ease of deployment, integration with serving frameworks, kernel optimizations, "
-            "supported model architectures, community support, and production readiness. "
-            "Include quantitative benchmarks where available and cite sources."
+            "You are a research planner specializing in LLM inference optimization and "
+            "model quantization. Create a comprehensive research outline with at least "
+            f"{num_sections} major sections. The outline must cover these technical "
+            "dimensions for each technology being compared: "
+            "(1) Quantization methodology and theoretical foundations, "
+            "(2) Kernel implementation and CUDA/Triton optimization, "
+            "(3) Memory footprint and bandwidth utilization, "
+            "(4) Throughput and latency benchmarks across model sizes, "
+            "(5) Hardware compatibility (GPU architectures, CPU, edge), "
+            "(6) Deployment complexity and ecosystem integration, "
+            "(7) Production readiness, community support, and maintenance. "
+            "Each section should have 3-5 subsections. Include a section on "
+            "benchmarking methodology to ensure fair comparisons. "
+            "Output as a numbered list of sections with subsections."
         )},
         {"role": "user", "content": (
             f"Topic: {topic}\n"
-            f"Competitors/Technologies to compare: {competitor_text}\n\n"
-            "Produce a detailed technical comparison covering quantization methodology, "
-            "performance benchmarks, accuracy trade-offs, deployment considerations, and "
-            "recommendations for different use cases (edge, cloud, batch, real-time)."
+            f"Technologies to compare: {competitor_text}\n\n"
+            "Create a research outline that enables a rigorous technical comparison "
+            "of these inference/quantization approaches."
         )},
     ]
-
 def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
     """Build a prompt to evaluate an efficiency research finding for quality classification.
     
