@@ -54,7 +54,7 @@ DAEMONS = [
 ]
 
 STALE_THRESHOLD = 120  # seconds without heartbeat = stale
-RESTART_COOLDOWN = 30  # don't restart same daemon more than once per 30s
+RESTART_COOLDOWN = 60  # don't restart same daemon more than once per 60s
 MAX_RESTARTS_PER_CYCLE = 3  # max restarts per check cycle
 HEALTH_CHECK_INTERVAL = 15  # check every 15s
 
@@ -128,15 +128,36 @@ def restart_daemon(name, script, args, reason):
             old_pid = int(pid_file.read_text().strip())
             if is_process_alive(old_pid):
                 os.kill(old_pid, signal.SIGTERM)
-                time.sleep(2)
+                # Wait up to 5 seconds for graceful shutdown
+                for _ in range(5):
+                    time.sleep(1)
+                    if not is_process_alive(old_pid):
+                        break
                 if is_process_alive(old_pid):
                     os.kill(old_pid, signal.SIGKILL)
+                    time.sleep(1)
         except:
             pass
     # Remove stale PID + heartbeat so daemon can start fresh
     pid_file.unlink(missing_ok=True)
     hb_file = STATE_DIR / f'{name}_heartbeat.json'
     hb_file.unlink(missing_ok=True)
+    
+    # Kill any stray processes running the same daemon script (race condition safety)
+    try:
+        script_name = script  # e.g., 'media_daemon.py'
+        result = subprocess.run(
+            ['pgrep', '-f', f'temuclaude/research/{script_name}'],
+            capture_output=True, text=True, timeout=5
+        )
+        stray_pids = [int(p) for p in result.stdout.strip().split('\n') if p.strip()]
+        for stray_pid in stray_pids:
+            if stray_pid != os.getpid() and is_process_alive(stray_pid):
+                os.kill(stray_pid, signal.SIGKILL)
+                log('WARNING', f'{name}: killed stray process {stray_pid} before restart')
+                time.sleep(1)
+    except:
+        pass
 
     # Start the daemon
     script_path = RESEARCH_DIR / script

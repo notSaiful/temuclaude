@@ -1,0 +1,9 @@
+{
+  "id": "swot_20260707T101131_inference_speed",
+  "source": "swot_analysis",
+  "severity": "MEDIUM",
+  "action": "No self-hosted vLLM \u2014 latency penalty",
+  "area": "inference_speed",
+  "title": "No self-hosted vLLM \u2014 latency penalty",
+  "timestamp": "2026-07-07T10:11:31.338897+00:00"
+}

@@ -7,6 +7,8 @@ import { FusionPipeline } from '@/components/FusionPipeline';
 import { MagneticButton } from '@/components/MagneticButton';
 import { PricingSection } from '@/components/PricingSection';
 import { ScrollProgress } from '@/components/ScrollProgress';
+import { CountUp, ScrollRevealText } from '@/components/CountUp';
+import { Testimonials } from '@/components/Testimonials';
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -89,13 +91,14 @@ export default function HomePage() {
                   className="mb-6 animate-fade-in-up"
                   style={{ animationDelay: '450ms' }}
                 >
-                  <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden">
+                  <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden group relative">
                     <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#febc2e' }} />
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28c840' }} />
                       <span className="text-[10px] text-text-muted ml-2">terminal</span>
                     </div>
+                    <CopyButton text='curl -X POST temuclaude.com/api/chat -H "Content-Type: application/json" -d {"messages":[{"role":"user","content":"hi"}]}' />
                     <div className="p-4 overflow-x-auto">
                       <div className="text-text-muted text-xs mb-2"># One request. One answer. No model selection.</div>
                       <div><span className="text-accent-olive">curl</span> <span className="text-accent-fig">-X POST</span> temuclaude.com/api/chat \</div>
@@ -144,9 +147,11 @@ export default function HomePage() {
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                Built for builders
-              </h2>
+              <ScrollRevealText
+                text="Built for builders"
+                className="text-3xl md:text-4xl font-serif text-text-primary mb-3"
+                style={{ fontWeight: 300, letterSpacing: '-0.02em' }}
+              />
               <p className="text-text-secondary">
                 Stop paying $30/M tokens for GPT-5.5. Stop wrangling multiple APIs.
                 One endpoint, frontier quality, a fraction of the cost.
@@ -289,16 +294,16 @@ export default function HomePage() {
             {/* Stats strip */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               {[
-                { value: '472', label: 'tests passing', color: '#788C5D' },
-                { value: '8', label: 'models fused', color: '#E25822' },
-                { value: '$0.05', label: 'per M cached tokens', color: '#E8B547' },
+                { value: 472, label: 'tests passing', color: '#788C5D', decimals: 0 },
+                { value: 8, label: 'models fused', color: '#E25822', decimals: 0 },
+                { value: 0.05, label: 'per M cached tokens', color: '#E8B547', decimals: 2, prefix: '$' },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <div
                     className="text-4xl md:text-5xl font-serif mb-2"
-                    style={{ fontWeight: 300, letterSpacing: '-0.02em', color: stat.color, fontVariantNumeric: 'tabular-nums' }}
+                    style={{ fontWeight: 300, letterSpacing: '-0.02em', color: stat.color }}
                   >
-                    {stat.value}
+                    <CountUp value={stat.value} prefix={stat.prefix || ''} decimals={stat.decimals} />
                   </div>
                   <div className="text-sm text-text-muted">{stat.label}</div>
                 </div>
@@ -323,6 +328,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ━━ Testimonials ━━ */}
+        <Testimonials />
 
         {/* ━━ How It Works — simplified for builders ━━ */}
         <section className="py-24 px-6">
