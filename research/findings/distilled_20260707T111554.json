@@ -1,0 +1,114 @@
+{
+  "distilled_at": "20260707T111554",
+  "total_raw_files": 20,
+  "total_findings": 3,
+  "new_findings": 3,
+  "already_distilled": 337,
+  "by_type": {
+    "github_repo": 3
+  },
+  "top_findings": [
+    {
+      "type": "github_repo",
+      "id": "1279243366",
+      "name": "eshwarvijay/agent-architecture",
+      "url": "https://github.com/eshwarvijay/agent-architecture",
+      "description": "The 21 agentic design patterns, distilled to concepts (no code) \u2014 a design-phase reference for building AI agents. Works as a Claude Code skill.",
+      "stars": 3,
+      "language": null,
+      "updated_at": "2026-07-07T10:43:04Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1279243366"
+    },
+    {
+      "type": "github_repo",
+      "id": "1196075007",
+      "name": "vibestackdev/vibe-stack",
+      "url": "https://github.com/vibestackdev/vibe-stack",
+      "description": "29 .mdc architecture rules that prevent AI coding assistants from hallucinating insecure auth, deprecated imports, and broken Next.js 15 patterns. Built for Cursor Agent and Claude Code.",
+      "stars": 6,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T10:51:55Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "hallucination",
+        "react",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1196075007"
+    },
+    {
+      "type": "github_repo",
+      "id": "1251695732",
+      "name": "clewisdev/agentic-firehose",
+      "url": "https://github.com/clewisdev/agentic-firehose",
+      "description": "Personal knowledge base for agentic engineering: curated captures of working practitioners' posts on Claude Code, agent     harnesses, memory architectures, prompting patterns, and tool use. Sources distilled into topic notes and cross-source synthesis.      Optimised for one reader's recall and frank reassessment, not as public docs.",
+      "stars": 3,
+      "language": "HTML",
+      "updated_at": "2026-07-07T10:44:29Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1251695732"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "github_repo",
+      "id": "1279243366",
+      "name": "eshwarvijay/agent-architecture",
+      "url": "https://github.com/eshwarvijay/agent-architecture",
+      "description": "The 21 agentic design patterns, distilled to concepts (no code) \u2014 a design-phase reference for building AI agents. Works as a Claude Code skill.",
+      "stars": 3,
+      "language": null,
+      "updated_at": "2026-07-07T10:43:04Z",
+      "relevance_score": 24,
+      "matched_keywords": [
+        "multi-agent",
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1279243366"
+    },
+    {
+      "type": "github_repo",
+      "id": "1196075007",
+      "name": "vibestackdev/vibe-stack",
+      "url": "https://github.com/vibestackdev/vibe-stack",
+      "description": "29 .mdc architecture rules that prevent AI coding assistants from hallucinating insecure auth, deprecated imports, and broken Next.js 15 patterns. Built for Cursor Agent and Claude Code.",
+      "stars": 6,
+      "language": "TypeScript",
+      "updated_at": "2026-07-07T10:51:55Z",
+      "relevance_score": 20,
+      "matched_keywords": [
+        "hallucination",
+        "react",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1196075007"
+    },
+    {
+      "type": "github_repo",
+      "id": "1251695732",
+      "name": "clewisdev/agentic-firehose",
+      "url": "https://github.com/clewisdev/agentic-firehose",
+      "description": "Personal knowledge base for agentic engineering: curated captures of working practitioners' posts on Claude Code, agent     harnesses, memory architectures, prompting patterns, and tool use. Sources distilled into topic notes and cross-source synthesis.      Optimised for one reader's recall and frank reassessment, not as public docs.",
+      "stars": 3,
+      "language": "HTML",
+      "updated_at": "2026-07-07T10:44:29Z",
+      "relevance_score": 15,
+      "matched_keywords": [
+        "agentic",
+        "claude code"
+      ],
+      "dedup_key": "github_repo:1251695732"
+    }
+  ]
+}

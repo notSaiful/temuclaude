@@ -510,32 +510,31 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
         )},
     ]
 
-def classify_efficiency_finding(speedup_factor: float, memory_savings_pct: float, quality_loss_pct: float) -> str:
-    """Classify an efficiency finding under the quality guardrail.
-
+def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, quality_loss_pct: float) -> str:
+    """Classify an efficiency finding using the quality guardrail system.
+    
     Categories:
-      - LOSSLESS: no measurable quality loss (quality_loss_pct == 0)
-      - QUALITY-PRESERVING: negligible quality loss (< 1%) with meaningful gains
-      - PARETO-OPTIMAL: trade-off exists but is on the Pareto frontier
-        (both speedup and savings are significant relative to quality cost)
-      - REJECTED: quality cost outweighs efficiency gains
-
-    For AWQ-style weight quantization (e.g., 4-bit AWQ):
-      speedup ~1.3-3x, memory savings ~50-75%, quality loss ~0.5-2%
-      => typically QUALITY-PRESERVING or PARETO-OPTIMAL
+    - LOSSLESS: speedup/savings with zero quality loss
+    - QUALITY-PRESERVING: speedup/savings with negligible quality loss (< 2%)
+    - PARETO-OPTIMAL: meaningful speedup/savings with acceptable quality tradeoff (< 10%)
+    - REJECTED: insufficient gains or excessive quality loss
+    
+    Designed for findings like AWQ (Activation-aware Weight Quantization) where
+    weight-only quantization (e.g., 4-bit) can deliver 2-4x speedup with minimal
+    quality degradation compared to full precision inference.
     """
-    if quality_loss_pct <= 0.0 and (speedup_factor > 1.0 or memory_savings_pct > 0.0):
+    if quality_loss_pct < 0 or speedup_factor < 1.0 or cost_savings_pct < 0:
+        return "REJECTED"
+    
+    if quality_loss_pct == 0.0 and speedup_factor >= 1.2 and cost_savings_pct >= 10.0:
         return "LOSSLESS"
-
-    if quality_loss_pct < 1.0 and speedup_factor >= 1.2 and memory_savings_pct >= 20.0:
+    
+    if quality_loss_pct < 2.0 and speedup_factor >= 1.5 and cost_savings_pct >= 20.0:
         return "QUALITY-PRESERVING"
-
-    # Pareto-optimal: meaningful gains that scale with acceptable quality cost
-    gain_score = (speedup_factor - 1.0) * 50.0 + memory_savings_pct
-    cost_score = quality_loss_pct * 10.0
-    if gain_score > cost_score and speedup_factor >= 1.1 and memory_savings_pct >= 10.0:
+    
+    if quality_loss_pct < 10.0 and speedup_factor >= 2.0 and cost_savings_pct >= 30.0:
         return "PARETO-OPTIMAL"
-
+    
     return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
     """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
