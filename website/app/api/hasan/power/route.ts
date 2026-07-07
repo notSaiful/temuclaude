@@ -53,6 +53,20 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'deactivate') {
+      // Kill watchdog first so it doesn't restart daemons
+      try {
+        const wdPid = parseInt(execSync(`cat ${STATE_DIR}/watchdog.pid 2>/dev/null`, { encoding: 'utf-8' }).trim());
+        if (wdPid && !isNaN(wdPid)) {
+          try { process.kill(wdPid, 'SIGTERM'); } catch {}
+        }
+        execSync(`rm -f ${STATE_DIR}/watchdog.pid ${STATE_DIR}/watchdog_heartbeat.json`, { timeout: 2000 });
+      } catch {}
+
+      // Kill sync daemon
+      try {
+        execSync('pkill -f "sync_daemon.py"', { timeout: 2000 });
+      } catch {}
+
       // Kill all daemons
       try {
         const pids = execSync(`ls ${STATE_DIR}/*.pid 2>/dev/null`, { encoding: 'utf-8' }).trim().split('\n').filter(Boolean);

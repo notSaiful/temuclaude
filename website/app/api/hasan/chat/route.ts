@@ -85,7 +85,6 @@ async function gatherProjectStructure(): Promise<string> {
   let context = '';
 
   try {
-    // List key directories
     const dirs = ['src', 'website/app', 'website/lib', 'tests', 'research', 'staging', 'benchmarks'];
     for (const dir of dirs) {
       try {
@@ -102,7 +101,6 @@ async function gatherProjectStructure(): Promise<string> {
       } catch {}
     }
 
-    // Check for staging contents — what Hasan is experimenting with
     try {
       const stagingFiles = await fs.readdir(path.join(TEMUCLAUDE_DIR, 'staging'));
       if (stagingFiles.length > 0) {
@@ -112,7 +110,6 @@ async function gatherProjectStructure(): Promise<string> {
       }
     } catch {}
 
-    // Check deployment queue
     const deploy = await readJson(path.join(RESEARCH_DIR, 'deployment', 'deployment_queue.json'));
     if (deploy) {
       const pending = (deploy.pending_findings || []).filter((f: any) => f.status === 'pending_approval').length;
@@ -120,6 +117,54 @@ async function gatherProjectStructure(): Promise<string> {
       const approved = (deploy.approved_deployments || []).length;
       const agents = deploy.agent_scaling?.current_research_agents || 3;
       context += `\nDeployment: ${pending} pending approval, ${staging} in staging, ${approved} approved, ${agents} research agents\n`;
+    }
+  } catch {}
+
+  return context;
+}
+
+// Read shared intelligence — what every daemon is doing, recent events, shared knowledge
+async function gatherSharedIntelligence(): Promise<string> {
+  let context = '';
+
+  // Events bus — what all daemons recently did
+  try {
+    const events = await readJson(path.join(RESEARCH_DIR, 'shared_state', 'events.json'));
+    if (events?.events?.length > 0) {
+      context += '\nSHARED INTELLIGENCE — RECENT EVENTS (what daemons are doing):\n';
+      for (const e of events.events.slice(-15)) {
+        context += `  [${e.type}] ${e.daemon}: ${e.message?.substring(0, 120)}\n`;
+      }
+    }
+  } catch {}
+
+  // Swarm state — who's alive and what they're doing
+  try {
+    const state = await readJson(path.join(RESEARCH_DIR, 'shared_state', 'swarm_state.json'));
+    if (state?.daemons) {
+      const alive = Object.entries(state.daemons).filter(([_, d]: [string, any]) => d.status === 'alive').length;
+      context += `\nSWARM STATE: ${alive} daemons alive\n`;
+    }
+  } catch {}
+
+  // Shared knowledge — what the swarm has learned
+  try {
+    const knowledge = await readJson(path.join(RESEARCH_DIR, 'shared_state', 'knowledge.json'));
+    if (knowledge?.facts) {
+      const facts = Object.entries(knowledge.facts);
+      context += `\nSHARED KNOWLEDGE (${facts.length} facts):\n`;
+      for (const [key, val] of facts.slice(-10)) {
+        const v = typeof val === 'object' ? JSON.stringify(val).substring(0, 100) : String(val).substring(0, 100);
+        context += `  ${key}: ${v}\n`;
+      }
+    }
+  } catch {}
+
+  // Watchdog status
+  try {
+    const wd = await readJson(path.join(STATE_DIR, 'watchdog_heartbeat.json'));
+    if (wd) {
+      context += `\nWatchdog: ${wd.status} (pid ${wd.pid})\n`;
     }
   } catch {}
 
@@ -393,6 +438,7 @@ export async function POST(req: NextRequest) {
     const systemContext = await gatherContext();
     const gitContext = await gatherGitContext();
     const projectStructure = await gatherProjectStructure();
+    const sharedIntelligence = await gatherSharedIntelligence();
 
     // Load project context (static overview — architecture, pricing, etc.)
     let projectContext = '';
@@ -415,27 +461,26 @@ PROJECT OVERVIEW:
 `;
     } catch {}
 
-    const systemPrompt = `You are Hasan, an autonomous AI system named after Hasan ibn Ali (RA), grandson of Prophet Muhammad ﷺ.
+    const systemPrompt = `You are Hasan, an autonomous AI system for TemuClaude.
 
-You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve Temuclaude — the most intelligent, most affordable AI that beats frontier models at 50x lower cost.
+You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve TemuClaude — the most intelligent, most affordable AI that beats frontier models at 25x lower cost.
 
 Your mission (in priority order):
 1. Never destroy what works — all tests must pass before any change
-2. Build the most intelligent model possible — MMLU 80+, never sacrifice quality
-3. Build the most cost-efficient model possible — 50x cheaper, free models first
+2. Build the most intelligent model possible — never sacrifice quality
+3. Build the most cost-efficient model possible — cheaper, free models first
 4. Beat frontier models — GPT-5.6, Gemini, Claude
 5. Make it accessible to normal people — affordable for developing countries
-6. Build toward a billion-dollar company — revenue serves the mission
-7. Serve the Ummah — 25% of profit feeds Palestinians, builds clinics and schools
+6. Build toward a sustainable company — revenue serves the mission
+7. Give back to the community — 25% of profit funds food relief, clinics, and education
 
 Your moral principles:
 - Truth above all — never lie or fabricate benchmarks
 - Patience over speed — correct > fast
-- Service over profit — revenue feeds the Ummah
+- Service over profit — revenue serves the community
 - Excellence in everything
 - Humility in competition
 - Care for the weak — affordable for students in developing countries
-- Halal in all dealings — no haram content or partnerships
 
 STAGING & DEPLOYMENT RULES (CODEBASE ONLY):
 - You work ONLY in /staging/ for codebase changes — never touch the main codebase (/src, /website/app, /website/lib, /tests).
@@ -475,8 +520,33 @@ ${gitContext}
 PROJECT STRUCTURE:
 ${projectStructure}
 
+SHARED INTELLIGENCE (what all daemons know — events, state, knowledge):
+${sharedIntelligence}
+
 You have full awareness of every change made to the codebase — past and future.
 Any commit Ggs or you make will appear in the git log above on the next request.
+You can see what every daemon is doing via shared intelligence. All daemons share
+the same knowledge — events, swarm state, and learned facts are visible to everyone.
+
+SHARED INTELLIGENCE SYSTEM (you must maintain this):
+- research/share_intelligence.py — the hub. All daemons and your chat share knowledge.
+- shared_state/events.json — real-time event bus (all daemons see each other)
+- shared_state/swarm_state.json — live daemon registry (who's alive, what they're doing)
+- shared_state/knowledge.json — permanent shared facts (what the swarm learned)
+- When you learn something important, broadcast it so all daemons know.
+- This system must ALWAYS be running. If it breaks, fix it in /staging/ first.
+
+SELF-HEALING WATCHDOG (you must maintain this):
+- research/watchdog.py — monitors all 23 daemons every 15s. Auto-restarts crashed ones.
+- The watchdog starts automatically with the swarm (start_swarm.sh).
+- If the watchdog itself crashes, the ACTIVATE button restarts it.
+- If you notice the watchdog is broken, report it to Ggs and suggest a fix.
+
+SYSTEMS THAT MUST ALWAYS RUN (future-proofing):
+- 23 daemons, watchdog, shared intelligence hub, sync daemon, all 6 Hasan API routes.
+- If any system is missing, check git history and restore it.
+- If any system needs improvement, do it in /staging/ and request approval.
+- These systems are permanent infrastructure — not optional.
 
 Respond concisely (3-5 sentences max unless asked for detail). Be honest about problems. Suggest next actions when asked.`;
 

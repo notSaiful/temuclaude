@@ -82,7 +82,7 @@ export default function PricingPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3 text-center" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Pricing</h1>
           <p className="text-text-secondary text-center mb-10 max-w-xl mx-auto">
-            Frontier-level intelligence at 1/10th the cost. 25% of every payment feeds the Ummah.
+            Frontier-level intelligence at 1/10th the cost. 25% of every payment goes to charity.
           </p>
 
           {/* Price comparison banner */}
@@ -100,11 +100,11 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Ummah Fund banner */}
+          {/* Charity Fund banner */}
           <div className="card max-w-3xl mx-auto mb-12" style={{ background: '#788C5D', color: '#fff' }}>
             <div className="text-center">
-              <p className="text-sm opacity-90 mb-1">25% of all profit goes to the Ummah Fund</p>
-              <p className="text-xs opacity-75">Palestine food relief · Muslim community kitchens · Orphan feeding · Medical clinics · Islamic schools</p>
+              <p className="text-sm opacity-90 mb-1">25% of all profit goes to charity</p>
+              <p className="text-xs opacity-75">Food relief · Community kitchens · Medical clinics · Education programs</p>
             </div>
           </div>
 

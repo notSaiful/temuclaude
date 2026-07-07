@@ -66,7 +66,7 @@ const DAEMON_META: Record<string, { label: string; group: string; icon: string }
   industry_radar_daemon: { label: 'Industry News Radar', group: 'Awareness', icon: 'radar' },
   model_optimizer_daemon: { label: 'Model Benchmark & Swap', group: 'Optimization', icon: 'robot' },
   cost_efficiency_daemon: { label: 'Credit & Throttle Guard', group: 'Finance', icon: 'dollar' },
-  revenue_daemon: { label: 'Revenue & Ummah Fund', group: 'Finance', icon: 'banknote' },
+  revenue_daemon: { label: 'Revenue & Charity Fund', group: 'Finance', icon: 'banknote' },
   growth_daemon: { label: 'SEO & User Growth', group: 'Growth', icon: 'trending-up' },
   competitive_dominance_daemon: { label: 'Competitive Benchmark Scorer', group: 'Strategy', icon: 'trophy' },
   self_expansion_daemon: { label: 'Auto-Daemon Creator', group: 'Self-Improvement', icon: 'seedling' },
@@ -384,13 +384,13 @@ export default function HasanPage() {
                 </div>
               </div>
 
-              {/* Ummah Fund Card */}
+              {/* Charity Fund Card */}
               <div style={{ ...s.card, border: '1px solid rgba(184,146,74,0.2)' }}>
-                <div style={s.cardHead}><span style={{ ...s.cardTitle, color: '#b8924a' }}>🤲 Ummah Fund</span></div>
+                <div style={s.cardHead}><span style={{ ...s.cardTitle, color: '#b8924a' }}>💰 Charity Fund</span></div>
                 <div style={s.ummahBox}>
                   <span style={s.ummahAmount}>${(data?.ummah.totalDistributed || 0).toFixed(2)}</span>
                   <span style={s.ummahLabel}>Total Distributed</span>
-                  <span style={s.ummahNote}>25% of profit → Palestine · Clinics · Schools</span>
+                  <span style={s.ummahNote}>25% of profit → Food · Clinics · Education</span>
                 </div>
               </div>
             </div>
