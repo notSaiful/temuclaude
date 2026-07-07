@@ -1116,3 +1116,55 @@ def build_awq_vllm_comparison_prompt() -> List[Dict]:
             "snippet."
         )},
     ]
+
+def get_cascade_model_for_research_pass(
+    pass_type: str,
+    topic_complexity: Optional[float] = None,
+    pareto_tracker: Optional[Dict] = None,
+    kill_switch_active: bool = False,
+) -> str:
+    """
+    RouteLLM cascade routing for deep research pipeline.
+    
+    Selects the cheapest model that preserves quality for each research pass:
+    - Planning pass: lightweight model (simple structuring task)
+    - Section research pass: mid-tier model (needs reasoning + facts)
+    - Synthesis pass: premium model (complex integration task)
+    - Review pass: mid-tier model (gap analysis)
+    - Expansion pass: mid-tier model (elaboration)
+    
+    Falls back to premium model if kill switch is active or quality drops below threshold.
+    
+    Args:
+        pass_type: One of 'plan', 'section', 'synthesize', 'review', 'expand'
+        topic_complexity: Optional 0.0-1.0 complexity score; if >0.7, upgrade tier
+        pareto_tracker: Optional dict with quality metrics; if quality_loss > 0.01, upgrade
+        kill_switch_active: If True, bypass cascade and use premium model
+    
+    Returns:
+        Model identifier string for the selected tier
+    """
+    PREMIUM_MODEL = os.environ.get("TEMUCLAUDE_PREMIUM_MODEL", "gpt-4o")
+    MID_MODEL = os.environ.get("TEMUCLAUDE_MID_MODEL", "gpt-4o-mini")
+    LIGHT_MODEL = os.environ.get("TEMUCLAUDE_LIGHT_MODEL", "gpt-4o-mini")
+
+    if kill_switch_active:
+        return PREMIUM_MODEL
+
+    if pareto_tracker is not None:
+        quality_loss = pareto_tracker.get("quality_loss", 0.0)
+        if quality_loss > 0.01:
+            return PREMIUM_MODEL
+
+    if topic_complexity is not None and topic_complexity > 0.7:
+        return PREMIUM_MODEL
+
+    cascade_map = {
+        "plan": LIGHT_MODEL,
+        "section": MID_MODEL,
+        "synthesize": PREMIUM_MODEL,
+        "review": MID_MODEL,
+        "expand": MID_MODEL,
+    }
+
+    return cascade_map.get(pass_type, PREMIUM_MODEL)

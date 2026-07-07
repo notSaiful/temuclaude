@@ -4628,30 +4628,64 @@
       "latency_ms": 15000,
       "success": true,
       "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-07T13:34:55.249308+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-07T13:34:55.252705+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k2.6"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
     }
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 89,
-      "successes": 89,
+      "count": 90,
+      "successes": 90,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 44500,
+      "total_latency": 45000,
       "models": {
-        "gpt-oss-120b": 89
+        "gpt-oss-120b": 90
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 89,
-      "successes": 89,
+      "count": 90,
+      "successes": 90,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 1335000,
+      "total_latency": 1350000,
       "models": {
-        "deepseek-v4-pro": 89,
-        "glm-5.2": 89,
-        "kimi-k2.6": 89
+        "deepseek-v4-pro": 90,
+        "glm-5.2": 90,
+        "kimi-k2.6": 90
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -4702,6 +4736,6 @@
       "best_model": "deepseek-v4-pro"
     }
   },
-  "total_records": 277,
-  "last_updated": "2026-07-07T13:04:56.967672+00:00"
+  "total_records": 279,
+  "last_updated": "2026-07-07T13:34:55.252728+00:00"
 }
