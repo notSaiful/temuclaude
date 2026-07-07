@@ -189,7 +189,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   }
 
   // LAYER 6: SELF-QA GATE — USVA 4-rubric verification
-  techniques.push('usva-4-rubric-qa');
+  techniques.push('usva-5-rubric-qa');
   let qaScore = await runUSVA(query, finalAnswer);
 
   // If QA fails, retry with Reflexion

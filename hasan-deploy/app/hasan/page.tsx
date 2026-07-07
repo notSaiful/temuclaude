@@ -143,7 +143,7 @@ export default function HasanPage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 3000);
+    const interval = setInterval(fetchData, 10000);
     const clock = setInterval(() => setNow(new Date()), 1000);
     // Fetch deployment data less frequently
     const fetchDeploy = async () => {
@@ -218,7 +218,16 @@ export default function HasanPage() {
     }
   };
 
-  if (loading && !data) {
+  if (error && !data) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#08080c', color: '#c8c8d4', fontFamily: "'IBM Plex Sans', sans-serif", gap: '16px', padding: '20px', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '6px', color: '#3b82f6' }}>H A S A N</h1>
+          <p style={{ color: '#6b6b7b', fontSize: '14px' }}>Connection error: {error}</p>
+          <button onClick={() => { setError(null); setLoading(true); fetchData(); }} style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#3b82f6', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}>Retry</button>
+        </div>
+      );
+    }
+    if (loading && !data && !error) {
     return (
       <div style={s.loadingWrap}>
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
@@ -680,7 +689,7 @@ const s: Record<string, React.CSSProperties> = {
   bgLayer1: { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 20% 30%, rgba(59,130,246,0.08) 0%, transparent 50%)', pointerEvents: 'none' },
   bgLayer2: { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.06) 0%, transparent 50%)', pointerEvents: 'none' },
   grain: { position: 'absolute', inset: 0, opacity: 0.02, pointerEvents: 'none', backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 32px', position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.05)' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.05)', flexWrap: 'wrap' as any, gap: '10px' },
   headerLeft: { display: 'flex', alignItems: 'center', gap: '14px' },
   statusOrb: { width: '14px', height: '14px', borderRadius: '50%' },
   logo: { fontSize: '26px', fontWeight: 900, letterSpacing: '6px', margin: 0, color: '#e8e8f0', fontFamily: "'IBM Plex Sans', sans-serif" },
@@ -689,20 +698,20 @@ const s: Record<string, React.CSSProperties> = {
   clockBox: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' },
   clockTime: { fontSize: '22px', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: '#3b82f6' },
   clockDate: { fontSize: '11px', color: '#6b6b7b', marginTop: '2px' },
-  tabs: { display: 'flex', gap: '4px', padding: '0 32px', position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.05)' },
+  tabs: { display: 'flex', gap: '4px', padding: '0 20px', position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.05)', overflowX: 'auto' as any, flexWrap: 'wrap' as any },
   tab: { background: 'transparent', border: 'none', color: '#6b6b7b', fontSize: '13px', fontWeight: 500, padding: '14px 20px', cursor: 'pointer', borderBottom: '2px solid transparent', transition: 'all 0.2s' },
   tabActive: { color: '#e8e8f0', borderBottom: '2px solid #3b82f6' },
-  content: { padding: '24px 32px', position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto' },
-  banner: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '24px 28px', marginBottom: '20px', backdropFilter: 'blur(10px)' },
+  content: { padding: '16px 20px', position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto' },
+  banner: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '20px', marginBottom: '20px', backdropFilter: 'blur(10px)', flexWrap: 'wrap' as any, gap: '12px' },
   bannerLeft: { flex: 1 },
   bannerTitle: { fontSize: '20px', fontWeight: 700, margin: 0, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '1px' },
   bannerSub: { fontSize: '13px', color: '#8b8b9b', marginTop: '6px' },
   identityNote: { fontSize: '11px', color: '#10b981', marginTop: '8px' },
-  bannerRight: { display: 'flex', gap: '10px' },
+  bannerRight: { display: 'flex', gap: '8px', flexWrap: 'wrap' as any, justifyContent: 'center' },
   pill: { display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '10px 18px', minWidth: '90px' },
   pillLabel: { fontSize: '9px', color: '#6b6b7b', letterSpacing: '1px' },
   pillValue: { fontSize: '16px', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", marginTop: '4px' },
-  cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '20px' },
+  cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '20px' },
   card: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '18px', backdropFilter: 'blur(10px)' },
   cardHead: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' },
   cardTitle: { fontSize: '12px', fontWeight: 600, color: '#8b8b9b', letterSpacing: '0.5px' },
@@ -736,7 +745,7 @@ const s: Record<string, React.CSSProperties> = {
   // Daemons tab
   daemonGroup: { marginBottom: '24px' },
   groupTitle: { fontSize: '13px', fontWeight: 600, color: '#6b6b7b', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '12px' },
-  daemonGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' },
+  daemonGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px',  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' },
   daemonCard: { display: 'flex', alignItems: 'center', gap: '12px', padding: '14px', borderRadius: '10px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer', transition: 'all 0.2s' },
   daemonIconBox: { width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)' },
   daemonText: { flex: 1, minWidth: 0 },

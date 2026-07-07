@@ -1,0 +1,297 @@
+{
+  "scout": "arxiv",
+  "timestamp": "20260707T055348",
+  "queries": [
+    "LLM orchestration multi-model fusion ensemble",
+    "model panel judge aggregator routing",
+    "mixture of agents layered aggregation",
+    "tree search MCTS LLM reasoning step-by-step",
+    "process reward model PRM verification",
+    "self-consistency chain-of-thought majority vote",
+    "test-time compute scaling reasoning",
+    "Tree of Thoughts Graph of Thoughts reasoning",
+    "LLM reflection self-refine iterative improvement",
+    "multi-agent LLM debate consensus collaboration",
+    "LLM swarm intelligence collective",
+    "cost-efficient LLM inference routing cascade",
+    "speculative decoding early exit LLM",
+    "automated prompt optimization OPRO evolutionary",
+    "prompt engineering meta-prompting DSPy compiled",
+    "model merging mixture of experts inference",
+    "ensemble LLM combination technique",
+    "self-verification LLM hallucination reduction code execution",
+    "LLM judge evaluator quality",
+    "AI agent architecture tool-use planning ReAct",
+    "LLM skill extraction Voyager library learning",
+    "self-improving LLM automatic improvement meta-learning",
+    "open weight LLM model release benchmark evaluation",
+    "LLM jailbreak defense adversarial attack prevention",
+    "prompt injection defense large language model",
+    "cognitive firewall zero-trust LLM safety gate",
+    "constitutional classifier input safety guardrail",
+    "self-healing prompt injection defense continuous",
+    "adversarial robustness LLM fine-tuning alignment",
+    "harmfulness refusal coupling safety alignment HARC",
+    "backdoor attack detection model weights",
+    "model supply chain poisoning defense",
+    "autonomous red team AI cybersecurity agent",
+    "agentic AI security tool-use attack prevention",
+    "MCP protocol security vulnerability exploitation",
+    "multi-agent cyber offense defense collaboration",
+    "AI agent red teaming framework open-source",
+    "LLM vulnerability detection code scanning repository",
+    "self-healing code patch generation LLM autonomous",
+    "logic vulnerability detection context-grounded reasoning",
+    "exploit chain construction autonomous AI",
+    "LLM runtime safety monitoring deployment security",
+    "AI model supply chain attack detection integrity",
+    "speculative decoding lossless LLM inference speedup",
+    "KV cache reuse prefix caching LLM efficiency",
+    "continuous batching paged attention vLLM throughput",
+    "MoE mixture experts sparse activation efficient inference",
+    "structured output constrained generation LLM efficiency",
+    "chunked prefill LLM inference optimization",
+    "cascade routing LLM cost reduction quality preserving",
+    "semantic caching LLM duplicate query detection",
+    "model quantization AWQ lossless quality preserving",
+    "early exit adaptive computation LLM efficiency",
+    "teacher student distillation LLM cost reduction",
+    "prompt caching provider API efficiency",
+    "context compression lossless token reduction",
+    "adaptive token budget LLM efficiency Pareto",
+    "DFlash draft model speculative decoding training",
+    "model weight merging TIES task arithmetic inference",
+    "EAGLE Medusa speculative decoding token-level",
+    "DSPy MIPROv2 prompt optimization efficiency gains",
+    "text-to-image diffusion model frontier quality benchmark",
+    "text-to-video generation model temporal consistency",
+    "diffusion transformer DiT image generation quality",
+    "flow matching rectified flow image video generation",
+    "image generation prompt following instruction adherence",
+    "video generation motion control camera movement",
+    "diffusion model best-of-N verifier guided search",
+    "image editing instruction following InstructPix2Pix",
+    "multi-reference image generation style consistency",
+    "video generation synchronized audio dialogue sound",
+    "diffusion model acceleration consistency few-step",
+    "text-to-3D generation model 2026",
+    "world model interactive video generation persistent",
+    "multimodal generation unified image video audio",
+    "diffusion model quality evaluation benchmark VBench",
+    "controlnet controllable generation pose depth edge",
+    "long video generation temporal consistency frames",
+    "image generation ELO arena human preference",
+    "video generation ELO arena benchmark quality",
+    "frontier image video model release 2026"
+  ],
+  "total_found": 14,
+  "total_fetched": 65,
+  "already_seen": 162,
+  "new_findings": 14,
+  "papers": [
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05375v1",
+      "title": "Fitted Occupancy-Ratio Evaluation without Bellman Completeness",
+      "abstract": "Occupancy ratios correct distribution shift in offline reinforcement learning and are central to off-policy evaluation. Existing primal-dual and minimax methods typically estimate these ratios by enforcing occupancy-balance moments over a critic class. We propose fitted occupancy-ratio evaluation (FORE), a fitted fixed-point method that characterizes the discounted occupancy ratio through an adjoint Bellman recursion. At each iteration, FORE solves a single-level density-ratio objective on one-step-transition data, thereby projecting the adjoint Bellman image onto a log-ratio class in Kullback--Leibler (KL) divergence. Unlike analyses of fitted Q-evaluation, which typically require value-function realizability together with Bellman completeness or projected-operator stability, our central approximation condition is just realizability of the discounted occupancy ratio itself. Under this condition, the population KL-projected recursion contracts in relative entropy toward the true ratio by virtue of the adjoint Bellman operator being a KL-contraction. For the empirical recursion, we establish finite-sample regret bounds that yield convergence in KL up to log-ratio approximation error and a statistical error governed by the complexity of the ratio hypothesis class. The fitted ratio supports direct value estimation by reward reweighting, occupancy-weighted fitted Q-evaluation, and doubly robust estimation that combines the fitted ratio with a fitted Q-function. Together, these results identify discounted occupancy-ratio realizability as a sufficient condition for offline policy evaluation without any completeness assumptions.",
+      "authors": [
+        "Lars van der Laan",
+        "Nathan Kallus"
+      ],
+      "published": "2026-07-06T17:53:32Z",
+      "query": "tree search MCTS LLM reasoning step-by-step",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05354v1",
+      "title": "Geometric Reciprocity: Unlocking Self-Supervision for Stereoscopic Video Generation",
+      "abstract": "Monocular-to-stereo conversion synthesizes stereoscopic content from 2D videos for immersive 3D experiences. In modern Depth-Image-Based Rendering (DIBR) approaches, stereo inpainting of disocclusions is the critical bottleneck. Training-based methods achieve superior quality but rely on scarce stereo pairs or synthetic data with domain gaps. We address this through the first self-supervised framework learning from monocular videos via cycle consistency. Our key contribution is the Geometric Reciprocity Theorem (GRT): under the nearest-neighbor DIBR formulation, the disocclusion mask when synthesizing a target view equals the mask of pixels lost when warping back from target to source, enabling analytical computation of test-time disocclusion masks directly from monocular images. This yields train-test consistency for the stated warping formulation, supporting self-supervised learning from unlimited monocular videos and substantial improvements over training-free and supervised state-of-the-art methods. Project page: https://visual-ai.github.io/grt/",
+      "authors": [
+        "Jingyi Lu",
+        "Kai Han"
+      ],
+      "published": "2026-07-06T17:32:04Z",
+      "query": "self-consistency chain-of-thought majority vote",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05289v1",
+      "title": "AU or pc? Inferring the distance of magnetized plasma near FRBs from propagation diagnostics",
+      "abstract": "Fast Radio Bursts (FRBs) are highly energetic, millisecond-duration radio transients. A significant fraction of repeating FRBs are found in magneto-active environments significantly different from typical interstellar medium, offering important insights into their origins and evolutionary pathways. Possible explanations range from companion winds to young magneto-active supernvae remnants. The spatial scales of the magneto-active environment is a major distinction of different models. In this work, we present a new method to estimate the physical scale of the magneto-active region surrounding FRBs by jointly analyzing measurements of temporal scattering ($\u03c4_\\mathrm{scat}$), depolarization ($\u03c3_\\mathrm{RM}$), and Faraday rotation measure (RM) variations ($\\left|\u0394\\mathrm{RM}/\u0394t\\right|$) in repeating sources. We systematically apply this method to all active repeaters with multiple RM measurements. Despite the coarse sampling and large uncertainties, the inferred distances tentatively favor SNR-scale magneto-environments for FRB 20190303A, FRB 20190417A, and FRB 20190520B, while still allowing binary-scale structures for FRB 20180916B and FRB 20201124A under plausible assumptions. Better sampling of propagation effects, together with future advances in simultaneous wideband measurements of multiple effects with CHORD and the DSA, has the potential to systematic discrimination among the origins of FRB magneto-environments and constrain progenitor evolution.",
+      "authors": [
+        "Wanjin Lu",
+        "Dongzi Li",
+        "Zhenyin Zhao",
+        "Fayin Wang"
+      ],
+      "published": "2026-07-06T16:30:22Z",
+      "query": "self-consistency chain-of-thought majority vote",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05282v1",
+      "title": "Wavelet Scattering Transform for Interpretable Schizophrenia Biomarker Discovery and Classification from Resting-State EEG",
+      "abstract": "Schizophrenia is a debilitating neuropsychiatric disorder characterized by profound cortical network dysregulation, for which objective, clinically translatable EEG based biomarkers remain underdeveloped. Existing automated classification pipelines rely predominantly on static power spectral density features inherently blind to amplitude modulation dynamics and cross-frequency coupling, phenomena central to schizophrenia pathophysiology, while adopting epoch level cross validation strategies that introduce temporal data leakage, artificially inflate reported performance. This study introduces a mathematically principled diagnostic framework integrating the multi-order Wavelet Scattering Transform(WST), strict Leave One Subject Out (LOSO) cross-validation, and SHAP explainability for simultaneous EEG classification and biomarker discovery. Hierarchical WST coefficients capturing multi-scale amplitude modulation structure were extracted from resting state multichannel EEG. Subject-level ANOVA with Benjamini Hochberg false discovery rate correction identified significant biomarkers, with Random Forest and SVM classifiers evaluated under strict LOSO cross validation and subject-level majority voting. Second-order scattering coefficients encoding cross frequency coupling dominated the discriminative biomarker set, with gamma-band features most prevalent, demonstrating that temporal amplitude modulation constitutes the primary electrophysiological signature of schizophrenia. Electrode P3 was identified as the single most discriminative site. Under rigorous subject independent evaluation, the Random Forest achieved 90.48% accuracy (AUC = 0.9339; sensitivity = 95.56%). The proposed WST framework establishes a rigorous, interpretable standard for EEG-driven psychiatric biomarker discovery that can also be applicable in the detection of schizophrenia subtypes in the future.",
+      "authors": [
+        "Md. Taksimul Ahsan Tawhid",
+        "Nasif Ahmed Rafe",
+        "Alif Tahmid Priyom",
+        "K. M. Mustafizur Rahman"
+      ],
+      "published": "2026-07-06T16:27:26Z",
+      "query": "self-consistency chain-of-thought majority vote",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05263v1",
+      "title": "Learning Probabilistic Embeddings for Unsupervised Action Segmentation",
+      "abstract": "This paper concerns the problem of unsupervised temporal action segmentation for long, untrimmed videos. Recent successful approaches follow a joint representation learning and clustering paradigm, where optimal transport (OT) is adopted to produce pseudo labels for learning frame representations. These approaches alternate between estimating pseudo labels using OT and optimizing the parameters with gradient descent during training, where OT is used for obtaining the final temporal action segmentation. A major limitation of these works is that they learn a deterministic embedding for frame representations. The iterative procedure between learning deterministic embeddings based on pseudo labels and estimating pseudo labels from the learned embedding can thus get quickly stuck in a local optimum. As an alternative, we thus propose to learn a probabilistic embedding for frame representations. The embeddings are modeled by Gaussian distributions and we sample from the distributions before estimating the pseudo labels. We evaluate our approach on several challenging temporal action segmentation datasets and achieve results comparable to, and in some cases, better than the state of the art. Compared to baselines with deterministic embeddings, our approach improves MoF up to 20.7\\% and F1-score up to 19.0\\%. Our code is available at https://github.com/derkbreeze/PEOT.",
+      "authors": [
+        "Shuai Li",
+        "Duc Manh Vu",
+        "Juergen Gall"
+      ],
+      "published": "2026-07-06T16:10:25Z",
+      "query": "self-consistency chain-of-thought majority vote",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05239v1",
+      "title": "Swimming-limited aggregation of bacteria in liquid crystals",
+      "abstract": "Aggregation and fragmentation processes are widespread in engineering and the natural world. Here, we investigate a distinct colloidal aggregation mechanism in an active system of motile bacteria in highly anisotropic environments. Specifically, we examine \\textit{Escherichia coli} bacteria swimming in one-dimensional confinement within nematic liquid crystals and observe long-lived chains of bacteria swimming along the nematic director. Crucially, we find that longer chains swim faster, in apparent contradiction to fundamental force-balance models that predict the swimming speed to be independent of chain length, as chains should swim at the average speed of their individual components. The seeming discrepancy is resolved by recognizing that chains do not form randomly but self-organize due to the relative velocities between bacteria. To elucidate the physical mechanism behind this active aggregation process, we combine our experimental findings with a minimal model of nearest-neighbour aggregation and agent-based simulations of active particles aggregating in one dimension. Consistent with experimental observations, our agent-based simulations reveal a positive correlation between the length and speed of dynamically self-assembled chains of active particles, with the correlation depending on the variance of the individual speed distribution and diminishing over time. Together, our experiments and theoretical models indicate a distinct regime of swimming-limited aggregation whose evolution is constrained by the intrinsic speed distribution of active agents, providing new insight into bacterial self-organization.",
+      "authors": [
+        "Guillaume Sint\u00e8s",
+        "Martyna Goral",
+        "Teresa L\u00f3pez-Le\u00f3n",
+        "Anke Lindner",
+        "Maria T\u0103tulea-Codrean"
+      ],
+      "published": "2026-07-06T15:48:13Z",
+      "query": "self-consistency chain-of-thought majority vote",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05366v1",
+      "title": "Depth profile of depth-weighted trees with bounded weights",
+      "abstract": "We study the depth-weighted random recursive trees introduced by Leckey, Mitsche and Wormald in the case where the weights are bounded from above and from below. We establish the scaling limit of the depth profile of these trees when the weights satisfy a law of large numbers. In particular, we obtain the scaling limit of the depth of these trees, generalising some results of Lichev, Linker, Lodewijks and Mitsche. We also answer negatively a question left open by the same authors, showing that the scaling limit of the depth does not hold in general. Our main tools are appropriately defined martingales combined with the general Edgeworth expansion for the profiles introduced by Kabluchko, Marynych and Sulzbach.",
+      "authors": [
+        "Emmanuel Kammerer"
+      ],
+      "published": "2026-07-06T17:44:25Z",
+      "query": "Tree of Thoughts Graph of Thoughts reasoning",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05362v1",
+      "title": "Rerouting Curves on Surfaces",
+      "abstract": "We study the problem of reconfiguring a crossing-free embedding of a graph on a surface, with edges represented as curves, into another crossing-free embedding of the same graph on the same surface with the same fixed vertex positions. In this process, we reroute one edge at a time while maintaining crossing-free intermediate embeddings. This problem was introduced by Ito et al. [TALG 2025], who showed that even if the graph is a matching of two edges, reconfiguration is not always possible in the plane, but is always possible on the torus. For matchings of two or more edges, they gave a necessary and sufficient condition for reconfigurable embeddings in the plane, but not on the torus. Our main result is that for matchings, trees and forests, reconfiguration is always possible on the torus, and consequently, on any orientable surface of genus at least one. In addition, we provide sufficient conditions for reconfiguration on orientable surfaces of genus at least one and in the projective plane. For more general graphs, we show that reconfiguration is not always possible.",
+      "authors": [
+        "Timo Brand",
+        "Stefan Felsner",
+        "Henry F\u00f6rster",
+        "Stephen Kobourov",
+        "Anna Lubiw",
+        "Yoshio Okamoto",
+        "J\u00e1nos Pach",
+        "Csaba D. T\u00f3th",
+        "G\u00e9za T\u00f3th",
+        "Torsten Ueckerdt",
+        "Pavel Valtr"
+      ],
+      "published": "2026-07-06T17:38:19Z",
+      "query": "Tree of Thoughts Graph of Thoughts reasoning",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05358v1",
+      "title": "On a complete characterization of path-free complexes associated with complete multipartite graphs",
+      "abstract": "Let $G$ be a graph and let $\\PF_t(G)$ denote the simplicial complex whose faces are vertex subsets whose induced subgraphs contain no path on $t$ vertices. These complexes encode a forbidden-subgraph condition as a family of allowed vertex subsets.   In this paper, we study $t$-path-free complexes of complete multipartite graphs. Let \\[ G=K_{n_1,\\dots,n_m}, \\qquad n_1\\le\\cdots\\le n_m. \\] We first obtain an explicit structural decomposition of $\\PF_t(G)$ as a union of join complexes, together with an additional lower-dimensional size-truncation term. Using this decomposition, we show that for $t\\le 2n_{m-1}-2$ the complex $\\PF_t(G)$ is not sequentially Cohen-Macaulay, while for $t\\ge 2 n_{m-1}-1$ it is vertex decomposable.   Consequently, we obtain a complete characterization for complete multipartite graphs: $\\PF_t(G)$ is vertex decomposable if and only if $t\\ge 2n_{m-1}-1$. Equivalently, this is also exactly the range in which $\\PF_t(G)$ is shellable and sequentially Cohen-Macaulay. We further analyze the topology via a Mayer-Vietoris spectral sequence: for complete bipartite graphs, we determine the full homotopy type as an explicit wedge of spheres in all cases.",
+      "authors": [
+        "Priyavrat Deshpande",
+        "Shuchita Goyal",
+        "Rutuja Sawant"
+      ],
+      "published": "2026-07-06T17:35:56Z",
+      "query": "Tree of Thoughts Graph of Thoughts reasoning",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05339v1",
+      "title": "TREK: Distill to Explore, Reinforce to Refine",
+      "abstract": "Group Relative Policy Optimization (GRPO) is effective when the current policy already samples useful reasoning trajectories, but it stalls on hard prompts whose correct solution modes lie outside the student's on-policy support. We propose TREK (Teacher-Routed Exploration via Forward KL), a simple staged procedure that uses distillation not for imitation but for exploration support expansion. A key advantage of TREK is its generality: because it only consumes verified output trajectories, it can use an external black-box teacher, a white-box teacher, or the same model given additional inference-time context, and it can efficiently identify which hard-prompt samples are most worth consolidating even when teacher internals are unavailable. TREK first identifies prompts where the unaided student has very low pass rate, queries a proposal source to produce verified candidate solutions, keeps the top-$r$ proposals ranked by current student likelihood, applies a short forward-KL phase to pull those verified modes into the student's support, and then returns to standard on-policy GRPO refinement. On mathematical reasoning, TREK with DeepSeek-V4 proposals improves Qwen3 models across all tested scales on AIME 2024 and AIME 2025; for Qwen3-8B, it improves AIME 2025 from 36.9 to 40.3 and AIME 2024 from 47.9 to 51.1 (avg@16), while the self-context variant reaches 38.5 and 49.6 without an external teacher. On agentic tasks, TREK raises ALFWorld success rate from 75.8 to 82.8 and ScienceWorld success rate from 12.5 to 26.7; notably, on the hardest task types, TREK achieves high success rates early in training while unaided GRPO requires substantially more optimization steps to reach comparable levels.",
+      "authors": [
+        "Yuanda Xu",
+        "Zhengze Zhou",
+        "Kayhan Behdin",
+        "Jelena Markovic-Voronov",
+        "Hejian Sang",
+        "Xiaomin Li",
+        "Wenhui Zhu",
+        "Xinchen Du",
+        "Aida Rahmattalabi",
+        "Ran He",
+        "Sen Na",
+        "Zhipeng Wang",
+        "Alborz Geramifard"
+      ],
+      "published": "2026-07-06T17:21:16Z",
+      "query": "speculative decoding early exit LLM",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05319v1",
+      "title": "Steering Optimisation Trajectories in Diffusion Representation Learning",
+      "abstract": "We study why diffusion autoencoders can achieve similar image quality while learning substantially different latent structures. We trace this behaviour to optimisation dynamics; we analyse curves of image reconstruction against latent representation quality, revealing trajectories that organise around two distinct regimes early in training. Models in the reconstruction regime prioritise image fidelity early, whereas those in the disentanglement regime improve reconstruction and disentanglement more gradually. We hypothesise that this behaviour can be influenced by targeting shortcut pathways in the diffusion U-Net and controlling early noise-level exposure, thereby shaping the reconstruction-disentanglement trade-off during training. To steer optimisation toward stronger representations, we introduce SteeringDRL, combining gated residual U-Nets with a simple noise-level exposure curriculum for training. Across disentanglement benchmarks, SteeringDRL improves representation quality and reduces seed sensitivity. Our method further extends to spatial disentanglement in object-centric learning, improving segmentation quality on synthetic and real-world datasets.",
+      "authors": [
+        "Rajat Rasal",
+        "Avinash Kori",
+        "Tian Xia",
+        "Ben Glocker"
+      ],
+      "published": "2026-07-06T16:58:05Z",
+      "query": "speculative decoding early exit LLM",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05367v1",
+      "title": "Investigating a Possible Variation of the Gravitational Constant Through Gas Mass Fraction Measurements and Type Ia Supernovae Observations",
+      "abstract": "In this paper, we investigate a possible time variation of the gravitational constant (G) using a non-parametric approach. Our main cosmological probe is the gas mass fraction of galaxy clusters measured from X-ray observations. We also account for the effect of a varying $G$ on the intrinsic luminosity of type Ia supernovae (SNe Ia) through the Chandrasekhar mass-luminosity relation. We consider a specific phenomenological scenario, motivated by some scalar-tensor and screened modified-gravity frameworks, in which the standardized luminosity of SNe Ia decreases with increasing Chandrasekhar mass. Using gas mass fraction measurements jointly with luminosity distances from the Pantheon+ compilation, we reconstruct the evolution of G through Gaussian Processes. Our results indicate that a constant gravitational coupling remains broadly consistent with the data, although mild low-redshift departures are allowed.",
+      "authors": [
+        "L. R. Cola\u00e7o",
+        "R. F. L. Holanda",
+        "Marcelo Ferreira"
+      ],
+      "published": "2026-07-06T17:45:50Z",
+      "query": "prompt engineering meta-prompting DSPy compiled",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05342v1",
+      "title": "Exact ratio preservation via outliers for fair $k$-center clustering",
+      "abstract": "We study the $k$-center clustering problem under demographic fairness constraints, where the point set is partitioned into groups, and the aim is to compute clusters that exhibit a given group proportion. Previous work in this direction assumes that the entire point set already respects the desired proportions or uses relaxed notions of fairness.   In this work, we propose a model that facilitates the creation of clusters that exactly match given target ratios, even when the input point set does not. We combine the well-known fair clustering model initiated by Chierichetti, Kumar, Lattanzi, and Vassilvitskii (NeurIPS 2017) with the notion of outliers to obtain a practical combinatorial framework that provides constant-factor approximate solutions for all proportion settings from $1:1$ for two groups to $t_1:t_2:\\ldots:t_m$ for $m\\geq 2$ groups, where $t_1,\\ldots,t_m$ are integers.   We implement and evaluate our algorithms, compare different variants, and provide evidence of the practicability of this approach.",
+      "authors": [
+        "Anna Arutyunova",
+        "Irina Fast",
+        "Annika Hennes",
+        "Carsten Krollmann",
+        "Daniel R. Schmidt",
+        "Melanie Schmidt"
+      ],
+      "published": "2026-07-06T17:23:55Z",
+      "query": "constitutional classifier input safety guardrail",
+      "source": "arxiv"
+    },
+    {
+      "arxiv_id": "http://arxiv.org/abs/2607.05374v1",
+      "title": "The Minkowski grid has robustly many repeated distances",
+      "abstract": "We show that there exists a constant $\u03b4> 0$ such that for any positive integer $n$ there exists a set of $n$ points $P \\subset \\mathbb{R}^2$ with the following property: for every subset $A \\subseteq P$ of size $|A| \\geq 2$, \\[ \\max_{\u03bb>0}   \\#\\{(a,b)\\in A \\times A:   a\\ne b,\\ \\lvert a-b\\rvert=\u03bb\\} \\gtrsim \\frac{|A|^2}{n^{1-\u03b4}}.\\] Our result is a vertical amplification of a robust Ramanujan estimate recently established by Croot-Mao-Pohoata-Sheffer-Yip for arbitrary subsets of the ordinary square grid, and is inspired by recent constructions for the Erd\u0151s unit distance problem and the Elekes-R\u00f3nyai problem.   Taking $A=P$, the inequality above gives a distance occurring $n^{1+\u03b4}$ times in $P$; thereby a scaled copy of $P$ is a counterexample for the unit-distance conjecture. In addition, the same inequality shows that (1) all subsets of $P$ of size $\\gtrsim n^{1-\u03b4}$ must contain isosceles triangles, and (2) all subsets of $P$ of size $\\gtrsim n^{1/2-\u03b4}$ must contain repeated distances. These features give polynomially improved estimates for old problems of Erd\u0151s. The existence of a set satisfying property (1) confirms a conjecture of Erd\u0151s from 1980, whereas the existence of a set with property (2) answers a question of Conlon-Fox-Gasarch-Harris-Ulrich-Zbarsky in the negative.",
+      "authors": [
+        "Sungchul Lee",
+        "Cosmin Pohoata",
+        "Daniel G. Zhu"
+      ],
+      "published": "2026-07-06T17:52:52Z",
+      "query": "image editing instruction following InstructPix2Pix",
+      "source": "arxiv"
+    }
+  ]
+}

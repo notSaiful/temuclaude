@@ -61,7 +61,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">5. API Usage</h2>
-              <p>API access is available on Pro and Enterprise plans. You are responsible for:</p>
+              <p>API access is available on Developer, Pro, and Enterprise plans. You are responsible for:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Keeping your API key secure</li>
                 <li>All usage under your API key</li>

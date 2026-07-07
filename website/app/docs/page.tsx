@@ -378,7 +378,7 @@ Response: SSE stream
     "cost": "$0.015",
     "techniques": ["moa-3-layer", "cross-review", "structured-aggregation",
                    "self-consistency", "prm-weighted-voting", "code-verification",
-                   "reflexion", "usva-4-rubric-qa", "s1-budget-forcing"]
+                   "reflexion", "usva-5-rubric-qa", "s1-budget-forcing"]}
   }
 }`} />
               <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which layers were activated. Full transparency — no black boxes.</Callout>
@@ -404,8 +404,8 @@ Response: SSE stream
                   </tr></thead>
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">20</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">50,000/mo</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">500,000/mo</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary">Enterprise</td><td className="py-2 px-3 text-text-secondary">10,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
                   </tbody>
                 </table>
