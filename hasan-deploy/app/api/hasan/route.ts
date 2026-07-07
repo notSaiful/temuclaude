@@ -54,7 +54,28 @@ export async function GET() {
           };
         }
       } catch {}
-      const enrich = (d: any) => ({ ...d, evolution });
+      // Read dynamic breakthroughs
+      let dynamicBreakthroughs: any[] = [];
+      try {
+        const btData = await readJson(path.join(RESEARCH_DIR, 'breakthroughs.json'));
+        if (btData?.breakthroughs && Array.isArray(btData.breakthroughs)) {
+          dynamicBreakthroughs = btData.breakthroughs;
+        }
+      } catch {}
+      // Read real cost data
+      let realCost: any = null;
+      try {
+        const costData = await readJson(path.join(RESEARCH_DIR, 'cost_data.json'));
+        if (costData?.summary) {
+          realCost = costData.summary;
+        }
+      } catch {}
+      const enrich = (d: any) => ({
+        ...d,
+        evolution,
+        dynamicBreakthroughs,
+        realCost,
+      });
       if (age < 30000) {
         return NextResponse.json({ ...enrich(synced), dataSource: 'sync-fresh', syncAge: Math.floor(age / 1000) });
       }

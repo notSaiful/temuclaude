@@ -1,0 +1,281 @@
+{
+  "breakthroughs": [
+    {
+      "title": "Self-Healing Guard \u2014 Adaptive, Continuously-Learning Prompt Injection Defense for Temuclaude",
+      "category": "Security",
+      "categoryColor": "#ef4444",
+      "summary": "This report investigates the design and implementation of a self-healing guardrail system for Temuclaude \u2014 a defense layer that continuously learns from new attack patterns, generates new detection rules autonomously, and evolves its effectiveness over time without human intervention. The research d",
+      "keyFindings": [
+        {
+          "name": "The ClawArmor Reference Architecture",
+          "detail": "ClawArmor (Alibaba-AAIG, GitHub, 18 stars, Apache 2.0, TypeScript, created April 2026) is the most complete open-source implementation of the self-healing guardrail pattern. It implements a defense-in"
+        },
+        {
+          "name": "The LLM-Driven Rule Updater",
+          "detail": "```python class DefenseRuleUpdater: \"\"\"LLM-driven rule generation from missed attacks and false positives.\"\"\" def __init__(self, api_base: str, api_key: str, model: str, max_rules_per_cycle: int = 3, "
+        },
+        {
+          "name": "Expected Performance",
+          "detail": "Based on the ClawArmor benchmarks and the Silmaril claims, the self-healing guard is expected to achieve the following performance characteristics. The static detection layer (existing `guard.py`) cat"
+        }
+      ],
+      "impact": "Static guardrails fail because attackers generate new attack patterns faster than security teams can update rules. Silmaril, a YC P26 startup launched in 2026, demonstrated that current defenses relyi",
+      "source": "Research Swarm",
+      "date": "2026-07-07",
+      "reportFile": "deep_research_cyber_self_healing_guard_20260706T203333.md",
+      "lines": 712
+    },
+    {
+      "title": "RouteLLM Cascade Routing \u2014 Preference-Data Trained Model Routing for Temuclaude",
+      "category": "Efficiency",
+      "categoryColor": "#10b981",
+      "summary": "This report presents a comprehensive analysis of RouteLLM cascade routing and its extensions for the Temuclaude orchestration system. The core finding is that preference-data trained routers, as established by the original RouteLLM paper (arXiv:2406.18665, ICLR 2025), can reduce LLM inference costs ",
+      "keyFindings": [
+        {
+          "name": "The Original RouteLLM Paper",
+          "detail": "The foundational paper, \"RouteLLM: Learning to Route LLMs with Preference Data\" by Isaac Ong, Amjad Almahairi, Vincent Wu, Wei-Lin Chiang, and colleagues at UC Berkeley and Anyscale, was published at "
+        },
+        {
+          "name": "Benchmark Results and Quality Impact",
+          "detail": "The RouteLLM paper provides detailed benchmarks across multiple widely-recognized evaluation sets. On MT Bench, the MF router with GPT-4 augmentation achieves 85 percent cost reduction while maintaini"
+        },
+        {
+          "name": "The Threshold Calibration Mechanism",
+          "detail": "The RouteLLM framework provides a threshold calibration utility that maps a desired percentage of strong model calls to a specific threshold value. For example, if a deployment wants 50 percent of que"
+        }
+      ],
+      "impact": "A critical finding for Temuclaude is the transfer learning capability. The paper shows that routers trained on one model pair (e.g., GPT-4 vs Mixtral-8x7B) maintain their performance even when the str",
+      "source": "2606.30217 \u00b7 2511.16664 \u00b7 2406.18665",
+      "date": "2026-07-07",
+      "reportFile": "deep_research_efficiency_routellm_cascade_20260706T214240.md",
+      "lines": 371
+    },
+    {
+      "title": "Full-Stack Cybersecurity for Temuclaude",
+      "category": "Security",
+      "categoryColor": "#ef4444",
+      "summary": "This report synthesizes research from arXiv (cs.CR), OWASP, AISI, Anthropic, NDSS, IBM, HiddenLayer, and the autonomous-cybersecurity-system skill to produce a comprehensive, full-stack cybersecurity defense and offense strategy for Temuclaude. The core insight from the literature is that cybersecur",
+      "keyFindings": [
+        {
+          "name": "The Lifecycle Vulnerability Taxonomy",
+          "detail": "A systematic survey published in June 2026 organized LLM vulnerabilities across eight lifecycle stages: data collection, pretraining, post-training alignment, model packaging and supply chain, retriev"
+        },
+        {
+          "name": "The Cognitive Firewall",
+          "detail": "The Cognitive Firewall, introduced in July 2026, represents the most promising runtime defense architecture for multi-turn attacks {cite index=\"5-0:2\"}. It interposes an independent oversight model be"
+        },
+        {
+          "name": "Model Supply Chain Security",
+          "detail": "The lifecycle survey identifies model packaging and supply chain as a critical vulnerability stage {cite index=\"6-0:5\"}. Models downloaded from HuggingFace or other registries can be poisoned, backdoo"
+        }
+      ],
+      "impact": "The 2026 update introduced the OWASP Top 10 for Agentic Applications, a new standard addressing the unique threats of autonomous AI agents {cite index=\"1-0:2\"}. This covers agent identity spoofing, un",
+      "source": "Research Swarm",
+      "date": "2026-07-06",
+      "reportFile": "deep_research_cybersecurity_2026-07-06.md",
+      "lines": 125
+    },
+    {
+      "title": "Beating Frontier Image and Video Generation Models",
+      "category": "Media",
+      "categoryColor": "#ec4899",
+      "summary": "This report synthesizes research from arXiv, Artificial Analysis leaderboards, Arena, OpenAI, Google DeepMind, Runway, Black Forest Labs, and NVIDIA to produce a comprehensive strategy for making Temuclaude's image and video generation always beat frontier models. The core insight, validated by the ",
+      "keyFindings": [
+        {
+          "name": "Image Generation",
+          "detail": "The image generation frontier in July 2026 is fractured, not because one tool failed, but because use cases have differentiated faster than any single model can cover. GPT Image 2 leads the Artificial"
+        },
+        {
+          "name": "Video Generation",
+          "detail": "The video generation frontier in 2026 is led by Runway Gen-4.5 at 1247 ELO on the Artificial Analysis Text-to-Video benchmark, making it the top-rated video model. Runway Gen-4.5 offers state-of-the-a"
+        },
+        {
+          "name": "Inference-Time Scaling for Diffusion Models",
+          "detail": "The foundational paper \"Inference-Time Scaling for Diffusion Models\" (arXiv:2501.09732) from Google DeepMind proves that increasing inference-time compute leads to substantial improvements in the qual"
+        }
+      ],
+      "impact": "The KDS paper (arXiv:2507.05604) from Google DeepMind and the University of Michigan introduces N-particle ensembling for diffusion models. KDS employs an N-particle ensemble of diffusion samples that",
+      "source": "2501.09732 \u00b7 2507.05604 \u00b7 2604.06260",
+      "date": "2026-07-06",
+      "reportFile": "deep_research_media_generation_2026-07-06.md",
+      "lines": 97
+    },
+    {
+      "title": "Lossless Efficiency and Cost Reduction for Temuclaude",
+      "category": "Efficiency",
+      "categoryColor": "#10b981",
+      "summary": "This report synthesizes research from arXiv, Modal, Sebastian Raschka, Apple Machine Learning Research, CVPR 2026, and production engineering guides to produce a comprehensive efficiency and cost-reduction strategy for Temuclaude. The guiding constraint, established by Ggs, is absolute: efficiency w",
+      "keyFindings": [
+        {
+          "name": "The 100x Price Spread",
+          "detail": "The 2026 LLM market exhibits a price spread of roughly 100 times between the cheapest usable model and the most capable one, from DeepSeek V4 at around $0.44 per million input tokens to GPT-5.5-pro at"
+        },
+        {
+          "name": "The Pareto Frontier",
+          "detail": "The Pareto efficiency framework, already implemented in Temuclaude's pareto_tracker.py, provides the mathematical foundation for quality-preserving efficiency. The principle is simple: maintain token "
+        },
+        {
+          "name": "MoE Sparse Activation",
+          "detail": "Mixture of Experts models are the most elegant lossless efficiency technique because the efficiency is baked into the model architecture itself. MoE models activate only a subset of parameters per tok"
+        }
+      ],
+      "impact": "Enterprise LLM spending hit $8.4 billion in 2025, up from $3.5 billion in 2024, more than doubling in a single year. A growing share of that is pure waste: most development teams squander 40 to 60 per",
+      "source": "Research Swarm",
+      "date": "2026-07-06",
+      "reportFile": "deep_research_efficiency_2026-07-06.md",
+      "lines": 93
+    },
+    {
+      "title": "Management Science for AI Agent Systems: The 5 Functions Applied to LLM Orchestration",
+      "category": "Strategy",
+      "categoryColor": "#06b6d4",
+      "summary": "This report applies Henri Fayol's 5 functions of management (Planning, Organizing, Staffing, Directing, Controlling) to AI agent systems, LLM orchestration, and autonomous systems. It bridges classical management theory (Fayol, Taylor, Drucker, Mintzberg, Deming) with modern AI agent research (ReAct",
+      "keyFindings": [
+        {
+          "name": "OKRs (Objectives and Key Results)",
+          "detail": "- **What**: Objectives are qualitative, inspirational goals. Key Results are quantitative measures (3-5 per objective) that indicate progress. - **How it works**: \"Improve system reliability (Objectiv"
+        },
+        {
+          "name": "SMART Goals",
+          "detail": "- **Specific**: Clear, unambiguous. Not \"improve the system\" but \"reduce API response time by 30%.\" - **Measurable**: Can verify completion objectively. - **Achievable**: Within capability bounds. - *"
+        },
+        {
+          "name": "Planning Fallacy (Kahneman & Tversky, 1979)",
+          "detail": "- **What**: People systematically underestimate time, cost, and risk of future actions, even when they have experience with similar tasks taking longer. - **Root cause**: Optimism bias \u2014 people focus "
+        }
+      ],
+      "impact": "- **What**: Objectives are qualitative, inspirational goals. Key Results are quantitative measures (3-5 per objective) that indicate progress. - **How",
+      "source": "2402.18679 \u00b7 2302.04761 \u00b7 2308.11432",
+      "date": "2026-07-04",
+      "reportFile": "deep_research_management_science_2026-07-03.md",
+      "lines": 851
+    },
+    {
+      "title": "Management Science \u2192 LLM Orchestration: A Comprehensive Mapping",
+      "category": "Orchestration",
+      "categoryColor": "#3b82f6",
+      "summary": "LLM orchestration IS fundamentally a management problem. Every function that a human manager performs for a team of specialists, an LLM orchestrator must perform for a pool of models. This report maps 8 domains of management science directly to LLM orchestration (specifically temuclaude), extracting",
+      "keyFindings": [
+        {
+          "name": "Practical Implementation for Temuclaude",
+          "detail": "``` PLANNING:  query \u2192 classify \u2192 strategy_select \u2192 decompose into sub-tasks ORGANIZING: define model pool, assign models to sub-tasks, set up verification topology DIRECTING: craft specific prompts p"
+        },
+        {
+          "name": "The Management Principle",
+          "detail": "Google's **Project Oxygen** (launched 2008) studied what makes managers great through data analysis. The result: **10 behaviors of the highest-performing managers**: 1. **Is a good coach** \u2014 effective"
+        },
+        {
+          "name": "How It Maps to LLM Orchestration (Temuclaude)",
+          "detail": "| Project Oxygen Trait | Orchestration Equivalent | |---|---| | **Good coach** | The meta-prompt that guides models \u2014 providing context, constraints, examples. A good system prompt \"coaches\" the model"
+        }
+      ],
+      "impact": "``` PLANNING:  query \u2192 classify \u2192 strategy_select \u2192 decompose into sub-tasks ORGANIZING: define model pool, assign models to sub-tasks, set up verific",
+      "source": "Research Swarm",
+      "date": "2026-07-04",
+      "reportFile": "deep_research_mgmt_orchestration_mapping_2026-07-03.md",
+      "lines": 611
+    },
+    {
+      "title": "LLM Orchestration & Multi-Model Combination Breakthroughs",
+      "category": "Orchestration",
+      "categoryColor": "#3b82f6",
+      "summary": "- **Paper:** Wang et al., \"Mixture-of-Agents Enhances Large Language Model Capabilities,\" arXiv:2406.04692 (June 2024)",
+      "keyFindings": [
+        {
+          "name": "Mixture-of-Agents (MoA)",
+          "detail": "- **Paper:** Wang et al., \"Mixture-of-Agents Enhances Large Language Model Capabilities,\" arXiv:2406.04692 (June 2024) - **Repo:** https://github.com/TogetherAI/MoA & https://github.com/leonardosul/mi"
+        },
+        {
+          "name": "Self-MoA",
+          "detail": "- **Paper:** Li et al., \"Rethinking Mixture-of-Agents: Is Mixing Different Large Language Models Beneficial?\" arXiv:2502.00674 (Feb 2025) - **What it is:** Challenges the \"diversity is better\" assumpt"
+        },
+        {
+          "name": "Sequential MoA",
+          "detail": "- **Paper:** Same Self-MoA paper (arXiv:2502.00674) - **What it is:** A sequential version of Self-MoA that aggregates LLM outputs on-the-fly over multiple rounds, as effective as aggregating all outp"
+        }
+      ],
+      "impact": "- **** HIGHLY INTEGRABLE. Temuclaude's current panel+judge is essentially a 2-layer MoA. Adding a 3rd layer where the 5 models (GLM-5.2, DeepSeek V4, Kimi K2.6, MiniMax M3, Nemotron) first propose, th",
+      "source": "github.com/EnnengYang/Awesome-Model-Merging-Methods-Theories-Applications \u00b7 github.com/hemingkx/SpeculativeDecodingPapers \u00b7 github.com/TogetherAI/MoA",
+      "date": "2026-07-04",
+      "reportFile": "deep_research_orchestration_2026-07-03.md",
+      "lines": 339
+    },
+    {
+      "title": "Deep Research Report: Prompt Optimization, Agent Architecture & AI Assistant Design",
+      "category": "Prompt Optimization",
+      "categoryColor": "#f59e0b",
+      "summary": "- Declarative framework \u2014 treats prompting as compilation, not handcrafting",
+      "keyFindings": [
+        {
+          "name": "DSPy Teacher-Student Pattern",
+          "detail": "- Distill reasoning of expensive models into optimized prompts for cheap models - Claims 50x cost reduction - INTEGRATION: HIGHLY RELEVANT \u2014 optimize prompts for weaker models using strongest model ou"
+        },
+        {
+          "name": "RAP (Reasoning via Planning)",
+          "detail": "- LLM as both world model AND reasoning agent with MCTS - 33% relative improvement over CoT on GPT-4 - INTEGRATION: MCTS-based planning for routing decisions and task decomposition ---"
+        },
+        {
+          "name": "Skills System (3-Level Progressive Disclosure)",
+          "detail": "- Level 0: skills_list() \u2192 [{name, description, category}] (~3k tokens) - Level 1: skill_view(name) \u2192 Full content + metadata - Level 2: skill_view(name, path) \u2192 Specific reference file - Agent-create"
+        }
+      ],
+      "impact": "-  HIGH PRIORITY \u2014 upgrade to MIPROv2 for joint instruction+demo optimization",
+      "source": "github.com/NousResearch/hermes-agent-self-evolution \u00b7 github.com/stanfordnlp/dspy \u00b7 2406.04692",
+      "date": "2026-07-04",
+      "reportFile": "deep_research_agent_arch_2026-07-03.md",
+      "lines": 268
+    },
+    {
+      "title": "Deep Research Report: LLM Reasoning Enhancement Breakthroughs",
+      "category": "Reasoning",
+      "categoryColor": "#8b5cf6",
+      "summary": "- Small language models (7B/3.8B) rival OpenAI o1 via MCTS-guided \"deep thinking\" at test time",
+      "keyFindings": [
+        {
+          "name": "rStar-Math (Microsoft, Jan 2025)",
+          "detail": "- Small language models (7B/3.8B) rival OpenAI o1 via MCTS-guided \"deep thinking\" at test time - Uses policy SLM + process reward model (PPM) SLM, both iteratively self-evolved - Code-augmented CoT da"
+        },
+        {
+          "name": "RAP (Reasoning via Planning)",
+          "detail": "- LLM serves as both world model AND reasoning agent; MCTS explores reasoning tree - LLaMA-33B surpasses CoT on GPT-4 with 33% relative improvement - INTEGRATION: YES \u2014 \"LLM as world model\" framing fo"
+        },
+        {
+          "name": "V-STaR (Feb 2024)",
+          "detail": "- Uses both correct AND incorrect self-generated solutions to train DPO-based verifier - Iterative: better reasoner \u2192 better verifier \u2192 better reasoner - Results: 4% to 17% test accuracy improvement o"
+        }
+      ],
+      "impact": "-  HIGH PRIORITY \u2014 MCTS + PPM is the architecture Temuclaude already planned",
+      "source": "2303.11366 \u00b7 2302.04761 \u00b7 2305.14992",
+      "date": "2026-07-04",
+      "reportFile": "deep_research_reasoning_2026-07-03.md",
+      "lines": 206
+    },
+    {
+      "title": "How the Best AI Agents, Software Teams, and Engineering Organizations Plan and Execute",
+      "category": "Strategy",
+      "categoryColor": "#06b6d4",
+      "summary": "- Plugin-based workflows: feature-dev plugin uses 7-phase approach with specialized agents (code-explorer, code-architect, code-reviewer)",
+      "keyFindings": [
+        {
+          "name": "Hermes Agent",
+          "detail": "- /plan skill: writes markdown plan instead of executing immediately, saves to .hermes/plans/ - Progressive disclosure: 3-level loading (list ~3k tokens \u2192 view \u2192 reference) - Self-improvement loop: cr"
+        },
+        {
+          "name": "Definition of Done",
+          "detail": "\u25a1 Code written and follows conventions \u25a1 Unit tests pass (>80% coverage of new code) \u25a1 Integration tests pass \u25a1 Code reviewed \u25a1 Documentation updated \u25a1 No known critical bugs \u25a1 Deployed to staging and"
+        },
+        {
+          "name": "OODA Loop",
+          "detail": "Observe \u2192 Orient \u2192 Decide \u2192 Act \u2192 Loop - Speed of iteration > perfection of each step - For AI: Observe (read state) \u2192 Orient (understand problem) \u2192 Decide (plan) \u2192 Act (implement) \u2192 Loop (verify)"
+        }
+      ],
+      "impact": "- /plan skill: writes markdown plan instead of executing immediately, saves to .hermes/plans/ - Progressive disclosure: 3-level loading (list ~3k toke",
+      "source": "Research Swarm",
+      "date": "2026-07-03",
+      "reportFile": "deep_research_planning_execution_2026-07-03.md",
+      "lines": 240
+    }
+  ],
+  "totalReports": 87,
+  "lastUpdated": "2026-07-07T14:45:48.956345"
+}

@@ -35,8 +35,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
+        sans: ['var(--font-sans)', '-apple-system', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        mono: ['var(--font-mono)', 'SF Mono', 'Monaco', 'monospace'],
       },
       borderRadius: {
         sm: '8px',
@@ -44,10 +45,13 @@ module.exports = {
         lg: '24px',
       },
       boxShadow: {
-        sm: '0 1px 3px rgba(26, 24, 22, 0.04)',
-        md: '0 4px 16px rgba(26, 24, 22, 0.08)',
-        lg: '0 8px 32px rgba(26, 24, 22, 0.10)',
+        sm: '0px 0px 0px 1px rgba(26, 24, 22, 0.04)',
+        md: '0px 0px 0px 1px rgba(26, 24, 22, 0.08), rgba(26, 24, 22, 0.05) 0px 4px 24px',
+        lg: '0px 0px 0px 1px rgba(26, 24, 22, 0.12), rgba(26, 24, 22, 0.08) 0px 8px 32px',
         glow: '0 0 24px rgba(217, 119, 87, 0.15)',
+        ring: '0px 0px 0px 1px rgba(26, 24, 22, 0.08)',
+        'ring-hover': '0px 0px 0px 1px rgba(26, 24, 22, 0.16)',
+        whisper: 'rgba(26, 24, 22, 0.05) 0px 4px 24px',
       },
       transitionTimingFunction: {
         spring: 'cubic-bezier(0.25, 1, 0.5, 1)',

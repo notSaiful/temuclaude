@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-07T14:44:23.854531",
+  "openrouter": {
+    "available": true,
+    "source": "openrouter",
+    "totalCredits": 0,
+    "totalUsage": 0.200161891,
+    "usageTotal": 0.174294971,
+    "usageDaily": 0,
+    "usageWeekly": 0,
+    "usageMonthly": 0.100245961,
+    "isFreeTier": true,
+    "limit": null,
+    "limitRemaining": null,
+    "expiresAt": null,
+    "burnRatePerDay": 0,
+    "throttleLevel": "green",
+    "remainingCredits": 0,
+    "budgetStatus": "free_tier"
+  },
+  "summary": {
+    "remainingCredits": 0,
+    "burnRatePerDay": 0,
+    "throttleLevel": "green",
+    "totalSpent24h": 0,
+    "totalSpentMonthly": 0.100245961,
+    "isFreeTier": true,
+    "budgetStatus": "free_tier"
+  }
+}

@@ -2,8 +2,8 @@
   "version": 1,
   "functions": {
     "/api/hasan/identity": {},
-    "/api/hasan/deploy": {},
     "/api/hasan/power": {},
+    "/api/hasan/deploy": {},
     "/api/hasan": {},
     "/api/hasan/sync": {},
     "/api/hasan/chat": {

@@ -1,18 +1,27 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Source_Sans_3, Newsreader, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { CookieConsent } from '@/components/CookieConsent';
 
-const inter = Inter({
+const sourceSans = Source_Sans_3({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-sans',
+  weight: ['300', '400', '500', '600'],
+});
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-serif',
+  weight: ['300', '400', '500'],
+  style: ['normal', 'italic'],
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-jetbrains',
+  variable: '--font-mono',
 });
 
 export const metadata: Metadata = {
@@ -57,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${sourceSans.variable} ${newsreader.variable} ${jetbrains.variable}`}>
       <head>
         <script
           type="application/ld+json"

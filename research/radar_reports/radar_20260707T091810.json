@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-07-07T09:18:10.485842+00:00",
+  "total_signals": 2,
+  "top_signals": [
+    {
+      "title": "YC CEO says he ships 37K LoC AI code per day. A developer looked under the hood",
+      "source": "hackernews",
+      "score": 2.5,
+      "url": "https://www.fastcompany.com/91520702/y-combinator-garry-tan-agentic-ai-social-media"
+    },
+    {
+      "title": "In Praise of Observational Evidence",
+      "source": "hackernews",
+      "score": 0.8,
+      "url": "https://asteriskmag.com/issues/14/in-praise-of-observational-evidence"
+    }
+  ]
+}
