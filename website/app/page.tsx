@@ -446,16 +446,14 @@ export default function HomePage() {
               </div>
             </div>
             <div className="pt-8 border-t border-border-subtle flex flex-col items-center gap-3">
-              <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="50" cy="50" r="10" fill="#E25822"/>
-                <line x1="50" y1="50" x2="50" y2="12" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="77" y2="23" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="88" y2="50" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="77" y2="77" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="50" y2="88" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="23" y2="77" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="12" y2="50" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="50" x2="23" y2="23" stroke="#E25822" stroke-width="4" stroke-linecap="round"/>
+              <svg width="32" height="32" viewBox="0 0 200 200" aria-hidden="true">
+                <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
+                <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
+                <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
+                <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
+                <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
+                <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
+                <circle cx="100" cy="85" r="6" fill="#D97757"/>
               </svg>
               <p className="text-sm text-text-muted">
                 Built by Mohammad Saiful Haque · MIT Licensed
@@ -464,140 +462,6 @@ export default function HomePage() {
           </div>
         </footer>
       </main>
-    </>
-  );
-}
-
-function OrchAnim() {
-  const models = [
-    { color: '#E25822', name: 'GLM-5.2', angle: -75, delay: 0 },
-    { color: '#C97B50', name: 'DeepSeek', angle: -45, delay: 0.1 },
-    { color: '#788C5D', name: 'Hy3', angle: -15, delay: 0.2 },
-    { color: '#C46686', name: 'Gemini', angle: 15, delay: 0.3 },
-    { color: '#E8B547', name: 'MiniMax', angle: 45, delay: 0.4 },
-    { color: '#D4A574', name: 'Sonnet', angle: 75, delay: 0.5 },
-  ];
-
-  const cx = 150, cy = 95, r = 68;
-
-  return (
-    <>
-      <svg viewBox="0 0 300 280" className="w-full h-auto" aria-hidden="true">
-        <defs>
-          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#E25822" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#E25822" stopOpacity="0" />
-          </radialGradient>
-          <filter id="softGlow">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-
-        <circle cx={cx} cy={cy} r="50" fill="url(#centerGlow)" />
-
-        {models.map((m, i) => {
-          const rad = (m.angle * Math.PI) / 180;
-          const x = cx + r * Math.sin(rad);
-          const y = cy - r * Math.cos(rad);
-          return (
-            <motion.line
-              key={`line-${i}`}
-              x1={x} y1={y} x2={cx} y2={cy}
-              stroke={m.color} strokeWidth="1.5" strokeLinecap="round"
-              opacity="0.5" strokeDasharray="3 3"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.8, delay: 0.2 + m.delay, ease: 'easeOut' }}
-            />
-          );
-        })}
-
-        {models.map((m, i) => {
-          const rad = (m.angle * Math.PI) / 180;
-          const x = cx + r * Math.sin(rad);
-          const y = cy - r * Math.cos(rad);
-          return (
-            <motion.circle
-              key={`particle-${i}`}
-              r="2.5" fill={m.color}
-              initial={{ cx: x, cy: y, opacity: 0 }}
-              animate={{ cx: [x, cx], cy: [y, cy], opacity: [0, 1, 0] }}
-              transition={{ duration: 1.5, delay: 1 + m.delay, repeat: Infinity, repeatDelay: 2, ease: 'easeIn' }}
-            />
-          );
-        })}
-
-        {models.map((m, i) => {
-          const rad = (m.angle * Math.PI) / 180;
-          const x = cx + r * Math.sin(rad);
-          const y = cy - r * Math.cos(rad);
-          return (
-            <motion.g
-              key={`node-${i}`}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: m.delay, ease: 'easeOut' }}
-            >
-              <motion.circle
-                cx={x} cy={y} r="15" fill={m.color} opacity="0.9"
-                animate={{ r: [15, 16, 15] }}
-                transition={{ duration: 2, delay: m.delay, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              <circle cx={x} cy={y} r="15" fill="none" stroke={m.color} strokeWidth="1" opacity="0.25" />
-              <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="#1A1816" fontWeight="700">
-                {m.name.slice(0, 7)}
-              </text>
-            </motion.g>
-          );
-        })}
-
-        <motion.circle
-          cx={cx} cy={cy} r="25" fill="none" stroke="#E25822" strokeWidth="1" opacity="0.2"
-          animate={{ r: [25, 40], opacity: [0.3, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
-        />
-        <motion.circle
-          cx={cx} cy={cy} r="22" fill="#E25822"
-          initial={{ scale: 0 }} animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.8, ease: 'backOut' }}
-          filter="url(#softGlow)"
-        />
-        <motion.text
-          x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle"
-          fontSize="8" fill="#FAF8F5" fontWeight="800"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          FUSE
-        </motion.text>
-
-        <motion.line
-          x1={cx} y1={cy + 22} x2={cx} y2={cy + 48}
-          stroke="#E25822" strokeWidth="2" strokeLinecap="round"
-          initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
-          transition={{ duration: 0.3, delay: 1.2 }}
-        />
-        <motion.polygon
-          points={`${cx - 5},${cy + 44} ${cx + 5},${cy + 44} ${cx},${cy + 52}`}
-          fill="#E25822"
-          initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4 }}
-        />
-
-        <motion.g
-          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.4 }}
-        >
-          <rect x={cx - 60} y={cy + 54} width="120" height="28" rx="6" fill="#1A1816" />
-          <text x={cx} y={cy + 72} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#FAF8F5" fontWeight="600">
-            One superior answer
-          </text>
-        </motion.g>
-      </svg>
-      <div className="absolute bottom-0 left-0 right-0 text-center">
-        <p className="text-xs text-text-muted font-mono">8 models → 3-layer fusion → 10 quality layers → 1 answer</p>
-      </div>
     </>
   );
 }

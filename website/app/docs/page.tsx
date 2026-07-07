@@ -4,6 +4,7 @@ const sections = [
   { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
   { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
+  { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
   { title: 'Self-Hosting', items: ['Docker', 'Fly.io', 'Environment Variables'] },
 ];
@@ -427,6 +428,114 @@ Response: SSE stream
                   </tbody>
                 </table>
               </div>
+            </section>
+
+            {/* === MEDIA ORCHESTRATION === */}
+
+            <section id="media-orchestration" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Media Orchestration</h2>
+              <p className="text-text-secondary mb-4">
+                TemuClaude also orchestrates media generation — images, video, text-to-speech, and music.
+                Same 10-stage pipeline (cache, intent, tier, parallel generation, judge, quality gate, reflexion, memory, return).
+                Each media type has its own model pool, routing logic, and quality gates.
+              </p>
+              <Callout type="note">Media orchestration requires an AIML API key (set <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">AIML_API_KEY</code> env var). The LLM orchestration works with just OpenRouter.</Callout>
+            </section>
+
+            <section id="image-generation" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Image Generation</h2>
+              <p className="text-text-secondary mb-4">3-tier routing with best-of-N generation and LLM judge:</p>
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border-default">
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Tier</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Models</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Cost/image</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Draft</td><td className="py-2 px-3 text-text-secondary">Z-Image-Turbo (ELO 1105)</td><td className="py-2 px-3 text-text-secondary">$0.005</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Standard</td><td className="py-2 px-3 text-text-secondary">Reve Image (ELO 1281), FLUX-2 Pro (ELO 1186), MAI Image 2.5 (ELO 1272)</td><td className="py-2 px-3 text-text-secondary">$0.031-0.048</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Premium</td><td className="py-2 px-3 text-text-secondary">Reve, MAI 2.5, Nano Banana 2, FLUX-2 Max, GPT Image 2 (ELO 1340)</td><td className="py-2 px-3 text-text-secondary">$0.031-0.211</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-sm text-text-secondary mb-2">Unique routing for special cases:</p>
+              <ul className="space-y-1 text-sm text-text-secondary list-disc list-inside mb-4">
+                <li>Vector/SVG output → Recraft V3</li>
+                <li>Text in images → FLUX-2 Flex, GPT Image 2</li>
+                <li>Extreme aspect ratios → Nano Banana 2</li>
+                <li>Character consistency → Nano Banana 2, GPT Image 2</li>
+                <li>Multilingual text → Seedream 4.5</li>
+              </ul>
+              <CodeBlock lang="bash" code={`# Generate an image
+curl -X POST https://temuclaude.com/api/media/generate \\
+  -H "Content-Type: application/json" \\
+  -d '{"type": "image", "prompt": "a cat on a windowsill", "tier": "standard"}'`} />
+            </section>
+
+            <section id="video-generation" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Video Generation</h2>
+              <p className="text-text-secondary mb-4">3-tier routing with async submit/poll pattern:</p>
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border-default">
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Tier</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Models</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Cost/min</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Draft</td><td className="py-2 px-3 text-text-secondary">LTXV-2 Fast (ELO 976)</td><td className="py-2 px-3 text-text-secondary">$2.40</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Standard</td><td className="py-2 px-3 text-text-secondary">Seedance 2.0 (ELO 1225), HappyHorse 1.0 (ELO 1131)</td><td className="py-2 px-3 text-text-secondary">$9.07-13.20</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Premium</td><td className="py-2 px-3 text-text-secondary">Seedance 2.0, HappyHorse, Kling V3 Pro (4K/60fps)</td><td className="py-2 px-3 text-text-secondary">$9.07-20.16</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-sm text-text-secondary mb-2">Unique routing for special cases:</p>
+              <ul className="space-y-1 text-sm text-text-secondary list-disc list-inside mb-4">
+                <li>4K video → Kling V3 Pro</li>
+                <li>Dialogue/lip-sync → Google Veo 3.1</li>
+                <li>Multi-input (images + clips + audio) → Seedance 2.0</li>
+                <li>Long-form video → LTXV-2</li>
+              </ul>
+            </section>
+
+            <section id="text-to-speech" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Text-to-Speech</h2>
+              <p className="text-text-secondary mb-4">3-tier routing with voice selection and quality gating:</p>
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border-default">
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Tier</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Models</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Cost/1K chars</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Draft</td><td className="py-2 px-3 text-text-secondary">Qwen3-TTS Flash (119 languages, 80ms latency)</td><td className="py-2 px-3 text-text-secondary">$0.013</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Standard</td><td className="py-2 px-3 text-text-secondary">ElevenLabs Turbo V2.5, MiniMax Speech 2.6, VibeVoice 7B</td><td className="py-2 px-3 text-text-secondary">$0.052-0.117</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Premium</td><td className="py-2 px-3 text-text-secondary">ElevenLabs V3 Alpha, Hume Octave 2, MiniMax Speech 2.6 HD</td><td className="py-2 px-3 text-text-secondary">$0.078-0.234</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section id="music-generation" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Music Generation</h2>
+              <p className="text-text-secondary mb-4">3-tier routing with lyrics support and quality gating:</p>
+              <div className="overflow-x-auto mb-4">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border-default">
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Tier</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Models</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Cost/song</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Draft</td><td className="py-2 px-3 text-text-secondary">MiniMax Music 2.0 (vocals, 240s max)</td><td className="py-2 px-3 text-text-secondary">$0.032</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Standard</td><td className="py-2 px-3 text-text-secondary">MiniMax Music 2.0 + Music 1.5 (ethnic instruments)</td><td className="py-2 px-3 text-text-secondary">$0.032-0.15</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Premium</td><td className="py-2 px-3 text-text-secondary">Music 2.0 + Music 1.5 + Music 2.6 (frontier, 300s max)</td><td className="py-2 px-3 text-text-secondary">$0.032-0.20</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <Callout type="tip">All music models support lyrics input. TemuClaude's judge scores musicality, prompt adherence, vocal quality, audio quality, and structure — same 5-rubric quality gate as the LLM pipeline.</Callout>
             </section>
 
             {/* === SELF-HOSTING === */}
