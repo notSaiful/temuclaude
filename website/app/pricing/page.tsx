@@ -108,26 +108,6 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* Email input for subscription */}
-          <div className="max-w-md mx-auto mb-8">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-border bg-card-bg text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-primary transition-colors"
-              aria-label="Email address"
-            />
-            <input
-              type="text"
-              placeholder="Your name (optional)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 mt-2 rounded-lg border border-border bg-card-bg text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-primary transition-colors"
-              aria-label="Name"
-            />
-          </div>
-
           {error && (
             <div className="max-w-md mx-auto mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm text-center">
               {error}
