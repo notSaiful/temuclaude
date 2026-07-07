@@ -1,4 +1,7 @@
-export const metadata = { title: 'Hasan — Temuclaude Autonomous System' };
+export const metadata = { 
+  title: 'Hasan — Temuclaude Autonomous System',
+  other: { 'cache-control': 'no-cache' }
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

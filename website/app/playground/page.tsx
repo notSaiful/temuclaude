@@ -124,12 +124,12 @@ export default function PlaygroundPage() {
       let assistantContent = '';
       let orchestrationData: OrchestrationData | undefined;
 
-      // Insert the placeholder assistant bubble once; all chunks update it.
+      // Insert placeholder assistant bubble once
       streamingIdxRef.current = -1;
       setMessages((prev) => {
-        const placeholder: Message = { role: 'assistant', content: '' };
+        const placeholderMsg: Message = { role: 'assistant', content: '' };
         streamingIdxRef.current = prev.length;
-        return [...prev, placeholder];
+        return [...prev, placeholderMsg];
       });
 
       if (reader) {
@@ -195,7 +195,7 @@ export default function PlaygroundPage() {
     <>
       <Navbar />
       <div className="flex h-screen pt-16">
-        <h1 className="sr-only">Temuclaude Playground</h1>
+        <h1 className="sr-only">TemuClaude Playground</h1>
 
         <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="TemuClaude Playground" id="main-content">
           {/* Free tier limit banner */}
@@ -332,7 +332,7 @@ export default function PlaygroundPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Ask Temuclaude anything..."
+                  placeholder="Ask TemuClaude anything..."
                   rows={1}
                   className="input flex-1 resize-none min-h-[44px] max-h-32"
                   aria-label="Enter your question"

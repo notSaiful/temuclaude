@@ -45,7 +45,7 @@ export function Navbar() {
       >
         <div className="container-max h-full flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2" aria-label="Temuclaude home">
+          <Link href="/" className="flex items-center gap-2" aria-label="TemuClaude home">
             {/* The Spark — small core, frontier output */}
             <svg width="28" height="28" viewBox="0 0 100 100" className="shrink-0" aria-hidden="true">
               <circle cx="50" cy="50" r="11" fill="#E25822"/>
@@ -59,7 +59,7 @@ export function Navbar() {
               <line x1="50" y1="50" x2="21" y2="21" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
             </svg>
             <span className="text-lg font-semibold tracking-tight text-text-primary">
-              Temuclaude
+              TemuClaude
             </span>
           </Link>
 

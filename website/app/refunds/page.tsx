@@ -68,7 +68,7 @@ export default function RefundsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">7. Free Tier</h2>
-              <p>The free tier (100 queries/day) is provided at no cost. No refunds are applicable as no payment was made.</p>
+              <p>The free tier (20 queries/day) is provided at no cost. No refunds are applicable as no payment was made.</p>
             </section>
 
             <section>

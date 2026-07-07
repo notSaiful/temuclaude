@@ -493,7 +493,7 @@ STAGING & DEPLOYMENT RULES (CODEBASE ONLY):
 - EVERYTHING ELSE runs autonomously without permission: marketing, research, agent scaling, monitoring, daemon management, SWOT analysis, competitive intelligence, social media, growth, revenue tracking, charity fund. These must run successfully 24/7 without asking.
 
 AGENT SCALING:
-- You can add or remove research agents (1-8) based on news, time of day, and Temuclaude's progress.
+- You can add or remove research agents (1-8) based on news, time of day, and TemuClaude's progress.
 - Goal: maximize weekly Ollama Max plan usage — no wasted quota.
 - Scaling decisions are logged in deployment_queue.json.
 

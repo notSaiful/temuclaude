@@ -25,7 +25,7 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. Description of Service</h2>
               <p>TemuClaude is an AI orchestration platform that routes queries to multiple AI models, fuses their responses, and returns a single answer. The Service includes:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Playground (free, 100 queries/day)</li>
+                <li>Playground (free, 20 queries/day)</li>
                 <li>Developer subscription ($15/month, 50,000 queries/month)</li>
                 <li>Pro subscription ($49/month, 500,000 queries/month)</li>
                 <li>Pay-as-you-go API ($0.50/M input, $2.00/M output tokens)</li>
