@@ -295,3 +295,174 @@ def is_research_request(text: str) -> bool:
             return True
 
     return False
+
+def cascade_route_research_call(
+    messages: List[Dict],
+    cheap_model_call: Callable[[List[Dict]], Awaitable[str]],
+    expensive_model_call: Callable[[List[Dict]], Awaitable[str]],
+    quality_check: Optional[Callable[[str], Awaitable[bool]]] = None,
+    min_word_count: int = 0,
+    max_retries: int = 1,
+) -> Awaitable[str]:
+    """
+    RouteLLM-style cascade routing for deep research calls.
+
+    Tries a cheap model first. If the output fails a quality gate
+    (word count threshold and/or async quality checker), escalates
+    to the expensive model. This preserves quality while cutting
+    costs — cheap model handles easy sections, expensive model
+    only invoked for hard ones.
+
+    Args:
+        messages: Chat messages to send.
+        cheap_model_call: Async callable for the cheap/weak model.
+        expensive_model_call: Async callable for the expensive/strong model.
+        quality_check: Optional async predicate; returns True if output is acceptable.
+        min_word_count: Minimum word count for the output to pass.
+        max_retries: Times to retry the cheap model before escalating.
+
+    Returns:
+        The accepted output string.
+    """
+    async def _run() -> str:
+        for attempt in range(max_retries + 1):
+            output = await cheap_model_call(messages)
+            word_count = len(output.split())
+            if word_count >= min_word_count:
+                if quality_check is None:
+                    return output
+                if await quality_check(output):
+                    return output
+        return await expensive_model_call(messages)
+
+    return _run()
+
+def build_media_generation_research_prompt(topic: str, frontier_models: List[str], priority_score: int = 0) -> List[Dict]:
+    """Build a specialized research prompt for media generation topics.
+
+    Tailored for topics like s3_verifier_guided_denoising, this prompt instructs
+    the research agent to search arXiv, GitHub, HuggingFace, and Artificial Analysis,
+    identify frontier models to beat, and produce an implementation-ready report
+    suitable for auto-integration into src/media/.
+    """
+    frontier_text = ", ".join(frontier_models) if frontier_models else "current frontier media models"
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in media generation "
+            "(image, video, audio synthesis). Your mission is to produce an "
+            "implementation-ready research report that identifies techniques, "
+            "architectures, and models that can beat current frontier systems. "
+            "Search arXiv for latest papers, GitHub for open-source implementations, "
+            "HuggingFace for model checkpoints and spaces, and Artificial Analysis "
+            "for benchmark scores. Focus on verifier-guided denoising, classifier-free "
+            "guidance variants, reward-model-guided sampling, and any novel sampling "
+            "strategies that improve fidelity, coherence, or prompt adherence. "
+            "For each technique found, provide: (1) paper reference, (2) core algorithm "
+            "description, (3) reported metrics vs frontier baselines, (4) open-source "
+            "availability, (5) integration difficulty estimate, and (6) recommended "
+            "placement within a media generation pipeline. Conclude with a ranked "
+            "list of models and techniques to add to the model pool."
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n"
+            f"Frontier models to beat: {frontier_text}\n"
+            f"Priority Score: {priority_score}\n\n"
+            "Conduct a comprehensive deep search and produce an implementation-ready "
+            "media generation report. Identify which frontier models and techniques "
+            "should be added to the pool for auto-integration into src/media/. "
+            "Include specific architecture details, sampling parameters, and code "
+            "snippets where available."
+        )},
+    ]
+
+def select_model_for_section(
+    section_title: str,
+    subsections: List[str],
+    topic: str,
+    complexity_threshold: float = 0.5,
+    cheap_model: str = "gpt-4o-mini",
+    expensive_model: str = "gpt-4o",
+    fallback_model: str = "gpt-4o",
+) -> Dict:
+    """
+    RouteLLM-style cascade routing for deep research sections.
+
+    Estimates section complexity using lightweight heuristics and selects
+    the appropriate model tier. Simple sections (background, definitions)
+    go to the cheap model; complex sections (analysis, debates, synthesis)
+    go to the expensive model. This preserves quality while cutting cost
+    on the majority of sections that don't require frontier reasoning.
+
+    Returns a dict with:
+        - model: selected model name
+        - complexity: estimated complexity score (0.0–1.0)
+        - rationale: human-readable reason for the routing decision
+    """
+    # Heuristic complexity signals
+    complexity_signals = {
+        "background": 0.15,
+        "introduction": 0.20,
+        "overview": 0.20,
+        "definition": 0.15,
+        "history": 0.25,
+        "current state": 0.35,
+        "key findings": 0.55,
+        "results": 0.55,
+        "analysis": 0.75,
+        "debates": 0.80,
+        "controversy": 0.85,
+        "future directions": 0.65,
+        "implications": 0.70,
+        "limitations": 0.60,
+        "methodology": 0.65,
+        "comparison": 0.60,
+        "synthesis": 0.85,
+        "conclusion": 0.40,
+        "summary": 0.30,
+    }
+
+    title_lower = section_title.lower()
+    combined_text = title_lower + " " + " ".join(s.lower() for s in subsections)
+
+    # Base complexity from keyword matching
+    matched_scores = []
+    for keyword, score in complexity_signals.items():
+        if keyword in combined_text:
+            matched_scores.append(score)
+
+    if matched_scores:
+        complexity = sum(matched_scores) / len(matched_scores)
+    else:
+        complexity = 0.40  # default moderate
+
+    # Boost complexity for sections with many subsections (more ground to cover)
+    if len(subsections) >= 5:
+        complexity = min(1.0, complexity + 0.10)
+
+    # Boost complexity if the topic itself looks technical
+    technical_markers = ["algorithm", "neural", "quantum", "optimization",
+                         "theorem", "architecture", "protocol", "cryptograph"]
+    topic_lower = topic.lower()
+    if any(marker in topic_lower for marker in technical_markers):
+        complexity = min(1.0, complexity + 0.10)
+
+    # Routing decision
+    if complexity >= complexity_threshold:
+        model = expensive_model
+        rationale = (
+            f"High complexity ({complexity:.2f} >= {complexity_threshold}) — "
+            f"using expensive model for quality preservation."
+        )
+    else:
+        model = cheap_model
+        rationale = (
+            f"Low complexity ({complexity:.2f} < {complexity_threshold}) — "
+            f"routing to cheap model for cost savings."
+        )
+
+    return {
+        "model": model,
+        "complexity": round(complexity, 3),
+        "rationale": rationale,
+        "fallback_model": fallback_model,
+    }
