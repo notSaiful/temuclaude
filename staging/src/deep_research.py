@@ -740,30 +740,32 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
 from typing import Optional, Callable, Awaitable, List, Dict
 
 
-def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM quantization") -> List[Dict]:
-    """Build a specialized deep research prompt for AWQ quantization vs vLLM.
+def build_awq_research_prompt(topic: str = "AWQ Quantization for LLM Inference") -> List[Dict]:
+    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization).
     
-    AWQ is a weight-only quantization method that protects salient weights
-    by observing activation magnitudes, achieving better accuracy than
-    GPTQ at 4-bit/3-bit. vLLM uses AWQ kernels for fast inference.
-    This prompt covers technical details, benchmarks, and integration.
+    Covers AWQ methodology, comparison with vLLM, performance benchmarks,
+    integration patterns, and deployment considerations.
     """
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM quantization. "
-            "Write a comprehensive technical section comparing AWQ (Activation-aware "
-            "Weight Quantization) with vLLM's quantization stack. Cover: "
-            "1) AWQ algorithm (salient weight detection via activation scaling), "
-            "2) vLLM's AWQ kernel implementation (fused kernels, Marlin, GEMM), "
-            "3) Benchmark comparisons (perplexity, latency, throughput at 4-bit/3-bit), "
-            "4) Integration patterns (AutoAWQ, llm-compressor, vLLM AWQ backend), "
-            "5) Limitations and future directions (W4A8, W4A4, kernel fusion). "
-            "Include specific numbers from papers (AWQ: arXiv:2306.00978, "
-            "vLLM AWQ benchmarks). Write at least 2000 words with citations."
+            "You are a deep research agent specializing in LLM quantization and inference optimization. "
+            "Research AWQ (Activation-aware Weight Quantization) comprehensively. "
+            "Cover: (1) AWQ algorithm and how it differs from GPTQ, "
+            "(2) Comparison with vLLM's quantization and serving approach, "
+            "(3) Performance benchmarks (throughput, latency, memory), "
+            "(4) Hardware compatibility (GPU types, CPU offloading), "
+            "(5) Integration with HuggingFace Transformers and custom serving, "
+            "(6) Trade-offs: accuracy vs speed vs memory, "
+            "(7) Deployment patterns for production, "
+            "(8) Limitations and known issues. "
+            "Include specific numbers, model names, and citations where possible. "
+            "Write at least 2000 words."
         )},
         {"role": "user", "content": (
-            f"Research Topic: {topic}\n\n"
-            "Produce a detailed technical comparison suitable for engineers "
-            "evaluating quantization backends for production LLM serving."
+            f"Topic: {topic}\n\n"
+            "Conduct a deep research analysis on AWQ quantization, with particular "
+            "focus on how it compares to vLLM as an inference engine. "
+            "Include practical implementation details for integrating AWQ-quantized "
+            "models into an AI orchestration engine."
         )},
     ]
