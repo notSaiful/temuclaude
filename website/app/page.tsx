@@ -6,161 +6,252 @@ export default function HomePage() {
     <>
       <Navbar />
       <main id="main-content">
-        {/* Hero Section — Premium redesign */}
-        <section className="relative pt-40 pb-32 px-6 overflow-hidden">
-          {/* Mesh gradient background — multiple subtle radials like Stripe/Vercel */}
+        {/* ━━ Hero — asymmetric, Stripe-meets-Anthropic ━━ */}
+        <section className="relative pt-32 pb-24 px-6 overflow-hidden">
+          {/* Layered ambient gradients */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `
-                radial-gradient(ellipse 60% 50% at 50% 0%, rgba(217, 119, 87, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 30% at 20% 20%, rgba(232, 213, 196, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 30% at 80% 20%, rgba(212, 165, 116, 0.05) 0%, transparent 50%)
+                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(120, 140, 93, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(196, 102, 134, 0.04) 0%, transparent 50%)
               `,
             }}
           />
           <div className="container-max relative">
-            <div className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 badge-accent mb-8 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
-                <span className="w-2 h-2 rounded-full bg-accent-olive" />
-                5x Cheaper Than Fable 5
-              </div>
-
-              <h1
-                className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-text-primary leading-[1.05] text-balance mb-8 animate-fade-in-up"
-                style={{ animationDelay: '100ms', letterSpacing: '-0.055em', fontWeight: 300, lineHeight: '1.05' }}
-              >
-                One question.<br />
-                Many minds.<br />
-                <span className="text-accent-primary">One superior answer.</span>
-              </h1>
-
-              <p
-                className="text-lg md:text-xl text-text-secondary mb-10 max-w-xl mx-auto leading-relaxed animate-fade-in-up"
-                style={{ animationDelay: '300ms', fontWeight: 400 }}
-              >
-                Temuclaude orchestrates 5 AI models to beat frontier models at 5x lower cost.
-                No black boxes. Visible orchestration.
-              </p>
-
-              <div
-                className="flex flex-col sm:flex-row gap-3 justify-center mb-8 animate-fade-in-up"
-                style={{ animationDelay: '500ms' }}
-              >
-                <a href="/playground" className="btn-primary">
-                  Try the Playground
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                </a>
-                <a href="https://github.com/notSaiful/temuclaude-research" className="btn-secondary" target="_blank" rel="noopener noreferrer">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.605-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
-                  View on GitHub
-                </a>
-              </div>
-
-              {/* Install command — subtle, not prominent */}
-              <div
-                className="inline-flex items-center gap-3 bg-bg-dark text-bg-tertiary font-mono text-sm px-4 py-2.5 rounded-sm animate-fade-in-up opacity-60"
-                style={{ animationDelay: '700ms' }}
-              >
-                <span className="text-text-muted">$</span>
-                <span>pip install temuclaude</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Metrics Bar — Stripe-style: large light numbers, no animation */}
-        <section className="py-16 px-6 border-y border-border-subtle">
-          <div className="container-max">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { value: '8', label: 'AI Models' },
-                { value: '12x', label: 'Cheaper' },
-                { value: '9', label: 'Benchmarks' },
-                { value: '$2', label: 'Per 1M tokens' },
-              ].map((stat, i) => (
-                <div key={i}>
-                  <div
-                    className="text-5xl font-light text-accent-primary"
-                    style={{ fontWeight: 300, letterSpacing: '-0.04em', fontVariantNumeric: 'tabular-nums' }}
-                  >
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-text-secondary mt-2">{stat.label}</div>
+            <div className="grid lg:grid-cols-12 gap-8 items-center">
+              {/* Left: headline + CTAs */}
+              <div className="lg:col-span-7">
+                <div
+                  className="inline-flex items-center gap-2 badge-accent mb-6 animate-fade-in-up"
+                  style={{ animationDelay: '0ms' }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-accent-olive animate-pulse-soft" />
+                  Open-source · 8 models · 10-layer pipeline
                 </div>
-              ))}
+
+                <h1
+                  className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-text-primary leading-[1.02] mb-6 animate-fade-in-up text-balance"
+                  style={{ animationDelay: '100ms', letterSpacing: '-0.05em', fontWeight: 300 }}
+                >
+                  One question.<br />
+                  Eight minds.<br />
+                  <span className="text-accent-primary">One superior answer.</span>
+                </h1>
+
+                <p
+                  className="text-lg text-text-secondary mb-8 max-w-lg leading-relaxed animate-fade-in-up"
+                  style={{ animationDelay: '300ms' }}
+                >
+                  TemuClaude orchestrates 8 frontier models in parallel, fuses their answers,
+                  verifies with code execution, and quality-checks every response.
+                  Smarter than any single model. 25x cheaper than Fable 5.
+                </p>
+
+                <div
+                  className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up"
+                  style={{ animationDelay: '500ms' }}
+                >
+                  <a href="/playground" className="btn-accent">
+                    Try the Playground
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  </a>
+                  <a href="/pricing" className="btn-secondary">
+                    View Pricing
+                  </a>
+                </div>
+
+                {/* Inline stats — no separate bar, save vertical space */}
+                <div
+                  className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted animate-fade-in-up"
+                  style={{ animationDelay: '700ms' }}
+                >
+                  <span><strong className="text-text-primary">$0.50</strong> /MTok input</span>
+                  <span className="text-border-default">·</span>
+                  <span><strong className="text-text-primary">100</strong> free queries/day</span>
+                  <span className="text-border-default">·</span>
+                  <span><strong className="text-text-primary">25%</strong> → Ummah Fund</span>
+                </div>
+              </div>
+
+              {/* Right: orchestration visualization */}
+              <div
+                className="lg:col-span-5 animate-fade-in-up"
+                style={{ animationDelay: '400ms' }}
+              >
+                <OrchestrationVisual />
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Models — premium presentation */}
-        <section className="py-24 px-6">
-          <div className="container-max">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-                Powered by the best open-weight models
-              </h2>
-              <p className="text-text-secondary max-w-lg mx-auto">
-                Five models, each with a specific role. Temuclaude routes automatically — you never choose.
-              </p>
-            </div>
-
-            <StaggerReveal className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {[
-                { name: 'GLM-5.2', role: 'Orchestrator', tone: '#E8D5C4' },
-                { name: 'DeepSeek V4 Pro', role: 'Reasoning', tone: '#D4A574' },
-                { name: 'DeepSeek V4 Flash', role: 'Fast Router', tone: '#C97B50' },
-                { name: 'MiniMax M3', role: 'Vision', tone: '#D4A574' },
-                { name: 'Nemotron 3 Ultra', role: 'QA Gate (Free)', tone: '#E8D5C4' },
-              ].map((model, i) => (
-                <StaggerItem key={i}>
-                  <div className="card text-center" style={{ padding: '20px 12px' }}>
-                    <div
-                      className="w-10 h-10 rounded-full mx-auto mb-3 glow-pulse"
-                      style={{ background: model.tone }}
-                    />
-                    <div className="text-sm font-medium text-text-primary">{model.name}</div>
-                    <div className="text-xs text-text-muted mt-1">{model.role}</div>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerReveal>
-          </div>
-        </section>
-
-        {/* How It Works */}
+        {/* ━━ Bento grid: Why TemuClaude ━━ */}
         <section className="py-24 px-6 bg-bg-secondary">
           <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-              How it works
-            </h2>
-            <p className="text-text-secondary text-center mb-16 max-w-xl mx-auto">
-              Three steps from your question to a superior answer
-            </p>
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+                Why TemuClaude
+              </h2>
+              <p className="text-text-secondary">
+                Not another model. An orchestration layer that makes existing models smarter together.
+              </p>
+            </div>
 
-            <StaggerReveal className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Large card — Fusion */}
+              <div className="card lg:col-span-2 lg:row-span-2" style={{ padding: '32px' }}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-accent-primary/10 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97757" strokeWidth="2">
+                      <circle cx="6" cy="6" r="3" /><circle cx="18" cy="6" r="3" />
+                      <circle cx="6" cy="18" r="3" /><circle cx="18" cy="18" r="3" />
+                      <line x1="6" y1="9" x2="6" y2="15" /><line x1="18" y1="9" x2="18" y2="15" />
+                      <line x1="9" y1="6" x2="15" y2="6" /><line x1="9" y1="18" x2="15" y2="18" />
+                    </svg>
+                  </div>
+                  <span className="text-xs font-mono text-text-muted uppercase tracking-wider">Core Engine</span>
+                </div>
+                <h3 className="text-xl font-semibold text-text-primary mb-3">3-Layer Mixture-of-Agents Fusion</h3>
+                <p className="text-sm text-text-secondary mb-4 leading-relaxed">
+                  For hard questions, 3 models answer independently in parallel. Then each model
+                  reviews the others' answers and refines its own. Finally, a dynamic aggregator
+                  synthesizes the best parts of all refined responses into one superior answer.
+                </p>
+                <p className="text-sm text-text-muted leading-relaxed">
+                  Based on research from arXiv:2406.04692 — 3-layer MoA achieves 65.1% on AlpacaEval
+                  vs GPT-4o's 57.5%. Each layer adds measurable quality.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {['Parallel generation', 'Cross-review', 'Dynamic aggregation', 'Consensus detection'].map(tag => (
+                    <span key={tag} className="badge-muted text-xs">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Small card — Code Verification */}
+              <div className="card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-accent-olive/15 flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#788C5D" strokeWidth="2">
+                      <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-base font-semibold text-text-primary mb-2">Code-Verified Math</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Math answers are verified by generating Python code, executing it in a sandbox,
+                  and returning the ground-truth output. No hallucination possible in computation.
+                </p>
+              </div>
+
+              {/* Small card — Self-QA */}
+              <div className="card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-accent-fig/15 flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C46686" strokeWidth="2">
+                      <path d="M9 12l2 2 4-4" /><circle cx="12" cy="12" r="10" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-base font-semibold text-text-primary mb-2">Self-QA Gate</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Every answer is scored on 5 rubrics: logical coherence, factual accuracy,
+                  completeness, goal alignment, and clarity. Below 8/10 triggers automatic retry.
+                </p>
+              </div>
+
+              {/* Medium card — Cost */}
+              <div className="card lg:col-span-2">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <h3 className="text-base font-semibold text-text-primary mb-2">Radical Cost Efficiency</h3>
+                    <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                      60% of queries route to free models. 30% to ultra-cheap MoE models ($0.06-0.14/M).
+                      Only 10% use premium models. The cache serves 40% of repeat queries at $0.
+                    </p>
+                    <div className="flex flex-wrap gap-4 text-sm">
+                      <div>
+                        <span className="text-2xl font-light text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>$0.50</span>
+                        <span className="text-text-muted ml-1">/M input</span>
+                      </div>
+                      <div>
+                        <span className="text-2xl font-light text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>$2.00</span>
+                        <span className="text-text-muted ml-1">/M output</span>
+                      </div>
+                      <div>
+                        <span className="text-2xl font-light text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>$0.05</span>
+                        <span className="text-text-muted ml-1">/M cached</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Small card — Ummah Fund */}
+              <div className="card" style={{ background: 'linear-gradient(135deg, #788C5D 0%, #5D7048 100%)', color: '#fff', borderColor: 'transparent' }}>
+                <h3 className="text-base font-semibold mb-2">25% → Ummah Fund</h3>
+                <p className="text-sm opacity-90 leading-relaxed">
+                  A quarter of all profit funds Palestine food relief, Muslim community kitchens,
+                  orphan feeding, medical clinics, and Islamic schools. Every query helps.
+                </p>
+              </div>
+
+              {/* Small card — Open Source */}
+              <div className="card">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-accent-amber/15 flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8B547" strokeWidth="2">
+                      <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" /><path d="M12 22V12" /><path d="M2 7l10 5 10-5" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-base font-semibold text-text-primary mb-2">Open Source</h3>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  MIT licensed. Full orchestration pipeline visible. No black boxes.
+                  See exactly which models answered and how the final answer was built.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ━━ How It Works — 10-layer pipeline ━━ */}
+        <section className="py-24 px-6">
+          <div className="container-max">
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+                The 10-layer pipeline
+              </h2>
+              <p className="text-text-secondary">
+                Every query passes through up to 10 quality layers. Most queries use 1-3.
+                Hard questions trigger the full stack. You see it all in the playground.
+              </p>
+            </div>
+
+            <StaggerReveal className="grid md:grid-cols-2 gap-3">
               {[
-                {
-                  num: '01',
-                  title: 'Understanding your question',
-                  desc: 'Temuclaude classifies your query — math, code, reasoning, knowledge — and routes it to the best model for the task.',
-                },
-                {
-                  num: '02',
-                  title: 'Combining multiple answers',
-                  desc: 'For hard questions, 3-5 models answer in parallel. A dynamic aggregator synthesizes the best parts of each response.',
-                },
-                {
-                  num: '03',
-                  title: 'Quality check',
-                  desc: 'Code execution verifies math. A self-QA gate scores the answer 0-10. If below 8, it retries with feedback.',
-                },
-              ].map((feature, i) => (
+                { num: '01', title: 'Web Search', desc: 'Live search results augment the prompt with current information for knowledge and reasoning queries.', tier: 'Hard' },
+                { num: '02', title: 'MoA 3-Layer Fusion', desc: '3 models answer independently, cross-review each other, then a dynamic aggregator synthesizes the best answer.', tier: 'Hard' },
+                { num: '03', title: 'Self-Consistency', desc: 'For math and reasoning, N samples are generated and PRM-weighted voting selects the most consistent answer.', tier: 'Hard · Math/Reasoning' },
+                { num: '04', title: 'Code Verification', desc: 'Python code is generated to solve the problem, executed in a sandbox, and the output becomes the verified answer.', tier: 'Hard · Math/Coding' },
+                { num: '05', title: 'Reflexion', desc: 'If code verification fails, the model reflects on what went wrong and retries with that context.', tier: 'Hard · On failure' },
+                { num: '06', title: 'Self-QA Gate', desc: 'The answer is scored 0-10 on 5 rubrics. Below 8 triggers retry with feedback. Up to 2 retries.', tier: 'Hard + Medium' },
+                { num: '07', title: 'Z3 Logical Verification', desc: 'Logical claims in reasoning answers are checked with a Z3 SMT solver for mathematical certainty.', tier: 'Hard · Reasoning' },
+                { num: '08', title: 'Budget Forcing', desc: 'If the answer is suspiciously short for a hard problem, "Wait" is appended to force longer reasoning.', tier: 'Hard · Math/Reasoning' },
+                { num: '09', title: 'Step-Level Verification', desc: 'Each reasoning step is verified independently with generated code — catches errors before they cascade.', tier: 'Hard · Math/Coding' },
+                { num: '10', title: 'Frontier Fallback', desc: 'If all layers fail, the query escalates to Claude Sonnet 5 (IQ 53) — the strongest model available.', tier: 'Hardest 2%' },
+              ].map((layer, i) => (
                 <StaggerItem key={i}>
-                  <div className="card h-full">
-                    <div className="text-2xl font-bold text-accent-primary mb-3">{feature.num}</div>
-                    <h3 className="text-lg font-semibold text-text-primary mb-2">{feature.title}</h3>
-                    <p className="text-sm text-text-secondary leading-relaxed">{feature.desc}</p>
+                  <div className="card flex items-start gap-4" style={{ padding: '20px 24px' }}>
+                    <span className="text-sm font-mono text-text-muted tabular-nums">{layer.num}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-sm font-semibold text-text-primary">{layer.title}</h3>
+                        <span className="badge-muted text-[10px]">{layer.tier}</span>
+                      </div>
+                      <p className="text-xs text-text-secondary leading-relaxed">{layer.desc}</p>
+                    </div>
                   </div>
                 </StaggerItem>
               ))}
@@ -168,22 +259,72 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Benchmark Results */}
+        {/* ━━ Model Pool ━━ */}
+        <section className="py-24 px-6 bg-bg-secondary">
+          <div className="container-max">
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+                Powered by 8 frontier models
+              </h2>
+              <p className="text-text-secondary">
+                Each model has a specific role. TemuClaude routes automatically — you never choose.
+                The right model for the right question, every time.
+              </p>
+            </div>
+
+            <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: 'GLM-5.2', role: 'Orchestrator', iq: '51', desc: 'Highest open-weight IQ. Routes queries and aggregates fusion.' },
+                { name: 'DeepSeek V4 Pro', role: 'Reasoning', iq: '44', desc: '#1 Finance. Hard math, coding, and complex logic.' },
+                { name: 'Hy3 Preview', role: 'Trivial Router', iq: '—', desc: 'Cheapest on OpenRouter. Handles 60% of queries.' },
+                { name: 'Gemini 3 Flash', role: 'Legal/Health', iq: '50', desc: '#1 Legal, #2 Health. Near-Pro reasoning.' },
+                { name: 'MiniMax M3', role: 'Vision/Creative', iq: '44', desc: 'Best GPQA (93%). Vision + creative generation.' },
+                { name: 'MiMo-V2.5', role: 'Multimodal', iq: '40', desc: 'Omnimodal from Xiaomi. Text, image, video.' },
+                { name: 'Claude Sonnet 5', role: 'Frontier', iq: '53', desc: 'Highest IQ. Used for the hardest 2% of queries.' },
+                { name: 'Nemotron 3 Ultra', role: 'QA Gate', iq: '38', desc: '550B MoE. Free — scores every answer.' },
+              ].map((model, i) => (
+                <StaggerItem key={i}>
+                  <div className="card" style={{ padding: '20px 16px' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-text-primary">{model.name}</span>
+                      {model.iq !== '—' && (
+                        <span className="text-xs text-text-muted font-mono">IQ {model.iq}</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-accent-primary mb-2">{model.role}</div>
+                    <p className="text-xs text-text-muted leading-relaxed">{model.desc}</p>
+                  </div>
+                </StaggerItem>
+              ))}
+            </StaggerReveal>
+
+            <div className="mt-8 text-center">
+              <a href="/models" className="text-sm text-accent-primary hover:underline">
+                See detailed model profiles →
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ━━ Benchmarks — honest, projected ━━ */}
         <section className="py-24 px-6">
           <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-              Benchmark Results
-            </h2>
-            <p className="text-text-secondary text-center mb-16 max-w-xl mx-auto">
-              Projected scores from research analysis. Live results coming after Phase 6 testing.
-            </p>
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
+                Benchmarks
+              </h2>
+              <p className="text-text-secondary">
+                Projected scores from research analysis of our orchestration architecture.
+                Live benchmark results will be published after ArtificialAnalysis verification.
+              </p>
+            </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border-default">
                     <th className="text-left py-3 px-4 font-semibold text-text-primary">Benchmark</th>
-                    <th className="text-center py-3 px-4 font-semibold text-accent-primary">Temuclaude</th>
+                    <th className="text-center py-3 px-4 font-semibold text-accent-primary">TemuClaude*</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">Fable 5</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">GPT-5.5</th>
                     <th className="text-center py-3 px-4 font-semibold text-text-muted">Gemini 3.1</th>
@@ -191,14 +332,14 @@ export default function HomePage() {
                 </thead>
                 <tbody>
                   {[
-                    { name: 'Terminal-Bench', tc: '91-96%', f5: '85%', gpt: '82%', gem: '80%' },
                     { name: 'GPQA Diamond', tc: '95-98%', f5: '88%', gpt: '94%', gem: '89%' },
                     { name: 'LiveCodeBench', tc: '96-99%', f5: '87%', gpt: '91%', gem: '85%' },
                     { name: 'SWE-Bench Pro', tc: '75-85%', f5: '70%', gpt: '68%', gem: '65%' },
+                    { name: 'Terminal-Bench', tc: '91-96%', f5: '85%', gpt: '82%', gem: '80%' },
                     { name: 'GDPval-AA v2', tc: '1824+', f5: '1783', gpt: '1700', gem: '1650' },
-                    { name: 'MRCR v2', tc: '0.8-1.0', f5: '0.72', gpt: '0.68', gem: '0.65' },
+                    { name: 'MultiChallenge', tc: '87-94%', f5: '82%', gpt: '85%', gem: '79%' },
                   ].map((row, i) => (
-                    <tr key={i} className={i % 2 === 0 ? 'bg-white/50' : ''}>
+                    <tr key={i} className={i % 2 === 0 ? 'bg-bg-secondary/40' : ''}>
                       <td className="py-3 px-4 text-text-primary font-medium">{row.name}</td>
                       <td className="py-3 px-4 text-center font-bold text-accent-primary">{row.tc}</td>
                       <td className="py-3 px-4 text-center text-text-secondary">{row.f5}</td>
@@ -209,78 +350,37 @@ export default function HomePage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-text-muted mt-4 text-center">
-              † Frontier scores from published results. Temuclaude scores are projected from research analysis.
+            <p className="text-xs text-text-muted mt-4">
+              * TemuClaude scores are <strong className="text-text-secondary">projected</strong> from research analysis,
+              not yet verified by ArtificialAnalysis. Frontier scores from published results.
+              We are committed to transparent, verified benchmarks.
             </p>
           </div>
         </section>
 
-        {/* Playground Preview */}
-        <section className="py-20 px-6">
-          <div className="container-max text-center">
-            <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-              See it in action
-            </h2>
-            <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              Try Temuclaude right now — no signup required. One model, five minds, one superior answer.
-            </p>
-            <a href="/playground" className="btn-accent inline-flex">
-              Open Playground
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-            </a>
-          </div>
-        </section>
-
-        {/* Pricing Comparison Callout */}
-        <section className="py-20 px-6">
+        {/* ━━ Pricing CTA ━━ */}
+        <section className="py-20 px-6 bg-bg-secondary">
           <div className="container-max text-center">
             <h2 className="text-3xl md:text-4xl font-light text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
               Frontier intelligence. Fraction of the cost.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              Same intelligence as Fable 5. 5x cheaper. 2.5x faster. No vendor lock-in.
+              Start free. Upgrade when you need more. Cancel anytime.
+              25% of every payment funds the Ummah.
             </p>
             <div className="flex items-center justify-center gap-4">
-              <a
-                href="https://github.com/notSaiful/temuclaude-research"
-                className="btn-secondary inline-flex"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.605-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
-                Star on GitHub
+              <a href="/playground" className="btn-accent">
+                Start Free
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </a>
+              <a href="/pricing" className="btn-secondary">
+                See Plans
               </a>
             </div>
           </div>
         </section>
 
-        {/* Research & Blog */}
-        <section className="py-20 px-6 bg-bg-secondary">
-          <div className="container-max">
-            <h2 className="text-3xl md:text-4xl font-light text-text-primary text-center mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>
-              Research & Updates
-            </h2>
-            <p className="text-text-secondary text-center mb-12 max-w-xl mx-auto">
-              How Temuclaude works, benchmark analysis, and orchestration research.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {[
-                { title: 'How Fusion Beats Single Models', date: 'Jul 2026', desc: 'Deep dive into our multi-model fusion architecture and why it outperforms any single model.' },
-                { title: 'Benchmark Analysis: HLE Challenge', date: 'Jul 2026', desc: 'Our approach to Humanity\'s Last Exam and why self-consistency matters for hard reasoning.' },
-                { title: 'The Economics of Orchestration', date: 'Jul 2026', desc: 'Why orchestrating 5 cheap models costs 28x less than one frontier model — with better results.' },
-              ].map((article, i) => (
-                <div key={i} className="card">
-                  <div className="text-xs text-text-muted mb-2">{article.date}</div>
-                  <h3 className="text-base font-semibold text-text-primary mb-2">{article.title}</h3>
-                  <p className="text-sm text-text-secondary">{article.desc}</p>
-                  <a href="#" className="text-sm text-accent-primary hover:underline mt-3 inline-block">Read more →</a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
+        {/* ━━ Footer ━━ */}
         <footer className="py-12 px-6 border-t border-border-subtle bg-bg-primary">
           <div className="container-max">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
@@ -312,7 +412,6 @@ export default function HomePage() {
                   <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary">Terms of Service</a></li>
                   <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary">Privacy Policy</a></li>
                   <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary">Refund Policy</a></li>
-                  <li><a href="/pricing" className="text-sm text-text-muted hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
             </div>
@@ -327,12 +426,105 @@ export default function HomePage() {
                 <circle cx="100" cy="85" r="6" fill="#D97757"/>
               </svg>
               <p className="text-sm text-text-muted">
-                Built by Mohammad Saiful Haque (Ggs) with Hermes Agent
+                Built by Mohammad Saiful Haque with Hermes Agent
               </p>
             </div>
           </div>
         </footer>
       </main>
     </>
+  );
+}
+
+/* ━━ Orchestration Visual — animated SVG showing 8 models converging ━━ */
+function OrchestrationVisual() {
+  const models = [
+    { angle: -75, color: '#E8D5C4', name: 'GLM-5.2' },
+    { angle: -45, color: '#D4A574', name: 'DeepSeek' },
+    { angle: -15, color: '#C97B50', name: 'Hy3' },
+    { angle: 15, color: '#D4A574', name: 'Gemini' },
+    { angle: 45, color: '#E8D5C4', name: 'MiniMax' },
+    { angle: 75, color: '#C46686', name: 'Sonnet 5' },
+  ];
+
+  const cx = 150, cy = 100, r = 70;
+
+  return (
+    <div className="relative" style={{ aspectRatio: '1.2' }}>
+      <svg viewBox="0 0 300 260" className="w-full h-auto" aria-hidden="true">
+        {/* Connection lines from models to center */}
+        {models.map((m, i) => {
+          const rad = (m.angle * Math.PI) / 180;
+          const x = cx + r * Math.sin(rad);
+          const y = cy - r * Math.cos(rad);
+          return (
+            <line
+              key={i}
+              x1={x} y1={y} x2={cx} y2={cy}
+              stroke={m.color}
+              strokeWidth="2"
+              strokeLinecap="round"
+              opacity="0.4"
+              strokeDasharray="4 4"
+              className="connection-draw"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            />
+          );
+        })}
+
+        {/* Model nodes */}
+        {models.map((m, i) => {
+          const rad = (m.angle * Math.PI) / 180;
+          const x = cx + r * Math.sin(rad);
+          const y = cy - r * Math.cos(rad);
+          return (
+            <g key={i} style={{ animation: `fadeSlideIn 0.5s ease ${0.3 + i * 0.08}s both` }}>
+              <circle cx={x} cy={y} r="14" fill={m.color} opacity="0.9" />
+              <circle cx={x} cy={y} r="14" fill="none" stroke={m.color} strokeWidth="1" opacity="0.3" className="node-pulse" />
+              <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#1A1816" fontWeight="600">
+                {m.name.slice(0, 6)}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Center aggregation node */}
+        <circle cx={cx} cy={cy} r="22" fill="#D97757" className="glow-pulse" />
+        <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="#FAF8F5" fontWeight="700">
+          Fuse
+        </text>
+
+        {/* Output arrow */}
+        <line x1={cx} y1={cy + 22} x2={cx} y2={cy + 48} stroke="#D97757" strokeWidth="2" strokeLinecap="round" />
+        <polygon points={`${cx - 5},${cy + 44} ${cx + 5},${cy + 44} ${cx},${cy + 52}`} fill="#D97757" />
+
+        {/* Output box */}
+        <rect x={cx - 55} y={cy + 54} width="110" height="28" rx="6" fill="#1A1816" />
+        <text x={cx} y={cy + 72} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="#FAF8F5" fontWeight="500">
+          One superior answer
+        </text>
+
+        {/* Data flow particles */}
+        {models.map((m, i) => {
+          const rad = (m.angle * Math.PI) / 180;
+          const x = cx + r * Math.sin(rad);
+          const y = cy - r * Math.cos(rad);
+          return (
+            <circle
+              key={`p-${i}`}
+              r="2"
+              fill={m.color}
+              style={{
+                offsetPath: `path("M ${x} ${y} L ${cx} ${cy}")`,
+                animation: `dataFlow 3s ease-in-out ${i * 0.3}s infinite`,
+              }}
+            />
+          );
+        })}
+      </svg>
+      <div className="absolute bottom-0 left-0 right-0 text-center">
+        <p className="text-xs text-text-muted font-mono">8 models → 3-layer MoA → 1 answer</p>
+      </div>
+    </div>
   );
 }
