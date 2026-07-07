@@ -197,7 +197,7 @@ export default function PlaygroundPage() {
       <div className="flex h-screen pt-16">
         <h1 className="sr-only">Temuclaude Playground</h1>
 
-        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="Temuclaude Playground" id="main-content">
+        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="TemuClaude Playground" id="main-content">
           {/* Free tier limit banner */}
           {showUpgradeBanner && limitMessage && (
             <div className="bg-accent-primary/10 border-b border-accent-primary/20 px-4 py-3">
@@ -316,9 +316,9 @@ export default function PlaygroundPage() {
               {/* Free tier counter */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-text-muted">
-                  {freeQueriesUsed < 100 ? `${100 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
+                  {freeQueriesUsed < 20 ? `${20 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
                 </span>
-                {freeQueriesUsed >= 60 && freeQueriesUsed < 100 && (
+                {freeQueriesUsed >= 12 && freeQueriesUsed < 20 && (
                   <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
                 )}
               </div>
