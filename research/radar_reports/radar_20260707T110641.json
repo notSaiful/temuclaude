@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-07-07T11:06:41.378179+00:00",
+  "total_signals": 1,
+  "top_signals": [
+    {
+      "title": "IDE with agentic support built using Flutter",
+      "source": "hackernews",
+      "score": 15.3,
+      "url": "https://lumide.dev"
+    }
+  ]
+}

@@ -1,60 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-06T21:47:19.895382+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T03:02:31.687916+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T03:02:31.689440+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T03:02:31.690457+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T03:03:05.937671+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T03:03:05.938145+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-07T03:03:05.938609+00:00",
       "tier": "hard",
       "tokens_used": 8192,
@@ -899,33 +845,87 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:03:47.433747+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:03:47.435069+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:03:47.435940+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:05:33.115205+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:05:33.116179+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T11:05:33.117037+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
     }
   ],
-  "total_queries": 387,
-  "total_tokens_used": 1078850,
-  "total_tokens_baseline": 3170304,
-  "correct": 168,
-  "incorrect": 84,
+  "total_queries": 393,
+  "total_tokens_used": 1104426,
+  "total_tokens_baseline": 3219456,
+  "correct": 172,
+  "incorrect": 86,
   "unknown": 135,
   "tier_stats": {
     "trivial": {
-      "count": 137,
-      "tokens": 43178,
-      "baseline": 1122304,
-      "correct": 84
+      "count": 139,
+      "tokens": 44178,
+      "baseline": 1138688,
+      "correct": 86
     },
     "medium": {
-      "count": 162,
-      "tokens": 347207,
-      "baseline": 1327104,
-      "correct": 84
+      "count": 164,
+      "tokens": 355399,
+      "baseline": 1343488,
+      "correct": 86
     },
     "hard": {
-      "count": 88,
-      "tokens": 688465,
-      "baseline": 720896,
+      "count": 90,
+      "tokens": 704849,
+      "baseline": 737280,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-07T10:56:42.969754+00:00"
+  "last_updated": "2026-07-07T11:05:33.117052+00:00"
 }
