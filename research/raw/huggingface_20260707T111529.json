@@ -1,0 +1,14 @@
+{
+  "scout": "huggingface",
+  "timestamp": "20260707T111529",
+  "total_papers": 0,
+  "total_models": 0,
+  "papers_fetched": 11,
+  "papers_new": 0,
+  "papers_already_seen": 19,
+  "models_fetched": 172,
+  "models_new": 0,
+  "models_already_seen": 175,
+  "papers": [],
+  "models": []
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
@@ -38,21 +38,11 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-/** Aurora glow that drifts on scroll — gives the hero atmosphere */
+/** Aurora glow — drifts gently, gives the hero atmosphere */
 function AuroraGlow() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end start'],
-  });
-  const y1 = useTransform(scrollYProgress, [0, 1], ['0%', '60%']);
-  const y2 = useTransform(scrollYProgress, [0, 1], ['0%', '-40%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
   return (
-    <div ref={ref} className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
       <motion.div
-        style={{ y: y1, opacity }}
         className="absolute -top-20 -right-20 w-[600px] h-[600px] rounded-full"
         animate={{
           scale: [1, 1.1, 1],
@@ -62,7 +52,6 @@ function AuroraGlow() {
         <div className="w-full h-full rounded-full" style={{ background: 'radial-gradient(circle, rgba(226,88,34,0.12) 0%, transparent 70%)' }} />
       </motion.div>
       <motion.div
-        style={{ y: y2, opacity }}
         className="absolute top-40 -left-20 w-[500px] h-[500px] rounded-full"
         animate={{
           scale: [1, 1.15, 1],
@@ -120,12 +109,31 @@ function FloatingOrbs() {
 }
 
 /** Pinned scroll section — the pipeline story unfolds as you scroll */
+function PipelineStep({ step, index, total }: { step: any; index: number; total: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, margin: '-50px' }}
+      transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+      className="absolute"
+    >
+      <div
+        className="text-5xl font-serif mb-3"
+        style={{ fontWeight: 300, color: step.color, letterSpacing: '-0.04em' }}
+      >
+        {step.num}
+      </div>
+      <h3 className="text-2xl font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>
+        {step.title}
+      </h3>
+      <p className="text-text-secondary max-w-md leading-relaxed">{step.desc}</p>
+    </motion.div>
+  );
+}
+
 function PipelineStory() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end end'],
-  });
 
   const steps = [
     { num: '01', title: 'You ask', desc: 'One API call. No model selection. Just your question.', color: '#E25822' },
@@ -146,30 +154,9 @@ function PipelineStory() {
               <div className="mb-8">
                 <span className="text-xs font-mono text-text-muted uppercase tracking-wider">The Pipeline</span>
               </div>
-              {steps.map((step, i) => {
-                const start = i / steps.length;
-                const end = (i + 1) / steps.length;
-                const opacity = useTransform(scrollYProgress, [start - 0.05, start, end, end + 0.05], [0, 1, 1, 0]);
-                const y = useTransform(scrollYProgress, [start - 0.05, start, end, end + 0.05], [30, 0, 0, -30]);
-                return (
-                  <motion.div
-                    key={i}
-                    style={{ opacity, y }}
-                    className="absolute"
-                  >
-                    <div
-                      className="text-5xl font-serif mb-3"
-                      style={{ fontWeight: 300, color: step.color, letterSpacing: '-0.04em' }}
-                    >
-                      {step.num}
-                    </div>
-                    <h3 className="text-2xl font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>
-                      {step.title}
-                    </h3>
-                    <p className="text-text-secondary max-w-md leading-relaxed">{step.desc}</p>
-                  </motion.div>
-                );
-              })}
+              {steps.map((step, i) => (
+                <PipelineStep key={i} step={step} index={i} total={steps.length} />
+              ))}
             </div>
 
             {/* Right: visual pipeline */}
@@ -185,15 +172,13 @@ function PipelineStory() {
                   const x2 = 200 + r * Math.cos(nextAngle);
                   const y2 = 200 + r * Math.sin(nextAngle);
                   return (
-                    <motion.line
+                    <line
                       key={i}
                       x1={x1} y1={y1} x2={x2} y2={y2}
                       stroke="#E25822"
                       strokeWidth="1"
                       strokeDasharray="4 4"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 0.2 }}
-                      transition={{ duration: 0.5, delay: i * 0.1 }}
+                      opacity="0.15"
                     />
                   );
                 })}
@@ -204,13 +189,11 @@ function PipelineStory() {
                   const x = 200 + r * Math.cos(angle);
                   const y = 200 + r * Math.sin(angle);
                   return (
-                    <motion.circle
+                    <circle
                       key={i}
                       cx={x} cy={y} r="24"
                       fill={step.color}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      opacity="0.8"
                     />
                   );
                 })}
@@ -266,22 +249,13 @@ function CtaSection() {
 }
 
 export default function HomePage() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: heroScroll } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  });
-  const heroY = useTransform(heroScroll, [0, 1], ['0%', '30%']);
-  const heroOpacity = useTransform(heroScroll, [0, 0.8], [1, 0]);
-  const heroScale = useTransform(heroScroll, [0, 1], [1, 0.95]);
-
   return (
     <>
       <Navbar />
       <ScrollProgress />
       <main id="main-content">
         {/* ━━ Hero — cinematic with parallax + floating orbs ━━ */}
-        <section ref={heroRef} className="relative min-h-screen pt-32 pb-24 px-6 overflow-hidden flex items-center">
+        <section className="relative min-h-screen pt-32 pb-24 px-6 overflow-hidden flex items-center">
           {/* Dot grid + aurora glows */}
           <div
             className="absolute inset-0 pointer-events-none"
@@ -293,8 +267,7 @@ export default function HomePage() {
           <AuroraGlow />
           <FloatingOrbs />
 
-          <motion.div
-            style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+          <div
             className="container-max relative z-10"
           >
             <div className="grid lg:grid-cols-12 gap-8 items-center">
@@ -394,7 +367,7 @@ export default function HomePage() {
                 <FusionPipeline />
               </motion.div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Scroll indicator */}
           <motion.div
