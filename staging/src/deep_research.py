@@ -735,39 +735,42 @@ from typing import Optional, Callable, Awaitable, List, Dict
 
 
 def build_awq_research_prompt() -> List[Dict]:
-    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization)
-    and its comparison with vLLM as an inference engine.
+    """Build a deep research prompt for AWQ (Activation-aware Weight Quantization).
 
-    This prompt guides the deep research pipeline to investigate AWQ's quantization
-    approach, performance characteristics, integration patterns, and competitive
-    positioning relative to vLLM, enabling Temuclaude to evaluate and potentially
-    adopt AWQ for model serving.
+    Covers the AWQ paper, comparison with vLLM, quantization efficiency,
+    and quality impact classification per the efficiency finding guardrails.
     """
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference optimization "
-            "and quantization techniques. Write a comprehensive, well-structured "
-            "research report section. Use prose (not bullet points). Include facts, "
-            "benchmarks, data, and citations where possible. Write at least 2000 words."
+            "You are a deep research agent specializing in LLM inference efficiency. "
+            "Research AWQ (Activation-aware Weight Quantization) comprehensively. "
+            "Cover: (1) the AWQ paper and method — how it identifies salient weights "
+            "using activation magnitudes, (2) quantization approach — 4-bit weight-only "
+            "quantization with per-channel scaling, (3) comparison with vLLM and other "
+            "serving frameworks, (4) speedup and memory savings metrics, (5) quality "
+            "impact — perplexity degradation, task accuracy retention vs FP16, "
+            "(6) integration considerations for an AI orchestration engine. "
+            "You MUST classify the finding as one of: LOSSLESS, QUALITY-PRESERVING, "
+            "PARETO-OPTIMAL, or REJECTED. Provide specific numbers for speedup, "
+            "memory savings, and quality loss (perplexity delta or accuracy drop)."
         )},
         {"role": "user", "content": (
-            "Research Topic: AWQ (Activation-aware Weight Quantization) vs vLLM\n\n"
-            "Sections to cover:\n"
-            "  - Background on LLM quantization methods (GPTQ, AWQ, SmoothQuant, bitsandbytes)\n"
-            "  - How AWQ works: activation-aware weight scaling, outlier channel detection\n"
-            "  - AWQ performance benchmarks: throughput, latency, memory footprint vs FP16\n"
-            "  - vLLM architecture: PagedAttention, continuous batching, tensor parallelism\n"
-            "  - AWQ integration with vLLM: supported models, configuration, loading patterns\n"
-            "  - Competitor comparison: vLLM vs TGI vs llama.cpp vs MLC-LLM for AWQ models\n"
-            "  - Practical deployment: quantizing models with AutoAWQ, serving with vLLM\n"
-            "  - Trade-offs: accuracy degradation, quantization bits (4-bit, 8-bit), group size\n"
-            "  - Temuclaude integration opportunities: model registry, quantized model loading\n"
-            "  - Future directions: AWQ variants, hardware support (CUDA, Apple Silicon)\n\n"
-            "Write this section in full with technical depth and implementation guidance."
+            "Research AWQ (Activation-aware Weight Quantization) for LLM inference.\n\n"
+            "Key questions to answer:\n"
+            "1. What is the core algorithm? How does AWQ differ from GPTQ and RTN?\n"
+            "2. What speedup does AWQ provide (tokens/sec) vs FP16 baseline?\n"
+            "3. What memory reduction does 4-bit AWQ achieve (GB saved per model)?\n"
+            "4. What is the quality loss — perplexity increase on WikiText, "
+            "accuracy drop on MMLU/HumanEval, and any task-specific degradation?\n"
+            "5. How does AWQ compare to vLLM's built-in quantization support?\n"
+            "6. Can AWQ be applied losslessly or is there always some quality tradeoff?\n"
+            "7. What are the hardware requirements and supported model architectures?\n"
+            "8. What is the integration path — which Python libraries/packages are needed "
+            "(e.g., autoawq, llm-awq) and what are the API entry points?\n\n"
+            "Provide a final classification: LOSSLESS / QUALITY-PRESERVING / "
+            "PARETO-OPTIMAL / REJECTED with justification."
         )},
     ]
-
-
 def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
     """Build a specialized prompt for researching LLM quantization and inference engine comparisons (e.g., AWQ vs vLLM)."""
     competitor_text = ", ".join(competitors)
