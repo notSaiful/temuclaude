@@ -1,0 +1,66 @@
+{
+  "distilled_at": "20260707T055947",
+  "total_raw_files": 15,
+  "total_findings": 2,
+  "new_findings": 2,
+  "already_distilled": 332,
+  "by_type": {
+    "hf_paper": 2
+  },
+  "top_findings": [
+    {
+      "type": "hf_paper",
+      "id": "2607.04428",
+      "title": "dOPSD: On-Policy Self-Distillation for Diffusion Language Models",
+      "abstract": "",
+      "upvotes": 1,
+      "url": "https://huggingface.co/papers/2607.04428",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.04428"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.02515",
+      "title": "PointDiT: Pixel-Space Diffusion for Monocular Geometry Estimation",
+      "abstract": "",
+      "upvotes": 0,
+      "url": "https://huggingface.co/papers/2607.02515",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.02515"
+    }
+  ],
+  "all_findings": [
+    {
+      "type": "hf_paper",
+      "id": "2607.04428",
+      "title": "dOPSD: On-Policy Self-Distillation for Diffusion Language Models",
+      "abstract": "",
+      "upvotes": 1,
+      "url": "https://huggingface.co/papers/2607.04428",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.04428"
+    },
+    {
+      "type": "hf_paper",
+      "id": "2607.02515",
+      "title": "PointDiT: Pixel-Space Diffusion for Monocular Geometry Estimation",
+      "abstract": "",
+      "upvotes": 0,
+      "url": "https://huggingface.co/papers/2607.02515",
+      "relevance_score": 10,
+      "matched_keywords": [
+        "fusion"
+      ],
+      "dedup_key": "hf_paper:2607.02515"
+    }
+  ]
+}
