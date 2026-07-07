@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 /**
@@ -11,6 +11,14 @@ import { useEffect, useRef, useState } from 'react';
 export function FusionPipeline() {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+
+  // Animated number for QA score
+  const qaScore = useMotionValue(0);
+  const qaDisplay = useTransform(qaScore, (v) => `✓ QA ${v.toFixed(1)}`);
+
+  // Animated number for cost
+  const cost = useMotionValue(0);
+  const costDisplay = useTransform(cost, (v) => `$${v.toFixed(3)}`);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,6 +33,21 @@ export function FusionPipeline() {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
+
+  // Animate numbers when visible
+  useEffect(() => {
+    if (!visible) return;
+    const timer1 = setTimeout(() => {
+      animate(qaScore, 9.4, { duration: 0.8, ease: 'easeOut' });
+    }, 2400);
+    const timer2 = setTimeout(() => {
+      animate(cost, 0.012, { duration: 0.8, ease: 'easeOut' });
+    }, 2400);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [visible, qaScore, cost]);
 
   const models = [
     { name: 'GLM-5.2', color: '#E25822', delay: 0 },
@@ -125,8 +148,8 @@ export function FusionPipeline() {
             transition={{ delay: 2.4, duration: 0.4 }}
             className="flex gap-3 text-[10px] text-text-muted"
           >
-            <span style={{ color: '#788C5D' }}>✓ QA 9.4</span>
-            <span style={{ color: '#E8B547' }}>$0.012</span>
+            <motion.span style={{ color: '#788C5D' }}>{qaDisplay}</motion.span>
+            <motion.span style={{ color: '#E8B547' }}>{costDisplay}</motion.span>
             <span style={{ color: '#C46686' }}>moa-3-layer</span>
           </motion.div>
         </div>

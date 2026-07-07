@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-07-07T14:53:54.406707",
+  "timestamp": "2026-07-07T14:59:06.021284",
   "system": "hasan",
-  "status": "all_systems_nominal",
+  "status": "partial",
   "daemons": {
     "total": 23,
-    "alive": 23,
+    "alive": 3,
     "list": [
       {
         "name": "scout_daemon",
         "pid": 18222,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -20,106 +20,105 @@
       {
         "name": "distiller_daemon",
         "pid": 41707,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
           "cycle_duration": 0.0,
-          "last_run": "2026-07-07T09:23:44.937593+00:00"
+          "last_run": "2026-07-07T09:28:44.982448+00:00"
         }
       },
       {
         "name": "research_daemon_1",
         "pid": 23531,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.06,
-          "last_run": "2026-07-07T09:20:46.752263+00:00"
+          "cycle_duration": 0.04,
+          "last_run": "2026-07-07T09:25:46.738613+00:00"
         }
       },
       {
         "name": "research_daemon_2",
         "pid": 24786,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.06,
-          "last_run": "2026-07-07T09:22:48.825879+00:00"
+          "cycle_duration": 0.08,
+          "last_run": "2026-07-07T09:27:48.860660+00:00"
         }
       },
       {
         "name": "research_daemon_3",
         "pid": 26130,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.02,
-          "last_run": "2026-07-07T09:19:50.854684+00:00"
+          "cycle_duration": 0.05,
+          "last_run": "2026-07-07T09:24:50.899970+00:00"
         }
       },
       {
         "name": "integrator_daemon",
         "pid": 16578,
         "alive": true,
-        "status": "sleeping",
+        "status": "running",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.0,
-          "last_run": "2026-07-07T09:22:46.665506+00:00"
+          "cycle_start": 1783416539.304616
         }
       },
       {
         "name": "coordinator_daemon",
         "pid": 15659,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.03,
-          "last_run": "2026-07-07T09:23:05.508346+00:00"
+          "cycle_duration": 0.05,
+          "last_run": "2026-07-07T09:28:05.554997+00:00"
         }
       },
       {
         "name": "cyber_daemon",
         "pid": 28346,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.06,
-          "last_run": "2026-07-07T09:21:52.924921+00:00"
+          "cycle_duration": 0.08,
+          "last_run": "2026-07-07T09:26:52.962718+00:00"
         }
       },
       {
         "name": "efficiency_daemon",
         "pid": 30469,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.02,
-          "last_run": "2026-07-07T09:18:54.979752+00:00"
+          "cycle_duration": 0.03,
+          "last_run": "2026-07-07T09:28:55.007389+00:00"
         }
       },
       {
         "name": "media_daemon",
         "pid": 44049,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.05,
-          "last_run": "2026-07-07T09:20:04.305388+00:00"
+          "cycle_duration": 0.1,
+          "last_run": "2026-07-07T09:25:04.374103+00:00"
         }
       },
       {
         "name": "marketing_daemon",
         "pid": 15783,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -130,40 +129,40 @@
       {
         "name": "feedback_daemon",
         "pid": 15798,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.99,
-          "last_run": "2026-07-07T08:25:29.300335+00:00"
+          "cycle_duration": 0.95,
+          "last_run": "2026-07-07T09:25:29.338787+00:00"
         }
       },
       {
         "name": "meta_auditor_daemon",
         "pid": 15934,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 5.81,
-          "last_run": "2026-07-07T08:55:51.246290+00:00"
+          "cycle_duration": 5.86,
+          "last_run": "2026-07-07T09:25:51.334056+00:00"
         }
       },
       {
         "name": "swot_daemon",
         "pid": 15963,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.01,
-          "last_run": "2026-07-06T21:44:37.185332+00:00"
+          "cycle_duration": 0.09,
+          "last_run": "2026-07-07T09:25:47.471997+00:00"
         }
       },
       {
         "name": "website_daemon",
         "pid": 19334,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -174,7 +173,7 @@
       {
         "name": "industry_radar_daemon",
         "pid": 19335,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -185,23 +184,23 @@
       {
         "name": "model_optimizer_daemon",
         "pid": 16132,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 18.74,
-          "last_run": "2026-07-07T06:24:33.058313+00:00"
+          "cycle_duration": 8.62,
+          "last_run": "2026-07-07T09:26:19.067151+00:00"
         }
       },
       {
         "name": "cost_efficiency_daemon",
         "pid": 16205,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 1.41,
-          "last_run": "2026-07-07T08:26:28.852298+00:00"
+          "cycle_duration": 0.88,
+          "last_run": "2026-07-07T09:26:28.394830+00:00"
         }
       },
       {
@@ -229,7 +228,7 @@
       {
         "name": "competitive_dominance_daemon",
         "pid": 14915,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -240,7 +239,7 @@
       {
         "name": "self_expansion_daemon",
         "pid": 16120,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
@@ -251,20 +250,20 @@
       {
         "name": "super_intelligence_daemon",
         "pid": 15975,
-        "alive": true,
+        "alive": false,
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 104.44,
-          "last_run": "2026-07-06T21:46:23.646744+00:00"
+          "cycle_duration": 57.11,
+          "last_run": "2026-07-07T09:26:46.515030+00:00"
         }
       }
     ]
   },
   "queue": {
     "newRaw": 0,
-    "newFindings": 0,
-    "implementationQueue": 0,
+    "newFindings": 11,
+    "implementationQueue": 2,
     "implementationFailed": 3
   },
   "sharedMemory": {
@@ -372,184 +371,184 @@
   },
   "activity": [
     {
-      "time": "2026-07-07 14:52:48",
-      "daemon": "research_daemon_2",
-      "level": "INFO",
-      "message": "Top priority: marketing_strategy (score: 145)"
+      "time": "2026-07-07 14:59:05",
+      "daemon": "integrator_daemon",
+      "level": "ERROR",
+      "message": "Auto-integrator stderr:"
     },
     {
-      "time": "2026-07-07 14:52:48",
-      "daemon": "research_daemon_2",
+      "time": "2026-07-07 14:59:05",
+      "daemon": "integrator_daemon",
       "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "message": "Retrying in 30s..."
     },
     {
-      "time": "2026-07-07 14:52:48",
-      "daemon": "research_daemon_2",
+      "time": "2026-07-07 14:58:55",
+      "daemon": "efficiency_daemon",
       "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "message": "Deep efficiency research on: Research and implement: AWQ (competitor: vLLM)"
     },
     {
-      "time": "2026-07-07 14:52:48",
-      "daemon": "research_daemon_2",
+      "time": "2026-07-07 14:58:55",
+      "daemon": "efficiency_daemon",
       "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T092248.txt"
+      "message": "Efficiency finding research report created: deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092855.md"
     },
     {
-      "time": "2026-07-07 14:52:48",
-      "daemon": "research_daemon_2",
+      "time": "2026-07-07 14:58:55",
+      "daemon": "efficiency_daemon",
       "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T092248.txt"
+      "message": "Efficiency finding research report created: deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092855.md"
     },
     {
-      "time": "2026-07-07 14:51:52",
+      "time": "2026-07-07 14:58:55",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "=== Efficiency research cycle 69 complete ==="
+    },
+    {
+      "time": "2026-07-07 14:58:55",
+      "daemon": "efficiency_daemon",
+      "level": "INFO",
+      "message": "=== Efficiency research cycle 69 complete ==="
+    },
+    {
+      "time": "2026-07-07 14:57:48",
+      "daemon": "research_daemon_2",
+      "level": "INFO",
+      "message": "Researching finding: /Users/saiful/temuclaude/research/findings/swot_20260707T092547_missing_feature.json"
+    },
+    {
+      "time": "2026-07-07 14:57:48",
+      "daemon": "research_daemon_2",
+      "level": "INFO",
+      "message": "Deep research on: Research and implement: AWQ (competitor: vLLM)"
+    },
+    {
+      "time": "2026-07-07 14:57:48",
+      "daemon": "research_daemon_2",
+      "level": "INFO",
+      "message": "Deep research on: Research and implement: AWQ (competitor: vLLM)"
+    },
+    {
+      "time": "2026-07-07 14:57:48",
+      "daemon": "research_daemon_2",
+      "level": "INFO",
+      "message": "Research report created: /Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092748.md"
+    },
+    {
+      "time": "2026-07-07 14:57:48",
+      "daemon": "research_daemon_2",
+      "level": "INFO",
+      "message": "Research report created: /Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T092748.md"
+    },
+    {
+      "time": "2026-07-07 14:56:52",
       "daemon": "cyber_daemon",
       "level": "INFO",
       "message": "Top cyber priority: cognitive_firewall (score: 125)"
     },
     {
-      "time": "2026-07-07 14:51:52",
+      "time": "2026-07-07 14:56:52",
       "daemon": "cyber_daemon",
       "level": "INFO",
       "message": "Already researched cognitive_firewall this session, skipping"
     },
     {
-      "time": "2026-07-07 14:51:52",
+      "time": "2026-07-07 14:56:52",
       "daemon": "cyber_daemon",
       "level": "INFO",
       "message": "Already researched cognitive_firewall this session, skipping"
     },
     {
-      "time": "2026-07-07 14:51:52",
+      "time": "2026-07-07 14:56:52",
       "daemon": "cyber_daemon",
       "level": "INFO",
-      "message": "=== Cyber research cycle 68 complete ==="
+      "message": "=== Cyber research cycle 69 complete ==="
     },
     {
-      "time": "2026-07-07 14:51:52",
+      "time": "2026-07-07 14:56:52",
       "daemon": "cyber_daemon",
       "level": "INFO",
-      "message": "=== Cyber research cycle 68 complete ==="
+      "message": "=== Cyber research cycle 69 complete ==="
     },
     {
-      "time": "2026-07-07 14:50:46",
-      "daemon": "research_daemon_1",
+      "time": "2026-07-07 14:56:28",
+      "daemon": "cost_efficiency_daemon",
       "level": "INFO",
-      "message": "Top priority: marketing_strategy (score: 145)"
+      "message": "Credits: $0.00, Burn: $0.00/day"
     },
     {
-      "time": "2026-07-07 14:50:46",
-      "daemon": "research_daemon_1",
+      "time": "2026-07-07 14:56:28",
+      "daemon": "cost_efficiency_daemon",
       "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "message": "Credits: $0.00, Burn: $0.00/day"
     },
     {
-      "time": "2026-07-07 14:50:46",
-      "daemon": "research_daemon_1",
+      "time": "2026-07-07 14:56:28",
+      "daemon": "cost_efficiency_daemon",
       "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "message": "Throttle level: red"
     },
     {
-      "time": "2026-07-07 14:50:46",
-      "daemon": "research_daemon_1",
+      "time": "2026-07-07 14:56:28",
+      "daemon": "cost_efficiency_daemon",
       "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T092046.txt"
+      "message": "Throttle level: red"
     },
     {
-      "time": "2026-07-07 14:50:46",
-      "daemon": "research_daemon_1",
+      "time": "2026-07-07 14:56:27",
+      "daemon": "cost_efficiency_daemon",
       "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T092046.txt"
+      "message": "=== Cost Efficiency cycle started ==="
     },
     {
-      "time": "2026-07-07 14:50:04",
-      "daemon": "media_daemon",
+      "time": "2026-07-07 14:56:19",
+      "daemon": "model_optimizer_daemon",
       "level": "INFO",
-      "message": "=== Media research cycle 63 started ==="
+      "message": "kimi-k2.6:cloud: correct=True, latency=2.74s"
     },
     {
-      "time": "2026-07-07 14:50:04",
-      "daemon": "media_daemon",
+      "time": "2026-07-07 14:56:19",
+      "daemon": "model_optimizer_daemon",
       "level": "INFO",
-      "message": "Top media priority: s3_verifier_guided_denoising (score: 115)"
+      "message": "kimi-k2.6:cloud: correct=True, latency=2.74s"
     },
     {
-      "time": "2026-07-07 14:50:04",
-      "daemon": "media_daemon",
+      "time": "2026-07-07 14:56:19",
+      "daemon": "model_optimizer_daemon",
       "level": "INFO",
-      "message": "Already researched s3_verifier_guided_denoising this session, skipping"
+      "message": "Model optimizer: best model = gpt-oss:120b:cloud"
     },
     {
-      "time": "2026-07-07 14:50:04",
-      "daemon": "media_daemon",
+      "time": "2026-07-07 14:56:19",
+      "daemon": "model_optimizer_daemon",
       "level": "INFO",
-      "message": "=== Media research cycle 63 complete ==="
+      "message": "Model optimizer: best model = gpt-oss:120b:cloud"
     },
     {
-      "time": "2026-07-07 14:49:50",
-      "daemon": "research_daemon_3",
+      "time": "2026-07-07 14:56:16",
+      "daemon": "model_optimizer_daemon",
       "level": "INFO",
-      "message": "Top priority: marketing_strategy (score: 145)"
+      "message": "deepseek-v4-pro:cloud: correct=True, latency=1.43s"
     },
     {
-      "time": "2026-07-07 14:49:50",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "time": "2026-07-07 14:55:51",
+      "daemon": "meta_auditor_daemon",
+      "level": "WARNING",
+      "message": "Could not fix: unattempted_research"
     },
     {
-      "time": "2026-07-07 14:49:50",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "No findings in queue, researching priority: marketing_strategy"
+      "time": "2026-07-07 14:55:51",
+      "daemon": "meta_auditor_daemon",
+      "level": "WARNING",
+      "message": "Could not fix: unattempted_research"
     },
     {
-      "time": "2026-07-07 14:49:50",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T091950.txt"
-    },
-    {
-      "time": "2026-07-07 14:49:50",
-      "daemon": "research_daemon_3",
-      "level": "INFO",
-      "message": "Created research prompt: /Users/saiful/temuclaude/research/raw/research_prompt_marketing_strategy_20260707T091950.txt"
-    },
-    {
-      "time": "2026-07-07 14:49:33",
-      "daemon": "website_daemon",
-      "level": "INFO",
-      "message": "Deployed successfully"
-    },
-    {
-      "time": "2026-07-07 14:48:54",
-      "daemon": "efficiency_daemon",
-      "level": "INFO",
-      "message": "Top efficiency priority: routellm_cascade (score: 125, quality: quality_preserving)"
-    },
-    {
-      "time": "2026-07-07 14:48:54",
-      "daemon": "efficiency_daemon",
-      "level": "INFO",
-      "message": "Already researched routellm_cascade this session, skipping"
-    },
-    {
-      "time": "2026-07-07 14:48:54",
-      "daemon": "efficiency_daemon",
-      "level": "INFO",
-      "message": "Already researched routellm_cascade this session, skipping"
-    },
-    {
-      "time": "2026-07-07 14:48:54",
-      "daemon": "efficiency_daemon",
-      "level": "INFO",
-      "message": "=== Efficiency research cycle 67 complete ==="
-    },
-    {
-      "time": "2026-07-07 14:48:54",
-      "daemon": "efficiency_daemon",
-      "level": "INFO",
-      "message": "=== Efficiency research cycle 67 complete ==="
+      "time": "2026-07-07 14:55:51",
+      "daemon": "meta_auditor_daemon",
+      "level": "WARNING",
+      "message": "Could not fix: unattempted_research"
     }
   ],
   "identity": {
@@ -558,7 +557,7 @@
     "goal": "Transform Temuclaude into a multi-billion dollar company "
   },
   "watchdog": {
-    "status": "running",
+    "status": "stopped",
     "pid": 89265
   },
   "stats": {
