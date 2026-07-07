@@ -386,6 +386,25 @@ def serve():
     async def health():
         return {"status": "ok"}
 
+    @api.get("/v1/chat/completions")
+    async def model_info():
+        return JSONResponse({
+            "status": "ok",
+            "model": "temuclaude",
+            "description": "TemuClaude — 8-Model Multi-Model AI Orchestration (OpenAI-compatible)",
+            "models": [
+                {"name": "GLM-5.2", "role": "Orchestrator + Aggregator", "iq": 51},
+                {"name": "DeepSeek V4 Pro", "role": "Reasoning + Self-Consistency + Reflexion", "iq": 44},
+                {"name": "Gemini 3.5 Flash", "role": "Legal/Health Specialist", "iq": 50},
+                {"name": "Hy3 Preview", "role": "Trivial Router (cheapest)", "iq": None},
+                {"name": "MiniMax M3", "role": "Vision + Creative", "iq": 44},
+                {"name": "MiMo-V2.5", "role": "Multimodal", "iq": 40},
+                {"name": "Nemotron", "role": "QA Gate (FREE)", "iq": 38},
+                {"name": "Claude Sonnet 5", "role": "Frontier Fallback", "iq": 53},
+            ],
+            "pipeline": ["moa-fusion", "self-consistency", "aggregation", "qa-gate", "reflexion", "frontier-fallback"],
+        })
+
     @api.post("/v1/chat/completions")
     async def chat_completions(request: Request):
         try:
