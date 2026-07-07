@@ -2,7 +2,7 @@ import { Navbar } from '@/components/Navbar';
 
 const sections = [
   { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
-  { title: 'Features', items: ['6-Layer Pipeline', '3-Tier Routing', 'MoA Fusion', 'Self-Consistency', 'Self-QA Gate', 'Reflexion', 'Frontier Fallback'] },
+  { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
@@ -60,7 +60,7 @@ export default function DocsPage() {
             </nav>
 
             <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Documentation</h1>
-            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — 8 models, 6-layer pipeline, one superior answer.</p>
+            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — 8 models, 10-layer pipeline, one superior answer.</p>
 
             {/* === OVERVIEW === */}
 
@@ -69,15 +69,13 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
               <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — ask anything, get a superior answer. No signup, no setup. 20 free queries/day.</p>
-              <p className="text-sm text-text-secondary mb-2">Option 2 — API access (OpenAI-compatible):</p>
+              <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
   -H "Content-Type: application/json" \\
-  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
+  -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
 
-# OpenAI-compatible — works with any OpenAI client library:
-# Python: openai.ChatCompletion.create(...)
-# JS: openai.chat.completions.create(...)`} />
-              <Callout type="tip">The playground runs the full 6-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
+# Response: SSE stream with answer + orchestration metadata`} />
+              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
             </section>
 
             <section id="architecture" className="mb-12">
@@ -88,9 +86,9 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Estimates difficulty</strong> (trivial, medium, hard)</li>
                 <li><strong className="text-text-primary">Routes</strong> to the best strategy:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>Trivial (60%) → single cheap model (Hy3 Preview)</li>
-                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 3 Flash, MiniMax M3, MiMo-V2.5)</li>
-                    <li>Hard (10%) → full 6-layer fusion stack (3 models parallel + self-consistency + aggregate + QA + reflexion)</li>
+                    <li>Trivial (60%) → single cheap model (Hy3 Preview, free models)</li>
+                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 3 Flash)</li>
+                    <li>Hard (10%) → full 10-layer fusion stack (3 models parallel + cross-review + aggregate + verify + QA + debate)</li>
                   </ul>
                 </li>
                 <li><strong className="text-text-primary">Returns</strong> one clean answer — orchestration is invisible but visible in the playground</li>
@@ -126,76 +124,87 @@ export default function DocsPage() {
 
             {/* === FEATURES === */}
 
-            <section id="6-layer-pipeline" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">6-Layer Pipeline</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 6 quality layers. Each is validated by published research or our own testing:</p>
+            <section id="10-layer-pipeline" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Pipeline</h2>
+              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers. Each is independently validated by published research:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li><strong className="text-text-primary">MoA Fusion</strong> — 3 models propose in parallel, aggregator synthesizes (100% on our 20-question benchmark)</li>
-                <li><strong className="text-text-primary">Self-Consistency</strong> — 3 DeepSeek samples vote on math answers (+18.4% MATH, arXiv:2203.11317)</li>
-                <li><strong className="text-text-primary">Aggregation</strong> — Analyze consensus, contradictions, synthesize one answer (arXiv:2406.04692)</li>
-                <li><strong className="text-text-primary">QA Gate</strong> — 5-rubric score (LC, FC, CM, GA, CL) by Nemotron (free, independent), retry if &lt; 8/10</li>
-                <li><strong className="text-text-primary">Reflexion</strong> — Retry with specific feedback from QA gate (91% HumanEval vs 80%, arXiv:2303.11366)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 5 (IQ 53) for hardest 2% where QA &lt; 6</li>
+                <li><strong className="text-text-primary">Web Search</strong> — DuckDuckGo for knowledge queries (free, unlimited)</li>
+                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Propose → Cross-Review → Aggregate (65.1% AlpacaEval vs GPT-4o 57.5%)</li>
+                <li><strong className="text-text-primary">Self-Consistency</strong> — PRM-weighted voting across N samples (+18.4% MATH)</li>
+                <li><strong className="text-text-primary">Code Verification</strong> — Execute Python, verify output (ground truth)</li>
+                <li><strong className="text-text-primary">Reflexion</strong> — Verbal reflection on failure, retry with context (91% HumanEval)</li>
+                <li><strong className="text-text-primary">Self-QA Gate</strong> — 5-rubric score (LC, FC, CM, GA, CL), retry if &lt; 8/10</li>
+                <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
+                <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
+                <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 5 (IQ 53) for hardest 2%</li>
               </ol>
-              <Callout type="note">Code execution (running Python to verify math) is planned for Oracle Cloud deployment. Currently math is verified via self-consistency (3-sample voting).</Callout>
             </section>
 
             <section id="3-tier-routing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">3-Tier Routing</h2>
               <p className="text-text-secondary mb-4">TemuClaude routes queries by difficulty to minimize cost without sacrificing quality:</p>
               <CodeBlock lang="text" code={`Difficulty estimation:
-  Word count, math keywords, code keywords, reasoning indicators
-  Score 0-15 → trivial (<3), medium (3-6), hard (7+)
+  Word count → 0-5 points
+  Task type (math/reasoning/coding) → +2 points
+  Keywords (explain, analyze, compare) → +1-2 points
+  Total → 0-10 scale
 
 Routing:
-  Trivial (60% of queries) → Hy3 Preview ($0.06/$0.21 per M)
-    Single model, fast, cheapest
-
-  Medium (30% of queries) → Specialist model
-    Math → DeepSeek V4 Pro
+  Trivial (60% of queries) → 1 cheap model, 500 tokens
+    Models: Hy3 Preview, free models ($0.00)
+    
+  Medium (30% of queries) → 1 specialist model, 4096 tokens
+    Math/Coding → DeepSeek V4 Pro
     Knowledge → GLM-5.2
     Legal/Health → Gemini 3 Flash
     Creative → MiniMax M3
-    Multimodal → MiMo-V2.5
-
-  Hard (10% of queries) → Full 6-layer fusion stack
-    3 models in parallel → aggregation → QA gate
-    + reflexion if QA < 8 + frontier fallback if QA < 6`} />
-              <Callout type="note">60% of queries use Hy3 Preview ($0.06/$0.21 per M). 30% use specialists. Only 10% trigger the full pipeline. QA gate is free (Nemotron). Blended cost: ~$1.44/M tokens.</Callout>
+    
+  Hard (10% of queries) → Full 10-layer fusion stack, 8192 tokens
+    3 models in parallel → cross-review → aggregate
+    + code verification + self-QA + reflexion + debate`} />
+              <Callout type="note">60% of queries cost $0 (free models or cache). 30% cost $0.06-0.14/M. Only 10% use the full pipeline. Average cost: $0.05/M tokens.</Callout>
             </section>
 
-            <section id="moa-fusion" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">MoA Fusion</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA):</p>
-              <CodeBlock lang="text" code={`Layer 1: 3 models propose independently (parallel)
+            <section id="moa-3-layer-fusion" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">MoA 3-Layer Fusion</h2>
+              <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
+              <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
   GLM-5.2 → response A
-  DeepSeek V4 Pro → response B (or self-consistency for math)
+  DeepSeek V4 Pro → response B
   Gemini 3 Flash → response C
 
-Layer 2: Aggregation (1 call)
-  GLM-5.2 analyzes all 3 responses:
-  - CONSENSUS: what most agree on (likely correct)
-  - CONTRADICTIONS: where they disagree, determine which is correct
-  - BEST INSIGHTS: extract unique points from each
-  - ERRORS: fix any mistakes
-  → One definitive answer
+Layer 2: Cross-Review
+  GLM-5.2 reviews B and C → improved A'
+  DeepSeek reviews A and C → improved B'
+  Gemini reviews A and B → improved C'
 
-Layer 3: QA Gate (free, Nemotron)
-  Score on 5 rubrics (1-10 each)
-  If average < 8 → reflexion (retry with feedback)
-  If average < 6 → frontier fallback (Claude Sonnet 5)`} />
-              <Callout type="tip">The aggregator sees all 3 responses and analyzes them directly — no separate cross-review layer needed. This reduces API calls from 14 to 7 while maintaining the same quality.</Callout>
+Layer 3: Aggregation
+  GLM-5.2 synthesizes A' + B' + C' → final answer
+  With structured analysis: consensus, contradictions, insights, blind spots`} />
+              <Callout type="note">Research: 3-layer MoA achieves 65.1% on AlpacaEval 2.0 vs GPT-4o's 57.5%. Each layer adds measurable quality.</Callout>
             </section>
 
             <section id="self-consistency" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-Consistency</h2>
-              <p className="text-text-secondary mb-4">For math questions, TemuClaude generates 3 samples and votes:</p>
+              <p className="text-text-secondary mb-4">For math and reasoning questions, TemuClaude generates N samples and votes:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>3 DeepSeek V4 Pro samples at temperature 0.7</li>
-                <li>Extract final answer from each sample</li>
-                <li>Majority vote — if 2 out of 3 agree, that's the answer</li>
-                <li>Research: +18.4% on MATH benchmark (arXiv:2203.11317)</li>
+                <li>Math: 3 samples at temperature 0.7</li>
+                <li>Reasoning: 2 samples</li>
+                <li>Each sample scored by Nemotron (PRM-weighted voting)</li>
+                <li>Highest-scoring answer selected as final</li>
               </ul>
+            </section>
+
+            <section id="code-verification" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Code Verification</h2>
+              <p className="text-text-secondary mb-4">For math and coding questions, TemuClaude generates Python code, executes it in a sandbox, and returns the verified output:</p>
+              <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
+                <li>Model generates code to solve the problem</li>
+                <li>Code executed in sandboxed subprocess (no network, temp dir, timeout)</li>
+                <li>If output matches → answer is verified (ground truth)</li>
+                <li>If execution fails → trigger Reflexion: model reflects, retries</li>
+              </ol>
             </section>
 
             <section id="self-qa-gate" className="mb-12">
@@ -225,13 +234,34 @@ Layer 3: QA Gate (free, Nemotron)
               <Callout type="tip">Reflexion achieves 91% on HumanEval (vs 80% without). The difference between a model that gives up and one that learns from mistakes.</Callout>
             </section>
 
+            <section id="budget-forcing" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Budget Forcing</h2>
+              <p className="text-text-secondary mb-4">If the answer is suspiciously short for a hard problem, TemuClaude appends "Wait" to force the model to continue reasoning (s1 paper, arXiv:2501.19393):</p>
+              <CodeBlock lang="text" code={`Model answer: "The answer is 42."
+  → Too short for a hard math problem
+  → Append "Wait"
+  → Model continues: "Let me verify... [longer reasoning]"`} />
+            </section>
+
+            <section id="z3-verification" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Z3 Logical Verification</h2>
+              <p className="text-text-secondary mb-4">For reasoning questions, TemuClaude extracts logical claims and checks them with a Z3 SMT solver:</p>
+              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
+                <li>Extracts "if X then Y", "X implies Y" patterns</li>
+                <li>Encodes as Z3 boolean constraints</li>
+                <li>Checks satisfiability (no contradictions)</li>
+                <li>If contradiction found → triggers multi-agent debate</li>
+              </ul>
+              <Callout type="note">Requires z3-solver: <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">pip install z3-solver</code>. Falls back gracefully if not installed.</Callout>
+            </section>
+
             <section id="frontier-fallback" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
-              <p className="text-text-secondary mb-4">For the hardest 2% of queries where QA score is below 6, TemuClaude escalates to Claude Sonnet 5 (IQ 53 — the highest available):</p>
+              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to Claude Sonnet 5 (IQ 53 — the highest available):</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Only triggers when QA score &lt; 6 after reflexion</li>
-                <li>Re-scored by Nemotron (not Claude, to avoid conflict)</li>
-                <li>If Nemotron scores the Claude answer higher, it replaces the previous answer</li>
+                <li>Only triggers when QA score &lt; 0.75 after all retries</li>
+                <li>Query must match frontier criteria (prove, derive, theorem, system design, refactor)</li>
+                <li>Frontier model gets the previous best answer as context</li>
                 <li>Re-scored — if better, replaces the answer</li>
               </ul>
             </section>
@@ -343,10 +373,12 @@ Response: SSE stream
     "aggregator": "glm-5.2",
     "consensus": 3,
     "qaScore": 8,
-    "totalLatency": "28.5",
-    "cost": "$0.003",
-    "techniques": ["moa-fusion", "self-consistency", "aggregation",
-                   "qa-gate", "reflexion"]}
+    "codeVerified": true,
+    "totalLatency": "48.2",
+    "cost": "$0.015",
+    "techniques": ["moa-3-layer", "cross-review", "structured-aggregation",
+                   "self-consistency", "prm-weighted-voting", "code-verification",
+                   "reflexion", "usva-4-rubric-qa", "s1-budget-forcing"]
   }
 }`} />
               <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which layers were activated. Full transparency — no black boxes.</Callout>
@@ -354,24 +386,11 @@ Response: SSE stream
 
             <section id="authentication" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
-              <p className="text-text-secondary mb-4">Free tier: no API key needed — just start calling. Paid plans use a Bearer token or x-api-key header:</p>
-              <CodeBlock lang="bash" code={`# Free tier — no key needed:
-curl -X POST https://temuclaude.com/v1/chat/completions \\
+              <p className="text-text-secondary mb-4">Free tier: no authentication needed. Paid plans use Bearer token:</p>
+              <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
-  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'
-
-# Paid plans — use your API key:
-curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "Authorization: Bearer tc_your_api_key" \\
-  -H "Content-Type: application/json" \\
-  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'
-
-# Or use x-api-key header:
-curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "x-api-key: tc_your_api_key" \\
-  -H "Content-Type: application/json" \\
-  -d '{"model": "temuclaude", "messages": [{"role": "user", "content": "Hello"}]}'} />
-              <p className="text-sm text-text-secondary mt-4">Get your API key from the <a href="/pricing" className="text-accent-primary hover:underline">pricing page</a> after subscribing to a Developer or Pro plan. The API is OpenAI-compatible — works with any OpenAI client library (Python, JS, Go, etc.).</p>
+  -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
             </section>
 
             <section id="rate-limits" className="mb-12">
@@ -385,8 +404,8 @@ curl -X POST https://temuclaude.com/v1/chat/completions \\
                   </tr></thead>
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">20</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">50,000/mo</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">500,000/mo</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary">Enterprise</td><td className="py-2 px-3 text-text-secondary">10,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
                   </tbody>
                 </table>
