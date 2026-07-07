@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
@@ -436,38 +439,88 @@ export default function HomePage() {
   );
 }
 
-/* ━━ Orchestration Visual — animated SVG showing 8 models converging ━━ */
+/* ━━ Orchestration Visual — premium Framer Motion interactive visualization ━━ */
 function OrchestrationVisual() {
+  return (
+    <div className="relative w-full" style={{ aspectRatio: '1.1', minHeight: '320px' }}>
+      <OrchAnim />
+    </div>
+  );
+}
+
+function OrchAnim() {
   const models = [
-    { angle: -75, color: '#E8D5C4', name: 'GLM-5.2' },
-    { angle: -45, color: '#D4A574', name: 'DeepSeek' },
-    { angle: -15, color: '#C97B50', name: 'Hy3' },
-    { angle: 15, color: '#D4A574', name: 'Gemini' },
-    { angle: 45, color: '#E8D5C4', name: 'MiniMax' },
-    { angle: 75, color: '#C46686', name: 'Sonnet 5' },
+    { color: '#D97757', name: 'GLM-5.2', angle: -75, delay: 0 },
+    { color: '#C97B50', name: 'DeepSeek', angle: -45, delay: 0.1 },
+    { color: '#788C5D', name: 'Hy3', angle: -15, delay: 0.2 },
+    { color: '#C46686', name: 'Gemini', angle: 15, delay: 0.3 },
+    { color: '#E8B547', name: 'MiniMax', angle: 45, delay: 0.4 },
+    { color: '#D4A574', name: 'Sonnet', angle: 75, delay: 0.5 },
   ];
 
-  const cx = 150, cy = 100, r = 70;
+  const cx = 150, cy = 95, r = 68;
 
   return (
-    <div className="relative" style={{ aspectRatio: '1.2' }}>
-      <svg viewBox="0 0 300 260" className="w-full h-auto" aria-hidden="true">
-        {/* Connection lines from models to center */}
+    <>
+      <svg viewBox="0 0 300 280" className="w-full h-auto" aria-hidden="true">
+        <defs>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#D97757" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#D97757" stopOpacity="0" />
+          </radialGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+
+        {/* Ambient glow behind center */}
+        <circle cx={cx} cy={cy} r="50" fill="url(#centerGlow)" />
+
+        {/* Animated connection lines */}
         {models.map((m, i) => {
           const rad = (m.angle * Math.PI) / 180;
           const x = cx + r * Math.sin(rad);
           const y = cy - r * Math.cos(rad);
           return (
-            <line
-              key={i}
+            <motion.line
+              key={`line-${i}`}
               x1={x} y1={y} x2={cx} y2={cy}
               stroke={m.color}
-              strokeWidth="2"
+              strokeWidth="1.5"
               strokeLinecap="round"
-              opacity="0.4"
-              strokeDasharray="4 4"
-              className="connection-draw"
-              style={{ animationDelay: `${i * 0.1}s` }}
+              opacity="0.5"
+              strokeDasharray="3 3"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.2 + m.delay, ease: 'easeOut' }}
+            />
+          );
+        })}
+
+        {/* Pulsing data particles flowing toward center */}
+        {models.map((m, i) => {
+          const rad = (m.angle * Math.PI) / 180;
+          const x = cx + r * Math.sin(rad);
+          const y = cy - r * Math.cos(rad);
+          return (
+            <motion.circle
+              key={`particle-${i}`}
+              r="2.5"
+              fill={m.color}
+              initial={{ cx: x, cy: y, opacity: 0 }}
+              animate={{
+                cx: [x, cx],
+                cy: [y, cy],
+                opacity: [0, 1, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                delay: 1 + m.delay,
+                repeat: Infinity,
+                repeatDelay: 2,
+                ease: 'easeIn',
+              }}
             />
           );
         })}
@@ -478,53 +531,112 @@ function OrchestrationVisual() {
           const x = cx + r * Math.sin(rad);
           const y = cy - r * Math.cos(rad);
           return (
-            <g key={i} style={{ animation: `fadeSlideIn 0.5s ease ${0.3 + i * 0.08}s both` }}>
-              <circle cx={x} cy={y} r="14" fill={m.color} opacity="0.9" />
-              <circle cx={x} cy={y} r="14" fill="none" stroke={m.color} strokeWidth="1" opacity="0.3" className="node-pulse" />
-              <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="7" fill="#1A1816" fontWeight="600">
-                {m.name.slice(0, 6)}
+            <motion.g
+              key={`node-${i}`}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: m.delay, ease: 'easeOut' }}
+            >
+              <motion.circle
+                cx={x} cy={y} r="15"
+                fill={m.color}
+                opacity="0.9"
+                animate={{ r: [15, 16, 15] }}
+                transition={{ duration: 2, delay: m.delay, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <circle cx={x} cy={y} r="15" fill="none" stroke={m.color} strokeWidth="1" opacity="0.25" />
+              <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="6.5" fill="#1A1816" fontWeight="700">
+                {m.name.slice(0, 7)}
               </text>
-            </g>
+            </motion.g>
           );
         })}
 
-        {/* Center aggregation node */}
-        <circle cx={cx} cy={cy} r="22" fill="#D97757" className="glow-pulse" />
-        <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="#FAF8F5" fontWeight="700">
-          Fuse
-        </text>
+        {/* Center aggregation node with pulse ring */}
+        <motion.circle
+          cx={cx} cy={cy} r="25" fill="none" stroke="#D97757" strokeWidth="1" opacity="0.2"
+          animate={{ r: [25, 40], opacity: [0.3, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
+        />
+        <motion.circle
+          cx={cx} cy={cy} r="22"
+          fill="#D97757"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.8, ease: 'backOut' }}
+          filter="url(#softGlow)"
+        />
+        <motion.text
+          x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle"
+          fontSize="8" fill="#FAF8F5" fontWeight="800"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          FUSE
+        </motion.text>
 
         {/* Output arrow */}
-        <line x1={cx} y1={cy + 22} x2={cx} y2={cy + 48} stroke="#D97757" strokeWidth="2" strokeLinecap="round" />
-        <polygon points={`${cx - 5},${cy + 44} ${cx + 5},${cy + 44} ${cx},${cy + 52}`} fill="#D97757" />
+        <motion.line
+          x1={cx} y1={cy + 22} x2={cx} y2={cy + 48}
+          stroke="#D97757" strokeWidth="2" strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.3, delay: 1.2 }}
+        />
+        <motion.polygon
+          points={`${cx - 5},${cy + 44} ${cx + 5},${cy + 44} ${cx},${cy + 52}`}
+          fill="#D97757"
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.4 }}
+        />
 
         {/* Output box */}
-        <rect x={cx - 55} y={cy + 54} width="110" height="28" rx="6" fill="#1A1816" />
-        <text x={cx} y={cy + 72} textAnchor="middle" dominantBaseline="middle" fontSize="9" fill="#FAF8F5" fontWeight="500">
-          One superior answer
-        </text>
+        <motion.g
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.4 }}
+        >
+          <rect x={cx - 60} y={cy + 54} width="120" height="28" rx="6" fill="#1A1816" />
+          <text x={cx} y={cy + 72} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="#FAF8F5" fontWeight="600">
+            One superior answer
+          </text>
+        </motion.g>
 
-        {/* Data flow particles */}
-        {models.map((m, i) => {
-          const rad = (m.angle * Math.PI) / 180;
-          const x = cx + r * Math.sin(rad);
-          const y = cy - r * Math.cos(rad);
-          return (
-            <circle
-              key={`p-${i}`}
-              r="2"
-              fill={m.color}
-              style={{
-                offsetPath: `path("M ${x} ${y} L ${cx} ${cy}")`,
-                animation: `dataFlow 3s ease-in-out ${i * 0.3}s infinite`,
-              }}
-            />
-          );
-        })}
+        {/* Tier labels on the left side */}
+        <motion.g
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.8, duration: 0.4 }}
+        >
+          <text x="8" y="20" fontSize="7" fill="#8E8B85" fontWeight="600">TRIVIAL</text>
+          <text x="8" y="32" fontSize="6" fill="#8E8B85">1 model · $0</text>
+          <line x1="8" y1="40" x2="20" y2="40" stroke="#8E8B85" strokeWidth="0.5" opacity="0.3" />
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 2.0, duration: 0.4 }}
+        >
+          <text x="8" y="55" fontSize="7" fill="#8E8B85" fontWeight="600">MEDIUM</text>
+          <text x="8" y="67" fontSize="6" fill="#8E8B85">1 specialist</text>
+          <line x1="8" y1="75" x2="20" y2="75" stroke="#8E8B85" strokeWidth="0.5" opacity="0.3" />
+        </motion.g>
+
+        <motion.g
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 2.2, duration: 0.4 }}
+        >
+          <text x="8" y="90" fontSize="7" fill="#D97757" fontWeight="700">HARD</text>
+          <text x="8" y="102" fontSize="6" fill="#8E8B85">3 models · 10 layers</text>
+        </motion.g>
       </svg>
       <div className="absolute bottom-0 left-0 right-0 text-center">
-        <p className="text-xs text-text-muted font-mono">8 models → 3-layer MoA → 1 answer</p>
+        <p className="text-xs text-text-muted font-mono">8 models → 3-layer MoA → 10 quality layers → 1 answer</p>
       </div>
-    </div>
+    </>
   );
 }
