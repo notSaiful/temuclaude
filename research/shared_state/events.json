@@ -429,7 +429,27 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783417857302_integrator_daemon",
+      "timestamp": "2026-07-07T15:20:57.302476",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 48.0s",
+      "extra": {
+        "duration": 47.97
+      }
+    },
+    {
+      "id": "evt_1783417887781_distiller_daemon",
+      "timestamp": "2026-07-07T15:21:27.781939",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 1.9s",
+      "extra": {
+        "duration": 1.9
+      }
     }
   ],
-  "last_update": "2026-07-07T15:20:55.823832"
+  "last_update": "2026-07-07T15:21:27.781948"
 }

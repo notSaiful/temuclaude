@@ -1,11 +1,39 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
 import { MagneticButton } from '@/components/MagneticButton';
 import { PricingSection } from '@/components/PricingSection';
 import { ScrollProgress } from '@/components/ScrollProgress';
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [text]);
+  return (
+    <button
+      onClick={handleCopy}
+      className="absolute top-2 right-2 p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10"
+      aria-label="Copy code to clipboard"
+    >
+      {copied ? (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#788C5D" strokeWidth="2">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ) : (
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8E8B85" strokeWidth="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 export default function HomePage() {
   return (
