@@ -545,37 +545,38 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
 def classify_efficiency_finding(speedup: float, savings: float, quality_loss: float) -> str:
     """Classify an efficiency finding based on its quality impact.
 
-    Categories:
-        LOSSLESS          — no quality loss, meaningful speedup or savings
-        QUALITY-PRESERVING — negligible quality loss (< 1%), meaningful gains
-        PARETO-OPTIMAL    — quality loss present but justified by gains
-        REJECTED          — quality loss too high relative to gains
+    Classification scheme:
+    - LOSSLESS: speedup/savings with zero quality loss
+    - QUALITY-PRESERVING: speedup/savings with negligible quality loss (< 1%)
+    - PARETO-OPTIMAL: meaningful speedup/savings with acceptable quality loss (1-5%)
+    - REJECTED: insufficient gains or excessive quality loss (> 5%)
 
     Args:
-        speedup:       inference speedup factor (e.g. 2.0 = 2x faster)
-        savings:       memory or cost savings fraction (0.0–1.0)
-        quality_loss:  quality degradation fraction (0.0–1.0)
+        speedup: Inference speedup factor (e.g., 2.0 = 2x faster, 1.0 = no change).
+        savings: Memory or cost savings as a fraction (e.g., 0.5 = 50% saved).
+        quality_loss: Quality degradation as a fraction (e.g., 0.02 = 2% loss).
 
     Returns:
         One of: LOSSLESS, QUALITY-PRESERVING, PARETO-OPTIMAL, REJECTED
     """
-    meaningful_gain = speedup > 1.1 or savings > 0.1
+    MIN_SPEEDUP = 1.1
+    MIN_SAVINGS = 0.05
+    NEGLIGIBLE_LOSS = 0.01
+    ACCEPTABLE_LOSS = 0.05
 
-    if not meaningful_gain:
+    has_gain = speedup >= MIN_SPEEDUP or savings >= MIN_SAVINGS
+
+    if not has_gain:
         return "REJECTED"
 
-    if quality_loss <= 0.0:
+    if quality_loss <= 0:
         return "LOSSLESS"
-
-    if quality_loss < 0.01:
+    elif quality_loss < NEGLIGIBLE_LOSS:
         return "QUALITY-PRESERVING"
-
-    # Pareto-optimal: gains outweigh quality loss
-    gain_score = max(speedup - 1.0, 0.0) + savings
-    if gain_score > quality_loss * 5:
+    elif quality_loss <= ACCEPTABLE_LOSS:
         return "PARETO-OPTIMAL"
-
-    return "REJECTED"
+    else:
+        return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
     """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
     
