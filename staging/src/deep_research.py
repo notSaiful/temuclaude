@@ -740,32 +740,35 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
 from typing import Optional, Callable, Awaitable, List, Dict
 
 
-def build_awq_research_prompt(topic: str = "AWQ Quantization for LLM Inference") -> List[Dict]:
-    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization).
-    
-    Covers AWQ methodology, comparison with vLLM, performance benchmarks,
-    integration patterns, and deployment considerations.
+def build_awq_research_prompt() -> List[Dict]:
+    """Build a specialized research prompt for AWQ (Activation-aware Weight Quantization)
+    and its comparison with vLLM as an inference engine.
+
+    This prompt guides the deep research pipeline to investigate AWQ's quantization
+    approach, performance characteristics, integration patterns, and competitive
+    positioning relative to vLLM, enabling Temuclaude to evaluate and potentially
+    adopt AWQ for model serving.
     """
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM quantization and inference optimization. "
-            "Research AWQ (Activation-aware Weight Quantization) comprehensively. "
-            "Cover: (1) AWQ algorithm and how it differs from GPTQ, "
-            "(2) Comparison with vLLM's quantization and serving approach, "
-            "(3) Performance benchmarks (throughput, latency, memory), "
-            "(4) Hardware compatibility (GPU types, CPU offloading), "
-            "(5) Integration with HuggingFace Transformers and custom serving, "
-            "(6) Trade-offs: accuracy vs speed vs memory, "
-            "(7) Deployment patterns for production, "
-            "(8) Limitations and known issues. "
-            "Include specific numbers, model names, and citations where possible. "
-            "Write at least 2000 words."
+            "You are a deep research agent specializing in LLM inference optimization "
+            "and quantization techniques. Write a comprehensive, well-structured "
+            "research report section. Use prose (not bullet points). Include facts, "
+            "benchmarks, data, and citations where possible. Write at least 2000 words."
         )},
         {"role": "user", "content": (
-            f"Topic: {topic}\n\n"
-            "Conduct a deep research analysis on AWQ quantization, with particular "
-            "focus on how it compares to vLLM as an inference engine. "
-            "Include practical implementation details for integrating AWQ-quantized "
-            "models into an AI orchestration engine."
+            "Research Topic: AWQ (Activation-aware Weight Quantization) vs vLLM\n\n"
+            "Sections to cover:\n"
+            "  - Background on LLM quantization methods (GPTQ, AWQ, SmoothQuant, bitsandbytes)\n"
+            "  - How AWQ works: activation-aware weight scaling, outlier channel detection\n"
+            "  - AWQ performance benchmarks: throughput, latency, memory footprint vs FP16\n"
+            "  - vLLM architecture: PagedAttention, continuous batching, tensor parallelism\n"
+            "  - AWQ integration with vLLM: supported models, configuration, loading patterns\n"
+            "  - Competitor comparison: vLLM vs TGI vs llama.cpp vs MLC-LLM for AWQ models\n"
+            "  - Practical deployment: quantizing models with AutoAWQ, serving with vLLM\n"
+            "  - Trade-offs: accuracy degradation, quantization bits (4-bit, 8-bit), group size\n"
+            "  - Temuclaude integration opportunities: model registry, quantized model loading\n"
+            "  - Future directions: AWQ variants, hardware support (CUDA, Apple Silicon)\n\n"
+            "Write this section in full with technical depth and implementation guidance."
         )},
     ]
