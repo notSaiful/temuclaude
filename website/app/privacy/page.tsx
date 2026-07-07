@@ -2,8 +2,8 @@ import { Navbar } from '@/components/Navbar';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Temuclaude',
-  description: 'Privacy Policy for Temuclaude AI orchestration platform.',
+  title: 'Privacy Policy — TemuClaude',
+  description: 'Privacy Policy for TemuClaude AI orchestration platform.',
 };
 
 export default function PrivacyPage() {

@@ -2,8 +2,8 @@ import { Navbar } from '@/components/Navbar';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service — Temuclaude',
-  description: 'Terms of Service for Temuclaude AI orchestration platform.',
+  title: 'Terms of Service — TemuClaude',
+  description: 'Terms of Service for TemuClaude AI orchestration platform.',
 };
 
 export default function TermsPage() {
@@ -18,12 +18,12 @@ export default function TermsPage() {
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">1. Acceptance of Terms</h2>
-              <p>By using Temuclaude ("the Service"), you agree to these Terms of Service. If you do not agree, do not use the Service. The Service is provided by Temuclaude ("we", "us", "our").</p>
+              <p>By using TemuClaude ("the Service"), you agree to these Terms of Service. If you do not agree, do not use the Service. The Service is provided by TemuClaude ("we", "us", "our").</p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. Description of Service</h2>
-              <p>Temuclaude is an AI orchestration platform that routes queries to multiple AI models, fuses their responses, and returns a single answer. The Service includes:</p>
+              <p>TemuClaude is an AI orchestration platform that routes queries to multiple AI models, fuses their responses, and returns a single answer. The Service includes:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Playground (free, 100 queries/day)</li>
                 <li>Developer subscription ($15/month, 50,000 queries/month)</li>
