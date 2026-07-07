@@ -531,36 +531,44 @@ def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, 
         return "PARETO-OPTIMAL"
     
     return "REJECTED"
-def build_competitor_analysis_prompt(technology: str, competitor: str, topic: str) -> List[Dict]:
-    """Build a prompt for researching a technology against a competitor (e.g., AWQ vs vLLM).
+def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
+    """Build a prompt for deep competitive analysis research (e.g., AWQ vs vLLM).
     
-    Generates a specialized research prompt focused on quantization and inference
-    optimization technologies, covering architecture, performance benchmarks,
-    memory efficiency, deployment considerations, and ecosystem support.
+    Generates a structured research plan that compares technologies across
+    architecture, performance, quantization methods, ecosystem, and adoption.
     """
+    if focus_areas is None:
+        focus_areas = [
+            "Architecture and core design philosophy",
+            "Quantization techniques (e.g., AWQ, GPTQ, bitsandbytes)",
+            "Inference throughput and latency benchmarks",
+            "Memory footprint and GPU utilization",
+            "Ease of deployment and integration",
+            "Community support and ecosystem maturity",
+            "Supported model formats and hardware backends",
+            "Production readiness and known limitations",
+        ]
+    focus_text = "\n".join(f"  - {f}" for f in focus_areas)
+    competitors_text = ", ".join(competitors)
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM inference optimization "
-            "and model quantization technologies. Write a comprehensive comparative "
-            "analysis using prose (not bullet points). Include quantitative benchmarks, "
-            "memory footprint comparisons, throughput metrics, accuracy preservation "
-            "results, and deployment trade-offs where available. Cite specific papers, "
-            "GitHub repositories, and benchmark sources. Write at least 2000 words."
+            "You are a technical research analyst specializing in LLM inference "
+            "and quantization technologies. Produce a rigorous, data-driven "
+            "competitive analysis. Compare each competitor across the listed "
+            "focus areas with specific metrics, benchmarks, and citations. "
+            "Highlight trade-offs, strengths, and weaknesses objectively. "
+            "Where quantitative data is unavailable, note the gap explicitly "
+            "rather than speculating. Output structured prose with clear "
+            "section headers for each focus area."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n"
-            f"Primary Technology: {technology}\n"
-            f"Competitor/Alternative: {competitor}\n\n"
-            f"Cover the following areas in depth:\n"
-            f"  - Quantization methodology of {technology} (e.g., activation-aware weight quantization, group size, zero-point handling)\n"
-            f"  - Architecture and inference engine of {competitor}\n"
-            f"  - Performance benchmarks: throughput (tokens/sec), latency, memory usage (GB)\n"
-            f"  - Accuracy preservation: perplexity, task-specific scores vs full precision\n"
-            f"  - Hardware compatibility: GPU types, CPU support, edge deployment\n"
-            f"  - Ease of integration: API surface, supported model formats, community ecosystem\n"
-            f"  - Use-case recommendations: when to choose {technology} over {competitor} and vice versa\n"
-            f"  - Recent developments and roadmap for both technologies\n\n"
-            f"Write this comparative analysis in full."
+            f"Competitors to compare: {competitors_text}\n"
+            f"Focus areas:\n{focus_text}\n\n"
+            "Write a comprehensive competitive analysis covering every focus area "
+            "for each competitor. Include any available benchmark numbers, "
+            "memory requirements, and deployment considerations. Conclude with "
+            "a recommendation matrix summarizing best-fit use cases."
         )},
     ]
 def build_quantization_research_prompt(topic: str, competitors: Optional[List[str]] = None) -> List[Dict]:
