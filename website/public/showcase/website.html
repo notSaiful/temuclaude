@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nebula — Ship products at the speed of thought</title>
+<style>
+  :root {
+    --bg: #07070d;
+    --bg-2: #0c0c18;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e8f0;
+    --muted: #8a8aa0;
+    --accent-1: #7c3aed;
+    --accent-2: #ec4899;
+    --accent-3: #06b6d4;
+    --grad: linear-gradient(135deg, #7c3aed 0%, #ec4899 50%, #06b6d4 100%);
+    --grad-soft: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(236,72,153,0.18), rgba(6,182,212,0.18));
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Ambient background */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(60% 50% at 20% 10%, rgba(124,58,237,0.18), transparent 60%),
+      radial-gradient(50% 40% at 80% 20%, rgba(236,72,153,0.14), transparent 60%),
+      radial-gradient(50% 50% at 50% 90%, rgba(6,182,212,0.12), transparent 60%);
+    z-index: -2;
+    pointer-events: none;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    background: rgba(7,7,13,0.6);
+    border-bottom: 1px solid var(--border);
+    transition: background .3s ease;
+  }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--grad);
+    box-shadow: 0 0 24px rgba(124,58,237,0.5);
+    position: relative;
+  }
+  .logo-mark::after {
+    content: ""; position: absolute; inset: 6px;
+    border-radius: 5px; background: var(--bg);
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta { display: flex; gap: 12px; align-items: center; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 22px; border-radius: 10px; font-weight: 600; font-size: 14px;
+    text-decoration: none; cursor: pointer; border: none; transition: all .25s ease;
+    font-family: inherit;
+  }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.04); }
+  .btn-primary {
+    background: var(--grad); background-size: 200% 200%;
+    color: white; position: relative; overflow: hidden;
+    box-shadow: 0 8px 30px rgba(124,58,237,0.35);
+    animation: shift 6s ease infinite;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(236,72,153,0.45); }
+  @keyframes shift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  .menu-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 8px; }
+  .menu-toggle span { display: block; width: 22px; height: 2px; background: var(--text); margin: 5px 0; transition: .3s; }
+
+  /* Hero */
+  .hero { position: relative; padding: 160px 0 100px; overflow: hidden; }
+  .hero-shapes { position: absolute; inset: 0; pointer-events: none; z-index: -1; }
+  .shape {
+    position: absolute; border-radius: 30%; filter: blur(2px);
+    background: var(--grad); opacity: 0.5;
+    box-shadow: 0 0 80px rgba(124,58,237,0.4);
+    animation: float 14s ease-in-out infinite;
+  }
+  .shape.s1 { width: 120px; height: 120px; top: 18%; left: 8%; animation-delay: 0s; border-radius: 42% 58% 60% 40% / 50% 40% 60% 50%; }
+  .shape.s2 { width: 80px; height: 80px; top: 60%; left: 14%; animation-delay: -3s; border-radius: 60% 40% 50% 50% / 40% 60% 40% 60%; background: linear-gradient(135deg,#ec4899,#7c3aed); }
+  .shape.s3 { width: 160px; height: 160px; top: 22%; right: 10%; animation-delay: -6s; border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%; background: linear-gradient(135deg,#06b6d4,#7c3aed); }
+  .shape.s4 { width: 60px; height: 60px; top: 70%; right: 18%; animation-delay: -9s; border-radius: 50% 60% 40% 50% / 50% 40% 60% 50%; background: linear-gradient(135deg,#ec4899,#06b6d4); }
+  .shape.s5 { width: 40px; height: 40px; top: 40%; left: 48%; animation-delay: -2s; background: linear-gradient(135deg,#7c3aed,#ec4899); }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-30px) rotate(8deg); }
+    66% { transform: translateY(20px) rotate(-6deg); }
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px; border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 13px; color: var(--muted); margin-bottom: 28px;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 80px);
+    line-height: 1.05; letter-spacing: -0.03em; font-weight: 800;
+    margin-bottom: 24px; max-width: 900px;
+  }
+  .gradient-text {
+    background: var(--grad); background-size: 200% 200%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shift 8s ease infinite;
+  }
+  .hero p.lead {
+    font-size: clamp(16px, 2vw, 20px); color: var(--muted);
+    max-width: 620px; margin-bottom: 40px;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 60px; }
+  .hero-meta { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; color: var(--muted); font-size: 13px; }
+  .hero-meta span { display: flex; align-items: center; gap: 8px; }
+  .hero-meta svg { width: 16px; height: 16px; stroke: #22c55e; fill: none; stroke-width: 2.5; }
+
+  /* Section base */
+  section { padding: 100px 0; position: relative; }
+  .section-head { text-align: center; max-width: 720px; margin: 0 auto 64px; }
+  .eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent-2); margin-bottom: 16px;
+  }
+  .section-head h2 { font-size: clamp(32px, 5vw, 52px); letter-spacing: -0.03em; line-height: 1.1; font-weight: 800; margin-bottom: 18px; }
+  .section-head p { color: var(--muted); font-size: 17px; }
+
+  /* Features */
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .feature {
+    position: relative; padding: 32px; border-radius: 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    transition: all .4s cubic-bezier(.2,.8,.2,1); overflow: hidden;
+  }
+  .feature::before {
+    content: ""; position: absolute; inset: 0; border-radius: 18px;
+    padding: 1px; background: var(--grad);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    opacity: 0; transition: opacity .4s ease;
+  }
+  .feature::after {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle at center, rgba(236,72,153,0.15), transparent 40%);
+    opacity: 0; transition: opacity .4s ease; pointer-events: none;
+  }
+  .feature:hover { transform: translateY(-6px); background: rgba(255,255,255,0.06); }
+  .feature:hover::before, .feature:hover::after { opacity: 1; }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 13px; margin-bottom: 22px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--grad-soft); border: 1px solid var(--border);
+    position: relative;
+  }
+  .feature-icon svg { width: 24px; height: 24px; stroke: url(#g); fill: none; stroke-width: 2; }
+  .feature h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em; }
+  .feature p { color: var(--muted); font-size: 15px; }
+
+  /* Stats */
+  .stats { padding: 80px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, transparent, rgba(124,58,237,0.04), transparent); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; text-align: center; }
+  .stat-num {
+    font-size: clamp(36px, 5vw, 56px); font-weight: 800; letter-spacing: -0.03em;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; line-height: 1;
+  }
+  .stat-label { color: var(--muted); font-size: 14px; margin-top: 10px; letter-spacing: 0.02em; }
+
+  /* Pricing */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  .plan {
+    padding: 36px 32px; border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; flex-direction: column; position: relative; transition: all .3s ease;
+  }
+  .plan:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
+  .plan.featured {
+    background: linear-gradient(180deg, rgba(124,58,237,0.12), rgba(236,72,153,0.06));
+    border-color: rgba(236,72,153,0.4);
+    box-shadow: 0 20px 60px rgba(124,58,237,0.25);
+  }
+  .plan-tag {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 700;
+    background: var(--grad); color: white; letter-spacing: 0.04em;
+  }
+  .plan h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .plan .desc { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .plan .price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+  .plan .price .currency { font-size: 22px; font-weight: 600; color: var(--muted); }
+  .plan .price .amount { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; }
+  .plan .price .period { color: var(--muted); font-size: 15px; }
+  .plan .billed { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+  .plan ul { list-style: none; margin-bottom: 28px; flex: 1; }
+  .plan ul li { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 14.5px; color: var(--text); border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .plan ul li:last-child { border-bottom: none; }
+  .check { width: 18px; height: 18px; flex-shrink: 0; stroke: #22c55e; fill: none; stroke-width: 3; }
+  .plan .btn { width: 100%; }
+  .plan.featured .btn-primary { box-shadow: 0 8px 30px rgba(236,72,153,0.5); }
+
+  /* Testimonials */
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .testimonial {
+    padding: 30px; border-radius: 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    transition: all .3s ease;
+  }
+  .testimonial:hover { border-color: rgba(255,255,255,0.18); transform: translateY(-3px); }
+  .stars { display: flex; gap: 3px; margin-bottom: 16px; }
+  .stars svg { width: 16px; height: 16px; fill: #fbbf24; }
+  .testimonial p { font-size: 15.5px; color: var(--text); margin-bottom: 22px; line-height: 1.6; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--grad); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 16px; }
+  .author-info .name { font-weight: 600; font-size: 14px; }
+  .author-info .role { color: var(--muted); font-size: 13px; }
+
+  /* CTA */
+  .cta-band { padding: 90px 0; }
+  .cta-box {
+    padding: 64px 40px; border-radius: 28px; text-align: center;
+    background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(236,72,153,0.12), rgba(6,182,212,0.12));
+    border: 1px solid var(--border); position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 0%, rgba(236,72,153,0.25), transparent 50%),
+                radial-gradient(circle at 70% 100%, rgba(6,182,212,0.2), transparent 50%);
+  }
+  .cta-box > * { position: relative; }
+  .cta-box h2 { font-size: clamp(30px, 4.5vw, 46px); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 16px; }
+  .cta-box p { color: var(--muted); font-size: 17px; margin-bottom: 32px; max-width: 540px; margin-left: auto; margin-right: auto; }
+
+  /* Footer */
+  footer { padding: 70px 0 40px; border-top: 1px solid var(--border); }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+  .footer-brand p { color: var(--muted); font-size: 14px; max-width: 280px; margin-top: 14px; }
+  .footer-col h4 { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-bottom: 18px; }
+  .footer-col a { display: block; color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 0; transition: color .2s; }
+  .footer-col a:hover { color: var(--text); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; flex-wrap: wrap; gap: 16px; }
+
+  /* Reveal animation */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal.delay-1 { transition-delay: .1s; }
+  .reveal.delay-2 { transition-delay: .2s; }
+  .reveal.delay-3 { transition-delay: .3s; }
+
+  @media (max-width: 900px) {
+    .features-grid, .pricing-grid, .testimonials-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 40px 20px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; padding: 20px 24px; background: rgba(7,7,13,0.95); border-bottom: 1px solid var(--border); gap: 18px; }
+    .nav-links.open { display: flex; }
+    .menu-toggle { display: block; }
+    .nav-cta .btn-ghost { display: none; }
+  }
+  @media (max-width: 560px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .hero { padding-top: 130px; }
+    section { padding: 70px 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG gradient defs for icons -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header>
+  <div class="container">
+    <nav>
+      <div class="logo"><div class="logo-mark"></div>Nebula</div>
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Features</a>
+        <a href="#stats">Stats</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#testimonials">Customers</a>
+      </div>
+      <div class="nav-cta">
+        <a href="#" class="btn btn-ghost">Sign in</a>
+        <a href="#pricing" class="btn btn-primary">Get started</a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-shapes">
+    <div class="shape s1"></div>
+    <div class="shape s2"></div>
+    <div class="shape s3"></div>
+    <div class="shape s4"></div>
+    <div class="shape s5"></div>
+  </div>
+  <div class="container">
+    <div class="badge reveal"><span class="dot"></span> New: AI-powered release automation is live</div>
+    <h1 class="reveal delay-1">Ship products at the <span class="gradient-text">speed of thought</span></h1>
+    <p class="lead reveal delay-2">Nebula unifies planning, building, and shipping into one fluid workflow. Less context switching, more momentum — your team ships 3× faster without the chaos.</p>
+    <div class="hero-cta reveal delay-3">
+      <a href="#pricing" class="btn btn-primary">Start free for 14 days</a>
+      <a href="#features" class="btn btn-ghost">Explore features →</a>
+    </div>
+    <div class="hero-meta reveal delay-3">
+      <span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> No credit card required</span>
+      <span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> SOC 2 Type II certified</span>
+      <span><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cancel anytime</span>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Features</span>
+      <h2>Everything your team needs, <span class="gradient-text">nothing it doesn't</span></h2>
+      <p>A focused toolkit that replaces five disconnected apps. Built for momentum, designed for clarity.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h3>Real-time collaboration</h3>
+        <p>See teammates' cursors move live. Comments, suggestions, and decisions stay anchored to the work that produced them.</p>
+      </div>
+      <div class="feature reveal delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M8 14l3 3 5-6"/></svg></div>
+        <h3>Smart automation</h3>
+        <p>Repetitive work disappears. Nebula learns your patterns and quietly handles status updates, assignments, and reminders.</p>
+      </div>
+      <div class="feature reveal delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
+        <h3>Live analytics</h3>
+        <p>Velocity, cycle time, and bottlenecks surface automatically. Make decisions from numbers, not gut feelings.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h3>Enterprise security</h3>
+        <p>End-to-end encryption, SSO, granular permissions, and audit logs. Compliance without the configuration headache.</p>
+      </div>
+      <div class="feature reveal delay-1">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Async by design</h3>
+        <p>Built-in video updates, threaded discussions, and a daily digest keep everyone aligned across time zones.</p>
+      </div>
+      <div class="feature reveal delay-2">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <h3>200+ integrations</h3>
+        <p>Connect Slack, GitHub, Figma, Linear, and the rest of your stack in two clicks. Data flows where it should.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stats" class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="reveal">
+        <div class="stat-num" data-target="12000" data-suffix="K+">0</div>
+        <div class="stat-label">Teams shipping with Nebula</div>
+      </div>
+      <div class="reveal delay-1">
+        <div class="stat-num" data-target="3" data-suffix="×">0</div>
+        <div class="stat-label">Average shipping velocity</div>
+      </div>
+      <div class="reveal delay-2">
+        <div class="stat-num" data-target="99" data-suffix=".9%">0</div>
+        <div class="stat-label">Uptime over 12 months</div>
+      </div>
+      <div class="reveal delay-3">
+        <div class="stat-num" data-target="47" data-suffix="M+">0</div>
+        <div class="stat-label">Tasks automated monthly</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Pricing</span>
+      <h2>Simple pricing that <span class="gradient-text">scales with you</span></h2>
+      <p>Start free. Upgrade when you're ready. No hidden fees, no per-seat surprises.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan reveal">
+        <h3>Starter</h3>
+        <p class="desc">For individuals and small teams getting started.</p>
+        <div class="price"><span class="currency">$</span><span class="amount">0</span><span class="period">/mo</span></div>
+        <div class="billed">Free forever — up to 5 members</div>
+        <ul>
+          <li><svg class="check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Unlimited tasks & projects</li>
+          <li><svg class="check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 3 active collaborators</li>
+          <li><svg class="check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 7-day version history</li>
+          <li><svg class="check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Community support</li>
+        </ul>
+        <a href="#" class="btn btn-ghost">Get started free</a>
+      </div>
+      
