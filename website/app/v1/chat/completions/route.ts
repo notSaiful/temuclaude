@@ -195,8 +195,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Run orchestration
-    const result = await runOrchestration(messages, temperature || 0.6, max_tokens || 4096);
+    // Run orchestration with timeout safeguard
+    // ArtificialAnalysis has 60s timeout — race pipeline against 45s
+    // If pipeline exceeds 45s, fall back to single quick model call
+    const pipelinePromise = runOrchestration(messages, temperature || 0.6, max_tokens || 4096);
+    const timeoutPromise = new Promise<{
+      content: string;
+      tokens: number;
+      models_used: string[];
+      tier: string;
+      latency_ms: number;
+    }>((resolve) => {
+      setTimeout(async () => {
+        const fallback = await callModel(ORCHESTRATOR, messages, 0.6, max_tokens || 4096);
+        resolve({
+          content: fallback.content,
+          tokens: fallback.tokens,
+          models_used: [ORCHESTRATOR],
+          tier: 'timeout-fallback',
+          latency_ms: 45000,
+        });
+      }, 45000);
+    });
+
+    const result = await Promise.race([pipelinePromise, timeoutPromise]);
 
     // Return OpenAI-compatible response
     const response = {
