@@ -512,54 +512,47 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
 
 def classify_efficiency_finding(
     speedup_factor: float,
-    resource_savings_pct: float,
+    memory_savings_pct: float,
     quality_loss_pct: float,
-    quality_metric_name: str = "accuracy",
+    technique_name: str = "",
 ) -> str:
     """
-    Classify an efficiency finding into a quality guardrail category.
+    Classify an efficiency finding into one of four quality guardrail buckets.
 
-    Categories (per Temuclaude quality guardrail policy):
-      - LOSSLESS: speedup/savings with zero measurable quality loss
-      - QUALITY-PRESERVING: negligible quality loss (< 1%) with meaningful gains
-      - PARETO-OPTIMAL: meaningful gains with acceptable, well-understood tradeoff
-      - REJECTED: gains insufficient or quality loss unacceptable
+    Used to gate whether a technique (e.g. AWQ quantization, vLLM-style
+    paged attention) is safe to auto-integrate into src/efficiency/.
 
-    Parameters
-    ----------
-    speedup_factor : float
-        e.g. 2.5 means 2.5x faster inference (AWQ typically 2-4x).
-    resource_savings_pct : float
-        Percentage of memory/compute saved, e.g. 65.0 for 65% VRAM reduction.
-    quality_loss_pct : float
-        Percentage degradation on the primary quality metric, e.g. 0.3 for 0.3%.
-    quality_metric_name : str
-        Name of the metric used (for documentation/debugging only).
+    Classification rules:
+      - LOSSLESS          : zero measurable quality loss
+      - QUALITY-PRESERVING: quality loss < 1% (imperceptible)
+      - PARETO-OPTIMAL    : quality loss >= 1% but speedup or savings
+                            justify the trade-off (speedup >= 1.5x OR
+                            memory savings >= 30%)
+      - REJECTED          : quality loss too high for the gains offered
 
-    Returns
-    -------
-    str
-        One of: "LOSSLESS", "QUALITY-PRESERVING", "PARETO-OPTIMAL", "REJECTED"
+    Args:
+        speedup_factor:    Inference speedup as a multiplier (1.0 = no change).
+        memory_savings_pct: Percentage of memory saved (0-100).
+        quality_loss_pct:  Percentage of quality degradation (0-100).
+        technique_name:    Optional name for logging/debugging.
+
+    Returns:
+        One of: "LOSSLESS", "QUALITY-PRESERVING",
+                "PARETO-OPTIMAL", "REJECTED".
     """
-    # Thresholds calibrated for LLM inference efficiency findings (AWQ, GPTQ, etc.)
-    MIN_SPEEDUP = 1.2          # must be at least 20% faster
-    MIN_SAVINGS = 10.0         # must save at least 10% resources
-    NEGLIGIBLE_LOSS = 1.0      # < 1% loss is negligible
-    ACCEPTABLE_LOSS = 5.0      # < 5% loss is acceptable for Pareto-optimal
-
-    has_meaningful_gain = speedup_factor >= MIN_SPEEDUP or resource_savings_pct >= MIN_SAVINGS
-
-    if not has_meaningful_gain:
-        return "REJECTED"
-
     if quality_loss_pct <= 0.0:
         return "LOSSLESS"
-    elif quality_loss_pct < NEGLIGIBLE_LOSS:
+
+    if quality_loss_pct < 1.0:
         return "QUALITY-PRESERVING"
-    elif quality_loss_pct < ACCEPTABLE_LOSS:
+
+    meaningful_speedup = speedup_factor >= 1.5
+    meaningful_savings = memory_savings_pct >= 30.0
+
+    if meaningful_speedup or meaningful_savings:
         return "PARETO-OPTIMAL"
-    else:
-        return "REJECTED"
+
+    return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
     """Build a specialized prompt for competitor analysis research (e.g., AWQ vs vLLM).
     
