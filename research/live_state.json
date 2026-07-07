@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-07T15:19:09.679964",
+  "timestamp": "2026-07-07T15:20:49.922683",
   "system": "hasan",
   "status": "all_unhealthy",
   "healthScore": 0,
@@ -128,8 +128,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.0,
-          "last_run": "2026-07-07T09:48:55.787750+00:00"
+          "cycle_duration": 0.01,
+          "last_run": "2026-07-07T09:50:25.816308+00:00"
         }
       },
       {
@@ -177,10 +177,11 @@
         "alive": true,
         "healthy": false,
         "healthReason": "no_heartbeat",
-        "status": "running",
+        "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_start": 1783417739.7863731
+          "cycle_duration": 14.78,
+          "last_run": "2026-07-07T09:49:14.567089+00:00"
         }
       },
       {
@@ -192,8 +193,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.15,
-          "last_run": "2026-07-07T09:48:55.105236+00:00"
+          "cycle_duration": 0.07,
+          "last_run": "2026-07-07T09:49:55.038649+00:00"
         }
       },
       {
@@ -205,8 +206,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.02,
-          "last_run": "2026-07-07T09:46:55.070285+00:00"
+          "cycle_duration": 0.33,
+          "last_run": "2026-07-07T09:48:17.631952+00:00"
         }
       },
       {
@@ -218,8 +219,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 0.01,
-          "last_run": "2026-07-07T09:46:55.058050+00:00"
+          "cycle_duration": 0.0,
+          "last_run": "2026-07-07T09:48:19.402564+00:00"
         }
       },
       {
@@ -257,8 +258,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 3.66,
-          "last_run": "2026-07-07T09:46:58.724428+00:00"
+          "cycle_duration": 2.46,
+          "last_run": "2026-07-07T09:48:42.960389+00:00"
         }
       },
       {
@@ -270,8 +271,8 @@
         "status": "sleeping",
         "heartbeatAge": null,
         "extra": {
-          "cycle_duration": 14.85,
-          "last_run": "2026-07-07T09:47:09.905641+00:00"
+          "cycle_duration": 10.39,
+          "last_run": "2026-07-07T09:48:52.264939+00:00"
         }
       },
       {
@@ -280,9 +281,12 @@
         "alive": true,
         "healthy": false,
         "healthReason": "no_heartbeat",
-        "status": "running",
+        "status": "sleeping",
         "heartbeatAge": null,
-        "extra": {}
+        "extra": {
+          "cycle_duration": 0.02,
+          "last_run": "2026-07-07T09:48:59.403039+00:00"
+        }
       },
       {
         "name": "website_daemon",
@@ -290,9 +294,12 @@
         "alive": true,
         "healthy": false,
         "healthReason": "no_heartbeat",
-        "status": "running",
+        "status": "sleeping",
         "heartbeatAge": null,
-        "extra": {}
+        "extra": {
+          "cycle_duration": 58.82,
+          "last_run": "2026-07-07T09:50:01.958395+00:00"
+        }
       },
       {
         "name": "industry_radar_daemon",
@@ -403,38 +410,12 @@
   "queue": {
     "newRaw": 0,
     "newFindings": 42,
-    "implementationQueue": 14,
+    "implementationQueue": 13,
     "implementationFailed": 1
   },
   "sharedMemory": {
-    "daemons": 40,
+    "daemons": 43,
     "recentEvents": [
-      {
-        "id": "evt_1783417719766_watchdog",
-        "timestamp": "2026-07-07T15:18:39.766696",
-        "daemon": "watchdog",
-        "type": "restart",
-        "message": "feedback_daemon: no PID file, restarting",
-        "extra": {}
-      },
-      {
-        "id": "evt_1783417721820_watchdog",
-        "timestamp": "2026-07-07T15:18:41.820021",
-        "daemon": "watchdog",
-        "type": "restart",
-        "message": "meta_auditor_daemon: no PID file, restarting",
-        "extra": {}
-      },
-      {
-        "id": "evt_1783417722960_feedback_daemon",
-        "timestamp": "2026-07-07T15:18:42.960501",
-        "daemon": "feedback_daemon",
-        "type": "cycle_complete",
-        "message": "Cycle completed in 2.5s",
-        "extra": {
-          "duration": 2.46
-        }
-      },
       {
         "id": "evt_1783417732267_meta_auditor_daemon",
         "timestamp": "2026-07-07T15:18:52.267025",
@@ -500,6 +481,36 @@
         "type": "restart",
         "message": "website_daemon: no PID file, restarting",
         "extra": {}
+      },
+      {
+        "id": "evt_1783417795804_distiller_daemon",
+        "timestamp": "2026-07-07T15:19:55.804572",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.0
+        }
+      },
+      {
+        "id": "evt_1783417801958_website_daemon",
+        "timestamp": "2026-07-07T15:20:01.958665",
+        "daemon": "website_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 58.8s",
+        "extra": {
+          "duration": 58.82
+        }
+      },
+      {
+        "id": "evt_1783417825816_distiller_daemon",
+        "timestamp": "2026-07-07T15:20:25.816514",
+        "daemon": "distiller_daemon",
+        "type": "cycle_complete",
+        "message": "Cycle completed in 0.0s",
+        "extra": {
+          "duration": 0.01
+        }
       }
     ],
     "knowledgeFacts": 3
@@ -523,22 +534,28 @@
   },
   "activity": [
     {
-      "time": "2026-07-07 15:19:09",
+      "time": "2026-07-07 15:20:21",
       "daemon": "integrator_daemon",
       "level": "ERROR",
       "message": "Auto-integrator stderr:"
     },
     {
-      "time": "2026-07-07 15:19:09",
+      "time": "2026-07-07 15:20:21",
       "daemon": "integrator_daemon",
       "level": "INFO",
       "message": "Retrying in 30s..."
     },
     {
-      "time": "2026-07-07 15:19:05",
+      "time": "2026-07-07 15:20:01",
       "daemon": "website_daemon",
       "level": "INFO",
-      "message": "Changes detected (44 features, 9 models) \u2014 deploying..."
+      "message": "Deployed successfully"
+    },
+    {
+      "time": "2026-07-07 15:20:01",
+      "daemon": "website_daemon",
+      "level": "INFO",
+      "message": "Deployed successfully"
     },
     {
       "time": "2026-07-07 15:19:05",
@@ -547,16 +564,10 @@
       "message": "Changes detected (44 features, 9 models) \u2014 deploying..."
     },
     {
-      "time": "2026-07-07 15:19:03",
+      "time": "2026-07-07 15:19:05",
       "daemon": "website_daemon",
       "level": "INFO",
-      "message": "website_daemon started (PID: 29106)"
-    },
-    {
-      "time": "2026-07-07 15:19:03",
-      "daemon": "website_daemon",
-      "level": "INFO",
-      "message": "=== Website update cycle started ==="
+      "message": "Changes detected (44 features, 9 models) \u2014 deploying..."
     },
     {
       "time": "2026-07-07 15:19:03",
