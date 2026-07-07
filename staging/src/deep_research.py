@@ -616,32 +616,41 @@ def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_a
         )},
     ]
 
-def build_quantization_research_prompt(topic: str, num_sections: int = 7) -> List[Dict]:
-    """Build a specialized research outline prompt for LLM quantization and inference optimization topics.
-    
-    Tailored for researching techniques like AWQ, GPTQ, vLLM, and related
-    model serving technologies. Ensures coverage of quantization methods,
-    performance benchmarks, hardware compatibility, and deployment trade-offs.
+def build_quantization_research_prompt(topic: str, competitors: Optional[List[str]] = None) -> List[Dict]:
+    """Build a specialized research prompt for model quantization and inference
+    optimization topics such as AWQ, GPTQ, vLLM, and related technologies.
+
+    This prompt guides the research agent to cover quantization algorithms,
+    performance benchmarks, hardware compatibility, deployment considerations,
+    and competitive analysis between inference engines.
     """
+    if competitors is None:
+        competitors = ["vLLM", "GPTQ", "llama.cpp", "TensorRT-LLM"]
+
+    competitor_text = ", ".join(competitors)
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM inference optimization "
-            "and model quantization. Create a comprehensive research outline with "
-            f"at least {num_sections} major sections. The outline must cover: "
-            "(1) background on model quantization and activation-aware methods, "
-            "(2) technical architecture of the target method (e.g., AWQ's salient "
-            "weight detection and scaling), (3) comparison with competing inference "
-            "engines (e.g., vLLM, TensorRT-LLM, llama.cpp), (4) performance "
-            "benchmarks including throughput, latency, and memory footprint, "
-            "(5) hardware compatibility (GPU types, CPU offloading, edge devices), "
-            "(6) deployment considerations and integration patterns, "
-            "(7) limitations, open problems, and future directions. "
-            "Each section should have 3-5 subsections. Output as a numbered list."
+            "You are a deep research agent specializing in LLM quantization and "
+            "inference optimization. You have expert knowledge of techniques such "
+            "as AWQ (Activation-aware Weight Quantization), GPTQ, SmoothQuant, and "
+            "inference engines like vLLM, TensorRT-LLM, and llama.cpp. "
+            "Produce a comprehensive, technically accurate research section. "
+            "Cover: (1) the quantization algorithm and how it works internally, "
+            "(2) accuracy preservation vs speed tradeoffs, "
+            "(3) hardware/backend support (CUDA, Triton, etc.), "
+            "(4) benchmark comparisons against competitors, "
+            "(5) deployment and integration considerations, "
+            "(6) limitations and open problems. "
+            "Use precise technical language, cite specific numbers where available, "
+            "and write in prose form (not bullet lists). "
+            "Target at least 2000 words."
         )},
         {"role": "user", "content": (
-            f"Topic: {topic}\n\n"
-            "Create a research outline focused on quantization and inference "
-            "optimization. Ensure AWQ and vLLM are explicitly compared where relevant."
+            f"Research Topic: {topic}\n\n"
+            f"Compare and analyze against these competitors/alternatives: {competitor_text}\n\n"
+            "Provide a thorough technical deep dive covering the quantization method, "
+            "its implementation details, performance characteristics, and how it "
+            "compares to competing approaches in the LLM serving ecosystem."
         )},
     ]
 def build_media_research_prompt(topic: str, mission: str = "BEAT FRONTIERS", 

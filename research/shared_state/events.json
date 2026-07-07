@@ -1,76 +1,6 @@
 {
   "events": [
     {
-      "id": "evt_1783430657330_distiller_daemon",
-      "timestamp": "2026-07-07T18:54:17.330309",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783430687338_distiller_daemon",
-      "timestamp": "2026-07-07T18:54:47.338076",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783430691389_coordinator_daemon",
-      "timestamp": "2026-07-07T18:54:51.389603",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.04
-      }
-    },
-    {
-      "id": "evt_1783430717347_distiller_daemon",
-      "timestamp": "2026-07-07T18:55:17.347342",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783430735438_integrator_daemon",
-      "timestamp": "2026-07-07T18:55:35.438249",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 6.4s",
-      "extra": {
-        "duration": 6.36
-      }
-    },
-    {
-      "id": "evt_1783430747355_distiller_daemon",
-      "timestamp": "2026-07-07T18:55:47.355489",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783430751386_coordinator_daemon",
-      "timestamp": "2026-07-07T18:55:51.386533",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.03
-      }
-    },
-    {
       "id": "evt_1783430777363_distiller_daemon",
       "timestamp": "2026-07-07T18:56:17.363534",
       "daemon": "distiller_daemon",
@@ -1999,7 +1929,77 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783433133996_integrator_daemon",
+      "timestamp": "2026-07-07T19:35:33.996162",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 4.8s",
+      "extra": {
+        "duration": 4.8
+      }
+    },
+    {
+      "id": "evt_1783433147967_distiller_daemon",
+      "timestamp": "2026-07-07T19:35:47.967550",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783433151618_coordinator_daemon",
+      "timestamp": "2026-07-07T19:35:51.618579",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.03
+      }
+    },
+    {
+      "id": "evt_1783433177977_distiller_daemon",
+      "timestamp": "2026-07-07T19:36:17.977794",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783433207987_distiller_daemon",
+      "timestamp": "2026-07-07T19:36:47.988006",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783433211612_coordinator_daemon",
+      "timestamp": "2026-07-07T19:36:51.612029",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783433237990_distiller_daemon",
+      "timestamp": "2026-07-07T19:37:17.990022",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
     }
   ],
-  "last_update": "2026-07-07T19:35:17.962843"
+  "last_update": "2026-07-07T19:37:17.990027"
 }
