@@ -91,10 +91,10 @@ const faqs = [
 ];
 
 const competitors = [
-  { name: 'TemuClaude', input: 0.50, output: 2.00, color: '#E25822' },
-  { name: 'Claude API', input: 15, output: 75, color: '#8E8B85' },
-  { name: 'GPT-5.5', input: 30, output: 120, color: '#8E8B85' },
-  { name: 'Gemini 3.1', input: 7, output: 21, color: '#8E8B85' },
+  { name: 'TemuClaude', input: 0.06, output: 0.21, color: '#E25822' },
+  { name: 'Claude Sonnet 5', input: 2, output: 10, color: '#8E8B85' },
+  { name: 'GPT-5.5', input: 5, output: 30, color: '#8E8B85' },
+  { name: 'Claude Fable 5', input: 10, output: 50, color: '#8E8B85' },
 ];
 
 export function PricingSection() {
@@ -231,7 +231,7 @@ export function PricingSection() {
             })}
           </div>
           <p className="text-xs text-text-muted mt-3 text-center">
-            TemuClaude: $0.50 input + $2.00 output = $2.50/M total. Others: published API pricing.
+            TemuClaude: $0.06 input + $0.21 output (Hy3, trivial tier). Blended ~$1.44/M across all tiers. Others: published API pricing.
           </p>
         </div>
 

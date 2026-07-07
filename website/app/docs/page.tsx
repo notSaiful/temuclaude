@@ -60,7 +60,7 @@ export default function DocsPage() {
             </nav>
 
             <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Documentation</h1>
-            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — 8 models, 10-layer pipeline, one superior answer.</p>
+            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — 8 models, 6-layer pipeline, one superior answer.</p>
 
             {/* === OVERVIEW === */}
 
@@ -75,7 +75,7 @@ export default function DocsPage() {
   -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
 
 # Response: SSE stream with answer + orchestration metadata`} />
-              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
+              <Callout type="tip">The playground runs the full 6-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
             </section>
 
             <section id="architecture" className="mb-12">
@@ -86,9 +86,9 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Estimates difficulty</strong> (trivial, medium, hard)</li>
                 <li><strong className="text-text-primary">Routes</strong> to the best strategy:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>Trivial (60%) → single cheap model (Hy3 Preview, free models)</li>
-                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 3 Flash)</li>
-                    <li>Hard (10%) → full 10-layer fusion stack (3 models parallel + cross-review + aggregate + verify + QA + debate)</li>
+                    <li>Trivial (60%) → single cheap model (Hy3 Preview)</li>
+                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 3 Flash, MiniMax M3, MiMo-V2.5)</li>
+                    <li>Hard (10%) → full 6-layer fusion stack (3 models parallel + self-consistency + aggregate + QA + reflexion)</li>
                   </ul>
                 </li>
                 <li><strong className="text-text-primary">Returns</strong> one clean answer — orchestration is invisible but visible in the playground</li>
@@ -124,59 +124,66 @@ export default function DocsPage() {
 
             {/* === FEATURES === */}
 
-            <section id="10-layer-pipeline" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Pipeline</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers. Each is independently validated by published research:</p>
+            <section id="6-layer-pipeline" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">6-Layer Pipeline</h2>
+              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 6 quality layers. Each is validated by published research or our own testing:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li><strong className="text-text-primary">Web Search</strong> — DuckDuckGo for knowledge queries (free, unlimited)</li>
-                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Propose → Cross-Review → Aggregate (65.1% AlpacaEval vs GPT-4o 57.5%)</li>
-                <li><strong className="text-text-primary">Self-Consistency</strong> — PRM-weighted voting across N samples (+18.4% MATH)</li>
-                <li><strong className="text-text-primary">Code Verification</strong> — Execute Python, verify output (ground truth)</li>
-                <li><strong className="text-text-primary">Reflexion</strong> — Verbal reflection on failure, retry with context (91% HumanEval)</li>
-                <li><strong className="text-text-primary">Self-QA Gate</strong> — 5-rubric score (LC, FC, CM, GA, CL), retry if &lt; 8/10</li>
-                <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
-                <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
-                <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 5 (IQ 53) for hardest 2%</li>
+                <li><strong className="text-text-primary">MoA Fusion</strong> — 3 models propose in parallel, aggregator synthesizes (100% on our 20-question benchmark)</li>
+                <li><strong className="text-text-primary">Self-Consistency</strong> — 3 DeepSeek samples vote on math answers (+18.4% MATH, arXiv:2203.11317)</li>
+                <li><strong className="text-text-primary">Aggregation</strong> — Analyze consensus, contradictions, synthesize one answer (arXiv:2406.04692)</li>
+                <li><strong className="text-text-primary">QA Gate</strong> — 5-rubric score (LC, FC, CM, GA, CL) by Nemotron (free, independent), retry if &lt; 8/10</li>
+                <li><strong className="text-text-primary">Reflexion</strong> — Retry with specific feedback from QA gate (91% HumanEval vs 80%, arXiv:2303.11366)</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 5 (IQ 53) for hardest 2% where QA &lt; 6</li>
               </ol>
+              <Callout type="note">Code execution (running Python to verify math) is planned for Oracle Cloud deployment. Currently math is verified via self-consistency (3-sample voting).</Callout>
             </section>
 
             <section id="3-tier-routing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">3-Tier Routing</h2>
               <p className="text-text-secondary mb-4">TemuClaude routes queries by difficulty to minimize cost without sacrificing quality:</p>
               <CodeBlock lang="text" code={`Difficulty estimation:
-  Word count → 0-5 points
-  Task type (math/reasoning/coding) → +2 points
-  Keywords (explain, analyze, compare) → +1-2 points
-  Total → 0-10 scale
+  Word count, math keywords, code keywords, reasoning indicators
+  Score 0-15 → trivial (<3), medium (3-6), hard (7+)
 
 Routing:
-  Trivial (60% of queries) → 1 cheap model, 500 tokens
-    Models: Hy3 Preview, free models ($0.00)
-    
-  Medium (30% of queries) → 1 specialist model, 4096 tokens
-    Math/Coding → DeepSeek V4 Pro
+  Trivial (60% of queries) → Hy3 Preview ($0.06/$0.21 per M)
+    Single model, fast, cheapest
+
+  Medium (30% of queries) → Specialist model
+    Math → DeepSeek V4 Pro
     Knowledge → GLM-5.2
     Legal/Health → Gemini 3 Flash
     Creative → MiniMax M3
-    
-  Hard (10% of queries) → Full 10-layer fusion stack, 8192 tokens
-    3 models in parallel → cross-review → aggregate
-    + code verification + self-QA + reflexion + debate`} />
-              <Callout type="note">60% of queries cost $0 (free models or cache). 30% cost $0.06-0.14/M. Only 10% use the full pipeline. Average cost: $0.05/M tokens.</Callout>
+    Multimodal → MiMo-V2.5
+
+  Hard (10% of queries) → Full 6-layer fusion stack
+    3 models in parallel → aggregation → QA gate
+    + reflexion if QA < 8 + frontier fallback if QA < 6`} />
+              <Callout type="note">60% of queries use Hy3 Preview ($0.06/$0.21 per M). 30% use specialists. Only 10% trigger the full pipeline. QA gate is free (Nemotron). Blended cost: ~$1.44/M tokens.</Callout>
             </section>
 
-            <section id="moa-3-layer-fusion" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">MoA 3-Layer Fusion</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
-              <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
+            <section id="moa-fusion" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">MoA Fusion</h2>
+              <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA):</p>
+              <CodeBlock lang="text" code={`Layer 1: 3 models propose independently (parallel)
   GLM-5.2 → response A
-  DeepSeek V4 Pro → response B
+  DeepSeek V4 Pro → response B (or self-consistency for math)
   Gemini 3 Flash → response C
 
-Layer 2: Cross-Review
-  GLM-5.2 reviews B and C → improved A'
-  DeepSeek reviews A and C → improved B'
+Layer 2: Aggregation (1 call)
+  GLM-5.2 analyzes all 3 responses:
+  - CONSENSUS: what most agree on (likely correct)
+  - CONTRADICTIONS: where they disagree, determine which is correct
+  - BEST INSIGHTS: extract unique points from each
+  - ERRORS: fix any mistakes
+  → One definitive answer
+
+Layer 3: QA Gate (free, Nemotron)
+  Score on 5 rubrics (1-10 each)
+  If average < 8 → reflexion (retry with feedback)
+  If average < 6 → frontier fallback (Claude Sonnet 5)`} />
+              <Callout type="tip">The aggregator sees all 3 responses and analyzes them directly — no separate cross-review layer needed. This reduces API calls from 14 to 7 while maintaining the same quality.</Callout>
+            </section>
   Gemini reviews A and B → improved C'
 
 Layer 3: Aggregation
