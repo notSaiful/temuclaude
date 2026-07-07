@@ -71,8 +71,10 @@ class ScoutDaemon(DaemonBase):
 
 def main():
     daemon = ScoutDaemon()
-    # Run every 6 hours = 21600 seconds
-    daemon.run(interval=21600)
+    # Run every 12 hours = 43200 seconds
+    # (increased from 6h to reduce API rate limits and let research daemons
+    # process the existing backlog of 90+ findings before finding new ones)
+    daemon.run(interval=43200)
 
 
 if __name__ == "__main__":

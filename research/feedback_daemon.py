@@ -38,6 +38,7 @@ class FeedbackDaemon(DaemonBase):
             "test_count": 0,
             "git_commits_24h": 0,
             "research_reports": 0,
+            "daemon_roi": {},
         }
 
         # Count from CHANGELOG
@@ -80,7 +81,75 @@ class FeedbackDaemon(DaemonBase):
         if findings_dir.exists():
             metrics["research_reports"] = len(list(findings_dir.glob("deep_research_*.md")))
 
+        # Daemon ROI — track which daemons are producing value
+        metrics["daemon_roi"] = self._compute_daemon_roi()
+
         return metrics
+
+    def _compute_daemon_roi(self) -> dict:
+        """Compute ROI for each daemon based on log activity and output."""
+        roi = {}
+        state_dir = Path("/tmp/temuclaude_daemons")
+
+        # Count outputs per daemon from shared intelligence events
+        try:
+            sys.path.insert(0, str(TEMUCLAUDE / "research"))
+            import share_intelligence as si
+            events = si.get_events(limit=200)
+        except Exception:
+            events = []
+
+        daemon_events = {}
+        for evt in events:
+            d = evt.get("daemon", "unknown")
+            daemon_events[d] = daemon_events.get(d, 0) + 1
+
+        # Count log lines per daemon (activity proxy)
+        for daemon_name in [
+            "scout_daemon", "distiller_daemon", "research_daemon_1",
+            "research_daemon_2", "research_daemon_3", "integrator_daemon",
+            "coordinator_daemon", "cyber_daemon", "efficiency_daemon",
+            "media_daemon", "marketing_daemon", "feedback_daemon",
+            "meta_auditor_daemon", "swot_daemon", "website_daemon",
+            "industry_radar_daemon", "model_optimizer_daemon",
+            "cost_efficiency_daemon", "revenue_daemon", "growth_daemon",
+            "competitive_dominance_daemon", "self_expansion_daemon",
+            "super_intelligence_daemon",
+        ]:
+            log_file = state_dir / f"{daemon_name}.log"
+            log_lines = 0
+            error_count = 0
+            if log_file.exists():
+                try:
+                    content = log_file.read_text()
+                    lines = content.strip().split("\n")
+                    log_lines = len(lines)
+                    error_count = sum(1 for l in lines if "ERROR" in l or "Exception" in l)
+                except Exception:
+                    pass
+
+            events_count = daemon_events.get(daemon_name, 0)
+
+            # ROI classification: HIGH (producing value), MEDIUM (active), LOW (idle/broken)
+            if log_lines == 0 and events_count == 0:
+                roi_class = "IDLE"
+            elif error_count > 10:
+                roi_class = "BROKEN"
+            elif events_count > 5 or log_lines > 100:
+                roi_class = "HIGH"
+            elif events_count > 0 or log_lines > 20:
+                roi_class = "MEDIUM"
+            else:
+                roi_class = "LOW"
+
+            roi[daemon_name] = {
+                "log_lines": log_lines,
+                "errors": error_count,
+                "events_broadcast": events_count,
+                "roi_class": roi_class,
+            }
+
+        return roi
 
     def _compute_adjustments(self, metrics: dict) -> dict:
         total = metrics["implementations_success"] + metrics["implementations_failed"]
@@ -128,6 +197,22 @@ class FeedbackDaemon(DaemonBase):
             f"{metrics['test_count']} tests, "
             f"{metrics['git_commits_24h']} commits/24h"
         )
+        # Log ROI summary
+        roi = metrics.get("daemon_roi", {})
+        if roi:
+            high = sum(1 for v in roi.values() if v["roi_class"] == "HIGH")
+            medium = sum(1 for v in roi.values() if v["roi_class"] == "MEDIUM")
+            low = sum(1 for v in roi.values() if v["roi_class"] in ("LOW", "IDLE"))
+            broken = sum(1 for v in roi.values() if v["roi_class"] == "BROKEN")
+            self.logger.info(
+                f"Daemon ROI: {high} HIGH, {medium} MEDIUM, {low} LOW/IDLE, {broken} BROKEN"
+            )
+            # Warn about broken daemons
+            for name, info in roi.items():
+                if info["roi_class"] == "BROKEN":
+                    self.logger.warning(f"Daemon {name} is BROKEN: {info['errors']} errors in log")
+                elif info["roi_class"] == "IDLE":
+                    self.logger.warning(f"Daemon {name} is IDLE: 0 log lines, 0 events")
         if adjustments.get("recommendations"):
             for rec in adjustments["recommendations"]:
                 self.logger.warning(f"Recommendation: {rec}")
