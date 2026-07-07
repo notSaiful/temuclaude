@@ -1,14 +1,16 @@
 <svg width="400" height="80" viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg">
-  <!-- Logo icon -->
-  <g transform="translate(10, 0) scale(0.35)">
-    <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" stroke-width="7" stroke-linecap="round"/>
-    <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" stroke-width="7" stroke-linecap="round"/>
-    <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" stroke-width="7" stroke-linecap="round"/>
-    <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" stroke-width="7" stroke-linecap="round"/>
-    <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" stroke-width="7" stroke-linecap="round"/>
-    <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
-    <circle cx="100" cy="85" r="6" fill="#D97757"/>
+  <!-- The Spark icon -->
+  <g transform="translate(8, 8) scale(0.64)">
+    <circle cx="50" cy="50" r="10" fill="#E8643C"/>
+    <line x1="50" y1="50" x2="50" y2="12" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="77" y2="23" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="88" y2="50" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="77" y2="77" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="50" y2="88" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="23" y2="77" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="12" y2="50" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="23" y2="23" stroke="#E8643C" stroke-width="4" stroke-linecap="round"/>
   </g>
   <!-- Wordmark -->
-  <text x="110" y="48" font-family="Inter, sans-serif" font-size="28" font-weight="400" letter-spacing="-0.5" fill="#1A1816">Temuclaude</text>
+  <text x="100" y="48" font-family="Inter, sans-serif" font-size="28" font-weight="600" letter-spacing="-0.5" fill="#1A1816">TemuClaude</text>
 </svg>

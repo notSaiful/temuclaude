@@ -2,6 +2,6 @@
   <g fill="#E8D5C4"><circle cx="50" cy="50" r="7"/><circle cx="50" cy="100" r="7"/><circle cx="50" cy="150" r="7"/></g>
   <g fill="#D4A574"><circle cx="100" cy="50" r="7"/><circle cx="100" cy="100" r="7"/><circle cx="100" cy="150" r="7"/></g>
   <g fill="#E8D5C4"><circle cx="150" cy="50" r="7"/><circle cx="150" cy="100" r="7"/><circle cx="150" cy="150" r="7"/></g>
-  <rect x="93" y="40" width="14" height="120" rx="4" fill="#D97757" opacity="0.2"/>
-  <circle cx="100" cy="100" r="12" fill="#D97757"/>
+  <rect x="93" y="40" width="14" height="120" rx="4" fill="#E8643C" opacity="0.2"/>
+  <circle cx="100" cy="100" r="12" fill="#E8643C"/>
 </svg>

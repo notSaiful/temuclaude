@@ -106,7 +106,7 @@ export default function HomePage() {
               <div className="card lg:col-span-2 lg:row-span-2" style={{ padding: '32px' }}>
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 rounded-lg bg-accent-primary/10 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97757" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8643C" strokeWidth="2">
                       <circle cx="6" cy="6" r="3" /><circle cx="18" cy="6" r="3" />
                       <circle cx="6" cy="18" r="3" /><circle cx="18" cy="18" r="3" />
                       <line x1="6" y1="9" x2="6" y2="15" /><line x1="18" y1="9" x2="18" y2="15" />
@@ -419,14 +419,16 @@ export default function HomePage() {
               </div>
             </div>
             <div className="pt-8 border-t border-border-subtle flex flex-col items-center gap-3">
-              <svg width="32" height="32" viewBox="0 0 200 200" aria-hidden="true">
-                <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
-                <circle cx="100" cy="85" r="6" fill="#D97757"/>
+              <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="10" fill="#E8643C"/>
+                <line x1="50" y1="50" x2="50" y2="12" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="77" y2="23" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="88" y2="50" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="77" y2="77" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="50" y2="88" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="23" y2="77" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="12" y2="50" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
+                <line x1="50" y1="50" x2="23" y2="23" stroke="#E8643C" strokeWidth="4" stroke-linecap="round"/>
               </svg>
               <p className="text-sm text-text-muted">
                 Built by Mohammad Saiful Haque with Hermes Agent
@@ -450,7 +452,7 @@ function OrchestrationVisual() {
 
 function OrchAnim() {
   const models = [
-    { color: '#D97757', name: 'GLM-5.2', angle: -75, delay: 0 },
+    { color: '#E8643C', name: 'GLM-5.2', angle: -75, delay: 0 },
     { color: '#C97B50', name: 'DeepSeek', angle: -45, delay: 0.1 },
     { color: '#788C5D', name: 'Hy3', angle: -15, delay: 0.2 },
     { color: '#C46686', name: 'Gemini', angle: 15, delay: 0.3 },
@@ -465,8 +467,8 @@ function OrchAnim() {
       <svg viewBox="0 0 300 280" className="w-full h-auto" aria-hidden="true">
         <defs>
           <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#D97757" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#D97757" stopOpacity="0" />
+            <stop offset="0%" stopColor="#E8643C" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#E8643C" stopOpacity="0" />
           </radialGradient>
           <filter id="softGlow">
             <feGaussianBlur stdDeviation="3" result="blur" />
@@ -554,13 +556,13 @@ function OrchAnim() {
 
         {/* Center aggregation node with pulse ring */}
         <motion.circle
-          cx={cx} cy={cy} r="25" fill="none" stroke="#D97757" strokeWidth="1" opacity="0.2"
+          cx={cx} cy={cy} r="25" fill="none" stroke="#E8643C" strokeWidth="1" opacity="0.2"
           animate={{ r: [25, 40], opacity: [0.3, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
         />
         <motion.circle
           cx={cx} cy={cy} r="22"
-          fill="#D97757"
+          fill="#E8643C"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5, delay: 0.8, ease: 'backOut' }}
@@ -579,14 +581,14 @@ function OrchAnim() {
         {/* Output arrow */}
         <motion.line
           x1={cx} y1={cy + 22} x2={cx} y2={cy + 48}
-          stroke="#D97757" strokeWidth="2" strokeLinecap="round"
+          stroke="#E8643C" strokeWidth="2" strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 0.3, delay: 1.2 }}
         />
         <motion.polygon
           points={`${cx - 5},${cy + 44} ${cx + 5},${cy + 44} ${cx},${cy + 52}`}
-          fill="#D97757"
+          fill="#E8643C"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4 }}
@@ -630,7 +632,7 @@ function OrchAnim() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 2.2, duration: 0.4 }}
         >
-          <text x="8" y="90" fontSize="7" fill="#D97757" fontWeight="700">HARD</text>
+          <text x="8" y="90" fontSize="7" fill="#E8643C" fontWeight="700">HARD</text>
           <text x="8" y="102" fontSize="6" fill="#8E8B85">3 models · 10 layers</text>
         </motion.g>
       </svg>

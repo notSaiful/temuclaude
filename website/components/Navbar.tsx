@@ -46,15 +46,17 @@ export function Navbar() {
         <div className="container-max h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" aria-label="Temuclaude home">
-            {/* Temuclaude Synthesis Logo — 5 converging strokes forming T */}
-            <svg width="28" height="28" viewBox="0 0 200 200" className="shrink-0" aria-hidden="true">
-              <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-              <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-              <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
-              <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-              <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-              <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
-              <circle cx="100" cy="85" r="6" fill="#D97757"/>
+            {/* The Spark — small core, frontier output */}
+            <svg width="28" height="28" viewBox="0 0 100 100" className="shrink-0" aria-hidden="true">
+              <circle cx="50" cy="50" r="11" fill="#E8643C"/>
+              <line x1="50" y1="50" x2="50" y2="10" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="79" y2="21" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="90" y2="50" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="79" y2="79" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="50" y2="90" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="21" y2="79" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="10" y2="50" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="21" y2="21" stroke="#E8643C" strokeWidth="4.5" stroke-linecap="round"/>
             </svg>
             <span className="text-lg font-semibold tracking-tight text-text-primary">
               Temuclaude
@@ -157,11 +159,11 @@ function OrchestrationLogo({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
       {/* Connection lines */}
-      <line x1="20" y1="30" x2="50" y2="50" stroke="#D97757" strokeWidth="1.5" opacity="0.4" />
-      <line x1="35" y1="15" x2="50" y2="50" stroke="#D97757" strokeWidth="1.5" opacity="0.4" />
-      <line x1="50" y1="10" x2="50" y2="50" stroke="#D97757" strokeWidth="1.5" opacity="0.4" />
-      <line x1="65" y1="15" x2="50" y2="50" stroke="#D97757" strokeWidth="1.5" opacity="0.4" />
-      <line x1="80" y1="30" x2="50" y2="50" stroke="#D97757" strokeWidth="1.5" opacity="0.4" />
+      <line x1="20" y1="30" x2="50" y2="50" stroke="#E8643C" strokeWidth="1.5" opacity="0.4" />
+      <line x1="35" y1="15" x2="50" y2="50" stroke="#E8643C" strokeWidth="1.5" opacity="0.4" />
+      <line x1="50" y1="10" x2="50" y2="50" stroke="#E8643C" strokeWidth="1.5" opacity="0.4" />
+      <line x1="65" y1="15" x2="50" y2="50" stroke="#E8643C" strokeWidth="1.5" opacity="0.4" />
+      <line x1="80" y1="30" x2="50" y2="50" stroke="#E8643C" strokeWidth="1.5" opacity="0.4" />
 
       {/* Model nodes */}
       <circle cx="20" cy="30" r="6" fill="#E8D5C4" />
@@ -171,7 +173,7 @@ function OrchestrationLogo({ size = 28 }: { size?: number }) {
       <circle cx="80" cy="30" r="6" fill="#E8D5C4" />
 
       {/* Central hub */}
-      <circle cx="50" cy="50" r="10" fill="#D97757" />
+      <circle cx="50" cy="50" r="10" fill="#E8643C" />
     </svg>
   );
 }

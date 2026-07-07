@@ -1,9 +1,9 @@
 <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <path d="M100 30 L100 120" stroke="#D97757" stroke-width="3"/>
-  <path d="M100 120 Q130 140 140 160" fill="none" stroke="#D97757" stroke-width="2" opacity="0.3" stroke-dasharray="4 4"/>
-  <path d="M100 120 Q70 140 60 160" fill="none" stroke="#D97757" stroke-width="2" opacity="0.3" stroke-dasharray="4 4"/>
-  <circle cx="100" cy="30" r="6" fill="#D97757"/>
-  <circle cx="140" cy="160" r="14" fill="#D97757"/>
+  <path d="M100 30 L100 120" stroke="#E8643C" stroke-width="3"/>
+  <path d="M100 120 Q130 140 140 160" fill="none" stroke="#E8643C" stroke-width="2" opacity="0.3" stroke-dasharray="4 4"/>
+  <path d="M100 120 Q70 140 60 160" fill="none" stroke="#E8643C" stroke-width="2" opacity="0.3" stroke-dasharray="4 4"/>
+  <circle cx="100" cy="30" r="6" fill="#E8643C"/>
+  <circle cx="140" cy="160" r="14" fill="#E8643C"/>
   <circle cx="60" cy="160" r="10" fill="#D4A574" opacity="0.5"/>
   <circle cx="100" cy="160" r="10" fill="#D4A574" opacity="0.5"/>
 </svg>
