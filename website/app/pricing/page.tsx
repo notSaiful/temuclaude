@@ -6,8 +6,8 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is TemuClaude different from using GPT-5.5 directly?', a: 'GPT-5.5 is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 25x lower cost.' },
-  { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 100 queries/day, no signup required. Upgrade when you need more.' },
+  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 30x lower cost than Claude Sonnet 5.' },
+  { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 20 queries/day, no signup required. Upgrade when you need more.' },
   { q: 'Which models does TemuClaude use?', a: '8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (reasoning), Hy3 Preview (cheapest), Gemini 3 Flash (legal/health), MiniMax M3 (vision/creative), MiMo-V2.5 (multimodal), Claude Sonnet 5 (frontier fallback), and Nemotron 3 Ultra (QA gate, free). We route to the best model automatically.' },
   { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through a 3-layer Mixture-of-Agents, verifies math with code execution, and quality-checks with a self-QA gate on 5 rubrics. You see the whole process in the playground.' },
   { q: 'Are the benchmark scores verified?', a: 'Not yet. Our benchmark scores are projected from research analysis of our orchestration architecture. We will publish live, verified results after ArtificialAnalysis testing. We believe in transparency.' },
@@ -90,12 +90,11 @@ export default function PricingPage() {
             <div className="text-center">
               <p className="text-sm text-text-secondary mb-3">vs Frontier Models (per 1M tokens)</p>
               <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
-                <div><span className="text-text-muted">Fable 5</span> <strong className="text-text-primary">$10 / $50</strong></div>
+                <div><span className="text-text-muted">Claude Sonnet 5</span> <strong className="text-text-primary">$3 / $15</strong></div>
                 <div><span className="text-text-muted">GPT-5.5</span> <strong className="text-text-primary">$5 / $30</strong></div>
-                <div><span className="text-text-muted">Opus 4.8</span> <strong className="text-text-primary">$5 / $25</strong></div>
-                <div><span className="text-text-muted">Sonnet 5</span> <strong className="text-text-primary">$3 / $15</strong></div>
+                <div><span className="text-text-muted">GPT-5</span> <strong className="text-text-primary">$5 / $25</strong></div>
                 <div><span className="text-text-muted">GLM-5.2</span> <strong className="text-text-primary">$1.40 / $4.40</strong></div>
-                <div><span className="text-accent-primary font-bold">Temuclaude $0.50 / $2.00</span></div>
+                <div><span className="text-accent-primary font-bold">TemuClaude $0.50 / $2.00</span></div>
               </div>
             </div>
           </div>
@@ -174,7 +173,7 @@ export default function PricingPage() {
               </div>
             </div>
             <p className="text-center text-sm text-text-secondary mt-4">
-              25x cheaper than Fable 5 ($10/$50). 15x cheaper than GPT-5.5 ($5/$30). 7.5x cheaper than Claude Sonnet 5 ($3/$15).
+              30x cheaper than Claude Sonnet 5 ($3/$15). 15x cheaper than GPT-5.5 ($5/$30). 7x cheaper than GLM-5.2 ($1.40/$4.40).
             </p>
           </div>
 

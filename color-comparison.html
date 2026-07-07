@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Comparison — #D97757 vs #E8643C</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e8e8f0; font-family: 'Inter', -apple-system, sans-serif; }
+  .container { max-width: 800px; margin: 0 auto; padding: 60px 20px; }
+  h1 { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+  .sub { text-align: center; color: #888; font-size: 13px; margin-bottom: 40px; }
+  .row { display: flex; gap: 32px; justify-content: center; margin-bottom: 32px; }
+  .card { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 32px; text-align: center; width: 300px; }
+  .card-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .swatch { width: 120px; height: 120px; border-radius: 16px; margin: 0 auto 16px; }
+  .hex { font-family: monospace; font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .desc { font-size: 12px; color: #666; line-height: 1.5; }
+  .diff { font-size: 13px; color: #888; text-align: center; margin-top: 24px; padding: 16px; background: #141414; border-radius: 12px; border: 1px solid #222; }
+  .diff strong { color: #E8643C; }
+  .side { display: flex; gap: 0; height: 60px; border-radius: 12px; overflow: hidden; margin-top: 24px; }
+  .side-a { flex: 1; background: #D97757; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .side-b { flex: 1; background: #E8643C; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Color Comparison</h1>
+  <p class="sub">Claude's orange vs our orange — side by side</p>
+  
+  <div class="row">
+    <div class="card">
+      <div class="card-label">Anthropic / Claude</div>
+      <div class="swatch" style="background: #D97757"></div>
+      <div class="hex" style="color: #D97757">#D97757</div>
+      <div class="desc">Claude's official brand accent color. Warm salmon-terracotta.</div>
+    </div>
+    <div class="card" style="border-color: #E8643C">
+      <div class="card-label">TemuClaude (ours)</div>
+      <div class="swatch" style="background: #E8643C"></div>
+      <div class="hex" style="color: #E8643C">#E8643C</div>
+      <div class="desc">Deeper, more saturated red-orange. Clearly different hex code.</div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="side-a">#D97757</div>
+    <div class="side-b">#E8643C</div>
+  </div>
+
+  <div class="diff">
+    <strong>Honest assessment:</strong> These colors are visually very similar. The hex codes are different (D9 vs E8, 57 vs 3C), but to the human eye they read as the same warm orange. If you want real visual distance from Anthropic, we need a more different color — not just a hex tweak. Options: a true burnt orange (#CC5500), a warm amber (#E89B20), or a rich rust (#B85042). Want me to show those?
+  </div>
+</div>
+</body>
+</html>
