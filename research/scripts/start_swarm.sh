@@ -19,15 +19,22 @@ mkdir -p "$RESEARCH_DIR/audit_reports" "$RESEARCH_DIR/swot_reports"
 mkdir -p "$RESEARCH_DIR/radar_reports" "$RESEARCH_DIR/cost_reports"
 mkdir -p "$RESEARCH_DIR/model_optimization_reports"
 
-# Kill any existing daemons first
+# Kill any existing daemons first — use pkill by process name, not just PID files
 echo "Stopping any existing daemons..."
+# Kill watchdog FIRST so it doesn't restart daemons we're about to kill
+pkill -f "watchdog.py" 2>/dev/null || true
+sleep 1
+# Kill all daemon processes by name
+pkill -f "temuclaude/research/.*_daemon\.py" 2>/dev/null || true
+pkill -f "temuclaude/research/sync_daemon" 2>/dev/null || true
+pkill -f "temuclaude/research/share_intelligence" 2>/dev/null || true
+sleep 2
+# Also kill by PID files as a fallback
 for pidfile in "$STATE_DIR"/*.pid; do
     if [ -f "$pidfile" ]; then
         pid=$(cat "$pidfile" 2>/dev/null)
         if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-            echo "  Killing $pid ($pidfile)"
-            kill -TERM "$pid" 2>/dev/null
-            sleep 1
+            echo "  Killing leftover PID $pid ($pidfile)"
             kill -KILL "$pid" 2>/dev/null || true
         fi
     fi
@@ -35,6 +42,14 @@ done
 
 # Wait for all processes to fully exit
 sleep 3
+
+# Verify zero processes
+remaining_procs=$(ps aux | grep 'temuclaude/research' | grep -v grep | wc -l | tr -d ' ')
+if [ "$remaining_procs" -gt 0 ]; then
+    echo "WARNING: $remaining_procs processes still alive, force killing..."
+    ps aux | grep 'temuclaude/research' | grep -v grep | awk '{print $2}' | xargs kill -9 2>/dev/null || true
+    sleep 2
+fi
 
 # Force-clear ALL state files
 rm -f "$STATE_DIR"/*.pid "$STATE_DIR"/*_heartbeat.json 2>/dev/null || true

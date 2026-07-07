@@ -509,3 +509,45 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
             "Provide concrete numbers wherever possible and conclude with the classification."
         )},
     ]
+
+def classify_efficiency_finding(technique_name: str, speedup_factor: float,
+                                 resource_savings_pct: float, quality_loss_pct: float,
+                                 quality_metric: str = "accuracy") -> str:
+    """
+    Classify an efficiency finding into one of four categories based on
+    speedup, resource savings, and quality loss.
+
+    Categories:
+    - LOSSLESS: No quality loss (quality_loss_pct == 0) with meaningful gains
+    - QUALITY-PRESERVING: Negligible quality loss (< 1%) with significant gains
+    - PARETO-OPTIMAL: Acceptable quality loss (>= 1% and <= 5%) with large gains
+    - REJECTED: Excessive quality loss (> 5%) or negligible gains
+
+    Example for AWQ (Activation-aware Weight Quantization):
+      speedup_factor=2.2, resource_savings_pct=65, quality_loss_pct=0.5
+      -> QUALITY-PRESERVING (4-bit weight quantization with minimal accuracy drop)
+
+    Example for vLLM (PagedAttention):
+      speedup_factor=3.0, resource_savings_pct=80, quality_loss_pct=0.0
+      -> LOSSLESS (serving optimization with identical outputs)
+    """
+    if not isinstance(speedup_factor, (int, float)) or speedup_factor <= 0:
+        return "REJECTED"
+    if not isinstance(resource_savings_pct, (int, float)) or resource_savings_pct < 0:
+        return "REJECTED"
+    if not isinstance(quality_loss_pct, (int, float)) or quality_loss_pct < 0:
+        return "REJECTED"
+
+    meaningful_gain = speedup_factor >= 1.2 or resource_savings_pct >= 20
+
+    if not meaningful_gain:
+        return "REJECTED"
+
+    if quality_loss_pct == 0:
+        return "LOSSLESS"
+    elif quality_loss_pct < 1.0:
+        return "QUALITY-PRESERVING"
+    elif quality_loss_pct <= 5.0:
+        return "PARETO-OPTIMAL"
+    else:
+        return "REJECTED"

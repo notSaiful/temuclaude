@@ -58,11 +58,19 @@ export default function HomePage() {
                   className="mb-6 animate-fade-in-up"
                   style={{ animationDelay: '450ms' }}
                 >
-                  <div className="bg-bg-dark rounded-md p-4 max-w-md font-mono text-sm overflow-x-auto">
-                    <div className="text-text-muted text-xs mb-2"># One request. One answer. No model selection.</div>
-                    <div><span className="text-accent-olive">curl</span> <span className="text-accent-fig">-X POST</span> temuclaude.com/api/chat \</div>
-                    <div className="pl-4">-H <span className="text-accent-amber">"Content-Type: application/json"</span> \</div>
-                    <div className="pl-4">-d <span className="text-accent-amber">'{"{"}"messages":[{"{"}"role":"user","content":"hi"{"}"}]{"}"}'</span></div>
+                  <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden">
+                    <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#febc2e' }} />
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#28c840' }} />
+                      <span className="text-[10px] text-text-muted ml-2">terminal</span>
+                    </div>
+                    <div className="p-4 overflow-x-auto">
+                      <div className="text-text-muted text-xs mb-2"># One request. One answer. No model selection.</div>
+                      <div><span className="text-accent-olive">curl</span> <span className="text-accent-fig">-X POST</span> temuclaude.com/api/chat \</div>
+                      <div className="pl-4">-H <span className="text-accent-amber">"Content-Type: application/json"</span> \</div>
+                      <div className="pl-4">-d <span className="text-accent-amber">'{"{"}"messages":[{"{"}"role":"user","content":"hi"{"}"}]{"}"}'</span></div>
+                    </div>
                   </div>
                 </div>
 
@@ -70,10 +78,10 @@ export default function HomePage() {
                   className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up"
                   style={{ animationDelay: '500ms' }}
                 >
-                  <a href="/playground" className="btn-accent">
+                  <MagneticButton href="/playground" className="btn-accent">
                     Try Free — 20 queries/day
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                  </a>
+                  </MagneticButton>
                   <a href="/pricing" className="btn-secondary">
                     View Pricing
                   </a>
