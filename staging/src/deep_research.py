@@ -1282,3 +1282,76 @@ def build_awq_vllm_research_prompt() -> List[Dict]:
             "numbers where available, and Python code examples for integration."
         )},
     ]
+
+def select_research_inference_backend(
+    available_backends: List[str],
+    latency_sensitive: bool = True,
+    cost_sensitive: bool = False,
+) -> str:
+    """Select the optimal inference backend for deep research tasks.
+
+    Based on efficiency finding: self-hosted vLLM incurs a latency penalty
+    compared to managed API providers. For multi-pass deep research (which
+    makes many sequential LLM calls), this latency penalty compounds across
+    plan -> research -> synthesize -> review -> expand stages.
+
+    Classification: LOSSLESS — no quality impact, pure latency improvement.
+
+    Args:
+        available_backends: List of backend identifiers, e.g.
+            ["openai_api", "anthropic_api", "self_hosted_vllm", "local_ollama"].
+        latency_sensitive: If True (default for interactive research), prefer
+            managed API providers to avoid vLLM cold-start and queueing latency.
+        cost_sensitive: If True, allow self-hosted vLLM as fallback when API
+            providers are unavailable or budget is constrained.
+
+    Returns:
+        The selected backend identifier from available_backends.
+
+    Raises:
+        ValueError: If available_backends is empty.
+    """
+    if not available_backends:
+        raise ValueError("available_backends must contain at least one backend")
+
+    # Preference order when latency matters: managed APIs first, then local,
+    # self-hosted vLLM last due to documented latency penalty.
+    if latency_sensitive:
+        preference_order = [
+            "anthropic_api",
+            "openai_api",
+            "google_api",
+            "local_ollama",
+            "self_hosted_vllm",
+        ]
+    else:
+        # When latency is not critical (e.g. batch background research),
+        # cost-sensitive users may prefer self-hosted vLLM.
+        preference_order = [
+            "self_hosted_vllm",
+            "local_ollama",
+            "anthropic_api",
+            "openai_api",
+            "google_api",
+        ]
+
+    # Override: if cost_sensitive and latency_sensitive, still avoid vLLM
+    # unless it's the only option (latency penalty outweighs savings for
+    # sequential multi-pass research pipelines).
+    if latency_sensitive and cost_sensitive:
+        preference_order = [
+            "openai_api",
+            "anthropic_api",
+            "google_api",
+            "local_ollama",
+            "self_hosted_vllm",
+        ]
+
+    available_set = set(available_backends)
+    for backend in preference_order:
+        if backend in available_set:
+            return backend
+
+    # If none of the known backends match, return the first available
+    # (caller is responsible for validating it).
+    return available_backends[0]
