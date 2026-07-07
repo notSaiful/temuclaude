@@ -10,15 +10,15 @@
     },
     "swarm_health": {
       "value": {
-        "alive": 13,
+        "alive": 23,
         "total": 23,
-        "timestamp": "2026-07-07T15:15:07.476198"
+        "timestamp": "2026-07-07T15:16:27.657341"
       },
       "daemon": "watchdog",
       "category": "system",
-      "timestamp": "2026-07-07T15:15:07.476260"
+      "timestamp": "2026-07-07T15:16:27.657404"
     }
   },
   "last_updated": "2026-07-06T18:02:36.132533+00:00",
-  "last_update": "2026-07-07T15:15:07.476263"
+  "last_update": "2026-07-07T15:16:27.657406"
 }

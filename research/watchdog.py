@@ -242,6 +242,15 @@ def main():
     write_heartbeat('running')
 
     cycle = 0
+    # Startup grace period: wait 60s before first health check
+    # This gives all 23 daemons time to start and write their PID files
+    # (start_swarm.sh takes ~23s to start all daemons with 1s sleep each)
+    log('INFO', f'Startup grace period: waiting 60s before first health check...')
+    write_heartbeat('starting')
+    time.sleep(60)
+    log('INFO', f'Grace period ended, starting health checks')
+    write_heartbeat('running')
+    
     while running:
         cycle += 1
         try:

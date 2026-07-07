@@ -4,6 +4,7 @@ import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { FusionPipeline } from '@/components/FusionPipeline';
 import { MagneticButton } from '@/components/MagneticButton';
+import { PricingSection } from '@/components/PricingSection';
 
 export default function HomePage() {
   return (
@@ -446,26 +447,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ━━ Pricing CTA ━━ */}
-        <section className="py-20 px-6 bg-bg-secondary">
-          <div className="container-max text-center">
-            <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-              $0.50 per million tokens.<br />That's it.
-            </h2>
-            <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              20 free queries/day. No signup. Upgrade when you need more. Cancel anytime.
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <a href="/playground" className="btn-accent">
-                Start Free
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-              </a>
-              <a href="/pricing" className="btn-secondary">
-                See Plans
-              </a>
-            </div>
-          </div>
-        </section>
+        {/* ━━ Pricing ━━ */}
+        <PricingSection />
 
         {/* ━━ Footer ━━ */}
         <footer className="py-12 px-6 border-t border-border-subtle bg-bg-primary">

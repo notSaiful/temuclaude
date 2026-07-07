@@ -1,0 +1,9 @@
+{
+  "id": "swot_20260707T094522_missing_feature",
+  "source": "swot_analysis",
+  "severity": "HIGH",
+  "action": "Research and implement: AWQ (competitor: vLLM)",
+  "area": "missing_feature",
+  "title": "Research and implement: AWQ (competitor: vLLM)",
+  "timestamp": "2026-07-07T09:45:22.527261+00:00"
+}
