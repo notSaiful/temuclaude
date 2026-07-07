@@ -6,16 +6,16 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, verifying math with code execution, and quality-checking every response on 5 rubrics. The result is measurably better, at 6x lower cost than Claude Sonnet 5.' },
+  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, self-checking every response on 5 rubrics, and retrying if quality is low. The result is measurably better, at 4x lower cost than Claude Sonnet 5.' },
   { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 20 queries/day, no signup required. Upgrade when you need more.' },
   { q: 'Which models does TemuClaude use?', a: '8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (reasoning), Hy3 Preview (cheapest), Gemini 3 Flash (legal/health), MiniMax M3 (vision/creative), MiMo-V2.5 (multimodal), Claude Sonnet 5 (frontier fallback), and Nemotron 3 Ultra (QA gate, free). We route to the best model automatically.' },
-  { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through a 3-layer Mixture-of-Agents, verifies math with code execution, and quality-checks with a self-QA gate on 5 rubrics. You see the whole process in the playground.' },
+  { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through Mixture-of-Agents (3 models propose, 1 aggregates), self-checks with a QA gate on 5 rubrics, and retries if quality is low. You see the whole process in the playground.' },
   { q: 'Are the benchmark scores verified?', a: 'Not yet. Our benchmark scores are projected from research analysis of our orchestration architecture. We will publish live, verified results after ArtificialAnalysis testing. We believe in transparency.' },
   { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored. We log routing decisions and quality scores for self-improvement, but never the content of your queries.' },
   { q: 'What about enterprise?', a: 'Enterprise includes SSO/SAML, SLA 99.9%, dedicated support, custom integrations, and unlimited queries. Contact us for details.' },
   { q: 'Can I cancel anytime?', a: 'Yes. No contracts. Cancel anytime from your dashboard or contact us.' },
-  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users pay per token: $0.50/M input, $2.00/M output, $0.05/M cached input. Contact us to set up metered billing.' },
-  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to free models, 30% to ultra-cheap models ($0.06-0.14/M), and only 10% to premium models. Our 3-layer MoA fusion makes cheap models together smarter than one expensive model alone. You get frontier-level answers at a fraction of the cost.' },
+  { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users pay per token: ~$1.44/M blended (varies by question difficulty — trivial costs less, hard costs more). Contact us to set up metered billing.' },
+  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to Hy3 Preview ($0.06/$0.21 per M), 30% to specialists, and only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron). You pay for smart routing, not raw frontier compute.' },
   { q: 'Does TemuClaude give back to the community?', a: 'Yes. 25% of all profit goes to verified charitable causes — food relief, community kitchens, medical clinics, and education programs. Every query you make helps.' },
 ];
 
@@ -90,11 +90,10 @@ export default function PricingPage() {
             <div className="text-center">
               <p className="text-sm text-text-secondary mb-3">vs Frontier Models (per 1M tokens)</p>
               <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
-                <div><span className="text-text-muted">Claude Sonnet 5</span> <strong className="text-text-primary">$3 / $15</strong></div>
+                <div><span className="text-text-muted">Claude Sonnet 5</span> <strong className="text-text-primary">$2 / $10</strong></div>
                 <div><span className="text-text-muted">GPT-5.5</span> <strong className="text-text-primary">$5 / $30</strong></div>
-                <div><span className="text-text-muted">GPT-5</span> <strong className="text-text-primary">$5 / $25</strong></div>
-                <div><span className="text-text-muted">GLM-5.2</span> <strong className="text-text-primary">$1.40 / $4.40</strong></div>
-                <div><span className="text-accent-primary font-bold">TemuClaude $0.50 / $2.00</span></div>
+                <div><span className="text-text-muted">Claude Fable 5</span> <strong className="text-text-primary">$10 / $50</strong></div>
+                <div><span className="text-accent-primary font-bold">TemuClaude ~$1.44/M blended</span></div>
               </div>
             </div>
           </div>
@@ -160,20 +159,20 @@ export default function PricingPage() {
             </div>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$0.50</div>
-                <div className="text-sm text-text-muted">per 1M input tokens</div>
+                <div className="text-2xl font-bold text-text-primary">~$1.44</div>
+                <div className="text-sm text-text-muted">per 1M tokens (blended)</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$2.00</div>
-                <div className="text-sm text-text-muted">per 1M output tokens</div>
+                <div className="text-2xl font-bold text-text-primary">$0.06</div>
+                <div className="text-sm text-text-muted">per 1M trivial (Hy3)</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
-                <div className="text-2xl font-bold text-text-primary">$0.05</div>
-                <div className="text-sm text-text-muted">per 1M cached input</div>
+                <div className="text-2xl font-bold text-text-primary">Free</div>
+                <div className="text-sm text-text-muted">QA gate (Nemotron)</div>
               </div>
             </div>
             <p className="text-center text-sm text-text-secondary mt-4">
-              6x cheaper than Claude Sonnet 5 ($3/$15). 10x cheaper than GPT-5.5 ($5/$30). 2.8x cheaper than GLM-5.2 ($1.40/$4.40).
+              4x cheaper than Claude Sonnet 5 ($2/$10). 12x cheaper than GPT-5.5 ($5/$30). 21x cheaper than Claude Fable 5 ($10/$50).
             </p>
           </div>
 
