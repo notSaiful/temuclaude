@@ -826,3 +826,45 @@ def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
             "Evaluate and classify this efficiency finding."
         )},
     ]
+
+def build_awq_research_plan_prompt() -> List[Dict]:
+    """Build a specialized research plan prompt for AWQ vs vLLM comparison and implementation."""
+    return [
+        {"role": "system", "content": (
+            "You are a research planner specializing in LLM quantization and inference optimization. "
+            "Create a comprehensive research outline comparing AWQ (Activation-aware Weight Quantization) "
+            "with vLLM's quantization approaches. Cover: 1) AWQ algorithm fundamentals and calibration "
+            "process, 2) vLLM's current quantization support (AWQ, GPTQ, SqueezeLLM, FP8), 3) "
+            "Performance benchmarks: latency, throughput, memory usage, accuracy degradation, "
+            "4) Integration patterns for AWQ in vLLM backend, 5) Hardware support (NVIDIA Hopper, "
+            "Ampere, AMD MI300, Intel Gaudi), 6) Production deployment considerations: model "
+            "repository formats, calibration data requirements, dynamic vs static quantization, "
+            "7) Temuclaude orchestration integration: model selection, quantization config, "
+            "auto-tuning pipelines. Each section must have 3-5 subsections with specific technical "
+            "detail requirements. Output as a numbered list."
+        )},
+        {"role": "user", "content": (
+            "Topic: AWQ (Activation-aware Weight Quantization) implementation and integration "
+            "for Temuclaude orchestration engine, competitive analysis against vLLM's quantization stack. "
+            "Create a research outline with at least 7 major sections covering algorithm internals, "
+            "benchmarking methodology, integration architecture, and production deployment."
+        )},
+    ]
+
+
+def queue_awq_research_task(research_queue: asyncio.Queue, priority: int = 10) -> None:
+    """Queue the AWQ research task with high priority for the deep research pipeline."""
+    task = {
+        "topic": "AWQ (Activation-aware Weight Quantization) implementation and vLLM competitive analysis",
+        "priority": priority,
+        "plan_prompt_builder": build_awq_research_plan_prompt,
+        "min_words": 15000,
+        "sections": 7,
+        "metadata": {
+            "source_finding": "swot_20260707T100738_missing_feature.json",
+            "research_type": "implementation_ready",
+            "target_module": "temuclaude.orchestration.quantization",
+            "competitor": "vLLM",
+        },
+    }
+    research_queue.put_nowait(task)
