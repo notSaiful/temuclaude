@@ -772,3 +772,26 @@ def build_awq_research_prompt() -> List[Dict]:
             "Write this section in full with technical depth and implementation guidance."
         )},
     ]
+
+
+def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
+    """Build a specialized prompt for researching LLM quantization and inference engine comparisons (e.g., AWQ vs vLLM)."""
+    competitor_text = ", ".join(competitors)
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM inference optimization and model quantization. "
+            "Research and compare quantization methods (AWQ, GPTQ, SmoothQuant, etc.) and inference engines "
+            f"({competitor_text}). Cover: quantization algorithms, memory footprint reductions, "
+            "throughput benchmarks, accuracy preservation, hardware compatibility (GPU types, CPU offloading), "
+            "ease of deployment, integration with serving frameworks, kernel optimizations, "
+            "supported model architectures, community support, and production readiness. "
+            "Include quantitative benchmarks where available and cite sources."
+        )},
+        {"role": "user", "content": (
+            f"Topic: {topic}\n"
+            f"Competitors/Technologies to compare: {competitor_text}\n\n"
+            "Produce a detailed technical comparison covering quantization methodology, "
+            "performance benchmarks, accuracy trade-offs, deployment considerations, and "
+            "recommendations for different use cases (edge, cloud, batch, real-time)."
+        )},
+    ]

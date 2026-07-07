@@ -15,36 +15,6 @@
         "avg_score": 0.0,
         "win_rate": 0.0
       }
-    },
-    "general_tts": {
-      "alibaba/qwen3-tts-flash": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      }
-    },
-    "emotion_understanding": {
-      "hume/octave-2": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      }
-    },
-    "voice_cloning": {
-      "elevenlabs/v3_alpha": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      },
-      "minimax/speech-2.6-hd": {
-        "wins": 0,
-        "total": 1,
-        "avg_score": 0.0,
-        "win_rate": 0.0
-      }
     }
   },
   "models": {
@@ -57,35 +27,15 @@
       "wins": 0,
       "total": 2,
       "avg_score": 0.0
-    },
-    "alibaba/qwen3-tts-flash": {
-      "wins": 0,
-      "total": 1,
-      "avg_score": 0.0
-    },
-    "hume/octave-2": {
-      "wins": 0,
-      "total": 1,
-      "avg_score": 0.0
-    },
-    "elevenlabs/v3_alpha": {
-      "wins": 0,
-      "total": 1,
-      "avg_score": 0.0
-    },
-    "minimax/speech-2.6-hd": {
-      "wins": 0,
-      "total": 1,
-      "avg_score": 0.0
     }
   },
   "overall": {
-    "total_generations": 7,
+    "total_generations": 4,
     "total_wins": 0,
     "cache_hits": 0,
-    "total_cost": 1.6850839999999998,
+    "total_cost": 1.64,
     "avg_score": 0.0,
-    "avg_iterations": 3.5714285714285716,
-    "last_updated": 1783424340.000198
+    "avg_iterations": 4.0,
+    "last_updated": 1783427693.693115
   }
 }
