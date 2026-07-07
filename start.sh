@@ -10,9 +10,9 @@ set -e
 echo "=== Starting Timuclaude ==="
 
 # Check master key
-if [ -z "$TIMUCLAUDE_MASTER_KEY" ]; then
-    echo "ERROR: TIMUCLAUDE_MASTER_KEY not set"
-    echo "Run: export TIMUCLAUDE_MASTER_KEY=\$(openssl rand -hex 32)"
+if [ -z "$TEMUCLAUDE_MASTER_KEY" ]; then
+    echo "ERROR: TEMUCLAUDE_MASTER_KEY not set"
+    echo "Run: export TEMUCLAUDE_MASTER_KEY=\$(openssl rand -hex 32)"
     exit 1
 fi
 

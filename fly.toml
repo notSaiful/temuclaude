@@ -1,7 +1,7 @@
 # fly.toml — Timuclaude Fly.io deployment configuration
 # Deploy with: fly deploy
 
-app = "timuclaude"
+app = "temuclaude"
 primary_region = "bom"  # Mumbai — closest to Nagpur, India
 
 [build]
@@ -32,4 +32,4 @@ primary_region = "bom"  # Mumbai — closest to Nagpur, India
   memory_mb = 512
 
 [env]
-  TIMUCLAUDE_MASTER_KEY = "change-me-in-fly-secrets"
+  TEMUCLAUDE_MASTER_KEY = "change-me-in-fly-secrets"
