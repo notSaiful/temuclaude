@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Source_Sans_3, Newsreader, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { CookieConsent } from '@/components/CookieConsent';
-import { CommandPalette } from '@/components/CommandPalette';
 
 const sourceSans = Source_Sans_3({
   subsets: ['latin'],
@@ -80,7 +79,6 @@ export default function RootLayout({
         </a>
         {children}
         <CookieConsent />
-        <CommandPalette />
       </body>
     </html>
   );

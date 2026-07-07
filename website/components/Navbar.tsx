@@ -7,23 +7,14 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { label: 'Models', href: '/models' },
   { label: 'Playground', href: '/playground' },
-  { label: 'Docs', href: '/docs', hasDropdown: true },
+  { label: 'Docs', href: '/docs' },
   { label: 'Benchmarks', href: '/benchmarks' },
   { label: 'Pricing', href: '/pricing' },
-];
-
-const docsSubmenu = [
-  { label: 'Quickstart', href: '/docs' },
-  { label: 'API Reference', href: '/docs#api' },
-  { label: 'Models', href: '/docs#models' },
-  { label: 'Configuration', href: '/docs#config' },
-  { label: 'Self-Hosting', href: '/docs#self-hosting' },
 ];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -74,60 +65,20 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) =>
-              item.hasDropdown ? (
-                <div
-                  key={item.href}
-                  className="relative"
-                  onMouseEnter={() => setDocsOpen(true)}
-                  onMouseLeave={() => setDocsOpen(false)}
-                >
-                  <Link
-                    href={item.href}
-                    className={`nav-link inline-flex items-center gap-1 ${
-                      pathname === item.href || pathname?.startsWith(item.href + '/')
-                        ? 'nav-link-active'
-                        : ''
-                    }`}
-                    aria-current={pathname === item.href ? 'page' : undefined}
-                  >
-                    {item.label}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={`transition-transform ${docsOpen ? 'rotate-180' : ''}`}>
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                  </Link>
-                  {docsOpen && (
-                    <div
-                      className="absolute top-full left-0 mt-1 w-48 bg-white border border-border-subtle rounded-sm py-2"
-                      style={{ boxShadow: '0px 0px 0px 1px rgba(26, 24, 22, 0.08), rgba(26, 24, 22, 0.05) 0px 4px 24px' }}
-                    >
-                      {docsSubmenu.map((sub) => (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
-                          className="block px-4 py-2 text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors"
-                        >
-                          {sub.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`nav-link ${
-                    pathname === item.href || pathname?.startsWith(item.href + '/')
-                      ? 'nav-link-active'
-                      : ''
-                  }`}
-                  aria-current={pathname === item.href ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-link ${
+                  pathname === item.href || pathname?.startsWith(item.href + '/')
+                    ? 'nav-link-active'
+                    : ''
+                }`}
+                aria-current={pathname === item.href ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
           {/* Desktop CTA */}
