@@ -935,3 +935,52 @@ def build_efficiency_finding_prompt(finding: Dict) -> List[Dict]:
             "recommendation on whether to integrate into src/efficiency/."
         )},
     ]
+
+def select_inference_backend(
+    available_backends: List[str],
+    require_low_latency: bool = True,
+    latency_estimates: Optional[Dict[str, float]] = None,
+) -> str:
+    """
+    Select the best inference backend for deep research workloads.
+
+    Research findings indicate self-hosted vLLM incurs a significant latency
+    penalty compared to managed API providers. When low latency is required
+    (the default for interactive deep-research passes), deprioritize any
+    backend whose name contains 'vllm' or 'self-hosted'.
+
+    Args:
+        available_backends: List of backend identifiers, e.g.
+            ["anthropic", "openai", "vllm_self_hosted", "local_vllm"].
+        require_low_latency: If True, avoid self-hosted vLLM backends.
+        latency_estimates: Optional mapping of backend -> estimated latency
+            in milliseconds. If provided, used to break ties / rank.
+
+    Returns:
+        The selected backend identifier.
+
+    Raises:
+        ValueError: If no backends are available.
+    """
+    if not available_backends:
+        raise ValueError("No inference backends available for selection")
+
+    latency_estimates = latency_estimates or {}
+
+    def _is_self_hosted_vllm(name: str) -> bool:
+        lowered = name.lower()
+        return "vllm" in lowered and ("self" in lowered or "hosted" in lowered or "local" in lowered)
+
+    def _latency(name: str) -> float:
+        return latency_estimates.get(name, float("inf"))
+
+    candidates = list(available_backends)
+
+    if require_low_latency:
+        filtered = [b for b in candidates if not _is_self_hosted_vllm(b)]
+        if filtered:
+            candidates = filtered
+
+    candidates.sort(key=lambda b: (_is_self_hosted_vllm(b), _latency(b), b))
+
+    return candidates[0]
