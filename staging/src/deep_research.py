@@ -759,38 +759,41 @@ from typing import Optional, Callable, Awaitable, List, Dict
 
 
 def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM") -> List[Dict]:
-    """Build a specialized research prompt for AWQ quantization and its comparison to vLLM.
+    """Build a specialized research prompt for AWQ quantization research.
     
-    Covers quantization theory, AWQ algorithm details, performance benchmarks,
-    memory efficiency, deployment considerations, and competitive analysis against vLLM.
+    Focuses on AWQ as a competitor to vLLM, covering quantization techniques,
+    performance benchmarks, memory efficiency, deployment considerations,
+    and integration patterns for AI orchestration engines.
     """
     return [
         {"role": "system", "content": (
             "You are a deep research agent specializing in LLM inference optimization "
-            "and model quantization techniques. Produce a comprehensive, implementation-ready "
-            "research report covering AWQ (Activation-aware Weight Quantization) and its "
-            "position relative to vLLM as an inference engine. "
-            "Include: (1) AWQ algorithm fundamentals — how activation-aware salient weight "
-            "identification works, the 0.5% salient weight threshold, and per-channel scaling; "
-            "(2) Quantization precision tradeoffs — INT4, INT8, group-size configurations, "
-            "and accuracy preservation compared to FP16 baselines; "
-            "(3) Memory and throughput benchmarks — KV cache savings, tokens/sec, batch size "
-            "scaling, and comparison tables against vLLM's default and quantized modes; "
-            "(4) Hardware compatibility — GPU support (NVIDIA Ampere/Hopper, AMD MI300), "
-            "CPU offloading, and edge deployment scenarios; "
-            "(5) Integration pathways — how to incorporate AWQ-quantized models into an "
-            "AI orchestration engine, including HuggingFace transformers integration, "
-            "autoawq library usage, and serving via vLLM with AWQ checkpoints; "
-            "(6) Limitations and risks — calibration dataset sensitivity, model architecture "
-            "constraints, and known failure modes. "
-            "Use prose, cite specific papers (Lin et al. 2023), benchmark numbers, and code "
-            "snippets where relevant. Write at least 2000 words."
+            "and quantization techniques. Research AWQ (Activation-aware Weight "
+            "Quantization) as a competitor to vLLM. Cover: (1) AWQ algorithm "
+            "fundamentals—how activation-aware weight quantization preserves "
+            "significant weights, (2) performance benchmarks vs vLLM (throughput, "
+            "latency, memory footprint), (3) supported model architectures and "
+            "hardware backends (CUDA, Triton kernels), (4) integration with "
+            "HuggingFace Transformers and other serving frameworks, (5) deployment "
+            "considerations for AI orchestration engines, (6) limitations and "
+            "trade-offs (accuracy degradation, bit-width options 4-bit/8-bit), "
+            "(7) community adoption and ecosystem maturity. Include specific "
+            "benchmark numbers, GitHub repository details, and citation-worthy "
+            "sources. Write at least 2000 words."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n\n"
-            "Produce a full implementation-ready research report on AWQ quantization, "
-            "its competitive positioning against vLLM, and concrete integration steps "
-            "for an AI orchestration engine."
+            "Produce a comprehensive technical analysis of AWQ quantization, "
+            "comparing it directly with vLLM's approach. Include:\n"
+            "- The AWQ paper (Lin et al.) key contributions\n"
+            "- Quantization error reduction techniques (per-channel scaling, "
+            "group-wise quantization)\n"
+            "- Inference speed comparisons on common models (Llama, Mistral, etc.)\n"
+            "- Memory savings and KV-cache implications\n"
+            "- How AWQ could be integrated into an AI orchestration engine like "
+            "Temuclaude for cost-efficient model serving\n"
+            "- Code examples for loading AWQ-quantized models\n"
+            "Cite sources with URLs where possible."
         )},
     ]
 def build_quantization_comparison_prompt(topic: str, competitors: List[str], num_sections: int = 7) -> List[Dict]:

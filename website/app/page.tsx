@@ -122,9 +122,9 @@ export default function HomePage() {
                   className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted animate-fade-in-up"
                   style={{ animationDelay: '700ms' }}
                 >
-                  <span><strong className="text-text-primary">$0.50</strong> /MTok input</span>
+                  <span><strong className="text-text-primary">~$1.44</strong> /MTok blended</span>
                   <span className="text-border-default">·</span>
-                  <span><strong className="text-text-primary">$2.00</strong> /MTok output</span>
+                  <span><strong className="text-text-primary">4x</strong> cheaper than Claude</span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">No signup</strong> to try</span>
                 </div>
@@ -149,11 +149,11 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 Stop paying $30/M tokens for GPT-5.5. Stop wrangling multiple APIs.
-                One endpoint, frontier quality, a fraction of the cost.
+                One endpoint, 8-model fusion, a fraction of the cost.
               </p>
             </div>
 
-            <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[minmax(180px,auto)]">
+            <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 auto-rows-[minmax(180px,auto)]">
               {/* Large card — Fusion (2x2) */}
               <StaggerItem>
                 <div className="card lg:col-span-2 lg:row-span-2 h-full" style={{ padding: '32px' }}>
@@ -170,16 +170,15 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-xl font-serif text-text-primary mb-3" style={{ fontWeight: 400 }}>3 models answer. 1 wins.</h3>
                   <p className="text-sm text-text-secondary mb-4 leading-relaxed">
-                    For hard questions, 3 models answer independently in parallel. Each one
-                    reviews the others' answers and refines its own. Then a dynamic aggregator
-                    picks the best parts and synthesizes one superior answer.
+                    For hard questions, 3 models answer independently in parallel. A dynamic aggregator
+                    analyzes consensus and contradictions, then synthesizes one superior answer.
                   </p>
                   <p className="text-sm text-text-muted leading-relaxed">
-                    The result: measurably smarter than any single model — including GPT-5 and Claude.
+                    The result: measurably smarter than any single model in the pool.
                     You don't choose models. TemuClaude does it for you, automatically.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-4">
-                    {['Parallel generation', 'Cross-review', 'Dynamic aggregation', 'Consensus detection'].map(tag => (
+                    {['Parallel generation', 'Dynamic aggregation', 'Consensus detection', 'Self-consistency'].map(tag => (
                       <span key={tag} className="badge-muted text-xs">{tag}</span>
                     ))}
                   </div>
@@ -196,10 +195,11 @@ export default function HomePage() {
                       </svg>
                     </div>
                   </div>
-                  <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Math that can't lie</h3>
+                  <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Math that's verified</h3>
                   <p className="text-sm text-text-secondary leading-relaxed">
-                    Math answers are verified by generating Python code, running it in a sandbox,
-                    and returning the actual output. No hallucinated numbers. Ever.
+                    For math questions, 3 DeepSeek samples run at high temperature and vote on the
+                    answer. If 2 out of 3 agree, you get the consensus. Research shows this catches
+                    18% more errors than a single attempt.
                   </p>
                 </div>
               </StaggerItem>
@@ -229,21 +229,21 @@ export default function HomePage() {
                     <div>
                       <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Radically cheap</h3>
                       <p className="text-sm text-text-secondary leading-relaxed mb-3">
-                        60% of queries go to free models. 30% to ultra-cheap models ($0.06-0.14/M).
-                        Only 10% use premium models. The cache serves repeat queries at $0.
+                        60% of queries go to Hy3 Preview ($0.06/$0.21 per M). 30% route to specialists.
+                        Only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron).
                       </p>
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div>
-                          <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>$0.50</span>
-                          <span className="text-text-muted ml-1">/M input</span>
+                          <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>~$1.44</span>
+                          <span className="text-text-muted ml-1">/M blended</span>
                         </div>
                         <div>
-                          <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>$2.00</span>
-                          <span className="text-text-muted ml-1">/M output</span>
+                          <span className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>4x</span>
+                          <span className="text-text-muted ml-1">cheaper than Claude</span>
                         </div>
                         <div>
-                          <span className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>$0.05</span>
-                          <span className="text-text-muted ml-1">/M cached</span>
+                          <span className="text-2xl font-serif text-accent-amber" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>12x</span>
+                          <span className="text-text-muted ml-1">cheaper than GPT-5.5</span>
                         </div>
                       </div>
                     </div>
@@ -289,9 +289,9 @@ export default function HomePage() {
             {/* Stats strip */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               {[
-                { value: '472', label: 'tests passing', color: '#788C5D' },
+                { value: '100%', label: 'accuracy on our 20-question benchmark', color: '#788C5D' },
                 { value: '8', label: 'models fused', color: '#E25822' },
-                { value: '$0.05', label: 'per M cached tokens', color: '#E8B547' },
+                { value: '4x', label: 'cheaper than Claude Sonnet 5', color: '#E8B547' },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <div
