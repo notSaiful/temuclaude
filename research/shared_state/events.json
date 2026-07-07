@@ -1,16 +1,6 @@
 {
   "events": [
     {
-      "id": "evt_1783424094765_distiller_daemon",
-      "timestamp": "2026-07-07T17:04:54.765686",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
       "id": "evt_1783424124776_distiller_daemon",
       "timestamp": "2026-07-07T17:05:24.776183",
       "daemon": "distiller_daemon",
@@ -1999,7 +1989,17 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783428438081_integrator_daemon",
+      "timestamp": "2026-07-07T18:17:18.081898",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 268.6s",
+      "extra": {
+        "duration": 268.59
+      }
     }
   ],
-  "last_update": "2026-07-07T18:17:16.724409"
+  "last_update": "2026-07-07T18:17:18.081904"
 }
