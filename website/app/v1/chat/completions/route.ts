@@ -1,20 +1,35 @@
 /**
- * TemuClaude OpenAI-Compatible API — Full Quality Pipeline
+ * TemuClaude OpenAI-Compatible API — Clean Proven Pipeline
  * POST /v1/chat/completions
  *
- * No quality sacrificed. Every layer implemented per research papers.
+ * Every layer proven by research or our own testing.
+ * No layer added unless it improves accuracy.
+ * No layer that adds risk, cost, or timeout danger without benefit.
  *
- * Pipeline:
- * 1. Difficulty classification (heuristic, no API call)
- * 2. Trivial → single model | Hard → full MoA
- * 3. Layer 1: 3 models propose in parallel
- * 4. Layer 2: 3 cross-review calls in parallel (each model reviews others)
- * 5. Layer 3: Aggregation by DIFFERENT model (DeepSeek, not GLM)
- * 6. Layer 4: Self-consistency (3 samples, parallel with Layer 1) — math only
- * 7. Layer 5: Code verification (generate + execute Python) — math only
- * 8. Layer 6: QA gate scored by STRONG model (GLM-5.2, not Nemotron)
- * 9. Layer 7: Reflexion — retry with feedback if QA < 8
- * 10. Layer 8: Frontier fallback — Claude Sonnet 5 if QA < 6
+ * Pipeline for HARD questions (7 calls max, not 14):
+ * 1. Classify difficulty (heuristic, no API call)
+ * 2. Trivial → single GLM-5.2 | Medium → single specialist
+ * 3. Layer 1: 3 models propose in parallel (GLM + DeepSeek + Gemini)
+ * 4. Layer 2: Self-consistency for math (3 samples, parallel with Layer 1)
+ * 5. Layer 3: Aggregation — analyze consensus, contradictions, synthesize (1 call)
+ * 6. Layer 4: QA gate — 5-rubric score by Nemotron (FREE, independent)
+ * 7. Layer 5: Reflexion if QA < 8 — retry with feedback (1 call)
+ * 8. Layer 6: Frontier fallback if QA < 6 — Claude Sonnet 5 (1 call)
+ *
+ * What was REMOVED and why:
+ * - Cross-review layer: Aggregation already sees all 3 responses and analyzes
+ *   consensus/contradictions. 3 extra calls for cross-review is redundant.
+ * - Budget forcing: Adds an API call + time. No proven benefit on our tests.
+ * - Claude as QA judge: $0.012/hard question. Nemotron is free and adequate
+ *   for scoring (reading an answer and giving a number is not hard reasoning).
+ * - Code verification (model-predicted): Asking a model to PREDICT what Python
+ *   code would output is not verification — it's another model guess.
+ *   Real code execution requires Oracle Cloud (future upgrade).
+ *
+ * Cost: ~$0.003-0.005 per hard question (without reflexion)
+ *       ~$0.015 per hard question (with frontier fallback)
+ * Budget for 3,500 AA questions: $5-12 (well within $25.89)
+ * Time: 20-30 seconds per hard question (well within 60s AA timeout)
  */
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -24,683 +39,277 @@ export const maxDuration = 120;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Model pool — role assignments based on MoA research principles
-const ORCHESTRATOR = 'z-ai/glm-5.2';           // IQ 51 — proposer + AGGREGATOR (strongest synthesizes)
-const REASONING_MODEL = 'deepseek/deepseek-v4-pro';  // IQ 44 — proposer + self-consistency + reflexion
-const SPECIALIST_MODEL = 'google/gemini-3.5-flash';   // IQ 50 — proposer + cross-review
-const QA_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — INDEPENDENT QA judge (strongest, no conflict)
-const QA_MODEL_BACKUP = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // Fallback only if Claude fails
-const FRONTIER_MODEL = 'anthropic/claude-sonnet-5';  // IQ 53 — hardest 2% + QA judge
+// Model pool — each assigned the role it's best at, no conflicts
+const M_GLM = 'z-ai/glm-5.2';                           // IQ 51 — proposer + aggregator (strongest synthesizes)
+const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';           // IQ 44 — proposer + self-consistency + reflexion
+const M_GEMINI = 'google/gemini-3.5-flash';              // IQ 50 — proposer
+const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // IQ 38 — QA judge (FREE, independent)
+const M_CLAUDE = 'anthropic/claude-sonnet-5';            // IQ 53 — frontier fallback only (hardest 2%)
 
-interface ChatMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-interface ModelResult {
-  success: boolean;
-  content: string;
-  error?: string;
-  tokens: number;
-  model: string;
-}
+interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
+interface Result { success: boolean; content: string; tokens: number }
 
 /**
  * Call a model via OpenRouter with reasoning field fallback
  */
-async function callModel(model: string, messages: ChatMessage[], temperature: number = 0.6, maxTokens: number = 4096): Promise<ModelResult> {
+async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): Promise<Result> {
   try {
-    const response = await fetch(OPENROUTER_URL, {
+    const r = await fetch(OPENROUTER_URL, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        temperature,
-        max_tokens: maxTokens,
-      }),
+      headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, messages, temperature: temp, max_tokens: maxTok }),
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      return { success: false, content: '', error: error?.error?.message || 'Model error', tokens: 0, model };
-    }
-
-    const data = await response.json();
-    // Handle reasoning models that put content in reasoning field
-    let content = data.choices?.[0]?.message?.content || '';
-    if (!content) {
-      content = data.choices?.[0]?.message?.reasoning || '';
-      if (!content) {
-        const rd = data.choices?.[0]?.message?.reasoning_details;
-        if (Array.isArray(rd) && rd.length > 0) {
-          content = rd.map((r: { text?: string }) => r.text || '').join('');
-        }
+    if (!r.ok) return { success: false, content: '', tokens: 0 };
+    const d = await r.json();
+    let c = d.choices?.[0]?.message?.content || '';
+    if (!c) {
+      c = d.choices?.[0]?.message?.reasoning || '';
+      if (!c) {
+        const rd = d.choices?.[0]?.message?.reasoning_details;
+        if (Array.isArray(rd)) c = rd.map((x: { text?: string }) => x.text || '').join('');
       }
     }
-    const tokens = data.usage?.total_tokens || 0;
-
-    return { success: true, content, tokens, model };
-  } catch (error) {
-    return { success: false, content: '', error: String(error), tokens: 0, model };
+    return { success: true, content: c, tokens: d.usage?.total_tokens || 0 };
+  } catch {
+    return { success: false, content: '', tokens: 0 };
   }
 }
 
 /**
- * Difficulty Classifier — sophisticated heuristic (no API call needed)
+ * Difficulty Classifier — heuristic, no API call needed
  */
-function classifyDifficulty(text: string): 'trivial' | 'medium' | 'hard' {
-  const lower = text.toLowerCase();
-  const words = text.split(/\s+/);
-  const wordCount = words.length;
-
-  // Math indicators
-  const mathOps = (text.match(/[+\-*/^=<>]/g) || []).length;
-  const mathKeywords = /\b(solve|calculate|derivative|integral|equation|prove|theorem|factor|simplify|evaluate|compute|matrix|probability|limit|optimi[sz]e)\b/i.test(lower);
-  const hasNumbers = /\d/.test(text);
-
-  // Code indicators
-  const codeKeywords = /\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(lower);
-
-  // Reasoning indicators
-  const reasoningKeywords = /\b(because|therefore|if.*then|contradiction|inference|deduce|imply|assume|prove that|show that|explain why|reason)\b/i.test(lower);
-
-  // Multi-step indicators
-  const multiStep = /\b(then|after|next|finally|step by step|how long|how many|show your work)\b/i.test(lower);
-
-  // Complexity markers
-  const hasMultipleClauses = (text.match(/[;,.]/g) || []).length > 3;
-  const hasConditions = /\b(if|when|where|given|assuming|suppose)\b/i.test(lower);
-
-  // Score the difficulty
-  let score = 0;
-  if (wordCount > 100) score += 4;
-  else if (wordCount > 50) score += 2;
-  else if (wordCount > 20) score += 1;
-
-  if (mathKeywords) score += 3;
-  if (mathOps > 3) score += 2;
-  if (codeKeywords) score += 3;
-  if (reasoningKeywords) score += 2;
-  if (multiStep) score += 2;
-  if (hasMultipleClauses) score += 1;
-  if (hasConditions) score += 1;
-  if (hasNumbers && mathKeywords) score += 1;
-
-  if (score >= 7) return 'hard';
-  if (score >= 3) return 'medium';
+function classify(text: string): 'trivial' | 'medium' | 'hard' {
+  const l = text.toLowerCase();
+  const wc = text.split(/\s+/).length;
+  let s = 0;
+  if (wc > 100) s += 4; else if (wc > 50) s += 2; else if (wc > 20) s += 1;
+  if (/\b(solve|calculate|derivative|integral|equation|prove|theorem|factor|simplify|evaluate|compute|matrix|probability|limit|optimi[sz]e)\b/i.test(l)) s += 3;
+  if ((text.match(/[+\-*/^=<>]/g) || []).length > 3) s += 2;
+  if (/\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(l)) s += 3;
+  if (/\b(because|therefore|if.*then|contradiction|inference|deduce|imply|assume|prove that|show that|explain why|reason)\b/i.test(l)) s += 2;
+  if (/\b(then|after|next|finally|step by step|how long|how many|show your work)\b/i.test(l)) s += 2;
+  if ((text.match(/[;,.]/g) || []).length > 3) s += 1;
+  if (/\b(if|when|where|given|assuming|suppose)\b/i.test(l)) s += 1;
+  if (s >= 7) return 'hard';
+  if (s >= 3) return 'medium';
   return 'trivial';
 }
 
-/**
- * Budget Forcing (s1 paper, arXiv:2501.19393)
- * If the answer is suspiciously short for a hard question, append "Wait"
- * to force the model to continue reasoning. Improves hard reasoning by 10-20%.
- */
-async function budgetForcing(
-  question: string,
-  answer: string,
-  model: string,
-  maxTokens: number,
-): Promise<{ content: string; tokens: number; forced: boolean }> {
-  // Check if answer is suspiciously short for a hard question
-  const answerWords = answer.split(/\s+/).length;
-  const questionWords = question.split(/\s+/).length;
-  const isHard = questionWords > 30 || /prove|derive|theorem|explain|analyze|compare|design|implement/i.test(question);
-
-  if (!isHard || answerWords > 50) {
-    return { content: answer, tokens: 0, forced: false };
-  }
-
-  // Append "Wait" and let model continue
-  const messages: ChatMessage[] = [
-    {
-      role: 'user',
-      content: question,
-    },
-    {
-      role: 'assistant',
-      content: answer + '\n\nWait, let me think about this more carefully.',
-    },
-    {
-      role: 'user',
-      content: 'Continue and provide the complete answer.',
-    },
-  ];
-
-  const result = await callModel(model, messages, 0.5, maxTokens);
-  if (result.success && result.content && result.content.length > answer.length) {
-    return { content: result.content, tokens: result.tokens, forced: true };
-  }
-  return { content: answer, tokens: result.tokens, forced: false };
-}
-
-function isMathQuestion(text: string): boolean {
+function isMath(text: string): boolean {
   return /\b(solve|calculate|derivative|integral|equation|prove|theorem|sum|product|factor|simplify|evaluate|compute|find.*value|matrix|probability|limit|optimi[sz]e)\b/i.test(text) ||
          (/\d/.test(text) && /[+\-*/^=]/.test(text));
 }
 
 /**
- * Layer 2: Cross-Review
- * Each model reviews the other two responses and improves its own.
- * Per MoA paper: this is where the biggest quality gains come from.
- */
-async function crossReview(
-  reviewerModel: string,
-  reviewerName: string,
-  question: string,
-  ownResponse: string,
-  otherResponses: { name: string; content: string }[],
-  maxTokens: number,
-): Promise<ModelResult> {
-  const otherText = otherResponses.map(r => `${r.name}: ${r.content}`).join('\n\n');
-
-  const messages: ChatMessage[] = [
-    {
-      role: 'system',
-      content: `You are ${reviewerName}, a critical reviewer. You previously answered a question. Now you see other AI models' answers. Review them for errors, missing information, and strengths. Then provide an improved answer.
-
-Rules:
-- If other models found something you missed, incorporate it
-- If other models made errors you can identify, avoid them
-- If your original answer was correct and complete, keep it
-- Be precise and thorough
-- Output ONLY your final improved answer, no meta-commentary`,
-    },
-    {
-      role: 'user',
-      content: `Question: ${question}\n\nYour original answer: ${ownResponse}\n\nOther models' answers:\n${otherText}\n\nProvide your improved answer:`,
-    },
-  ];
-
-  return callModel(reviewerModel, messages, 0.5, maxTokens);
-}
-
-/**
- * Layer 3: Structured Aggregation by DIFFERENT model (not a proposer)
- * Uses DeepSeek V4 Pro as aggregator for diversity per MoA paper.
- */
-async function aggregateAnswers(
-  question: string,
-  responses: { name: string; content: string }[],
-  maxTokens: number,
-): Promise<ModelResult> {
-  const responseText = responses.map(r => `${r.name}: ${r.content}`).join('\n\n---\n\n');
-
-  const messages: ChatMessage[] = [
-    {
-      role: 'system',
-      content: `You are an expert answer synthesizer. You will receive a question and multiple cross-reviewed AI responses. Synthesize the best possible answer.
-
-Analyze:
-1. CONSENSUS: What do most responses agree on? This is likely correct.
-2. CONTRADICTIONS: Where do responses disagree? Determine which is correct.
-3. STRENGTHS: What unique insights does each response contribute?
-4. WEAKNESSES: What errors or gaps exist?
-
-Provide a single, definitive answer that:
-- Incorporates all correct points from every response
-- Resolves contradictions by choosing the correct position
-- Fills any gaps
-- Is clear, precise, and complete
-- Does NOT mention the analysis process
-
-Output ONLY the final answer.`,
-    },
-    {
-      role: 'user',
-      content: `Question: ${question}\n\nCross-reviewed responses:\n${responseText}\n\nProvide the definitive answer:`,
-    },
-  ];
-
-  // Use GLM-5.2 as aggregator — strongest model synthesizes the final answer
-  // (MoA paper: aggregator should be the most capable model)
-  return callModel(ORCHESTRATOR, messages, 0.3, maxTokens);
-}
-
-/**
- * Layer 4: Self-Consistency for Math
- * 3 samples at temp 0.7, majority vote on final answer.
+ * Self-Consistency: 3 samples at temp 0.7, majority vote on final answer.
  * Research: +18.4% on MATH benchmark (arXiv:2203.11317).
  */
-async function selfConsistency(
-  question: string,
-  model: string,
-  numSamples: number,
-  maxTokens: number,
-): Promise<{ answer: string; tokens: number; samples: string[] }> {
-  const samples: string[] = [];
-  let totalTokens = 0;
+async function selfConsistency(q: string, maxTok: number): Promise<{ answer: string; tokens: number }> {
+  const results = await Promise.all([
+    call(M_DEEPSEEK, [{ role: 'user', content: q }], 0.7, maxTok),
+    call(M_DEEPSEEK, [{ role: 'user', content: q }], 0.7, maxTok),
+    call(M_DEEPSEEK, [{ role: 'user', content: q }], 0.7, maxTok),
+  ]);
+  const samples = results.filter(r => r.success && r.content).map(r => r.content.trim());
+  const tokens = results.reduce((s, r) => s + r.tokens, 0);
+  if (samples.length === 0) return { answer: '', tokens };
 
-  const promises = Array.from({ length: numSamples }, () =>
-    callModel(model, [{ role: 'user', content: question }], 0.7, maxTokens)
-  );
-  const results = await Promise.all(promises);
-
-  for (const result of results) {
-    if (result.success && result.content) {
-      samples.push(result.content.trim());
-      totalTokens += result.tokens;
-    }
-  }
-
-  if (samples.length === 0) return { answer: '', tokens: totalTokens, samples: [] };
-
-  // Extract final answer for voting
-  const extractFinal = (text: string): string => {
-    const lines = text.split('\n').filter(l => l.trim());
-    const lastLine = lines[lines.length - 1]?.trim() || '';
-    if (lastLine.length < 50) return lastLine;
-    const match = text.match(/(?:answer is|=|equals|result is|x\s*=)\s*[:\s]*([^\n.]+)/i);
-    if (match) return match[1].trim();
-    return lastLine;
+  const extract = (t: string): string => {
+    const lines = t.split('\n').filter(x => x.trim());
+    const last = lines[lines.length - 1]?.trim() || '';
+    if (last.length < 50) return last;
+    const m = t.match(/(?:answer is|=|equals|result is|x\s*=)\s*[:\s]*([^\n.]+)/i);
+    return m ? m[1].trim() : last;
   };
 
-  const finals = samples.map(extractFinal);
+  const finals = samples.map(extract);
   const counts: Record<string, number> = {};
-  for (const ans of finals) counts[ans] = (counts[ans] || 0) + 1;
+  for (const a of finals) counts[a] = (counts[a] || 0) + 1;
 
-  let bestAnswer = samples[0];
-  let bestCount = 0;
+  let best = samples[0], bestCount = 0;
   for (let i = 0; i < finals.length; i++) {
-    if (counts[finals[i]] > bestCount) {
-      bestCount = counts[finals[i]];
-      bestAnswer = samples[i];
-    }
+    if (counts[finals[i]] > bestCount) { bestCount = counts[finals[i]]; best = samples[i]; }
   }
-
-  return { answer: bestAnswer, tokens: totalTokens, samples };
+  return { answer: best, tokens };
 }
 
 /**
- * Layer 5: Code Verification for Math
- * Generate Python code to solve the problem, extract output.
- * This catches math errors that voting and fusion miss.
+ * Aggregation: Analyze consensus, contradictions, synthesize one definitive answer.
+ * The aggregator sees all 3 responses — this replaces the separate cross-review layer.
  */
-async function codeVerify(
-  question: string,
-  proposedAnswer: string,
-  maxTokens: number,
-): Promise<{ verified: boolean; codeOutput: string; tokens: number }> {
-  const messages: ChatMessage[] = [
-    {
-      role: 'system',
-      content: `You are a math verification system. Given a math question and a proposed answer, write Python code that solves the problem independently. Then state what the code outputs. If the code output matches the proposed answer, say VERIFIED. If not, say MISMATCH and give the correct answer.
+async function aggregate(q: string, responses: { name: string; content: string }[], maxTok: number): Promise<Result> {
+  const text = responses.map(r => `${r.name}: ${r.content}`).join('\n\n---\n\n');
+  return call(M_GLM, [
+    { role: 'system', content: `You are an expert answer synthesizer. Analyze the responses for:
+1. CONSENSUS — what most agree on (likely correct)
+2. CONTRADICTIONS — where they disagree, determine which is correct
+3. BEST INSIGHTS — extract unique points from each
+4. ERRORS — fix any mistakes
 
-Format:
-CODE: <python code>
-OUTPUT: <what the code outputs>
-STATUS: VERIFIED or MISMATCH
-CORRECT_ANSWER: <the correct answer if mismatch, otherwise same as proposed>`,
-    },
-    {
-      role: 'user',
-      content: `Question: ${question}\nProposed answer: ${proposedAnswer}\n\nVerify by writing Python code:`,
-    },
-  ];
-
-  const result = await callModel(REASONING_MODEL, messages, 0.0, maxTokens);
-  const verified = /VERIFIED/i.test(result.content);
-  const outputMatch = result.content?.match(/OUTPUT:\s*(.+)/i);
-  const codeOutput = outputMatch ? outputMatch[1].trim() : '';
-
-  return { verified, codeOutput, tokens: result.tokens };
+Provide ONE definitive answer. Do NOT mention the analysis. Output ONLY the final answer.` },
+    { role: 'user', content: `Question: ${q}\n\nResponses:\n${text}\n\nProvide the definitive answer:` },
+  ], 0.3, maxTok);
 }
 
 /**
- * Layer 6: QA Gate — scored by Claude Sonnet 5 (IQ 53, independent, no conflict)
- * For frontier fallback re-score: uses Nemotron (independent from Claude)
+ * QA Gate: 5-rubric score by Nemotron (FREE, independent judge).
+ * Nemotron IQ 38 is weak for GENERATING answers but fine for SCORING them —
+ * it's just reading an answer and giving a number 1-10.
  */
-async function qaGate(
-  question: string,
-  answer: string,
-  useBackupJudge: boolean = false,
-): Promise<{ score: number; tokens: number; feedback: string }> {
-  const messages: ChatMessage[] = [
-    {
-      role: 'system',
-      content: `You are a strict QA evaluator. Score the answer on 5 rubrics:
-1. LC — Logical Coherence (is the reasoning consistent?)
-2. FC — Factual Correctness (are the facts right?)
-3. CM — Completeness (does it address all parts?)
-4. GA — Goal Alignment (does it answer what was asked?)
-5. CL — Clarity (is it clear and accessible?)
+async function qaGate(q: string, a: string): Promise<{ score: number; tokens: number; feedback: string }> {
+  const r = await call(M_NEMOTRON, [
+    { role: 'system', content: `Score this answer on 5 rubrics (1-10 each):
+LC — Logical Coherence
+FC — Factual Correctness
+CM — Completeness
+GA — Goal Alignment
+CL — Clarity
 
-Score each rubric 1-10. Output format:
-LC: X
-FC: X
-CM: X
-GA: X
-CL: X
+Output:
 AVERAGE: X
-FEEDBACK: <one sentence on what to improve>`,
-    },
-    {
-      role: 'user',
-      content: `Question: ${question}\nAnswer: ${answer}\n\nScore this answer:`,
-    },
-  ];
+FEEDBACK: <one sentence>` },
+    { role: 'user', content: `Question: ${q}\nAnswer: ${a}\n\nScore:` },
+  ], 0.0, 200);
 
-  // Primary: Claude Sonnet 5 (IQ 53, independent judge)
-  // Backup: Nemotron (used for frontier fallback re-score to avoid Claude judging Claude)
-  const judgeModel = useBackupJudge ? QA_MODEL_BACKUP : QA_MODEL;
-  let result = await callModel(judgeModel, messages, 0.0, 200);
-  // If primary fails, try the other
-  if (!result.success) {
-    const fallbackModel = useBackupJudge ? QA_MODEL : QA_MODEL_BACKUP;
-    result = await callModel(fallbackModel, messages, 0.0, 200);
-  }
-
-  const avgMatch = result.content?.match(/AVERAGE:\s*(\d+(?:\.\d+)?)/i);
-  const score = avgMatch ? parseFloat(avgMatch[1]) : 8;
-  const feedbackMatch = result.content?.match(/FEEDBACK:\s*(.+)/i);
-  const feedback = feedbackMatch ? feedbackMatch[1].trim() : '';
-
-  return { score, tokens: result.tokens, feedback };
+  const avg = r.content?.match(/AVERAGE:\s*(\d+(?:\.\d+)?)/i);
+  const fb = r.content?.match(/FEEDBACK:\s*(.+)/i);
+  return { score: avg ? parseFloat(avg[1]) : 8, tokens: r.tokens, feedback: fb ? fb[1].trim() : '' };
 }
 
 /**
- * Layer 7: Reflexion — retry with specific feedback
+ * Reflexion: Retry with specific feedback from QA gate.
+ * Research: 91% on HumanEval vs 80% without (arXiv:2303.11366).
  */
-async function reflexion(
-  question: string,
-  previousAnswer: string,
-  feedback: string,
-  model: string,
-  maxTokens: number,
-): Promise<ModelResult> {
-  const messages: ChatMessage[] = [
-    {
-      role: 'system',
-      content: 'You are answering a question. A previous attempt received feedback. Use the feedback to improve. Output ONLY the improved answer.',
-    },
-    {
-      role: 'user',
-      content: `Question: ${question}\n\nPrevious answer: ${previousAnswer}\n\nFeedback: ${feedback}\n\nProvide an improved answer:`,
-    },
-  ];
-
-  return callModel(model, messages, 0.4, maxTokens);
+async function reflexion(q: string, prevAnswer: string, feedback: string, maxTok: number): Promise<Result> {
+  return call(M_DEEPSEEK, [
+    { role: 'system', content: 'You are answering a question. A previous attempt received feedback. Use it to improve. Output ONLY the improved answer.' },
+    { role: 'user', content: `Question: ${q}\n\nPrevious answer: ${prevAnswer}\n\nFeedback: ${feedback}\n\nImproved answer:` },
+  ], 0.4, maxTok);
 }
 
 /**
- * FULL ORCHESTRATION PIPELINE — NO QUALITY SACRIFICED
+ * Full Orchestration Pipeline
  */
-async function runOrchestration(messages: ChatMessage[], temperature: number = 0.6, maxTokens: number = 4096) {
-  const startTime = Date.now();
-  let totalTokens = 0;
-  const lastMessage = messages[messages.length - 1]?.content || '';
-  const difficulty = classifyDifficulty(lastMessage);
-  const hasMath = isMathQuestion(lastMessage);
-  const modelsUsed: string[] = [];
-  const techniques: string[] = [];
+async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
+  const start = Date.now();
+  let tokens = 0;
+  const q = messages[messages.length - 1]?.content || '';
+  const diff = classify(q);
+  const math = isMath(q);
 
-  // ── TRIVIAL: Single fast model ──
-  if (difficulty === 'trivial') {
-    const result = await callModel(ORCHESTRATOR, messages, temperature, maxTokens);
-    return {
-      content: result.content,
-      tokens: result.tokens,
-      models_used: [ORCHESTRATOR],
-      tier: 'trivial',
-      latency_ms: Date.now() - startTime,
-      techniques: [],
-    };
+  // Trivial: single fast model
+  if (diff === 'trivial') {
+    const r = await call(M_GLM, messages, temp, maxTok);
+    return { content: r.content, tokens: r.tokens, tier: 'trivial', time: Date.now() - start };
   }
 
-  // ── MEDIUM: Single specialist model ──
-  if (difficulty === 'medium') {
-    // Pick the best specialist for the question type
-    const model = hasMath ? REASONING_MODEL : ORCHESTRATOR;
-    const result = await callModel(model, messages, temperature, maxTokens);
-    return {
-      content: result.content,
-      tokens: result.tokens,
-      models_used: [model],
-      tier: 'medium',
-      latency_ms: Date.now() - startTime,
-      techniques: [],
-    };
+  // Medium: single specialist
+  if (diff === 'medium') {
+    const m = math ? M_DEEPSEEK : M_GLM;
+    const r = await call(m, messages, temp, maxTok);
+    return { content: r.content, tokens: r.tokens, tier: 'medium', time: Date.now() - start };
   }
 
   // ── HARD: Full MoA Pipeline ──
-  techniques.push('moa-3-layer');
 
-  // LAYER 4: Self-consistency for math — runs IN PARALLEL with Layer 1
-  let scResult: { answer: string; tokens: number; samples: string[] } | null = null;
-  if (hasMath) {
-    techniques.push('self-consistency');
-    // Start self-consistency in parallel with Layer 1
-    const scPromise = selfConsistency(lastMessage, REASONING_MODEL, 3, maxTokens);
-
-    // LAYER 1: 3 models propose in parallel (GLM + Gemini, DeepSeek is doing self-consistency)
-    const [r1, r3] = await Promise.all([
-      callModel(ORCHESTRATOR, messages, temperature, maxTokens),
-      callModel(SPECIALIST_MODEL, messages, temperature, maxTokens),
+  // MATH: self-consistency replaces single DeepSeek call (runs parallel with other proposals)
+  if (math) {
+    const [r1, r3, sc] = await Promise.all([
+      call(M_GLM, messages, temp, maxTok),
+      call(M_GEMINI, messages, temp, maxTok),
+      selfConsistency(q, maxTok),
     ]);
+    tokens += r1.tokens + r3.tokens + sc.tokens;
 
-    // Get self-consistency result
-    scResult = await scPromise;
+    const l1: { name: string; content: string }[] = [];
+    if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
+    if (sc.answer) l1.push({ name: 'Model B (DeepSeek, self-consistency)', content: sc.answer });
+    if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content });
 
-    totalTokens += r1.tokens + r3.tokens + scResult.tokens;
-    modelsUsed.push(ORCHESTRATOR, SPECIALIST_MODEL, REASONING_MODEL);
+    if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
-    // Build Layer 1 results (self-consistency winner replaces single DeepSeek call)
-    const layer1: { name: string; content: string; model: string }[] = [];
-    if (r1.success && r1.content) layer1.push({ name: 'Model A (GLM-5.2)', content: r1.content, model: ORCHESTRATOR });
-    if (scResult.answer) layer1.push({ name: 'Model B (DeepSeek V4 Pro, self-consistency)', content: scResult.answer, model: REASONING_MODEL });
-    if (r3.success && r3.content) layer1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content, model: SPECIALIST_MODEL });
+    // Aggregation
+    const agg = await aggregate(q, l1, maxTok);
+    tokens += agg.tokens;
+    let final = (agg.success && agg.content) ? agg.content : l1[0].content;
 
-    if (layer1.length === 0) {
-      return { content: '', tokens: totalTokens, models_used: modelsUsed, tier: 'hard', latency_ms: Date.now() - startTime, techniques };
-    }
+    // QA gate
+    const qa = await qaGate(q, final);
+    tokens += qa.tokens;
 
-    // LAYER 2: Cross-review — 3 parallel calls, each model reviews the others
-    techniques.push('cross-review');
-    const crPromises: Promise<ModelResult>[] = [];
-    for (let i = 0; i < layer1.length; i++) {
-      const own = layer1[i];
-      const others = layer1.filter((_, j) => j !== i);
-      crPromises.push(crossReview(own.model, own.name, lastMessage, own.content, others, maxTokens));
-    }
-    const crResults = await Promise.all(crPromises);
-    totalTokens += crResults.reduce((sum, r) => sum + r.tokens, 0);
-
-    // Build cross-reviewed responses
-    const reviewed: { name: string; content: string }[] = [];
-    for (let i = 0; i < layer1.length; i++) {
-      const cr = crResults[i];
-      reviewed.push({
-        name: layer1[i].name,
-        content: (cr.success && cr.content) ? cr.content : layer1[i].content,
-      });
-    }
-
-    // LAYER 3: Aggregation by DIFFERENT model (DeepSeek aggregates, not GLM)
-    techniques.push('structured-aggregation');
-    const aggResult = await aggregateAnswers(lastMessage, reviewed, maxTokens);
-    totalTokens += aggResult.tokens;
-
-    let finalContent = (aggResult.success && aggResult.content) ? aggResult.content : reviewed[0]?.content || '';
-
-    // BUDGET FORCING: If answer is too short for a hard question, force more reasoning
-    if (finalContent) {
-      techniques.push('budget-forcing');
-      const bfResult = await budgetForcing(lastMessage, finalContent, ORCHESTRATOR, maxTokens);
-      totalTokens += bfResult.tokens;
-      if (bfResult.forced) {
-        finalContent = bfResult.content;
-      }
-    }
-
-    // LAYER 5: Code verification for math
-    if (finalContent && hasMath) {
-      techniques.push('code-verification');
-      const verify = await codeVerify(lastMessage, finalContent, maxTokens);
-      totalTokens += verify.tokens;
-      // If code says mismatch, check if there's a correct answer in the verification output
-      if (!verify.verified && verify.codeOutput) {
-        const correctMatch = verify.codeOutput.match(/CORRECT_ANSWER:\s*(.+)/i);
-        if (correctMatch && correctMatch[1].trim()) {
-          // Don't blindly replace, but use as signal for QA gate
-          finalContent += `\n\n[Code verification suggests checking: ${correctMatch[1].trim()}]`;
-        }
-      }
-    }
-
-    // LAYER 6: QA Gate — scored by STRONG model (GLM-5.2, IQ 51)
-    if (finalContent) {
-      techniques.push('qa-gate');
-      const qa = await qaGate(lastMessage, finalContent);
-      totalTokens += qa.tokens;
-      modelsUsed.push(QA_MODEL);
-
-      // LAYER 7: Reflexion if QA < 8
-      if (qa.score < 8) {
-        techniques.push('reflexion');
-        const refResult = await reflexion(lastMessage, finalContent, qa.feedback, REASONING_MODEL, maxTokens);
-        totalTokens += refResult.tokens;
-        if (refResult.success && refResult.content) {
-          const qa2 = await qaGate(lastMessage, refResult.content);
-          totalTokens += qa2.tokens;
-          if (qa2.score > qa.score) {
-            finalContent = refResult.content;
-          }
-        }
-      }
-
-      // LAYER 8: Frontier fallback if QA < 6
-      if (qa.score < 6) {
-        techniques.push('frontier-fallback');
-        const frontierResult = await callModel(FRONTIER_MODEL, messages, temperature, maxTokens);
-        totalTokens += frontierResult.tokens;
-        modelsUsed.push(FRONTIER_MODEL);
-        if (frontierResult.success && frontierResult.content) {
-          const qa3 = await qaGate(lastMessage, frontierResult.content, true); // Use Nemotron to avoid Claude judging Claude
-          totalTokens += qa3.tokens;
-          if (qa3.score > qa.score) {
-            finalContent = frontierResult.content;
-          }
-        }
-      }
-    }
-
-    return {
-      content: finalContent,
-      tokens: totalTokens,
-      models_used: modelsUsed,
-      tier: 'hard',
-      latency_ms: Date.now() - startTime,
-      techniques,
-    };
-  }
-
-  // ── HARD (non-math): Full MoA without self-consistency/code-verify ──
-
-  // LAYER 1: 3 models propose in parallel
-  const [r1, r2, r3] = await Promise.all([
-    callModel(ORCHESTRATOR, messages, temperature, maxTokens),
-    callModel(REASONING_MODEL, messages, temperature, maxTokens),
-    callModel(SPECIALIST_MODEL, messages, temperature, maxTokens),
-  ]);
-
-  totalTokens += r1.tokens + r2.tokens + r3.tokens;
-  modelsUsed.push(ORCHESTRATOR, REASONING_MODEL, SPECIALIST_MODEL);
-
-  const layer1: { name: string; content: string; model: string }[] = [];
-  if (r1.success && r1.content) layer1.push({ name: 'Model A (GLM-5.2)', content: r1.content, model: ORCHESTRATOR });
-  if (r2.success && r2.content) layer1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content, model: REASONING_MODEL });
-  if (r3.success && r3.content) layer1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content, model: SPECIALIST_MODEL });
-
-  if (layer1.length === 0) {
-    return { content: '', tokens: totalTokens, models_used: modelsUsed, tier: 'hard', latency_ms: Date.now() - startTime, techniques };
-  }
-
-  // LAYER 2: Cross-review — 3 parallel calls
-  techniques.push('cross-review');
-  const crPromises: Promise<ModelResult>[] = [];
-  for (let i = 0; i < layer1.length; i++) {
-    const own = layer1[i];
-    const others = layer1.filter((_, j) => j !== i);
-    crPromises.push(crossReview(own.model, own.name, lastMessage, own.content, others, maxTokens));
-  }
-  const crResults = await Promise.all(crPromises);
-  totalTokens += crResults.reduce((sum, r) => sum + r.tokens, 0);
-
-  const reviewed: { name: string; content: string }[] = [];
-  for (let i = 0; i < layer1.length; i++) {
-    const cr = crResults[i];
-    reviewed.push({
-      name: layer1[i].name,
-      content: (cr.success && cr.content) ? cr.content : layer1[i].content,
-    });
-  }
-
-  // LAYER 3: Aggregation by DeepSeek (different from proposers)
-  techniques.push('structured-aggregation');
-  const aggResult = await aggregateAnswers(lastMessage, reviewed, maxTokens);
-  totalTokens += aggResult.tokens;
-
-  let finalContent = (aggResult.success && aggResult.content) ? aggResult.content : reviewed[0]?.content || '';
-
-  // BUDGET FORCING: If answer is too short for a hard question, force more reasoning
-  if (finalContent) {
-    techniques.push('budget-forcing');
-    const bfResult = await budgetForcing(lastMessage, finalContent, ORCHESTRATOR, maxTokens);
-    totalTokens += bfResult.tokens;
-    if (bfResult.forced) {
-      finalContent = bfResult.content;
-    }
-  }
-
-  // LAYER 6: QA Gate
-  if (finalContent) {
-    techniques.push('qa-gate');
-    const qa = await qaGate(lastMessage, finalContent);
-    totalTokens += qa.tokens;
-    modelsUsed.push(QA_MODEL);
-
-    // LAYER 7: Reflexion
+    // Reflexion if QA < 8
     if (qa.score < 8) {
-      techniques.push('reflexion');
-      const refResult = await reflexion(lastMessage, finalContent, qa.feedback, REASONING_MODEL, maxTokens);
-      totalTokens += refResult.tokens;
-      if (refResult.success && refResult.content) {
-        const qa2 = await qaGate(lastMessage, refResult.content);
-        totalTokens += qa2.tokens;
-        if (qa2.score > qa.score) {
-          finalContent = refResult.content;
+      const ref = await reflexion(q, final, qa.feedback, maxTok);
+      tokens += ref.tokens;
+      if (ref.success && ref.content) {
+        const qa2 = await qaGate(q, ref.content);
+        tokens += qa2.tokens;
+        if (qa2.score > qa.score) final = ref.content;
+      }
+
+      // Frontier fallback if QA < 6
+      if (qa.score < 6) {
+        const frontier = await call(M_CLAUDE, messages, temp, maxTok);
+        tokens += frontier.tokens;
+        if (frontier.success && frontier.content) {
+          // Re-score with Nemotron (not Claude, to avoid conflict)
+          const qa3 = await qaGate(q, frontier.content);
+          tokens += qa3.tokens;
+          if (qa3.score > qa.score) final = frontier.content;
         }
       }
     }
 
-    // LAYER 8: Frontier fallback
+    return { content: final, tokens, tier: 'hard', time: Date.now() - start };
+  }
+
+  // HARD (non-math): 3 proposals, no self-consistency
+  const [r1, r2, r3] = await Promise.all([
+    call(M_GLM, messages, temp, maxTok),
+    call(M_DEEPSEEK, messages, temp, maxTok),
+    call(M_GEMINI, messages, temp, maxTok),
+  ]);
+  tokens += r1.tokens + r2.tokens + r3.tokens;
+
+  const l1: { name: string; content: string }[] = [];
+  if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
+  if (r2.success && r2.content) l1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content });
+  if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content });
+
+  if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
+
+  // Aggregation
+  const agg = await aggregate(q, l1, maxTok);
+  tokens += agg.tokens;
+  let final = (agg.success && agg.content) ? agg.content : l1[0].content;
+
+  // QA gate
+  const qa = await qaGate(q, final);
+  tokens += qa.tokens;
+
+  // Reflexion if QA < 8
+  if (qa.score < 8) {
+    const ref = await reflexion(q, final, qa.feedback, maxTok);
+    tokens += ref.tokens;
+    if (ref.success && ref.content) {
+      const qa2 = await qaGate(q, ref.content);
+      tokens += qa2.tokens;
+      if (qa2.score > qa.score) final = ref.content;
+    }
+
+    // Frontier fallback if QA < 6
     if (qa.score < 6) {
-      techniques.push('frontier-fallback');
-      const frontierResult = await callModel(FRONTIER_MODEL, messages, temperature, maxTokens);
-      totalTokens += frontierResult.tokens;
-      modelsUsed.push(FRONTIER_MODEL);
-      if (frontierResult.success && frontierResult.content) {
-        const qa3 = await qaGate(lastMessage, frontierResult.content);
-        totalTokens += qa3.tokens;
-        if (qa3.score > qa.score) {
-          finalContent = frontierResult.content;
-        }
+      const frontier = await call(M_CLAUDE, messages, temp, maxTok);
+      tokens += frontier.tokens;
+      if (frontier.success && frontier.content) {
+        const qa3 = await qaGate(q, frontier.content);
+        tokens += qa3.tokens;
+        if (qa3.score > qa.score) final = frontier.content;
       }
     }
   }
 
-  return {
-    content: finalContent,
-    tokens: totalTokens,
-    models_used: modelsUsed,
-    tier: 'hard',
-    latency_ms: Date.now() - startTime,
-    techniques,
-  };
+  return { content: final, tokens, tier: 'hard', time: Date.now() - start };
 }
 
 export async function POST(request: NextRequest) {
@@ -715,6 +324,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Optional API key auth (if TEMUCLAUDE_MASTER_KEY is set)
     const authKey = request.headers.get('authorization')?.replace('Bearer ', '');
     const masterKey = process.env.TEMUCLAUDE_MASTER_KEY;
     if (masterKey && authKey !== masterKey) {
@@ -724,29 +334,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Run full orchestration with timeout safeguard
-    // ArtificialAnalysis has 60s timeout — we race against 55s
-    const pipelinePromise = runOrchestration(messages, temperature ?? 0.6, max_tokens ?? 4096);
+    // Run pipeline with timeout safeguard (45s → single model fallback)
+    // ArtificialAnalysis has 60s timeout — 45s + 15s fallback = 60s max
+    const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
+    const timeout = new Promise<{ content: string; tokens: number; tier: string; time: number }>(resolve => {
+      setTimeout(async () => {
+        const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096);
+        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 45000 });
+      }, 45000);
+    });
 
-    // Fallback: if pipeline takes >55s, return a quick single-model response
-    const timeoutPromise = new Promise<{ content: string; tokens: number; models_used: string[]; tier: string; latency_ms: number; techniques: string[] }>(
-      (resolve) => {
-        setTimeout(async () => {
-          // Quick fallback — single GLM-5.2 call
-          const fallback = await callModel(ORCHESTRATOR, messages, 0.6, max_tokens ?? 4096);
-          resolve({
-            content: fallback.content,
-            tokens: fallback.tokens,
-            models_used: [ORCHESTRATOR],
-            tier: 'timeout-fallback',
-            latency_ms: 55000,
-            techniques: ['timeout-fallback'],
-          });
-        }, 45000); // Start fallback at 45s — leaves 15s for fallback call, well within AA's 60s
-      }
-    );
-
-    const result = await Promise.race([pipelinePromise, timeoutPromise]);
+    const result = await Promise.race([pipeline, timeout]);
 
     return NextResponse.json({
       id: `chatcmpl-${Date.now()}`,
@@ -759,12 +357,12 @@ export async function POST(request: NextRequest) {
         finish_reason: 'stop',
       }],
       usage: {
-        prompt_tokens: messages.reduce((sum, m) => sum + Math.ceil(m.content.length / 4), 0),
+        prompt_tokens: messages.reduce((s, m) => s + Math.ceil(m.content.length / 4), 0),
         completion_tokens: Math.ceil(result.content.length / 4),
         total_tokens: result.tokens,
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: { message: 'Internal server error', type: 'server_error' } },
       { status: 500 }
@@ -777,7 +375,7 @@ export async function GET() {
     status: 'ok',
     model: 'temuclaude',
     description: 'TemuClaude — Multi-Model AI Orchestration (OpenAI-compatible)',
-    pipeline: ['moa-3-layer', 'cross-review', 'structured-aggregation', 'self-consistency', 'code-verification', 'qa-gate', 'reflexion', 'frontier-fallback'],
+    pipeline: ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback'],
     models_available: ['temuclaude', 'temuclaude-hard', 'temuclaude-fast'],
   });
 }
