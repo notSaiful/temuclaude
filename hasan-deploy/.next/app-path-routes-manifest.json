@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/hasan/identity/route": "/api/hasan/identity",
+  "/api/hasan/power/route": "/api/hasan/power",
+  "/api/hasan/sync/route": "/api/hasan/sync",
+  "/api/hasan/deploy/route": "/api/hasan/deploy",
+  "/api/hasan/route": "/api/hasan",
+  "/api/hasan/chat/route": "/api/hasan/chat",
+  "/hasan/page": "/hasan"
+}
