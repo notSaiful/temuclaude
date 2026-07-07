@@ -337,44 +337,76 @@ def cascade_route_research_call(
 
     return _run()
 
-def build_media_generation_research_prompt(topic: str, frontier_models: List[str], priority_score: int = 0) -> List[Dict]:
+def build_media_generation_research_prompt(
+    topic: str,
+    frontier_models: List[str] = None,
+    target_sources: List[str] = None,
+    priority_score: int = 0,
+    mission: str = "BEAT FRONTIERS",
+) -> List[Dict]:
     """Build a specialized research prompt for media generation topics.
-
-    Tailored for topics like s3_verifier_guided_denoising, this prompt instructs
-    the research agent to search arXiv, GitHub, HuggingFace, and Artificial Analysis,
-    identify frontier models to beat, and produce an implementation-ready report
-    suitable for auto-integration into src/media/.
+    
+    Tailored for frontier media generation research (image/video/audio synthesis)
+    with emphasis on verifier-guided denoising, diffusion techniques, and
+    identifying models to integrate into the media pool.
+    
+    Args:
+        topic: Research topic identifier (e.g., 's3_verifier_guided_denoising')
+        frontier_models: List of frontier models to beat (e.g., GPT Image 2, Sora 2)
+        target_sources: List of sources to search (arXiv, GitHub, HuggingFace, etc.)
+        priority_score: Priority score from the research queue
+        mission: High-level mission statement
+    
+    Returns:
+        List of message dicts suitable for LLM consumption
     """
-    frontier_text = ", ".join(frontier_models) if frontier_models else "current frontier media models"
+    if frontier_models is None:
+        frontier_models = [
+            "GPT Image 2",
+            "Sora 2",
+            "Veo 3.1",
+            "Runway Gen-4.5",
+        ]
+    if target_sources is None:
+        target_sources = [
+            "arXiv (latest papers on verifier-guided denoising, diffusion models)",
+            "GitHub (open-source implementations, code repos)",
+            "HuggingFace (model weights, spaces, pipelines)",
+            "Artificial Analysis (benchmark leaderboards, model comparisons)",
+        ]
+    
+    frontier_text = ", ".join(frontier_models)
+    sources_text = "\n".join(f"  - {s}" for s in target_sources)
+    
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in media generation "
-            "(image, video, audio synthesis). Your mission is to produce an "
-            "implementation-ready research report that identifies techniques, "
-            "architectures, and models that can beat current frontier systems. "
-            "Search arXiv for latest papers, GitHub for open-source implementations, "
-            "HuggingFace for model checkpoints and spaces, and Artificial Analysis "
-            "for benchmark scores. Focus on verifier-guided denoising, classifier-free "
-            "guidance variants, reward-model-guided sampling, and any novel sampling "
-            "strategies that improve fidelity, coherence, or prompt adherence. "
-            "For each technique found, provide: (1) paper reference, (2) core algorithm "
-            "description, (3) reported metrics vs frontier baselines, (4) open-source "
-            "availability, (5) integration difficulty estimate, and (6) recommended "
-            "placement within a media generation pipeline. Conclude with a ranked "
-            "list of models and techniques to add to the model pool."
+            "You are a deep research agent specializing in media generation AI. "
+            "Your mission is to produce an implementation-ready research report "
+            f"that advances the goal: {mission}. "
+            f"You must identify techniques that can beat or match: {frontier_text}. "
+            "Focus on verifier-guided denoising, reward-guided diffusion, "
+            "classifier-free guidance improvements, and novel sampling strategies. "
+            "For each technique found, provide: "
+            "(1) paper reference and arXiv ID, "
+            "(2) core algorithm description, "
+            "(3) implementation complexity (low/medium/high), "
+            "(4) expected quality uplift, "
+            "(5) which frontier model it targets, "
+            "(6) specific Python code patterns or library dependencies needed. "
+            "Identify which models should be added to the media generation pool. "
+            "Output should be structured for auto-integration into src/media/."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n"
-            f"Frontier models to beat: {frontier_text}\n"
-            f"Priority Score: {priority_score}\n\n"
-            "Conduct a comprehensive deep search and produce an implementation-ready "
-            "media generation report. Identify which frontier models and techniques "
-            "should be added to the pool for auto-integration into src/media/. "
-            "Include specific architecture details, sampling parameters, and code "
-            "snippets where available."
+            f"Priority Score: {priority_score}\n"
+            f"Mission: {mission}\n"
+            f"Frontier models to beat: {frontier_text}\n\n"
+            f"Target sources to search:\n{sources_text}\n\n"
+            "Conduct deep research and produce an implementation-ready report. "
+            "Include specific model names, repository URLs, and integration steps "
+            "for the Temuclaude media generation pipeline."
         )},
     ]
-
 def select_model_for_section(
     section_title: str,
     subsections: List[str],
