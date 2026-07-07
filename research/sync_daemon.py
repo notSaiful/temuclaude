@@ -213,11 +213,11 @@ def write_sync_file(data):
     os.replace(tmp, SYNC_FILE)
 
 def push_to_vercel(data):
-    """Push live data to Vercel deployment via sync endpoint."""
+    """Push live data to Vercel deployment via status endpoint."""
     if not VERCEL_URL:
         return False
     try:
-        url = f"{VERCEL_URL}/api/hasan/sync"
+        url = f"{VERCEL_URL}/api/hasan"
         req = urllib.request.Request(
             url,
             data=json.dumps(data).encode('utf-8'),
