@@ -117,11 +117,12 @@ export const PLANS: Record<PlanId, Plan> = {
 };
 
 // Pay-as-you-go token pricing (per 1M tokens)
-// Positioned between ultra-cheap ($0.14 DeepSeek) and mid-tier ($1.40 GLM-5.2)
-// 10-25x cheaper than frontier, 78% gross margin
+// Blended average based on routing: 60% trivial (cheapest), 30% medium, 10% hard (full MoA)
+// Positioned at ~4x cheaper than Claude Sonnet 5, ~12x cheaper than GPT-5.5
 export const PAYG_PRICING = {
-  inputPerMillion: 0.50,   // $0.50 per 1M input tokens
-  outputPerMillion: 2.00,  // $2.00 per 1M output tokens
+  inputPerMillion: 0.50,   // $0.50 per 1M input tokens (average)
+  outputPerMillion: 2.00,  // $2.00 per 1M output tokens (average)
+  blendedPerMillion: 1.44, // ~$1.44 per 1M blended (actual cost varies by difficulty)
   cachedInputPerMillion: 0.05, // $0.05 per 1M cached input tokens (90% discount)
   currency: 'USD',
 };

@@ -47,33 +47,48 @@ interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
 
 /**
- * Call a model via OpenRouter with reasoning field fallback
+ * Call a model via OpenRouter with reasoning field fallback.
+ * Prepends English enforcement system prompt to ensure consistent English output.
  */
 async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): Promise<Result> {
   try {
+    // Prepend English system prompt if user didn't provide one
+    let msgs = messages;
+    if (!messages.some(m => m.role === 'system')) {
+      msgs = [{ role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' }, ...messages];
+    }
     const r = await fetch(OPENROUTER_URL, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, messages, temperature: temp, max_tokens: maxTok }),
+      body: JSON.stringify({ model, messages: msgs, temperature: temp, max_tokens: maxTok }),
     });
     if (!r.ok) return { success: false, content: '', tokens: 0 };
     const d = await r.json();
     let c = d.choices?.[0]?.message?.content || '';
     if (!c) {
+      // Fallback 1: reasoning field (some models put answer here)
       c = d.choices?.[0]?.message?.reasoning || '';
-      if (!c) {
-        const rd = d.choices?.[0]?.message?.reasoning_details;
-        if (Array.isArray(rd)) c = rd.map((x: { text?: string }) => x.text || '').join('');
+    }
+    if (!c) {
+      // Fallback 2: reasoning_details array
+      const rd = d.choices?.[0]?.message?.reasoning_details;
+      if (Array.isArray(rd)) {
+        // Try to get the last element (usually the final answer, not the thinking process)
+        c = rd.map((x: { text?: string }) => x.text || '').join('');
       }
     }
-    return { success: true, content: c, tokens: d.usage?.total_tokens || 0 };
+    // Strip leading/trailing whitespace
+    c = (c || '').trim();
+    return { success: !!c, content: c, tokens: d.usage?.total_tokens || 0 };
   } catch {
     return { success: false, content: '', tokens: 0 };
   }
 }
 
 /**
- * Difficulty Classifier — heuristic, no API call
+ * Difficulty Classifier — heuristic, no API call.
+ * Code generation tasks route to "medium" (single strong model) not "hard" (full MoA),
+ * because code needs one strong model with high output, not 3 models debating.
  */
 function classify(text: string): 'trivial' | 'medium' | 'hard' {
   const l = text.toLowerCase();
@@ -82,14 +97,33 @@ function classify(text: string): 'trivial' | 'medium' | 'hard' {
   if (wc > 100) s += 4; else if (wc > 50) s += 2; else if (wc > 20) s += 1;
   if (/\b(solve|calculate|derivative|integral|equation|prove|theorem|factor|simplify|evaluate|compute|matrix|probability|limit|optimi[sz]e)\b/i.test(l)) s += 3;
   if ((text.match(/[+\-*/^=<>]/g) || []).length > 3) s += 2;
-  if (/\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(l)) s += 3;
   if (/\b(because|therefore|if.*then|contradiction|inference|deduce|imply|assume|prove that|show that|explain why|reason)\b/i.test(l)) s += 2;
   if (/\b(then|after|next|finally|step by step|how long|how many|show your work)\b/i.test(l)) s += 2;
   if ((text.match(/[;,.]/g) || []).length > 3) s += 1;
   if (/\b(if|when|where|given|assuming|suppose)\b/i.test(l)) s += 1;
+  
+  // Code generation detection — route to medium (single model), not hard (MoA).
+  // Code needs one strong model with high max_tokens, not 3 models debating.
+  const isCodeGen = /\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b/i.test(l) &&
+                    /\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b/i.test(l);
+  if (isCodeGen) return 'medium';
+  
+  // General coding keywords still add to score but won't force hard if code gen detected
+  if (/\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(l)) s += 3;
+  
   if (s >= 7) return 'hard';
   if (s >= 3) return 'medium';
   return 'trivial';
+}
+
+/**
+ * Detect if the query is a code generation task (not a code reasoning/debugging task).
+ * Code generation should route to a single strong model, not the full MoA pipeline.
+ */
+function isCodeGen(text: string): boolean {
+  const l = text.toLowerCase();
+  return /\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b/i.test(l) &&
+         /\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b/i.test(l);
 }
 
 function isMath(text: string): boolean {
@@ -185,7 +219,7 @@ FEEDBACK: <one sentence>` },
       if (nums.length > 0) score = nums.reduce((a: number, b: number) => a + b, 0) / nums.length;
     }
   }
-  if (!score) score = 7;
+  if (!score) score = 5; // Default to 5 (triggers reflexion) not 7 (skips it)
   return { score, tokens: r.tokens, feedback: fb ? fb[1].trim() : 'Improve completeness and clarity' };
 }
 
@@ -225,10 +259,12 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
 
   // ── MEDIUM: Route to best specialist ──
   if (diff === 'medium') {
-    let model = M_GLM;
+    let model = M_GLM; // default to GLM (strongest overall)
     if (math) model = M_DEEPSEEK;
     else if (creative) model = M_MINIMAX;
     else if (multimodal) model = M_MIMO;
+    // Code generation uses GLM (best at following complex instructions)
+    // isCodeGen already detected by classifier, routing here is automatic via medium
     const r = await call(model, messages, temp, maxTok);
     return { content: r.content, tokens: r.tokens, tier: 'medium', time: Date.now() - start };
   }
@@ -424,13 +460,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Timeout safeguard: 45s → single GLM fallback (within AA's 60s limit)
+    // Timeout safeguard: 90s → single GLM fallback (within Vercel's 120s limit)
     const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
     const timeout = new Promise<{ content: string; tokens: number; tier: string; time: number }>(resolve => {
       setTimeout(async () => {
         const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096);
-        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 45000 });
-      }, 45000);
+        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 90000 });
+      }, 90000);
     });
 
     const result = await Promise.race([pipeline, timeout]);
