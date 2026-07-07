@@ -1,60 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-06T21:04:03.161796+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T21:05:42.156138+00:00",
-      "tier": "medium",
-      "tokens_used": 117,
-      "baseline_tokens": 8192,
-      "correct": null,
-      "task_type": "coding",
-      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens"
-    },
-    {
-      "timestamp": "2026-07-06T21:13:29.879020+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T21:13:29.879815+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T21:13:29.880341+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-06T21:14:10.779772+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-06T21:14:10.780231+00:00",
       "tier": "medium",
       "tokens_used": 4096,
@@ -899,33 +845,87 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:10:56.810417+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:10:56.811028+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:10:56.811512+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:14:25.611914+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:14:25.612773+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T05:14:25.613278+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
     }
   ],
-  "total_queries": 321,
-  "total_tokens_used": 797514,
-  "total_tokens_baseline": 2629632,
-  "correct": 124,
-  "incorrect": 62,
+  "total_queries": 327,
+  "total_tokens_used": 823090,
+  "total_tokens_baseline": 2678784,
+  "correct": 128,
+  "incorrect": 64,
   "unknown": 135,
   "tier_stats": {
     "trivial": {
-      "count": 115,
-      "tokens": 32178,
-      "baseline": 942080,
-      "correct": 62
+      "count": 117,
+      "tokens": 33178,
+      "baseline": 958464,
+      "correct": 64
     },
     "medium": {
-      "count": 140,
-      "tokens": 257095,
-      "baseline": 1146880,
-      "correct": 62
+      "count": 142,
+      "tokens": 265287,
+      "baseline": 1163264,
+      "correct": 64
     },
     "hard": {
-      "count": 66,
-      "tokens": 508241,
-      "baseline": 540672,
+      "count": 68,
+      "tokens": 524625,
+      "baseline": 557056,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-07T04:53:32.610330+00:00"
+  "last_updated": "2026-07-07T05:14:25.613285+00:00"
 }

@@ -15,7 +15,39 @@
       "type": "system",
       "message": "Shared intelligence hub initialized",
       "extra": {}
+    },
+    {
+      "id": "evt_1783401218710_watchdog",
+      "timestamp": "2026-07-07T10:43:38.710030",
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783401308831_watchdog",
+      "timestamp": "2026-07-07T10:45:08.831165",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "revenue_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783401325874_watchdog",
+      "timestamp": "2026-07-07T10:45:25.874598",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "revenue_daemon: no PID file, restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783401340896_watchdog",
+      "timestamp": "2026-07-07T10:45:40.896194",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "revenue_daemon: no PID file, restarting",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-07T02:53:57.769510"
+  "last_update": "2026-07-07T10:45:40.896203"
 }

@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-07-07T05:16:00.333403+00:00",
+  "total_signals": 2,
+  "top_signals": [
+    {
+      "title": "Giving a domain a hill to climb: benchmarking as data activation",
+      "source": "hackernews",
+      "score": 25.7,
+      "url": "https://sparsethought.com/2026/07/03/benchmarking-as-data-activation/"
+    },
+    {
+      "title": "Small AI Models Gain Traction In places with unreliable networks",
+      "source": "hackernews",
+      "score": 6.9,
+      "url": "https://spectrum.ieee.org/small-language-models-ai-pharmaceuticals"
+    }
+  ]
+}
