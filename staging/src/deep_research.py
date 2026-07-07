@@ -603,53 +603,47 @@ def build_quantization_research_prompt(topic: str, competitors: Optional[List[st
     ]
 def build_media_research_prompt(topic: str, mission: str = "BEAT FRONTIERS", 
                                 frontier_models: Optional[List[str]] = None,
-                                target_dir: str = "src/media/") -> List[Dict]:
-    """Build a research prompt specialized for media generation topics.
-    
-    Tailored for verifier-guided denoising and similar media generation
-    research, incorporating frontier model benchmarks and implementation
-    readiness requirements.
-    """
+                                search_targets: Optional[List[str]] = None) -> List[Dict]:
+    """Build a specialized research prompt for media generation topics like
+    verifier-guided denoising, targeting frontier model benchmarks."""
     if frontier_models is None:
-        frontier_models = [
-            "GPT Image 2", "Sora 2", "Veo 3.1", "Runway Gen-4.5"
-        ]
-    frontiers_text = ", ".join(frontier_models)
+        frontier_models = ["GPT Image 2", "Sora 2", "Veo 3.1", "Runway Gen-4.5"]
+    if search_targets is None:
+        search_targets = ["arXiv", "GitHub", "HuggingFace", "Artificial Analysis"]
+    
+    frontier_str = ", ".join(frontier_models)
+    search_str = ", ".join(search_targets)
+    
     return [
         {"role": "system", "content": (
             "You are a deep research agent specializing in media generation "
-            "AI (image, video, audio synthesis). Your mission is to produce "
-            f"implementation-ready reports that help BEAT frontier models "
-            f"({frontiers_text}).\n\n"
-            "Conduct deep search across:\n"
-            "1. arXiv — latest papers on diffusion, verifier-guided denoising, "
-            "classifier-free guidance, reward-guided sampling, DPO for diffusion\n"
-            "2. GitHub — reference implementations, code snippets, repos\n"
-            "3. HuggingFace — model checkpoints, pipelines, diffusers integrations\n"
-            "4. Artificial Analysis — benchmark scores and leaderboards\n\n"
-            "Your report must include:\n"
-            "- Technical architecture of the proposed approach\n"
-            "- Verifier model design (what guides the denoising)\n"
-            "- Training and inference pipeline details\n"
-            "- Quantitative comparison vs frontier models\n"
-            "- Concrete Python implementation plan for "
-            f"{target_dir}\n"
-            "- Which frontier models to add to the model pool\n"
-            "- Risks, limitations, and fallback strategies\n\n"
-            "Write at least 10000 words. Use prose with code blocks where helpful."
+            "(image, video, audio synthesis). Your mission is to find "
+            "implementation-ready techniques that can beat current frontier models. "
+            f"Target frontiers to surpass: {frontier_str}. "
+            f"Search across: {search_str}. "
+            "Focus on: (1) verifier-guided denoising methods and reward-model "
+            "feedback during diffusion sampling, (2) classifier-free vs classifier-"
+            "guided trade-offs, (3) DPO/RLHF fine-tuning for diffusion models, "
+            "(4) multi-step verifier architectures (VLM judges, CLIP-score, "
+            "human-preference models), (5) inference-time scaling laws for "
+            "denoising search (best-of-N, beam search, particle filtering), "
+            "(6) open-source model pools that could be integrated. "
+            "For each technique found, provide: method name, paper/source link, "
+            "key algorithmic steps, expected quality gain (FID/CLIP/human pref), "
+            "compute cost, and integration path into a Python media pipeline. "
+            "Output structured sections with code-ready pseudocode where possible."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n"
             f"Mission: {mission}\n"
-            f"Frontier targets to beat: {frontiers_text}\n"
-            f"Implementation target: {target_dir}\n\n"
-            "Produce a comprehensive, implementation-ready media generation "
-            "research report covering verifier-guided denoising and related "
-            "techniques. Include specific algorithmic details, pseudocode, "
-            "and a step-by-step integration plan."
+            f"Frontier targets: {frontier_str}\n\n"
+            "Conduct a comprehensive search and produce an implementation-ready "
+            "media generation report. Identify which frontier models or open-source "
+            "alternatives should be added to the model pool. Include specific "
+            "verifier-guided denoising algorithms with pseudocode suitable for "
+            "integration into src/media/."
         )},
     ]
-
 def build_technical_comparison_prompt(topic: str, competitors: List[str], num_sections: int = 6) -> List[Dict]:
     """Build a research outline prompt specialized for technical feature comparisons
     such as AWQ vs vLLM quantization/inference engines.
