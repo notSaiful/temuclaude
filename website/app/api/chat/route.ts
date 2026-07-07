@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
           streamText(controller, encoder, result.content);
           sendOrch(controller, encoder, taskType, tier, [{ name: specialist.split('/').pop()||'', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.002', techniques);
         } else {
-          // HARD: Full 10-layer stack
+          // HARD: Full 6-layer stack
           await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
         }
 

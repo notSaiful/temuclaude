@@ -56,7 +56,7 @@ export default function BenchmarksPage() {
             <p className="text-sm text-text-secondary">
               <strong className="text-text-primary">* About these scores:</strong> TemuClaude scores are
               <strong className="text-accent-primary"> projected</strong> from research analysis of our
-              orchestration architecture (3-layer MoA, code verification, self-QA, reflexion, frontier fallback).
+              orchestration architecture (MoA fusion, self-consistency, QA gate, reflexion, frontier fallback).
               They are <strong className="text-text-primary">not yet verified</strong> by ArtificialAnalysis.
               Frontier scores are from published model results. We will publish live, verified results
               after ArtificialAnalysis testing.
@@ -72,11 +72,11 @@ export default function BenchmarksPage() {
               </div>
               <div className="card">
                 <h3 className="font-semibold text-text-primary mb-1">Routing Strategy</h3>
-                <p>3-tier routing: trivial (60% of queries) routes to the cheapest model. Medium (30%) routes to a specialist. Hard (10%) triggers the full 10-layer pipeline: fusion + code verification + self-QA + reflexion.</p>
+                <p>3-tier routing: trivial (60% of queries) routes to the cheapest model. Medium (30%) routes to a specialist. Hard (10%) triggers the full 6-layer pipeline: fusion + self-consistency + aggregation + QA + reflexion.</p>
               </div>
               <div className="card">
                 <h3 className="font-semibold text-text-primary mb-1">Why TemuClaude scores higher</h3>
-                <p>The 3-layer Mixture-of-Agents (MoA) pattern is proven to outperform any single model by 7-20% across benchmarks (arXiv:2406.04692). Adding code verification eliminates math hallucination. Self-QA with reflexion adds 10-20% on hard problems (arXiv:2303.11366). These layers compound — the full pipeline is stronger than the sum of its parts.</p>
+                <p>The Mixture-of-Agents (MoA) pattern is proven to outperform any single model by 7-20% across benchmarks (arXiv:2406.04692). Self-consistency adds 18.4% on math (arXiv:2203.11317). Self-QA with reflexion adds 10-20% on hard problems (arXiv:2303.11366). These layers compound — the full pipeline is stronger than the sum of its parts.</p>
               </div>
               <div className="card">
                 <h3 className="font-semibold text-text-primary mb-1">Reproducibility</h3>
