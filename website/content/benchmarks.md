@@ -2,6 +2,6 @@
 
 | Model | Pass Rate |
 |-------|-----------|
-| **Temuclaude** | **0%** |
-| openai/gpt-oss-120b | 60% |
-| deepseek/deepseek-chat | 100% |
+| **Temuclaude** | **20%** |
+| openai/gpt-oss-120b | 0% |
+| deepseek/deepseek-chat | 0% |

@@ -30,83 +30,103 @@
   "recent_events": [
     {
       "daemon": "watchdog",
-      "type": "system",
-      "message": "Shared intelligence hub initialized"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "system",
-      "message": "Shared intelligence hub initialized"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "system",
-      "message": "Shared intelligence hub initialized"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "revenue_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "revenue_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "revenue_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "integrator_daemon: no PID file, restarting"
-    },
-    {
-      "daemon": "watchdog",
       "type": "restart",
       "message": "growth_daemon: no PID file, restarting"
+    },
+    {
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized"
+    },
+    {
+      "daemon": "test",
+      "type": "test_event",
+      "message": "Testing shared intelligence"
+    },
+    {
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "research_daemon_2",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "media_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "efficiency_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "cyber_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.1s"
+    },
+    {
+      "daemon": "swot_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "self_expansion_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "growth_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s"
+    },
+    {
+      "daemon": "revenue_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.1s"
+    },
+    {
+      "daemon": "cost_efficiency_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.5s"
+    },
+    {
+      "daemon": "feedback_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 1.1s"
+    },
+    {
+      "daemon": "meta_auditor_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 5.8s"
+    },
+    {
+      "daemon": "competitive_dominance_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 9.9s"
+    },
+    {
+      "daemon": "watchdog",
+      "type": "system",
+      "message": "Shared intelligence hub initialized"
     }
   ],
   "knowledge_count": 3,
