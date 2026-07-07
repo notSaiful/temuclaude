@@ -795,3 +795,34 @@ def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> 
             "recommendations for different use cases (edge, cloud, batch, real-time)."
         )},
     ]
+
+def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
+    """Build a prompt to evaluate an efficiency research finding for quality classification.
+    
+    Evaluates speedup, memory savings, and quality loss to classify as:
+    LOSSLESS / QUALITY-PRESERVING / PARETO-OPTIMAL / REJECTED
+    """
+    return [
+        {"role": "system", "content": (
+            "You are an efficiency research evaluator. Analyze the finding for three metrics:\n"
+            "1. Speedup factor (throughput increase, latency reduction)\n"
+            "2. Memory/compute savings (VRAM reduction, FLOPs reduction)\n"
+            "3. Quality loss (accuracy drop, perplexity increase, benchmark regression)\n\n"
+            "Classify the finding into exactly one category:\n"
+            "- LOSSLESS: Zero quality loss, any speedup/savings\n"
+            "- QUALITY-PRESERVING: Negligible quality loss (<1% relative), significant speedup/savings\n"
+            "- PARETO-OPTIMAL: Meaningful quality loss but optimal trade-off (best in class for given quality level)\n"
+            "- REJECTED: Quality loss too high, or speedup/savings insufficient to justify loss\n\n"
+            "Output format:\n"
+            "CLASSIFICATION: <category>\n"
+            "SPEEDUP: <factor or N/A>\n"
+            "SAVINGS: <percentage or N/A>\n"
+            "QUALITY_LOSS: <metric and value or N/A>\n"
+            "JUSTIFICATION: <2-3 sentences>"
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n"
+            f"Finding to Evaluate: {finding}\n\n"
+            "Evaluate and classify this efficiency finding."
+        )},
+    ]
