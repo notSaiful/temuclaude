@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-07T18:14:53.269632+00:00",
+  "total_signals": 4,
+  "top_signals": [
+    {
+      "title": "Chat Control 1.0 and 2.0 Explained",
+      "source": "hackernews",
+      "score": 6.5,
+      "url": "https://fightchatcontrol.eu/chat-control-overview"
+    },
+    {
+      "title": "Why skilled workers come to Germany and then leave again",
+      "source": "hackernews",
+      "score": 3.9,
+      "url": "https://www.dw.com/en/germany-migrants-skilled-workers-integration-labor-market-bureaucracy-language-housing/a-77853162"
+    },
+    {
+      "title": "Automating AI Away",
+      "source": "hackernews",
+      "score": 2.4,
+      "url": "https://replicated.live/blog/away"
+    },
+    {
+      "title": "GitHub Freno: cooperative, highly available throttler service",
+      "source": "hackernews",
+      "score": 1.3,
+      "url": "https://github.com/github/freno"
+    }
+  ]
+}
