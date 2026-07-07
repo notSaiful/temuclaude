@@ -7,19 +7,12 @@
       "static/chunks/main-app-a4f392d8c9b2775c.js",
       "static/chunks/app/_not-found/page-3a3916d51db9dc02.js"
     ],
-    "/api/hasan/chat/route": [
+    "/layout": [
       "static/chunks/webpack-078f6dfb37dff419.js",
       "static/chunks/4bd1b696-c023c6e3521b1417.js",
       "static/chunks/255-04967ae8cecd9e42.js",
       "static/chunks/main-app-a4f392d8c9b2775c.js",
-      "static/chunks/app/api/hasan/chat/route-f625c55b536c543d.js"
-    ],
-    "/api/hasan/power/route": [
-      "static/chunks/webpack-078f6dfb37dff419.js",
-      "static/chunks/4bd1b696-c023c6e3521b1417.js",
-      "static/chunks/255-04967ae8cecd9e42.js",
-      "static/chunks/main-app-a4f392d8c9b2775c.js",
-      "static/chunks/app/api/hasan/power/route-f625c55b536c543d.js"
+      "static/chunks/app/layout-f625c55b536c543d.js"
     ],
     "/api/hasan/identity/route": [
       "static/chunks/webpack-078f6dfb37dff419.js",
@@ -28,19 +21,26 @@
       "static/chunks/main-app-a4f392d8c9b2775c.js",
       "static/chunks/app/api/hasan/identity/route-f625c55b536c543d.js"
     ],
+    "/api/hasan/power/route": [
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-04967ae8cecd9e42.js",
+      "static/chunks/main-app-a4f392d8c9b2775c.js",
+      "static/chunks/app/api/hasan/power/route-f625c55b536c543d.js"
+    ],
+    "/api/hasan/chat/route": [
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-04967ae8cecd9e42.js",
+      "static/chunks/main-app-a4f392d8c9b2775c.js",
+      "static/chunks/app/api/hasan/chat/route-f625c55b536c543d.js"
+    ],
     "/api/hasan/deploy/route": [
       "static/chunks/webpack-078f6dfb37dff419.js",
       "static/chunks/4bd1b696-c023c6e3521b1417.js",
       "static/chunks/255-04967ae8cecd9e42.js",
       "static/chunks/main-app-a4f392d8c9b2775c.js",
       "static/chunks/app/api/hasan/deploy/route-f625c55b536c543d.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack-078f6dfb37dff419.js",
-      "static/chunks/4bd1b696-c023c6e3521b1417.js",
-      "static/chunks/255-04967ae8cecd9e42.js",
-      "static/chunks/main-app-a4f392d8c9b2775c.js",
-      "static/chunks/app/layout-f625c55b536c543d.js"
     ],
     "/api/hasan/sync/route": [
       "static/chunks/webpack-078f6dfb37dff419.js",
