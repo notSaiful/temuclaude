@@ -41,7 +41,7 @@ interface HasanData {
   swot: { strengths: number; weaknesses: number; opportunities: number; threats: number } | null;
   radar: { totalSignals: number } | null;
   cost: { remainingCredits: number; burnRatePerDay: number; throttleLevel: string; totalSpent24h: number; totalTokens24h: number };
-  ummah: { totalDistributed: number; entries: number };
+  charity: { totalDistributed: number; entries: number };
   activity: ActivityItem[];
   identity: { verified: boolean; purpose: string; goal: string };
   stats: { sourceModules: number };
@@ -387,10 +387,10 @@ export default function HasanPage() {
               {/* Charity Fund Card */}
               <div style={{ ...s.card, border: '1px solid rgba(184,146,74,0.2)' }}>
                 <div style={s.cardHead}><span style={{ ...s.cardTitle, color: '#b8924a' }}>💰 Charity Fund</span></div>
-                <div style={s.ummahBox}>
-                  <span style={s.ummahAmount}>${(data?.ummah.totalDistributed || 0).toFixed(2)}</span>
-                  <span style={s.ummahLabel}>Total Distributed</span>
-                  <span style={s.ummahNote}>25% of profit → Food · Clinics · Education</span>
+                <div style={s.charityBox}>
+                  <span style={s.charityAmount}>${(data?.charity.totalDistributed || 0).toFixed(2)}</span>
+                  <span style={s.charityLabel}>Total Distributed</span>
+                  <span style={s.charityNote}>25% of profit → Food · Clinics · Education</span>
                 </div>
               </div>
             </div>
@@ -717,10 +717,10 @@ const s: Record<string, React.CSSProperties> = {
   memCell: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
   memNum: { fontSize: '24px', fontWeight: 900, fontFamily: "'JetBrains Mono', monospace", color: '#8b5cf6' },
   memLabel: { fontSize: '10px', color: '#6b6b7b' },
-  ummahBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
-  ummahAmount: { fontSize: '32px', fontWeight: 900, color: '#b8924a', fontFamily: "'JetBrains Mono', monospace" },
-  ummahLabel: { fontSize: '10px', color: '#8b8b9b' },
-  ummahNote: { fontSize: '9px', color: '#6b6b7b', textAlign: 'center', marginTop: '6px' },
+  charityBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' },
+  charityAmount: { fontSize: '32px', fontWeight: 900, color: '#b8924a', fontFamily: "'JetBrains Mono', monospace" },
+  charityLabel: { fontSize: '10px', color: '#8b8b9b' },
+  charityNote: { fontSize: '9px', color: '#6b6b7b', textAlign: 'center', marginTop: '6px' },
   feedPanel: { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '20px', backdropFilter: 'blur(10px)' },
   feedHead: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' },
   feedTitle: { fontSize: '14px', fontWeight: 600, color: '#8b8b9b', margin: 0 },
