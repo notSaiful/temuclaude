@@ -825,27 +825,57 @@ def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
         )},
     ]
 
-def build_awq_research_plan_prompt() -> List[Dict]:
-    """Build a specialized research plan prompt for AWQ vs vLLM comparison and implementation."""
+def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM", num_sections: int = 6) -> List[Dict]:
+    """Build a specialized research plan for AWQ quantization vs vLLM comparison."""
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization and inference optimization. "
+            "You are a research planner specializing in LLM quantization techniques. "
             "Create a comprehensive research outline comparing AWQ (Activation-aware Weight Quantization) "
-            "with vLLM's quantization approaches. Cover: 1) AWQ algorithm fundamentals and calibration "
-            "process, 2) vLLM's current quantization support (AWQ, GPTQ, SqueezeLLM, FP8), 3) "
-            "Performance benchmarks: latency, throughput, memory usage, accuracy degradation, "
-            "4) Integration patterns for AWQ in vLLM backend, 5) Hardware support (NVIDIA Hopper, "
-            "Ampere, AMD MI300, Intel Gaudi), 6) Production deployment considerations: model "
-            "repository formats, calibration data requirements, dynamic vs static quantization, "
-            "7) Temuclaude orchestration integration: model selection, quantization config, "
-            "auto-tuning pipelines. Each section must have 3-5 subsections with specific technical "
-            "detail requirements. Output as a numbered list."
+            "with vLLM's quantization approaches. Include at least 6 major sections with 3-5 subsections each. "
+            "Cover: technical foundations, quantization algorithms, performance benchmarks, "
+            "deployment considerations, integration with inference engines, and future directions. "
+            "Output as a numbered list of sections with subsections."
         )},
         {"role": "user", "content": (
-            "Topic: AWQ (Activation-aware Weight Quantization) implementation and integration "
-            "for Temuclaude orchestration engine, competitive analysis against vLLM's quantization stack. "
-            "Create a research outline with at least 7 major sections covering algorithm internals, "
-            "benchmarking methodology, integration architecture, and production deployment."
+            f"Topic: {topic}\n\n"
+            "Create a detailed research outline covering:\n"
+            "1. AWQ algorithm fundamentals and activation-aware scaling\n"
+            "2. vLLM quantization methods (AWQ, GPTQ, SmoothQuant, FP8)\n"
+            "3. Comparative benchmarks: perplexity, latency, throughput, memory\n"
+            "4. Hardware support: GPU (H100, A100, RTX 4090), CPU, Apple Silicon\n"
+            "5. Integration patterns: vLLM AWQ backend, llama.cpp, TensorRT-LLM\n"
+            "6. Production deployment: model serving, batching, KV cache quantization\n"
+            "7. Temuclaude integration strategy for AWQ model orchestration\n\n"
+            "Write as a numbered outline with subsections."
+        )},
+    ]
+
+
+def build_awq_section_prompt(section_title: str, subsections: List[str], topic: str) -> List[Dict]:
+    """Build a prompt to research one AWQ-specific section with technical depth."""
+    sub_text = "\n".join(f"  - {s}" for s in subsections)
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM quantization. "
+            "Write a comprehensive, technically rigorous section for a research report. "
+            "Use prose with equations, pseudo-code, and architectural diagrams described in text. "
+            "Include specific metrics: quantization error (L2), perplexity delta, "
+            "tokens/sec, VRAM usage, kernel-level optimizations. "
+            "Cite papers: AWQ (Lin et al. 2023), vLLM (Kwon et al. 2023), "
+            "GPTQ (Frantar et al. 2022), SmoothQuant (Xiao et al. 2022). "
+            "Write at least 2000 words for this section."
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n"
+            f"Section: {section_title}\n"
+            f"Subsections to cover:\n{sub_text}\n\n"
+            "Write this section with full technical depth. Include:\n"
+            "- Mathematical formulation of AWQ scaling factors\n"
+            "- vLLM's PagedAttention interaction with quantized weights\n"
+            "- Kernel fusion opportunities for INT4/FP8 GEMM\n"
+            "- Calibration dataset requirements and sensitivity analysis\n"
+            "- End-to-end latency breakdown (prefill vs decode)\n"
+            "- Temuclaude orchestration implications"
         )},
     ]
 

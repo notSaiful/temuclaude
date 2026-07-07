@@ -1,6 +1,6 @@
 ============================================================
 TEMUCLAUDE RESEARCH SWARM — DYNAMIC PRIORITY REPORT
-Generated: 2026-07-07T12:57:51.190070+00:00
+Generated: 2026-07-07T12:59:51.213221+00:00
 ============================================================
 
 TOKEN ALLOCATION (% of research tokens):
