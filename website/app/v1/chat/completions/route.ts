@@ -115,10 +115,13 @@ async function selfConsistency(q: string, maxTok: number): Promise<{ answer: str
   if (samples.length === 0) return { answer: '', tokens };
 
   const extract = (t: string): string => {
+    // Try \boxed{} first (common in math models)
+    const boxed = t.match(/\\boxed\{([^}]+)\}/);
+    if (boxed) return boxed[1].trim();
     const lines = t.split('\n').filter(x => x.trim());
     const last = lines[lines.length - 1]?.trim() || '';
     if (last.length < 50) return last;
-    const m = t.match(/(?:answer is|=|equals|result is|x\s*=)\s*[:\s]*([^\n.]+)/i);
+    const m = t.match(/(?:answer is|final answer is|=|equals|result is|x\s*=)\s*[:\s]*([^\n.]+)/i);
     return m ? m[1].trim() : last;
   };
 
@@ -169,11 +172,24 @@ Output:
 AVERAGE: X
 FEEDBACK: <one sentence>` },
     { role: 'user', content: `Question: ${q}\nAnswer: ${a}\n\nScore:` },
-  ], 0.0, 200);
+  ], 0.0, 500);
 
+  // Robust parsing — handle different formats Nemotron might return
   const avg = r.content?.match(/AVERAGE:\s*(\d+(?:\.\d+)?)/i);
   const fb = r.content?.match(/FEEDBACK:\s*(.+)/i);
-  return { score: avg ? parseFloat(avg[1]) : 8, tokens: r.tokens, feedback: fb ? fb[1].trim() : '' };
+  // If no AVERAGE found, try to compute from individual rubric scores
+  let score = avg ? parseFloat(avg[1]) : 0;
+  if (!score && r.content) {
+    const rubricScores = r.content.match(/(?:LC|FC|CM|GA|CL):\s*(\d+)/gi);
+    if (rubricScores && rubricScores.length >= 3) {
+      const nums = rubricScores.map(s => { const m = s.match(/(\d+)/); return m ? parseInt(m[1]) : 0; }).filter(n => n > 0);
+      if (nums.length > 0) score = nums.reduce((a: number, b: number) => a + b, 0) / nums.length;
+    }
+  }
+  // Default to 7 (not 8) if parsing fails — 7 means "probably fine, don't reflexion"
+  // This is safer than 8 (which skips reflexion) for unparseable responses
+  if (!score) score = 7;
+  return { score, tokens: r.tokens, feedback: fb ? fb[1].trim() : 'Improve completeness and clarity' };
 }
 
 /**
