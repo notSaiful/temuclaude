@@ -217,6 +217,7 @@ def push_to_vercel(data):
     if not VERCEL_URL:
         return False
     try:
+        # Push main status data
         url = f"{VERCEL_URL}/api/hasan"
         req = urllib.request.Request(
             url,
@@ -225,6 +226,20 @@ def push_to_vercel(data):
             method='POST',
         )
         urllib.request.urlopen(req, timeout=5)
+
+        # Push power state
+        power_state = {
+            'status': 'active' if data.get('daemons', {}).get('alive', 0) > 0 else 'deactivated',
+            'alive': data.get('daemons', {}).get('alive', 0),
+            'total': 23,
+        }
+        power_req = urllib.request.Request(
+            f"{VERCEL_URL}/api/hasan/power",
+            data=json.dumps({'action': 'sync', 'powerState': power_state}).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+        urllib.request.urlopen(power_req, timeout=5)
         return True
     except Exception as e:
         print(f"  Vercel push failed: {e}", flush=True)

@@ -1,9 +1,9 @@
 {
-  "/api/hasan/chat/route": "/api/hasan/chat",
-  "/api/hasan/power/route": "/api/hasan/power",
-  "/api/hasan/identity/route": "/api/hasan/identity",
-  "/api/hasan/deploy/route": "/api/hasan/deploy",
   "/_not-found/page": "/_not-found",
+  "/api/hasan/identity/route": "/api/hasan/identity",
+  "/api/hasan/power/route": "/api/hasan/power",
+  "/api/hasan/chat/route": "/api/hasan/chat",
+  "/api/hasan/deploy/route": "/api/hasan/deploy",
   "/api/hasan/sync/route": "/api/hasan/sync",
   "/api/hasan/route": "/api/hasan",
   "/hasan/page": "/hasan"
