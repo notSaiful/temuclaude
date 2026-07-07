@@ -510,46 +510,37 @@ def build_efficiency_research_prompt(finding: Dict, topic: str) -> List[Dict]:
         )},
     ]
 
-def classify_efficiency_finding(
-    speedup_factor: float,
-    memory_savings_pct: float,
-    quality_loss_pct: float,
-    technique_name: str = "",
-) -> str:
-    """
-    Classify an efficiency finding into one of four quality guardrail buckets.
+def classify_efficiency_finding(speedup: float, savings: float, quality_loss: float) -> str:
+    """Classify an efficiency finding based on its quality impact.
 
-    Used to gate whether a technique (e.g. AWQ quantization, vLLM-style
-    paged attention) is safe to auto-integrate into src/efficiency/.
-
-    Classification rules:
-      - LOSSLESS          : zero measurable quality loss
-      - QUALITY-PRESERVING: quality loss < 1% (imperceptible)
-      - PARETO-OPTIMAL    : quality loss >= 1% but speedup or savings
-                            justify the trade-off (speedup >= 1.5x OR
-                            memory savings >= 30%)
-      - REJECTED          : quality loss too high for the gains offered
+    Categories:
+        LOSSLESS          — no quality loss, meaningful speedup or savings
+        QUALITY-PRESERVING — negligible quality loss (< 1%), meaningful gains
+        PARETO-OPTIMAL    — quality loss present but justified by gains
+        REJECTED          — quality loss too high relative to gains
 
     Args:
-        speedup_factor:    Inference speedup as a multiplier (1.0 = no change).
-        memory_savings_pct: Percentage of memory saved (0-100).
-        quality_loss_pct:  Percentage of quality degradation (0-100).
-        technique_name:    Optional name for logging/debugging.
+        speedup:       inference speedup factor (e.g. 2.0 = 2x faster)
+        savings:       memory or cost savings fraction (0.0–1.0)
+        quality_loss:  quality degradation fraction (0.0–1.0)
 
     Returns:
-        One of: "LOSSLESS", "QUALITY-PRESERVING",
-                "PARETO-OPTIMAL", "REJECTED".
+        One of: LOSSLESS, QUALITY-PRESERVING, PARETO-OPTIMAL, REJECTED
     """
-    if quality_loss_pct <= 0.0:
+    meaningful_gain = speedup > 1.1 or savings > 0.1
+
+    if not meaningful_gain:
+        return "REJECTED"
+
+    if quality_loss <= 0.0:
         return "LOSSLESS"
 
-    if quality_loss_pct < 1.0:
+    if quality_loss < 0.01:
         return "QUALITY-PRESERVING"
 
-    meaningful_speedup = speedup_factor >= 1.5
-    meaningful_savings = memory_savings_pct >= 30.0
-
-    if meaningful_speedup or meaningful_savings:
+    # Pareto-optimal: gains outweigh quality loss
+    gain_score = max(speedup - 1.0, 0.0) + savings
+    if gain_score > quality_loss * 5:
         return "PARETO-OPTIMAL"
 
     return "REJECTED"
