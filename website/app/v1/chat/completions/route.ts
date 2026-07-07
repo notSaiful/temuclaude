@@ -18,7 +18,7 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Model pool for orchestration
 const ORCHESTRATOR = 'z-ai/glm-5.2';
-const REASONING_MODEL = 'deepseek/deepseek-chat-v4-pro';
+const REASONING_MODEL = 'deepseek/deepseek-v4-pro';
 const SPECIALIST_MODEL = 'google/gemini-3.5-flash';
 const QA_MODEL = 'nvidia/nemotron-3-ultra-550b-a55b:free';
 const FRONTIER_MODEL = 'anthropic/claude-sonnet-5';
