@@ -8,6 +8,8 @@ import asyncio
 import json
 import tempfile
 
+import pytest
+
 # Add project root to path
 project_root = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, project_root)
