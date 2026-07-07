@@ -496,53 +496,7 @@ export default function HasanPage() {
               </div>
             </div>
 
-            {/* Major Breakthroughs Found */}
-            <div style={s.btBox}>
-              <div style={s.btHead}>
-                <Icon name="sparkles" size={16} color="#3b82f6" />
-                <span style={s.btTitle}>Major Breakthroughs Found</span>
-                <span style={s.btCount}>
-                  {(data?.dynamicBreakthroughs?.length || BREAKTHROUGHS.length)} findings
-                </span>
-              </div>
-              <div style={s.btList}>
-                {/* Dynamic breakthroughs from research swarm (preferred) */}
-                {(data?.dynamicBreakthroughs?.length > 0 ? data.dynamicBreakthroughs.slice(0, 8) : BREAKTHROUGHS).map((bt: any, i: number) => (
-                  <motion.div key={bt.title || bt.name}
-                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                    style={s.btCard}>
-                    <div style={s.btCardHead}>
-                      <span style={s.btCardTitle}>{bt.title}</span>
-                      <span style={{
-                        ...s.btCat,
-                        color: bt.categoryColor || BT_CAT_COLORS[bt.category] || '#8b5cf6',
-                      }}>{bt.category}</span>
-                    </div>
-                    <p style={s.btSummary}>{bt.summary}</p>
-                    {/* Show key findings if available (dynamic), otherwise show impact (static) */}
-                    {bt.keyFindings && bt.keyFindings.length > 0 ? (
-                      <div style={s.btKeyFindings}>
-                        {bt.keyFindings.slice(0, 2).map((kf: any, j: number) => (
-                          <div key={j} style={s.btKeyFinding}>
-                            <span style={s.btKeyFindingDot}>▸</span>
-                            <span style={s.btKeyFindingText}>{kf.name}: {kf.detail.substring(0, 100)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div style={s.btImpact}>
-                        <Icon name="zap" size={11} color="#10b981" />
-                        <span style={s.btImpactText}>{bt.impact}</span>
-                      </div>
-                    )}
-                    <div style={s.btFooter}>
-                      <span style={s.btSource}>{bt.source}</span>
-                      {bt.date && <span style={s.btDate}>{bt.date}</span>}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+
 
             {/* Evolution Engine */}
             <div style={s.evoBox}>
