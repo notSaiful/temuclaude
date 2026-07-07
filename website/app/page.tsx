@@ -11,6 +11,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
+      <ScrollProgress />
       <main id="main-content">
         {/* ━━ Hero ━━ */}
         <section className="relative pt-32 pb-24 px-6 overflow-hidden">
