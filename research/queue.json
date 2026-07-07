@@ -4,8 +4,6 @@
   "research_requests": [],
   "research_complete": [],
   "implementation_queue": [
-    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_routellm_cascade_20260707T102046.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T102420.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T102421.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T102422.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T102546.md",
@@ -132,13 +130,15 @@
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101546.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101546.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101546.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101920.md"
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101920.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101922.md"
   ],
   "implementation_failed": [
     "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101421.md",
     "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101422.md",
-    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101921.md"
+    "/Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260707T101921.md",
+    "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_routellm_cascade_20260707T102046.md"
   ],
   "priority_updates": [],
-  "last_updated": "2026-07-07T11:57:09.701847+00:00"
+  "last_updated": "2026-07-07T12:18:04.020131+00:00"
 }
