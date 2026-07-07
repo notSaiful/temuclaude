@@ -532,43 +532,38 @@ def classify_efficiency_finding(speedup_factor: float, cost_savings_pct: float, 
     
     return "REJECTED"
 def build_competitor_analysis_prompt(topic: str, competitors: List[str], focus_areas: Optional[List[str]] = None) -> List[Dict]:
-    """Build a prompt for deep competitive analysis research (e.g., AWQ vs vLLM).
+    """Build a prompt for researching competitor analysis, e.g. AWQ vs vLLM.
     
-    Generates a structured research plan that compares technologies across
-    architecture, performance, quantization methods, ecosystem, and adoption.
+    Specialized for quantization/optimization framework comparisons.
     """
-    if focus_areas is None:
-        focus_areas = [
-            "Architecture and core design philosophy",
-            "Quantization techniques (e.g., AWQ, GPTQ, bitsandbytes)",
-            "Inference throughput and latency benchmarks",
-            "Memory footprint and GPU utilization",
-            "Ease of deployment and integration",
-            "Community support and ecosystem maturity",
-            "Supported model formats and hardware backends",
-            "Production readiness and known limitations",
-        ]
-    focus_text = "\n".join(f"  - {f}" for f in focus_areas)
-    competitors_text = ", ".join(competitors)
+    competitor_text = "\n".join(f"  - {c}" for c in competitors)
+    default_focus = [
+        "Architecture and core algorithms",
+        "Quantization methodology (e.g., activation-aware weight quantization)",
+        "Performance benchmarks (throughput, latency, memory)",
+        "Supported model architectures and hardware",
+        "Ease of deployment and integration",
+        "Community adoption and ecosystem",
+        "Limitations and trade-offs",
+    ]
+    focus = focus_areas if focus_areas else default_focus
+    focus_text = "\n".join(f"  - {f}" for f in focus)
     return [
         {"role": "system", "content": (
-            "You are a technical research analyst specializing in LLM inference "
-            "and quantization technologies. Produce a rigorous, data-driven "
-            "competitive analysis. Compare each competitor across the listed "
-            "focus areas with specific metrics, benchmarks, and citations. "
-            "Highlight trade-offs, strengths, and weaknesses objectively. "
-            "Where quantitative data is unavailable, note the gap explicitly "
-            "rather than speculating. Output structured prose with clear "
-            "section headers for each focus area."
+            "You are a deep research agent specializing in ML inference optimization "
+            "and model quantization frameworks. Conduct a thorough competitor analysis "
+            "covering technical architecture, quantization techniques (such as AWQ "
+            "activation-aware weight quantization), performance benchmarks, and "
+            "practical deployment considerations. Use prose with citations where "
+            "possible. Write at least 2000 words."
         )},
         {"role": "user", "content": (
             f"Research Topic: {topic}\n"
-            f"Competitors to compare: {competitors_text}\n"
+            f"Competitors/Technologies to compare:\n{competitor_text}\n"
             f"Focus areas:\n{focus_text}\n\n"
-            "Write a comprehensive competitive analysis covering every focus area "
-            "for each competitor. Include any available benchmark numbers, "
-            "memory requirements, and deployment considerations. Conclude with "
-            "a recommendation matrix summarizing best-fit use cases."
+            "Provide a detailed comparative analysis including technical deep dives "
+            "into quantization approaches, benchmark comparisons, and recommendations "
+            "for different use cases."
         )},
     ]
 def build_quantization_research_prompt(topic: str, focus_methods: Optional[List[str]] = None) -> List[Dict]:
