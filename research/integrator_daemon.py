@@ -101,11 +101,6 @@ class IntegratorDaemon(DaemonBase):
                 
                 self.logger.info(f"Attempt {attempt+1}/{max_attempts}: {Path(finding_file).name}")
                 
-                # Copy the finding to staging for reference
-                staging_finding = STAGING_DIR / Path(finding_file).name
-                with open(staging_finding, 'w') as f:
-                    f.write(content)
-                
                 # Run auto-integrator in STAGING directory only
                 # Create a staging copy of src if it doesn't exist
                 staging_src = STAGING_DIR / "src"
