@@ -56,6 +56,46 @@ MODEL_POOL = {
         "cost_tier": "flat",
         "routing_weight": 0.7,
     },
+    "llama-3.3-70b-instruct": {
+        "ollama_tag": "llama3.3:70b",
+        "role": "specialist",
+        "strengths": ["reasoning", "coding", "knowledge"],
+        "context_length": 131_072,
+        "thinking": False,
+        "tools": True,
+        "cost_tier": "cheap",
+        "routing_weight": 0.88,
+    },
+    "gemini-2.0-flash": {
+        "ollama_tag": "gemini-2.0-flash:cloud",
+        "role": "worker",
+        "strengths": ["multimodal", "speed", "knowledge"],
+        "context_length": 1_048_576,
+        "thinking": False,
+        "tools": True,
+        "cost_tier": "ultra_cheap",
+        "routing_weight": 0.86,
+    },
+    "mistral-large-2": {
+        "ollama_tag": "mistral-large:cloud",
+        "role": "specialist",
+        "strengths": ["coding", "reasoning", "multilingual"],
+        "context_length": 131_072,
+        "thinking": False,
+        "tools": True,
+        "cost_tier": "premium",
+        "routing_weight": 0.85,
+    },
+    "claude-3.5-sonnet": {
+        "ollama_tag": "claude-3.5-sonnet:cloud",
+        "role": "frontier_fallback",
+        "strengths": ["coding", "reasoning", "agentic"],
+        "context_length": 200_000,
+        "thinking": False,
+        "tools": True,
+        "cost_tier": "premium",
+        "routing_weight": 0.95,
+    },
 }
 
 # Cheaper models for trivial queries
@@ -111,6 +151,11 @@ OPENROUTER_MODELS = {
     "kimi-k2.6": "moonshotai/kimi-k2.6",                # legacy — kept for compatibility
     "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",      # legacy — kept for compatibility
     "gpt-oss-120b": "openai/gpt-oss-120b",              # legacy — kept for compatibility
+    # v3 Hybrid pool models
+    "llama-3.3-70b-instruct": "meta-llama/llama-3.3-70b-instruct",
+    "gemini-2.0-flash": "google/gemini-2.0-flash",
+    "mistral-large-2": "mistralai/mistral-large-2",
+    "claude-3.5-sonnet": "anthropic/claude-3.5-sonnet",
     # Ultra-cheap MoE models for shepherding workers and medium tier
     "deepseek-v4-flash": "deepseek/deepseek-v4-flash",  # $0.09/$0.18/M — shepherd worker
     "qwen3-235b-moe": "qwen/qwen3-235b-a22b-2507",      # $0.09/$0.10/M — MoE reasoning
@@ -213,6 +258,13 @@ AIML_MODELS = {
 
 # Auto-detect: use OpenRouter if key is set, otherwise Ollama
 import os as _os
+try:
+    from dotenv import load_dotenv
+    # Load .env from project root
+    load_dotenv(_os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), ".env"))
+except ImportError:
+    pass
+
 _USE_OPENROUTER = bool(_os.environ.get("OPENROUTER_API_KEY"))
 _HAS_AIML_KEY = bool(_os.environ.get("AIML_API_KEY"))
 

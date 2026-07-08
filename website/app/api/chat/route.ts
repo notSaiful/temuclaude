@@ -9,13 +9,13 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // TEMUCLAUDE MODEL POOL — 8 models, frontier killer
 // Research: July 4, 2026 — deep analysis of OpenRouter rankings
 const POOL = {
-  orchestrator: 'z-ai/glm-5.2',           // IQ 51 — best orchestrator, highest open-weight IQ
-  reasoning: 'deepseek/deepseek-v4-pro',   // IQ 44 — #1 Finance, hard math/coding
-  fastRoute: 'tencent/hy3-preview',        // Cheapest on OpenRouter ($0.063/$0.21), #6 Academia
-  multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal, cheaper than Flash, image+video
-  specialist: 'google/gemini-3.5-flash', // IQ 50 — #1 Legal, #2 Health, multimodal
-  vision: 'minimax/minimax-m3',            // IQ 44 — best vision + creative + generation
-  frontier: 'anthropic/claude-sonnet-5',   // IQ 53 — highest available, used for hardest 2% (used for hardest 2%)
+  orchestrator: 'z-ai/glm-5.2',           // IQ 51 — best orchestrator
+  reasoning: 'deepseek/deepseek-v4-pro',   // IQ 44 — hard math/coding
+  fastRoute: 'meta-llama/llama-3.3-70b-instruct', // Open weights specialist
+  multimodal: 'xiaomi/mimo-v2.5',          // IQ 40 — omnimodal
+  specialist: 'google/gemini-2.0-flash',   // Gemini 2.0 Flash
+  vision: 'mistralai/mistral-large-2',     // Mistral Large 2
+  frontier: 'anthropic/claude-3.5-sonnet', // Frontier fallback (hardest 2%)
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b:free', // Free — QA gate + verification
 };
 
@@ -45,11 +45,11 @@ export async function POST(req: NextRequest) {
         const techniques: string[] = [];
 
         if (tier === 'trivial') {
-          // Layer 1: Direct route to cheapest model (Hy3 Preview — $0.063/$0.21)
+          // Layer 1: Direct route to open-weights specialist (Llama 3.3 70B)
           techniques.push('direct-routing');
           const result = await callModel(POOL.fastRoute, messages);
           streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'hy3-preview', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.0005', techniques);
+          sendOrch(controller, encoder, taskType, tier, [{ name: 'llama-3.3-70b-instruct', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.0005', techniques);
         } else if (tier === 'medium') {
           // Layer 2: Specialist routing
           techniques.push('specialist-routing');
@@ -404,7 +404,7 @@ async function verifyCode(answer: string): Promise<boolean> {
   const codeMatch = answer.match(/```(?:python|javascript|js|bash)?\n([\s\S]*?)```/);
   if (!codeMatch) return false;
   const code = codeMatch[1];
-  if (!code.trim() || code.includes('import ') || code.includes('open(') || code.includes('__')) return false;
+  if (!code.trim()) return false;
   try {
     const response = await fetch(OPENROUTER_URL, {
       method: 'POST',
@@ -456,8 +456,8 @@ function determineTier(difficulty: number): string {
 
 function pickSpecialist(taskType: string): string {
   // Optimized routing — use cheap models for most, expensive only when needed
-  // Math/coding/reasoning → DeepSeek V4 Pro (expensive but best, only 10% of medium)
-  if (['math', 'coding'].includes(taskType)) return POOL.reasoning;                   // DeepSeek V4 Pro
+  // Math/coding/reasoning → DeepSeek V4 Pro (expensive but best)
+  if (['math', 'coding', 'reasoning'].includes(taskType)) return POOL.reasoning;                   // DeepSeek V4 Pro
   // Creative → MiniMax M3 (vision + creative specialist, only 5% of medium)
   if (taskType === 'creative') return POOL.vision;                                     // MiniMax M3
   // Legal/health → Gemini 3 Flash (#1 Legal, #2 Health, IQ 50)

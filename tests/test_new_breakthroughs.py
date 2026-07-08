@@ -53,7 +53,6 @@ def test_step_extraction() -> bool:
     print(f"  OK: Empty response — found {len(steps5)} steps")
     
     print("  5/5 passed")
-    return True
 
 
 # ============================================================
@@ -93,7 +92,6 @@ def test_pareto_tracking() -> bool:
     print(f"  OK: Metrics file persisted to {METRICS_FILE}")
     
     print("  4/4 passed")
-    return True
 
 
 # ============================================================
@@ -139,7 +137,6 @@ def test_preference_router() -> bool:
     print(f"  OK: Preferences file persisted to {PREFS_FILE}")
     
     print("  4/4 passed")
-    return True
 
 
 # ============================================================
@@ -168,7 +165,6 @@ def test_budget_forcing() -> bool:
     print(f"  OK: Empty response gets 'Wait' appended")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
@@ -186,7 +182,7 @@ def test_z3_verification() -> bool:
     if "Z3 not installed" in result.get("reason", ""):
         print(f"  OK: Z3 not installed — graceful fallback (pip install z3-solver to enable)")
         print(f"  1/1 passed (with note)")
-        return True
+        return
     
     # Z3 IS installed — verify it works
     assert "verified" in result, "Result should have 'verified' key"
@@ -208,7 +204,6 @@ def test_z3_verification() -> bool:
     print(f"  OK: No logical patterns — Z3 returns gracefully")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
@@ -233,11 +228,8 @@ def main():
     
     for name, test_func in tests:
         try:
-            if test_func():
-                passed += 1
-            else:
-                failed += 1
-                print(f"  FAILED: {name}")
+            test_func()
+            passed += 1
         except Exception as e:
             failed += 1
             print(f"  FAILED: {name} — {e}")

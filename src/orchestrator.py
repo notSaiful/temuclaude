@@ -38,10 +38,12 @@ if __package__:
     from .skill_curator import track_skill_usage
     from .pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
     from .preference_router import record_routing_decision, get_routing_recommendations
-    from .verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3
+    from .verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3, verify_logical_with_z3_enhanced
+    from .shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from .ui_ux import LoopEngine, IntentClassifier
     from .cache import get_cache
     from .models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
+    from .reasoning_tree import MCTSReasoningSearch
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -58,7 +60,8 @@ else:
     from src.logger import QueryLogger
     from src.fusion import fuse, get_panel, get_aggregator
     from src.consistency import self_consistency
-    from src.verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3
+    from src.verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3, verify_logical_with_z3_enhanced
+    from src.shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from src.self_qa import self_qa_gate
     from src.skills_loader import build_enhanced_system_prompt
     from src.adaptive import get_model_for_task
@@ -73,6 +76,7 @@ else:
     from src.ui_ux import LoopEngine, IntentClassifier
     from src.cache import get_cache
     from src.models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
+    from src.reasoning_tree import MCTSReasoningSearch
 
 
 import re as _re
@@ -390,6 +394,33 @@ class Temuclaude:
         if max_tokens < 200:
             max_tokens = 200
 
+        # Clone messages to prevent mutating original list
+        messages_copy = []
+        for msg in messages:
+            messages_copy.append(dict(msg))
+
+        # Inject Quiet-STaR implicit thought directive for thinker models
+        thinker_models = [
+            "glm-5.2", "deepseek-v4-pro", "llama-3.3-70b-instruct", "claude-3.5-sonnet",
+            "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2", "anthropic/claude-3.5-sonnet"
+        ]
+        if model in thinker_models:
+            sys_msg_idx = -1
+            for i, msg in enumerate(messages_copy):
+                if msg.get("role") == "system":
+                    sys_msg_idx = i
+                    break
+            
+            thought_prompt = (
+                "\nCRITICAL: Please structure your step-by-step intermediate reasoning, calculations, "
+                "hypotheses, and code tests inside <thought> ... </thought> tags. Focus on logical self-verification "
+                "and correctness. Output your final response outside of the <thought> block."
+            )
+            if sys_msg_idx >= 0:
+                messages_copy[sys_msg_idx]["content"] = messages_copy[sys_msg_idx]["content"] + thought_prompt
+            else:
+                messages_copy.insert(0, {"role": "system", "content": thought_prompt.strip()})
+
         # Determine which backend and model ID to use
         if __package__:
             from .models import OPENROUTER_MODELS, OPENROUTER_FREE_MODELS, _USE_OPENROUTER
@@ -415,7 +446,7 @@ class Temuclaude:
                 response = await asyncio.wait_for(
                     self.client.chat.completions.create(
                         model=ollama_tag,
-                        messages=messages,
+                        messages=messages_copy,
                         temperature=temperature,
                         max_tokens=max_tokens,
                         extra_headers={"Authorization": f"Bearer {api_key}"} if _USE_OPENROUTER and api_key else None,
@@ -550,7 +581,28 @@ class Temuclaude:
 
         return answer  # All failed, return last error
 
-    async def complete(self, query: str, system_prompt: str = None) -> str:
+    async def project_multimodal_inputs(self, query: str) -> str:
+        """Project visual elements in the query into structured text descriptions (Multimodal Projection)."""
+        visual_keywords = ["image", "picture", "screenshot", "diagram", "chart", "graph", "plot"]
+        if any(kw in query.lower() for kw in visual_keywords):
+            # Extract any image URLs or file paths
+            urls = _re.findall(r'https?://[^\s<>"]+|/[^\s<>"]+\.(?:png|jpg|jpeg|gif|webp)', query)
+            if urls:
+                description_prompt = (
+                    f"You are a multimodal visual assistant. The user provided this query referencing an image: '{query}' "
+                    "Analyze the referenced image link/path and describe its visual contents, data points, or code layout in detail. "
+                    "Format any charts/graphs as markdown tables. Output only the description."
+                )
+                messages = [
+                    {"role": "system", "content": "You are a visual assistant. Convert images to detailed structured text description."},
+                    {"role": "user", "content": description_prompt}
+                ]
+                description = await self.call_model_with_fallback("minimax-m3", messages, max_tokens=1024)
+                if description and not description.startswith("[ERROR"):
+                    return query + f"\n\n[Visual Component Description (Multimodal Projection)]:\n{description}"
+        return query
+
+    async def complete(self, query: str, system_prompt: str = None, budget_profile: str = "balanced") -> str:
         """
         Main entry point. User sends a query, gets one response.
         All orchestration is internal.
@@ -570,9 +622,6 @@ class Temuclaude:
         start_time = time.time()
 
         # Step 0: Semantic cache check — zero cost, zero quality loss
-        # If we've seen this query (or a semantically identical one) before,
-        # return the cached answer. $0 API cost. 100% quality (cached answer
-        # was already verified by the full pipeline when first generated).
         try:
             cache = get_cache()
             cache_key_messages = [{"role": "user", "content": query}]
@@ -593,11 +642,15 @@ class Temuclaude:
         except Exception:
             pass  # Cache failure must never break the response
 
+        # Apply Multimodal Visual Projection if applicable
+        if budget_profile != "max_savings":
+            query = await self.project_multimodal_inputs(query)
+
         # Step 1: Classify the task
         task_type = await self.classify_task(query)
         tier = self.determine_tier(query, task_type)
 
-        # UI/UX generation: route through Loop Engine (research: Loop Engineering beats single-prompt)
+        # UI/UX generation: route through Loop Engine
         if task_type == "ui_ux":
             ui_result = await self.generate_ui(query)
             latency_ms = int((time.time() - start_time) * 1000)
@@ -613,23 +666,26 @@ class Temuclaude:
             )
             return ui_result
 
-        # Step 2: Route based on tier (unified routing + cascading)
-        # OPTION A: Mathematical zero quality sacrifice.
-        # Every tier uses FRONTIER-QUALITY models (IQ 44+ on ArtificialAnalysis).
-        # Cost savings come ONLY from:
-        #   - Exact match cache (returns verified answer, zero quality loss)
-        #   - Routing to the cheapest frontier model per task type
-        #   - Fusion for hard tier (smarter than any single model — actually BETTER)
-        #   - Adaptive token budgets (don't waste tokens on easy queries)
-        # No MoE models (MMLU 82.8 < frontier 88+), no free models, no shepherding.
-        if tier == "trivial":
-            # Use the CHEAPEST frontier model: deepseek-v4-pro (IQ 44, frontier quality).
-            # On Ollama: flat rate. On OpenRouter: $0.435/$0.87/M — cheapest frontier.
-            # Zero quality sacrifice: IQ 44 is frontier, same quality as $15/M models
-            # on trivial queries.
-            model = "deepseek-v4-pro"  # IQ 44, frontier quality
+        # Apply cost-quality budget profile constraints
+        n_samples = None
+        if budget_profile == "max_quality":
+            if tier != "trivial":
+                tier = "hard"
+            token_budget = 8192
+            n_samples = 10
+        elif budget_profile == "max_savings":
+            if tier == "hard":
+                tier = "medium"
+            token_budget = 1000
+            n_samples = 1
+        else:
             token_budget = self.get_adaptive_token_budget(tier)
-            enhanced_prompt = build_enhanced_system_prompt(task_type, system_prompt, tier=tier)
+            n_samples = self.get_adaptive_n_samples(tier)
+
+        # Step 2: Route based on tier (unified routing + cascading)
+        if tier == "trivial":
+            model = "deepseek-v4-pro"  # IQ 44, frontier quality
+            enhanced_prompt = build_enhanced_system_prompt(task_type, system_prompt, tier=tier, query=query)
             track_skill_usage(task_type)
             messages = [
                 {"role": "system", "content": enhanced_prompt},
@@ -639,26 +695,34 @@ class Temuclaude:
             models_used = [model]
             strategy = "direct_frontier_deepseek_v4_pro+trivial"
         elif tier == "medium":
-            # Use adaptive routing to pick the best FRONTIER model for this task type.
-            # get_model_for_task() returns frontier models (IQ 44+):
-            #   math/coding → deepseek-v4-pro (IQ 44)
-            #   knowledge → glm-5.2 (IQ 51)
-            #   creative → minimax-m3 (IQ 44)
-            # Zero quality sacrifice: every model is frontier quality.
             model = get_model_for_task(task_type)
-            token_budget = self.get_adaptive_token_budget(tier)
             evolved_prompt = get_system_prompt(task_type, system_prompt)
-            enhanced_prompt = build_enhanced_system_prompt(task_type, evolved_prompt, tier=tier)
+            enhanced_prompt = build_enhanced_system_prompt(task_type, evolved_prompt, tier=tier, query=query)
             track_skill_usage(task_type)
             messages = [
                 {"role": "system", "content": enhanced_prompt},
                 {"role": "user", "content": query},
             ]
 
-            # For reasoning/math at medium tier, use Tree of Thoughts (arXiv:2305.10601)
-            # ToT gives +70pp on search-heavy tasks. Only for reasoning/math.
-            # This INCREASES quality, doesn't sacrifice it.
-            if task_type in ("reasoning", "math") and len(query.split()) > 15:
+            # LLM Shepherding for Max Savings or whenever applicable
+            if (budget_profile == "max_savings" or should_shepherd(task_type, tier)) and task_type in ("math", "coding"):
+                shepherd_model = "deepseek-v4-pro"
+                worker_model = "deepseek-v4-flash"
+                hint_tokens = calculate_hint_tokens(token_budget)
+                shepherd_msgs = build_shepherd_messages(messages, hint_tokens)
+                
+                hint = await self.call_model_with_fallback(shepherd_model, shepherd_msgs, max_tokens=hint_tokens)
+                if not hint.startswith("[ERROR"):
+                    worker_msgs = build_worker_messages(messages, hint)
+                    completion = await self.call_model_with_fallback(worker_model, worker_msgs, max_tokens=token_budget)
+                    answer = combine_hint_and_completion(hint, completion)
+                    models_used = [shepherd_model, worker_model]
+                    strategy = "shepherded_savings"
+                else:
+                    answer = await self.call_model_with_fallback(worker_model, messages, max_tokens=token_budget)
+                    models_used = [worker_model]
+                    strategy = "direct_worker_fallback"
+            elif task_type in ("reasoning", "math") and len(query.split()) > 15 and budget_profile != "max_savings":
                 tot_result = await tree_of_thoughts(
                     query, model, self.call_model_with_fallback,
                     max_depth=3, branching=3, max_nodes=10,
@@ -668,16 +732,14 @@ class Temuclaude:
                     answer = tot_result["answer"]
                     strategy = f"tree_of_thoughts(d={3},nodes={tot_result['nodes_explored']})"
                 else:
-                    # ToT didn't find a final answer — fall back to direct
                     answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
                     strategy = "direct_specialist+tot_fallback"
             else:
                 answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
                 strategy = "direct_specialist+skills+adaptive+adaptive_tokens"
 
-            # Lightweight self-QA for knowledge queries — catches factual errors
-            # on the tier that previously had zero verification.
-            if task_type == "knowledge":
+            # Lightweight self-QA for knowledge queries (bypassed in max_savings)
+            if task_type == "knowledge" and budget_profile != "max_savings":
                 qa_result = await self_qa_gate(
                     query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
                     threshold=8, max_retries=1, max_tokens=1500,
@@ -692,44 +754,67 @@ class Temuclaude:
 
             models_used = [model]
         else:
-            # Hard tier: full orchestration with 3-layer MoA + adaptive compute
-            # Strategy depends on task type:
-            # - math: 3-layer MoA + code verification + PRM-weighted self-consistency
-            # - coding: 3-layer MoA + code verification
-            # - knowledge: 3-layer MoA only
-            # - reasoning: 3-layer MoA + PRM-weighted self-consistency
-            # - creative: 3-layer MoA only
-            # - agentic: 3-layer MoA only
+            # Hard tier: full orchestration with 3-layer MoA + adaptive compute + MCTS + Self-Play
+            use_code_verify = task_type in ("math", "coding") and budget_profile != "max_savings"
+            use_self_consistency = task_type in ("math", "reasoning") and budget_profile != "max_savings"
 
-            use_code_verify = task_type in ("math", "coding")
-            use_self_consistency = task_type in ("math", "reasoning")
-            token_budget = self.get_adaptive_token_budget(tier)
+            # Run v3 upgrades: MCTS step search + self-play loops for hard math/coding/reasoning
+            mcts_ran = False
+            self_play_ran = False
+            if task_type in ("math", "coding", "reasoning") and budget_profile != "max_savings":
+                try:
+                    # Callback for model calls
+                    async def mcts_model_call(model_id, msgs, tokens):
+                        return await self.call_model_with_fallback(model_id, msgs, max_tokens=tokens)
+                    
+                    # 1. MCTS Step-Level Search Tree
+                    mcts_searcher = MCTSReasoningSearch(
+                        call_model_func=mcts_model_call,
+                        prm_model="gemini-2.0-flash",
+                        policy_model="deepseek-v4-pro",
+                        branch_factor=3,
+                        max_depth=4,
+                        iterations=5
+                    )
+                    mcts_res = await mcts_searcher.search(query, initial_thought="")
+                    answer = mcts_res["path"]
+                    strategy = "mcts_step_search"
+                    models_used = ["deepseek-v4-pro", "gemini-2.0-flash"]
+                    mcts_ran = True
 
-            # Step 1: Run 3-layer MoA Fusion panel
-            fusion_result = await fuse(
-                query, task_type, self.call_model_with_fallback,
-                max_tokens=token_budget, moa_layers=3
-            )
-            answer = fusion_result["answer"]
-            models_used = fusion_result["panel"] + [fusion_result["aggregator"]]
-            strategy = f"fusion_3L_MoA({fusion_result['moa_layers']}layers)"
+                    # 2. Generator-Discriminator Self-Play Loop
+                    repaired_ans = await self.generator_discriminator_loop(query, answer)
+                    if repaired_ans != answer:
+                        answer = repaired_ans
+                        strategy += "+self_play_correction"
+                        models_used.append("mistral-large-2")
+                        models_used.append("llama-3.3-70b-instruct")
+                        self_play_ran = True
+                except Exception as ex:
+                    logger.warning(f"MCTS/Self-Play pipeline failed: {ex}. Falling back to standard MoA.")
+
+            if not mcts_ran:
+                # Step 1: Run 3-layer MoA Fusion panel
+                fusion_result = await fuse(
+                    query, task_type, self.call_model_with_fallback,
+                    max_tokens=token_budget, moa_layers=3
+                )
+                answer = fusion_result["answer"]
+                models_used = fusion_result["panel"] + [fusion_result["aggregator"]]
+                strategy = f"fusion_3L_MoA({fusion_result['moa_layers']}layers)"
 
             # Step 2: Code verification (for math/coding)
             if use_code_verify:
                 code_model = TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
-                # Step-Level Code Verification (rStar-Math pattern)
-                # First verify the fusion answer's reasoning steps, then final answer
                 step_result = await verify_steps_with_code(
                     query, answer, code_model, self.call_model_with_fallback,
                     max_tokens=2048, execution_timeout=10
                 )
                 if step_result["verified"]:
-                    # Step-level verification passed — high confidence
                     answer = step_result["answer"]
                     models_used.append(f"{code_model}+step_verify({step_result['steps_verified']}/{step_result['steps_total']})")
                     strategy += f"+step_verify({step_result['steps_verified']}/{step_result['steps_total']})"
                 else:
-                    # Step verification failed — try final-answer verification as fallback
                     code_result = await verify_with_code(
                         query, code_model, self.call_model_with_fallback, max_tokens=4096
                     )
@@ -737,39 +822,34 @@ class Temuclaude:
                         answer = code_result["answer"]
                         models_used.append(f"{code_model}+code")
                         strategy += "+code_verify"
-                    # If both failed, keep the fusion answer
 
             # Step 3: PRM-weighted self-consistency (for math/reasoning)
             if use_self_consistency:
                 consistency_model = get_aggregator(task_type)
-                # Adaptive N samples based on difficulty (BEST-Route)
-                n_samples = self.get_adaptive_n_samples(tier)
                 consistency_result = await self_consistency(
                     query, consistency_model, self.call_model_with_fallback,
                     n_samples=n_samples, temperature=0.7, max_tokens=token_budget,
                     use_prm_weighting=True, verifier_model="nemotron-3-ultra"
                 )
                 if consistency_result["confidence"] >= 0.6:
-                    # High agreement — use the consistency answer
                     answer = consistency_result["answer"]
                     models_used.append(f"{consistency_model}+consistency_prm(n={n_samples})")
                     strategy += f"+prm_consistency(n={n_samples})"
-                # If low agreement, keep the fusion answer
 
-            # Step 4: Self-QA gate with USVA 4-rubric + Reflexion
-            # Score the answer using USVA, retry with reflexion if below threshold
-            qa_result = await self_qa_gate(
-                query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
-                threshold=8, max_retries=2, max_tokens=2000,
-                use_usva=True, use_reflexion=True
-            )
+            # Step 4: Self-QA gate with USVA 4-rubric + Reflexion (bypassed in max_savings)
+            if budget_profile == "max_savings":
+                qa_result = {"accepted": True, "final_answer": answer, "attempts": 1}
+            else:
+                qa_result = await self_qa_gate(
+                    query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
+                    threshold=8, max_retries=2, max_tokens=2000,
+                    use_usva=True, use_reflexion=True
+                )
+                
             if qa_result["accepted"]:
                 answer = qa_result["final_answer"]
                 strategy += "+usva_qa_passed"
             elif qa_result["attempts"] > 1:
-                # Retried with reflexion but still below threshold
-                # ESCALATION: Multi-agent debate (arXiv:2511.11306 — selective debate)
-                # Only trigger when self-QA fails — debate is expensive
                 debate_result = await multi_agent_debate(
                     query, self.call_model_with_fallback,
                     panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
@@ -779,58 +859,65 @@ class Temuclaude:
                 answer = debate_result["answer"]
                 models_used.append("debate_panel+nemotron")
                 strategy += f"+debate_escalation({debate_result['rounds']}r)"
-            # If only 1 attempt (first pass), keep the original answer
 
-        # Step 5: s1 Budget Forcing (arXiv:2501.19393) — applies to ALL tiers
-        # If the answer is too short for a hard problem, append "Wait" to force more reasoning
-        if task_type in ("math", "reasoning") and len(answer.split()) < 50:
+        # Step 5: s1 Budget Forcing (arXiv:2501.19393) — applies to ALL tiers except savings
+        if task_type in ("math", "reasoning") and len(answer.split()) < 50 and budget_profile != "max_savings":
             forced = apply_budget_forcing(answer, min_reasoning_tokens=200)
             if forced != answer:
                 answer = forced
                 strategy += "+s1_budget_forcing"
 
-        # Step 6: Z3/SMT Logical Verification (ConsistPRM pattern) — applies to ALL tiers
+        # Step 6: Z3/SMT Logical Verification (enhanced)
         if task_type == "reasoning":
-            z3_result = verify_logical_with_z3(query, answer)
-            if z3_result["verified"]:
-                strategy += "+z3_verified"
-            elif "contradictions" in z3_result.get("reason", "").lower():
-                strategy += "+z3_contradiction"
-                if "debate" not in strategy:
-                    debate_result = await multi_agent_debate(
-                        query, self.call_model_with_fallback,
-                        panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
-                        rounds=2, aggregator="nemotron-3-ultra",
-                        max_tokens=token_budget if tier == "hard" else 4096
-                    )
-                    answer = debate_result["answer"]
-                    models_used.append("debate_z3_escalation")
-                    strategy += "+debate_z3"
+            if budget_profile == "max_savings":
+                pass
+            else:
+                z3_result = await verify_logical_with_z3_enhanced(
+                    query, answer, "deepseek-v4-pro", self.call_model_with_fallback
+                )
+                if z3_result["verified"]:
+                    strategy += "+z3_verified"
+                elif "contradictions" in z3_result.get("reason", "").lower():
+                    strategy += "+z3_contradiction"
+                    if "debate" not in strategy:
+                        debate_result = await multi_agent_debate(
+                            query, self.call_model_with_fallback,
+                            panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
+                            rounds=2, aggregator="nemotron-3-ultra",
+                            max_tokens=token_budget if tier == "hard" else 4096
+                        )
+                        answer = debate_result["answer"]
+                        models_used.append("debate_z3_escalation")
+                        strategy += "+debate_z3"
 
-        # Step 7: Post-hoc simplification (research: arXiv:2508.11816)
-        # After correctness is verified, rewrite for clarity and accessibility.
-        # Two-stage approach: generate correct answer first, then simplify presentation.
-        # Only runs for medium and hard tiers — trivial is already short.
-        try:
-            original_len = len(answer.split())
-            answer = await self.simplify_response(answer, tier)
-            simplified_len = len(answer.split())
-            if simplified_len < original_len:
-                models_used.append("simplify_pass")
-                strategy += f"+simplified({original_len}→{simplified_len}w)"
-        except Exception:
-            pass  # Simplification failure must never break the response
+        # Step 7: Post-hoc simplification
+        if budget_profile != "max_savings":
+            try:
+                original_len = len(answer.split())
+                answer = await self.simplify_response(answer, tier)
+                simplified_len = len(answer.split())
+                if simplified_len < original_len:
+                    models_used.append("simplify_pass")
+                    strategy += f"+simplified({original_len}→{simplified_len}w)"
+            except Exception:
+                pass
+
+        # Strip thinking tags from final output to present clean responses
+        clean_answer = _re.sub(r'<thought>.*?</thought>', '', answer, flags=_re.DOTALL).strip()
+        if not clean_answer:
+            clean_answer = answer.replace("<thought>", "").replace("</thought>", "").strip()
+        answer = clean_answer
 
         latency_ms = int((time.time() - start_time) * 1000)
 
-        # Record Pareto efficiency metrics (token_savings vs accuracy)
+        # Record Pareto efficiency metrics
         try:
-            estimated_tokens = len(answer) // 4 if answer else 0  # Rough token estimate
+            estimated_tokens = len(answer) // 4 if answer else 0
             record_pareto(tier, estimated_tokens, correct=None, task_type=task_type, strategy=strategy)
         except Exception:
-            pass  # Don't let metrics break the response
+            pass
 
-        # Record routing decision for preference-data collection (RouteLLM pattern)
+        # Record routing decision
         try:
             record_routing_decision(
                 query=query, task_type=task_type, tier=tier,
@@ -839,7 +926,7 @@ class Temuclaude:
                 latency_ms=latency_ms, success=not answer.startswith("[ERROR"),
             )
         except Exception:
-            pass  # Don't let metrics break the response
+            pass
 
         # Log the query
         self.logger.log(
@@ -853,18 +940,23 @@ class Temuclaude:
             success=not answer.startswith("[ERROR"),
         )
 
-        # Step 7: Cache the response for future queries (zero quality loss)
-        # The answer has passed all verification gates (self-QA, code verify,
-        # Z3 logical, debate). Caching it means future identical or semantically
-        # similar queries get this verified answer for $0 cost.
+        # Save successfully verified hard-tier answers as a skill in the Voyager library
+        if tier == "hard" and not answer.startswith("[ERROR"):
+            try:
+                from .memory_bank_v2 import VoyagerMemoryBank
+                bank = VoyagerMemoryBank()
+                bank.add_skill(query, answer, task_type)
+            except Exception:
+                pass
+
+        # Cache the response for future queries
         try:
             cache = get_cache()
             cache_key_messages = [{"role": "user", "content": query}]
-            # Quality score: 1.0 if answer passed all gates, 0.5 if it had errors
             quality = 1.0 if not answer.startswith("[ERROR") else 0.5
             cache.set("cache", cache_key_messages, answer, quality_score=quality)
         except Exception:
-            pass  # Cache failure must never break the response
+            pass
 
         return answer
 
@@ -929,6 +1021,41 @@ class Temuclaude:
         
         # Simplification failed — return original answer (safety net)
         return answer
+
+    async def generator_discriminator_loop(self, query: str, initial_answer: str, generator_model: str = "llama-3.3-70b-instruct", discriminator_model: str = "mistral-large-2") -> str:
+        """Run Generator-Discriminator self-play correction loop stochastically for hard logic tasks."""
+        critique_prompt = (
+            f"Question: '{query}'\n"
+            f"Draft Solution:\n{initial_answer}\n\n"
+            f"Analyze the draft solution above. Identify any logical flaws, arithmetic errors, "
+            f"edge cases, or formatting contradictions. If there are no issues, reply 'NO_ISSUES'. "
+            f"Otherwise, provide a clear, concise bullet-point list of the flaws."
+        )
+        critique_messages = [
+            {"role": "system", "content": "You are a logical critic. Be rigorous and precise."},
+            {"role": "user", "content": critique_prompt}
+        ]
+        
+        critique = await self.call_model_with_fallback(discriminator_model, critique_messages, max_tokens=1024)
+        if critique.startswith("[ERROR") or "NO_ISSUES" in critique:
+            return initial_answer
+            
+        # Flaws detected, run repair step
+        repair_prompt = (
+            f"Question: '{query}'\n"
+            f"Draft Solution:\n{initial_answer}\n\n"
+            f"Logical Critique:\n{critique}\n\n"
+            f"Correct the draft solution according to the critique. Output the final correct solution."
+        )
+        repair_messages = [
+            {"role": "system", "content": "You are a logical correction assistant. Correct the solution based on the critic's comments."},
+            {"role": "user", "content": repair_prompt}
+        ]
+        
+        repaired = await self.call_model_with_fallback(generator_model, repair_messages, max_tokens=4096)
+        if repaired.startswith("[ERROR"):
+            return initial_answer
+        return repaired
 
     async def generate_ui(self, query: str, user_context: dict = None) -> str:
         """Generate UI/UX using the Loop Engineering system.

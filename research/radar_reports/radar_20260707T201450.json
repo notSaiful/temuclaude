@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-07-07T20:14:50.304997+00:00",
+  "total_signals": 6,
+  "top_signals": [
+    {
+      "title": "Run AI workloads on any cloud, store on Hugging Face: zero-egress storage with SkyPilot",
+      "source": "rss_huggingface",
+      "score": 25,
+      "url": ""
+    },
+    {
+      "title": "Show HN: Docx-CLI: agents read/edit Word docs using 1/2 the time and tokens",
+      "source": "hackernews",
+      "score": 16.9,
+      "url": "https://github.com/kklimuk/docx-cli"
+    },
+    {
+      "title": "Show HN: Halo \u2013 open-source, tamper-evident runtime evidence for AI agents",
+      "source": "hackernews",
+      "score": 15.7,
+      "url": "https://github.com/bkuan001/halo-record"
+    },
+    {
+      "title": "AI Meets Cryptography 1: What AI Found in Cloudflare's Circl",
+      "source": "hackernews",
+      "score": 3.2,
+      "url": "https://blog.zksecurity.xyz/posts/circl-bugs/"
+    },
+    {
+      "title": "Show HN: Davit, a Apple Containers UI",
+      "source": "hackernews",
+      "score": 2.5,
+      "url": "https://davit.app"
+    },
+    {
+      "title": "Show HN: Rowboat \u2013 Open-source, local-first alternative to Claude Desktop",
+      "source": "hackernews",
+      "score": 1.2,
+      "url": "https://github.com/rowboatlabs/rowboat"
+    }
+  ]
+}

@@ -16,10 +16,10 @@ export default function HomePage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `
-                radial-gradient(circle at 1px 1px, rgba(26,24,22,0.04) 1px, transparent 0),
-                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(120, 140, 93, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(196, 102, 134, 0.04) 0%, transparent 50%)
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.03) 1px, transparent 0),
+                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(226, 88, 34, 0.08) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(143, 166, 115, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(216, 124, 158, 0.04) 0%, transparent 50%)
               `,
               backgroundSize: '24px 24px, 100% 100%, 100% 100%, 100% 100%',
             }}
@@ -110,7 +110,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Why TemuClaude — for vibe coders ━━ */}
-        <section className="py-24 px-6 bg-bg-secondary">
+        <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
@@ -198,8 +198,8 @@ export default function HomePage() {
                     <div>
                       <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Radically cheap</h3>
                       <p className="text-sm text-text-secondary leading-relaxed mb-3">
-                        60% of queries go to Hy3 Preview ($0.06/$0.21 per M). 30% route to specialists.
-                        Only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron).
+                        60% of queries go to Llama 3.3 / Gemini 2.0 Flash (cheapest). 30% route to specialized shepherding logic.
+                        Only 10% trigger the full MCTS-guided multi-agent fusion. Verifications are fast and secure.
                       </p>
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div>
@@ -253,7 +253,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Social Proof ━━ */}
-        <section className="py-20 px-6">
+        <section className="py-28 px-6">
           <div className="container-max">
             {/* Stats strip */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -294,7 +294,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ How It Works — simplified for builders ━━ */}
-        <section className="py-24 px-6">
+        <section className="py-28 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
@@ -341,7 +341,7 @@ export default function HomePage() {
                 <div className="text-accent-olive">"orchestration"</div>
                 <div className="pl-4 text-accent-fig">"taskType"</div><div className="pl-8 text-text-inverse">"math"</div>
                 <div className="pl-4 text-accent-fig">"tier"</div><div className="pl-8 text-text-inverse">"hard"</div>
-                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-3-flash"]</div>
+                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-2.0-flash"]</div>
                 <div className="pl-4 text-accent-fig">"qaScore"</div><div className="pl-8 text-text-inverse">9.2</div>
                 <div className="pl-4 text-accent-fig">"cost"</div><div className="pl-8 text-text-inverse">"$0.015"</div>
                 <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-fusion", "self-consistency", "aggregation", "qa-gate", "reflexion"]</div>
@@ -351,28 +351,28 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Model Pool ━━ */}
-        <section className="py-24 px-6 bg-bg-secondary">
+        <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-                8 models. You never pick.
+                Unified Model Pool. You never pick.
               </h2>
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
-                Easy questions use Hy3 Preview (cheapest). Hard ones get the full fusion pipeline.
+                Easy questions use Llama 3.3 or Gemini 2.0 (cheapest). Hard ones get the full MCTS-guided multi-agent fusion.
               </p>
             </div>
 
             <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { name: 'GLM-5.2', role: 'Orchestrator', iq: '51', desc: 'Highest open-weight IQ. Routes and aggregates.' },
-                { name: 'DeepSeek V4 Pro', role: 'Reasoning', iq: '44', desc: 'Hard math, coding, complex logic.' },
-                { name: 'Hy3 Preview', role: 'Cheap router', iq: '—', desc: 'Handles 60% of queries at lowest cost.' },
-                { name: 'Gemini 3 Flash', role: 'Legal/Health', iq: '50', desc: '#1 Legal, #2 Health on benchmarks.' },
-                { name: 'MiniMax M3', role: 'Vision/Creative', iq: '44', desc: 'Best GPQA score. Vision + creative.' },
-                { name: 'MiMo-V2.5', role: 'Multimodal', iq: '40', desc: 'Text, image, video. From Xiaomi.' },
-                { name: 'Claude Sonnet 5', role: 'Frontier', iq: '53', desc: 'Highest IQ. Used for hardest 2% only.' },
-                { name: 'Nemotron 3 Ultra', role: 'QA Gate', iq: '38', desc: '550B MoE. Free — scores every answer.' },
+                { name: 'GLM-5.2', role: 'Orchestrator', iq: '51', desc: 'Highest open-weight IQ. Final consensus and aggregation.' },
+                { name: 'DeepSeek Pro', role: 'Reasoning', iq: '44', desc: 'Hard math, coding, complex step-by-step logic.' },
+                { name: 'Llama 3.3', role: 'Specialist', iq: '40', desc: 'High-quality open-weights expert panelist.' },
+                { name: 'Gemini 2.0 Flash', role: 'Worker/RAG', iq: '40', desc: 'Ultra-fast completions, visual projection, and search.' },
+                { name: 'Mistral Large 2', role: 'Logic Specialist', iq: '43', desc: 'Multi-lingual reasoning and self-play discriminator.' },
+                { name: 'Claude 3.5 Sonnet', role: 'Frontier Fallback', iq: '53', desc: 'Selective fallback for failing hard-tier queries.' },
+                { name: 'MiMo-V2.5', role: 'Multimodal', iq: '40', desc: 'Specialist for text, image, and video analysis.' },
+                { name: 'Z3 Solver', role: 'Logical Verifier', iq: '—', desc: 'SMT solver checks consistency of intermediate claims.' },
               ].map((model, i) => (
                 <StaggerItem key={i}>
                   <div className="card" style={{ padding: '20px 16px' }}>
@@ -398,7 +398,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Pipeline ━━ */}
-        <section className="py-24 px-6">
+        <section className="py-28 px-6">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
@@ -413,11 +413,11 @@ export default function HomePage() {
             <StaggerReveal className="grid md:grid-cols-2 gap-4">
               {[
                 { num: '01', title: 'Classify', desc: 'Your question is analyzed and classified by difficulty (trivial, medium, hard) and type (math, coding, creative, reasoning). No API call needed — pure heuristics.' },
-                { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (Hy3 Preview, $0.06/M). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
-                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash. For math, DeepSeek runs 3 samples and votes (self-consistency).' },
-                { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all 3 responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
-                { num: '05', title: 'QA Gate', desc: 'Nemotron (free, independent) scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
-                { num: '06', title: 'Reflexion', desc: 'DeepSeek retries with the QA feedback. If still below 6/10, Claude Sonnet 5 is called as frontier fallback. You always get the best version.' },
+                { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (Llama 3.3 70B). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
+                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek Pro, and Gemini 2.0 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
+                { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
+                { num: '05', title: 'QA Gate', desc: 'Gemini 2.0 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
+                { num: '06', title: 'Reflexion', desc: 'Generator-Discriminator loops critique and repair logic errors. If verifications still fail, Claude 3.5 Sonnet is called as a frontier fallback.' },
               ].map((step, i) => (
                 <StaggerItem key={i}>
                   <div className="card h-full flex gap-4">
@@ -434,7 +434,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Live Comparison ━━ */}
-        <section className="py-24 px-6 bg-bg-secondary">
+        <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max">
             <div className="mb-12 max-w-2xl">
               <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
@@ -486,7 +486,7 @@ export default function HomePage() {
         </section>
 
         {/* ━━ Pricing CTA ━━ */}
-        <section className="py-20 px-6 bg-bg-secondary">
+        <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max text-center">
             <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
               ~$1.44 per million tokens.<br />That's it.

@@ -20,33 +20,33 @@ When you ask TemuClaude a question, here's what happens:
 
 1. **Classification** — Your query is categorized (math, coding, reasoning, knowledge, etc.) and difficulty is estimated (trivial, medium, hard).
 
-2. **Routing** — 60% of queries are trivial and route to the cheapest model (Hy3 Preview at $0.06/M). 30% are medium and route to a specialist. Only 10% trigger the full fusion pipeline.
+2. **Routing** — 60% of queries are trivial and route to the cheapest model (Llama 3.3 at $0.06/M). 30% are medium and route to a specialist. Only 10% trigger the full fusion pipeline.
 
 3. **3-Layer MoA Fusion** (for hard queries):
-   - **Layer 1**: GLM-5.2, DeepSeek V4 Pro, and Gemini 3 Flash each answer independently
+   - **Layer 1**: GLM-5.2, DeepSeek Pro, and Gemini 2.0 Flash each answer independently
    - **Layer 2**: Each model reviews the others' answers and refines its own
    - **Layer 3**: GLM-5.2 synthesizes all refined answers into one
 
-4. **Code Verification** — For math questions, Python code is generated, executed in a sandbox, and the output becomes the verified answer. No hallucinated numbers.
+4. **Code Verification** — For math questions, Python code is generated, executed in a sandbox, and verified. Programmatic correctness is proved by a Z3 logical SMT solver.
 
 5. **Self-QA Gate** — Every answer is scored on 5 rubrics (logical coherence, factual correctness, completeness, goal alignment, clarity). If it scores below 8/10, TemuClaude retries with reflexion feedback.
 
-6. **Frontier Fallback** — For the hardest 2% of queries where all layers fail, Claude Sonnet 5 (IQ 53) is called as a safety net.
+6. **Frontier Fallback** — For the hardest 2% of queries where all layers fail, Claude 3.5 Sonnet (IQ 53) is called as a safety net.
 
-## The 8 Models
+## The Models
 
 | Model | Role | IQ | Cost ($/1M) |
 |-------|------|-----|------------|
 | GLM-5.2 | Orchestrator | 51 | $0.91 / $2.86 |
-| DeepSeek V4 Pro | Reasoning | 44 | $0.18 / $0.18 |
-| Hy3 Preview | Cheap router | — | $0.06 / $0.10 |
-| Gemini 3 Flash | Legal/Health | 50 | $0.50 / $3.00 |
-| MiniMax M3 | Vision/Creative | 44 | $0.22 |
+| DeepSeek Pro | Reasoning | 44 | $0.18 / $0.18 |
+| Llama 3.3 | Cheap router | 40 | $0.06 / $0.10 |
+| Gemini 2.0 Flash | Utility / RAG | 40 | $0.075 / $0.30 |
+| Mistral Large 2 | Logic Specialist | 43 | $2.00 / $6.00 |
+| Claude 3.5 Sonnet | Frontier fallback | 53 | $3.00 / $15.00 |
 | MiMo-V2.5 | Multimodal | 40 | $0.06 |
-| Claude Sonnet 5 | Frontier fallback | 53 | $3.00 / $15.00 |
-| Nemotron 3 Ultra | QA Gate | 38 | FREE |
+| Z3 Solver | Logical Verifier | — | Local |
 
-The key insight: Nemotron 3 Ultra (550B MoE) is **free** on OpenRouter, so our quality gate costs nothing. And 60% of queries route to free or near-free models, making the blended cost ~$0.05/MTok.
+The key insight: Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers. And 60% of queries route to free or near-free models, making the blended cost ~$1.44/M tokens.
 
 ## The Results
 

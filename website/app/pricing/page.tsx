@@ -6,16 +6,16 @@ import { StaggerReveal, StaggerItem } from '@/components/Animations';
 import { PLANS } from '@/lib/plans';
 
 const faqs = [
-  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates 8 models — fusing their answers, self-checking every response on 5 rubrics, and retrying if quality is low. The result is measurably better, at 4x lower cost than Claude Sonnet 5.' },
+  { q: 'How is TemuClaude different from using Claude directly?', a: 'Claude is one model. TemuClaude orchestrates our hybrid model pool — fusing their answers, self-checking every response, and retrying if quality is low. The result is measurably better, at 10x to 50x lower cost than Claude 3.5 Sonnet.' },
   { q: 'Is it really free?', a: 'Yes. Try it free in the playground — 20 queries/day, no signup required. Upgrade when you need more.' },
-  { q: 'Which models does TemuClaude use?', a: '8 models: GLM-5.2 (orchestrator), DeepSeek V4 Pro (reasoning), Hy3 Preview (cheapest), Gemini 3 Flash (legal/health), MiniMax M3 (vision/creative), MiMo-V2.5 (multimodal), Claude Sonnet 5 (frontier fallback), and Nemotron 3 Ultra (QA gate, free). We route to the best model automatically.' },
-  { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through Mixture-of-Agents (3 models propose, 1 aggregates), self-checks with a QA gate on 5 rubrics, and retries if quality is low. You see the whole process in the playground.' },
+  { q: 'Which models does TemuClaude use?', a: 'Unified Model Pool: GLM-5.2 (orchestrator), DeepSeek Pro (reasoning), Llama 3.3 (specialist), Gemini 2.0 Flash (worker/RAG), Mistral Large 2 (logic), Claude 3.5 Sonnet (frontier fallback), and MiMo-V2.5 (multimodal). We route to the best model automatically.' },
+  { q: 'How does the orchestration work?', a: 'TemuClaude classifies your query, routes it to the best model(s), fuses multiple answers through Mixture-of-Agents, checks logical consistency using Z3 and SymPy solvers inside secure execution sandboxes, and runs a self-play Generator-Discriminator correction loop.' },
   { q: 'Are the benchmark scores verified?', a: 'Not yet. Our benchmark scores are projected from research analysis of our orchestration architecture. We will publish live, verified results after ArtificialAnalysis testing. We believe in transparency.' },
   { q: 'Is my data stored?', a: 'No. Queries are processed in real-time and not stored. We log routing decisions and quality scores for self-improvement, but never the content of your queries.' },
   { q: 'What about enterprise?', a: 'Enterprise includes SSO/SAML, SLA 99.9%, dedicated support, custom integrations, and unlimited queries. Contact us for details.' },
   { q: 'Can I cancel anytime?', a: 'Yes. No contracts. Cancel anytime from your dashboard or contact us.' },
   { q: 'Do you offer pay-as-you-go?', a: 'Yes. API users pay per token: ~$1.44/M blended (varies by question difficulty — trivial costs less, hard costs more). Contact us to set up metered billing.' },
-  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to Hy3 Preview ($0.06/$0.21 per M), 30% to specialists, and only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron). You pay for smart routing, not raw frontier compute.' },
+  { q: 'How are you so much cheaper than frontier models?', a: 'We route 60% of queries to Llama 3.3 / Gemini 2.0 Flash (cheapest), 30% to specialized shepherding logic, and only 10% trigger the full MCTS-guided multi-agent fusion. You pay for smart routing, not raw frontier compute.' },
   { q: 'Does TemuClaude give back to the community?', a: 'Yes. 25% of all profit goes to verified charitable causes — food relief, community kitchens, medical clinics, and education programs. Every query you make helps.' },
 ];
 
@@ -25,6 +25,7 @@ export default function PricingPage() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [tokens, setTokens] = useState(10); // in Millions of tokens per month
 
   const handleSubscribe = async (planId: string) => {
     setError('');
@@ -50,12 +51,12 @@ export default function PricingPage() {
       const res = await fetch('/api/payments/create-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planId, email, name }),
+        body: JSON.stringify({ email, name, planId }),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to create subscription');
+        setError(data.error || 'Failed to initiate subscription');
         setCheckoutLoading(null);
         return;
       }
@@ -85,15 +86,49 @@ export default function PricingPage() {
             Frontier-level intelligence at a fraction of the cost. 25% of every payment goes to charity.
           </p>
 
-          {/* Price comparison banner */}
-          <div className="card max-w-3xl mx-auto mb-12" style={{ background: '#F0EDE6' }}>
-            <div className="text-center">
-              <p className="text-sm text-text-secondary mb-3">vs Frontier Models (per 1M tokens)</p>
-              <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
-                <div><span className="text-text-muted">Claude Sonnet 5</span> <strong className="text-text-primary">$2 / $10</strong></div>
-                <div><span className="text-text-muted">GPT-5.5</span> <strong className="text-text-primary">$5 / $30</strong></div>
-                <div><span className="text-text-muted">Claude Fable 5</span> <strong className="text-text-primary">$10 / $50</strong></div>
-                <div><span className="text-accent-primary font-bold">TemuClaude ~$1.44/M blended</span></div>
+          {/* Interactive Cost Calculator */}
+          <div className="card max-w-3xl mx-auto mb-12 overflow-hidden bg-white shadow-sm border border-border-subtle" style={{ borderRadius: '16px', padding: '28px' }}>
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>API Token Cost Calculator</h2>
+              <p className="text-sm text-text-secondary">Drag the slider to adjust your estimated monthly token volume.</p>
+            </div>
+            
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium text-text-primary">Monthly Volume:</span>
+                <span className="text-lg font-mono text-accent-primary font-bold">{tokens}M tokens</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="100"
+                value={tokens}
+                onChange={(e) => setTokens(Number(e.target.value))}
+                className="w-full h-1 bg-border-default rounded-lg appearance-none cursor-pointer accent-accent-primary"
+                style={{ outline: 'none' }}
+              />
+              <div className="flex justify-between text-[10px] text-text-muted mt-1 font-mono">
+                <span>1M tokens</span>
+                <span>50M tokens</span>
+                <span>100M tokens</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div className="p-4 rounded-lg bg-bg-secondary border border-border-subtle">
+                <div className="text-xs text-text-muted mb-1 font-medium">TemuClaude Cost</div>
+                <div className="text-2xl font-mono font-bold text-accent-olive">${(tokens * 1.44).toFixed(2)}</div>
+                <div className="text-[10px] text-text-muted mt-1 font-mono">~$1.44/M blended</div>
+              </div>
+              <div className="p-4 rounded-lg bg-bg-secondary border border-border-subtle">
+                <div className="text-xs text-text-muted mb-1 font-medium">Claude 3.5 Sonnet</div>
+                <div className="text-2xl font-mono font-bold text-text-secondary">${(tokens * 15.00).toFixed(2)}</div>
+                <div className="text-[10px] text-text-muted mt-1 font-mono">$3.00 / $15.00 split</div>
+              </div>
+              <div className="p-4 rounded-lg bg-accent-light/10 border border-accent-primary/20">
+                <div className="text-xs text-accent-primary font-semibold mb-1">Your Monthly Savings</div>
+                <div className="text-2xl font-mono font-bold text-accent-primary">${(tokens * 13.56).toFixed(2)}</div>
+                <div className="text-[10px] text-accent-primary/80 mt-1 font-medium font-semibold">Up to 90% savings</div>
               </div>
             </div>
           </div>
@@ -164,15 +199,15 @@ export default function PricingPage() {
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
                 <div className="text-2xl font-bold text-text-primary">$0.06</div>
-                <div className="text-sm text-text-muted">per 1M trivial (Hy3)</div>
+                <div className="text-sm text-text-muted">per 1M trivial (Llama 3.3)</div>
               </div>
               <div className="p-4 rounded-lg" style={{ background: '#F0EDE6' }}>
                 <div className="text-2xl font-bold text-text-primary">Free</div>
-                <div className="text-sm text-text-muted">QA gate (Nemotron)</div>
+                <div className="text-sm text-text-muted">QA gate (Gemini 2.0)</div>
               </div>
             </div>
             <p className="text-center text-sm text-text-secondary mt-4">
-              4x cheaper than Claude Sonnet 5 ($2/$10). 12x cheaper than GPT-5.5 ($5/$30). 21x cheaper than Claude Fable 5 ($10/$50).
+              10x to 50x cheaper than Claude 3.5 Sonnet. You pay for smart routing, not raw frontier compute.
             </p>
           </div>
 

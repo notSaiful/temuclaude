@@ -1,158 +1,159 @@
 {
-  "timestamp": "2026-07-06T17:52:22.109756+00:00",
-  "total_issues": 76,
+  "timestamp": "2026-07-07T20:13:53.346259+00:00",
+  "total_issues": 92,
   "by_layer": {
-    "test_suite": 1,
     "daemon_logs": 20,
-    "code_scan": 48,
-    "stale_findings": 7
+    "code_scan": 62,
+    "stale_findings": 10
   },
   "issues": [
     {
-      "layer": "test_suite",
-      "type": "test_failure",
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/swot_daemon.log",
+      "type": "daemon_error",
       "severity": "HIGH",
-      "description": "FAILED tests/test_phase5.py::test_cache_stats - KeyError: 'hits'"
+      "description": "2026-07-07 21:41:48 | swot_daemon | ERROR | swot_daemon already running (PID file exists)"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/self_expansion_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 21:41:50 | self_expansion_daemon | ERROR | self_expansion_daemon already running (PID file exists)"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/super_intelligence_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 21:41:49 | super_intelligence_daemon | ERROR | super_intelligence_daemon already running (PID file exists)"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:29:23 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:32:31 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:34:10 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:37:15 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:38:11 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:38:50 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:41:02 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:43:03 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/integrator_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 22:44:22 | integrator_daemon | ERROR | Auto-integrator stderr:"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/growth_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 21:41:55 | growth_daemon | ERROR | growth_daemon already running (PID file exists)"
+    },
+    {
+      "layer": "daemon_logs",
+      "file": "/tmp/temuclaude_daemons/model_optimizer_daemon.log",
+      "type": "daemon_error",
+      "severity": "HIGH",
+      "description": "2026-07-07 21:41:52 | model_optimizer_daemon | ERROR | model_optimizer_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:13:41 | competitive_dominance_daemon | ERROR | competitive_dominance_daemon already running (PID file exists)"
+      "description": "2026-07-07 21:41:56 | competitive_dominance_daemon | ERROR | competitive_dominance_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:14:06 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
+      "description": "2026-07-07 21:44:43 | competitive_dominance_daemon | ERROR | competitive_dominance_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:15:07 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:15:57 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:16:59 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:18:14 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:19:09 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:21:11 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/competitive_dominance_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:22:12 | competitive_dominance_daemon | ERROR | Error in main loop: 'NoneType' object has no attribute 'lower'"
+      "description": "2026-07-07 21:44:43 | competitive_dominance_daemon | ERROR | competitive_dominance_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/marketing_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:13:38 | marketing_daemon | ERROR | marketing_daemon already running (PID file exists)"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:13:23 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174045_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:18:23 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:16:12 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:17:15 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:17:39 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:17:51 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
-    },
-    {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/research_daemon_2.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:18:23 | research_daemon_2 | ERROR | Failed to process finding {\"id\": \"swot_20260706T174326_missing_feature\", \"source\": \"swot_analysis\", \"severity\": \"HIGH\", \"action\": \"Research and implem"
+      "description": "2026-07-07 21:41:54 | marketing_daemon | ERROR | marketing_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/website_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:13:42 | website_daemon | ERROR | website_daemon already running (PID file exists)"
+      "description": "2026-07-07 21:41:58 | website_daemon | ERROR | website_daemon already running (PID file exists)"
     },
     {
       "layer": "daemon_logs",
       "file": "/tmp/temuclaude_daemons/revenue_daemon.log",
       "type": "daemon_error",
       "severity": "HIGH",
-      "description": "2026-07-06 23:13:42 | revenue_daemon | ERROR | revenue_daemon already running (PID file exists)"
+      "description": "2026-07-07 21:41:57 | revenue_daemon | ERROR | revenue_daemon already running (PID file exists)"
     },
     {
-      "layer": "daemon_logs",
-      "file": "/tmp/temuclaude_daemons/efficiency_daemon.log",
-      "type": "daemon_error",
-      "severity": "HIGH",
-      "description": "2026-07-06 23:13:28 | efficiency_daemon | ERROR | efficiency_daemon already running (PID file exists)"
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/code_executor.py",
+      "line": 122,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 122"
     },
     {
       "layer": "code_scan",
@@ -212,67 +213,99 @@
     },
     {
       "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 518,
+      "file": "/Users/saiful/temuclaude/src/time_utils.py",
+      "line": 118,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 518"
+      "description": "broad_except at line 118"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/browser.py",
+      "line": 36,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 36"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 731,
+      "line": 642,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 731"
+      "description": "broad_except at line 642"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 740,
+      "line": 917,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 740"
+      "description": "broad_except at line 917"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 751,
+      "line": 928,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 751"
+      "description": "broad_except at line 928"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 776,
+      "line": 958,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 776"
+      "description": "broad_except at line 958"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 360,
+      "line": 466,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 360"
+      "description": "broad_except at line 466"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 413,
+      "line": 519,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 413"
+      "description": "broad_except at line 519"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/orchestrator.py",
-      "line": 449,
+      "line": 555,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 449"
+      "description": "broad_except at line 555"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/orchestrator.py",
+      "line": 902,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 902"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/orchestrator.py",
+      "line": 949,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 949"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/orchestrator.py",
+      "line": 793,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 793"
     },
     {
       "layer": "code_scan",
@@ -281,6 +314,46 @@
       "severity": "LOW",
       "type": "broad_except",
       "description": "broad_except at line 99"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/skills_loader.py",
+      "line": 171,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 171"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/memory_bank_v2.py",
+      "line": 60,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 60"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/memory_bank_v2.py",
+      "line": 71,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 71"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/memory_bank_v2.py",
+      "line": 87,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 87"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/memory_bank_v2.py",
+      "line": 137,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 137"
     },
     {
       "layer": "code_scan",
@@ -309,18 +382,42 @@
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/verifier.py",
-      "line": 182,
+      "line": 183,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 182"
+      "description": "broad_except at line 183"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/src/verifier.py",
-      "line": 242,
+      "line": 243,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 242"
+      "description": "broad_except at line 243"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/verifier.py",
+      "line": 624,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 624"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/reasoning_tree.py",
+      "line": 134,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 134"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/src/reasoning_tree.py",
+      "line": 170,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 170"
     },
     {
       "layer": "code_scan",
@@ -341,46 +438,6 @@
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_phase2.py",
-      "line": 235,
-      "severity": "LOW",
-      "type": "broad_except",
-      "description": "broad_except at line 235"
-    },
-    {
-      "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_phase2.py",
-      "line": 278,
-      "severity": "LOW",
-      "type": "broad_except",
-      "description": "broad_except at line 278"
-    },
-    {
-      "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_phase2.py",
-      "line": 320,
-      "severity": "LOW",
-      "type": "broad_except",
-      "description": "broad_except at line 320"
-    },
-    {
-      "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
-      "line": 80,
-      "severity": "LOW",
-      "type": "broad_except",
-      "description": "broad_except at line 80"
-    },
-    {
-      "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
-      "line": 120,
-      "severity": "LOW",
-      "type": "broad_except",
-      "description": "broad_except at line 120"
-    },
-    {
-      "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
       "line": 241,
       "severity": "LOW",
       "type": "broad_except",
@@ -388,91 +445,131 @@
     },
     {
       "layer": "code_scan",
-      "file": "/Users/saiful/temuclaude/tests/test_phase3.py",
-      "line": 300,
+      "file": "/Users/saiful/temuclaude/tests/test_phase2.py",
+      "line": 285,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 300"
+      "description": "broad_except at line 285"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_phase2.py",
+      "line": 328,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 328"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
+      "line": 79,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 79"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
+      "line": 118,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 118"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_new_breakthroughs.py",
+      "line": 233,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 233"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_phase3.py",
-      "line": 335,
+      "line": 306,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 335"
+      "description": "broad_except at line 306"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_phase3.py",
+      "line": 342,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 342"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 254,
+      "line": 258,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 254"
+      "description": "broad_except at line 258"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 271,
+      "line": 275,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 271"
+      "description": "broad_except at line 275"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 288,
+      "line": 292,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 288"
+      "description": "broad_except at line 292"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 308,
+      "line": 312,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 308"
+      "description": "broad_except at line 312"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 324,
+      "line": 328,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 324"
+      "description": "broad_except at line 328"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 447,
+      "line": 453,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 447"
+      "description": "broad_except at line 453"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 221,
+      "line": 224,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 221"
+      "description": "broad_except at line 224"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 372,
+      "line": 377,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 372"
+      "description": "broad_except at line 377"
     },
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_orchestrator.py",
-      "line": 477,
+      "line": 483,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 477"
+      "description": "broad_except at line 483"
     },
     {
       "layer": "code_scan",
@@ -533,45 +630,32 @@
     {
       "layer": "code_scan",
       "file": "/Users/saiful/temuclaude/tests/test_phase4.py",
-      "line": 159,
+      "line": 165,
       "severity": "LOW",
       "type": "broad_except",
-      "description": "broad_except at line 159"
+      "description": "broad_except at line 165"
+    },
+    {
+      "layer": "code_scan",
+      "file": "/Users/saiful/temuclaude/tests/test_phase5.py",
+      "line": 127,
+      "severity": "LOW",
+      "type": "broad_except",
+      "description": "broad_except at line 127"
     },
     {
       "layer": "stale_findings",
       "type": "unattempted_research",
       "severity": "LOW",
-      "file": "/Users/saiful/temuclaude/research/findings/deep_research_orchestration_2026-07-03.md",
-      "description": "Research deep_research_orchestration_2026-07-03.md is 24h+ old, never attempted"
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260706T180310.md",
+      "description": "Research deep_research_cyber_cognitive_firewall_20260706T180310.md is 24h+ old, never attempted"
     },
     {
       "layer": "stale_findings",
       "type": "unattempted_research",
       "severity": "LOW",
-      "file": "/Users/saiful/temuclaude/research/findings/deep_research_management_science_2026-07-03.md",
-      "description": "Research deep_research_management_science_2026-07-03.md is 24h+ old, never attempted"
-    },
-    {
-      "layer": "stale_findings",
-      "type": "unattempted_research",
-      "severity": "LOW",
-      "file": "/Users/saiful/temuclaude/research/findings/deep_research_unknown_20260705T104348.md",
-      "description": "Research deep_research_unknown_20260705T104348.md is 24h+ old, never attempted"
-    },
-    {
-      "layer": "stale_findings",
-      "type": "unattempted_research",
-      "severity": "LOW",
-      "file": "/Users/saiful/temuclaude/research/findings/deep_research_reasoning_2026-07-03.md",
-      "description": "Research deep_research_reasoning_2026-07-03.md is 24h+ old, never attempted"
-    },
-    {
-      "layer": "stale_findings",
-      "type": "unattempted_research",
-      "severity": "LOW",
-      "file": "/Users/saiful/temuclaude/research/findings/deep_research_planning_execution_2026-07-03.md",
-      "description": "Research deep_research_planning_execution_2026-07-03.md is 24h+ old, never attempted"
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_cybersecurity_2026-07-06.md",
+      "description": "Research deep_research_cybersecurity_2026-07-06.md is 24h+ old, never attempted"
     },
     {
       "layer": "stale_findings",
@@ -579,6 +663,48 @@
       "severity": "LOW",
       "file": "/Users/saiful/temuclaude/research/findings/deep_research_mgmt_orchestration_mapping_2026-07-03.md",
       "description": "Research deep_research_mgmt_orchestration_mapping_2026-07-03.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_routellm_cascade_20260706T140303.md",
+      "description": "Research deep_research_efficiency_routellm_cascade_20260706T140303.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260706T174045.md",
+      "description": "Research deep_research_cyber_cognitive_firewall_20260706T174045.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_unknown_20260706T184101.md",
+      "description": "Research deep_research_unknown_20260706T184101.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260706T134711.md",
+      "description": "Research deep_research_cyber_cognitive_firewall_20260706T134711.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_efficiency_2026-07-06.md",
+      "description": "Research deep_research_efficiency_2026-07-06.md is 24h+ old, never attempted"
+    },
+    {
+      "layer": "stale_findings",
+      "type": "unattempted_research",
+      "severity": "LOW",
+      "file": "/Users/saiful/temuclaude/research/findings/deep_research_cyber_cognitive_firewall_20260706T174326.md",
+      "description": "Research deep_research_cyber_cognitive_firewall_20260706T174326.md is 24h+ old, never attempted"
     },
     {
       "layer": "stale_findings",

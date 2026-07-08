@@ -52,10 +52,10 @@ export function OrchestrationDiagram() {
         {/* Model nodes */}
         {[
           { cx: 80, cy: 100, color: '#E8D5C4', label: 'GLM-5.2', delay: 0 },
-          { cx: 200, cy: 60, color: '#D4A574', label: 'DeepSeek', delay: 0.2 },
-          { cx: 300, cy: 40, color: '#C97B50', label: 'Kimi K2.6', delay: 0.4 },
-          { cx: 400, cy: 60, color: '#D4A574', label: 'MiniMax', delay: 0.6 },
-          { cx: 520, cy: 100, color: '#E8D5C4', label: 'Nemotron', delay: 0.8 },
+          { cx: 200, cy: 60, color: '#D4A574', label: 'DeepSeek Pro', delay: 0.2 },
+          { cx: 300, cy: 40, color: '#C97B50', label: 'Llama 3.3', delay: 0.4 },
+          { cx: 400, cy: 60, color: '#D4A574', label: 'Gemini 2.0', delay: 0.6 },
+          { cx: 520, cy: 100, color: '#E8D5C4', label: 'Mistral L2', delay: 0.8 },
         ].map((node, i) => (
           <g
             key={i}
@@ -87,6 +87,47 @@ export function OrchestrationDiagram() {
               fontWeight="500"
             >
               {node.label}
+            </text>
+          </g>
+        ))}
+
+        {/* MCTS reasoning sub-nodes representing step-level search tree */}
+        {[
+          { parentX: 200, parentY: 60, childX: 160, childY: 25, q: 'Q=9.4', color: '#D4A574' },
+          { parentX: 200, parentY: 60, childX: 200, childY: 15, q: 'Q=8.1', color: '#D4A574' },
+          { parentX: 300, parentY: 40, childX: 270, childY: 15, q: 'Q=9.6', color: '#C97B50' },
+          { parentX: 300, parentY: 40, childX: 330, childY: 15, q: 'Q=7.8', color: '#C97B50' },
+        ].map((branch, i) => (
+          <g
+            key={`branch-${i}`}
+            style={{
+              opacity: visible ? 0.8 : 0,
+              transition: `opacity 0.5s ease-out ${1.2 + i * 0.1}s`,
+            }}
+          >
+            {/* Branch line */}
+            <line
+              x1={branch.parentX}
+              y1={branch.parentY}
+              x2={branch.childX}
+              y2={branch.childY}
+              stroke={branch.color}
+              strokeWidth="1.5"
+              strokeDasharray="2,2"
+            />
+            {/* Small node circle */}
+            <circle cx={branch.childX} cy={branch.childY} r="4" fill={branch.color} />
+            {/* Q-value text */}
+            <text
+              x={branch.childX}
+              y={branch.childY - 6}
+              textAnchor="middle"
+              fontSize="7"
+              fill="#8E8B85"
+              fontFamily="monospace"
+              fontWeight="bold"
+            >
+              {branch.q}
             </text>
           </g>
         ))}

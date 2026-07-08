@@ -29,6 +29,7 @@ from typing import Optional, Callable, Awaitable, List
 
 CODE_GENERATION_PROMPT = (
     "You are a Python code generator. Write Python code that solves the following problem. "
+    "You are encouraged to use SymPy for symbolic math, limits, calculus, or algebraic solving if helpful. "
     "Only output the Python code, no explanation, no markdown formatting. "
     "The code should print the final answer to stdout.\n\n"
     "Problem: {question}"
@@ -447,33 +448,56 @@ def verify_logical_with_z3(
             "answer": None,
         }
     
-    # Extract simple logical patterns from the response
-    # Look for: "if X then Y", "X implies Y", "X and Y", "X or Y"
-    # This is a basic pattern matcher — full NLP logic extraction is complex
-    
     solver = Solver()
     bool_vars = {}
     
-    def get_bool(name: str):
-        """Get or create a Z3 boolean variable."""
-        clean = name.strip().lower().replace(" ", "_")[:20]
-        if clean not in bool_vars:
-            bool_vars[clean] = Bool(clean)
-        return bool_vars[clean]
-    
+    def parse_expr(name: str):
+        """Parse expression, handling optional negation."""
+        clean = name.strip().lower()
+        negated = False
+        if clean.startswith("not "):
+            negated = True
+            clean = clean[4:].strip()
+        elif clean.startswith("no "):
+            negated = True
+            clean = clean[3:].strip()
+            
+        clean_var = clean.replace(" ", "_")[:20]
+        if not clean_var:
+            clean_var = "var_empty"
+        if clean_var not in bool_vars:
+            bool_vars[clean_var] = Bool(clean_var)
+            
+        return bool_vars[clean_var], clean_var, negated
+
     # Find "if X then Y" patterns
     if_patterns = re.findall(r'if\s+(.+?)\s+then\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
+    premises_vars = set()
+    conclusions_vars = set()
+    
     for premise, conclusion in if_patterns:
-        p = get_bool(premise)
-        c = get_bool(conclusion)
-        solver.add(Implies(p, c))
+        p_var, p_name, p_neg = parse_expr(premise)
+        c_var, c_name, c_neg = parse_expr(conclusion)
+        
+        p_expr = Not(p_var) if p_neg else p_var
+        c_expr = Not(c_var) if c_neg else c_var
+        
+        solver.add(Implies(p_expr, c_expr))
+        premises_vars.add(p_name)
+        conclusions_vars.add(c_name)
     
     # Find "X implies Y" patterns
     impl_patterns = re.findall(r'(.+?)\s+implies\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
     for premise, conclusion in impl_patterns:
-        p = get_bool(premise)
-        c = get_bool(conclusion)
-        solver.add(Implies(p, c))
+        p_var, p_name, p_neg = parse_expr(premise)
+        c_var, c_name, c_neg = parse_expr(conclusion)
+        
+        p_expr = Not(p_var) if p_neg else p_var
+        c_expr = Not(c_var) if c_neg else c_var
+        
+        solver.add(Implies(p_expr, c_expr))
+        premises_vars.add(p_name)
+        conclusions_vars.add(c_name)
     
     # If no logical patterns found, Z3 can't verify
     if not bool_vars:
@@ -483,6 +507,12 @@ def verify_logical_with_z3(
             "answer": None,
         }
     
+    # To check if rules are contradictory under active premises,
+    # we assert that pure premises (never conclusions) are True.
+    pure_premises = premises_vars - conclusions_vars
+    for p_name in pure_premises:
+        solver.add(bool_vars[p_name] == True)
+        
     # Check if the constraints are satisfiable (not contradictory)
     result = solver.check()
     
@@ -511,3 +541,86 @@ def verify_logical_with_z3(
             "reason": "Z3 could not determine satisfiability",
             "answer": None,
         }
+
+
+async def verify_logical_with_z3_enhanced(
+    question: str,
+    response: str,
+    model: str,
+    call_model_func: Callable[..., Awaitable[str]],
+    max_tokens: int = 4096,
+) -> dict:
+    """Enhanced logical verification using LLM-to-Z3 translation.
+    
+    Translates logic constraints in the reasoning response to a Python script
+    using the z3-solver library, runs it in a subprocess, and reports consistency.
+    """
+    system_prompt = (
+        "You are a Z3 constraint translator. Extract the variables and logical constraints "
+        "from the question and answer reasoning. Write a Python script using the `z3-solver` "
+        "library that defines Bool variables for statements, adds constraints, checks if "
+        "they are satisfiable, and prints exactly 'SATISFIABLE' or 'UNSATISFIABLE'.\n"
+        "Only output Python code, no explanation, no markdown format."
+    )
+    user_prompt = (
+        f"Question: {question}\n"
+        f"Reasoning/Response: {response}\n\n"
+        "Generate the Z3 solver Python code:"
+    )
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+    
+    code_response = await call_model_func(model, messages, max_tokens=max_tokens)
+    z3_code = extract_code(code_response)
+    
+    if not z3_code.strip():
+        # Fall back to the basic regex-based solver
+        return verify_logical_with_z3(question, response)
+        
+    # Run the Z3 script in temp sandbox
+    with tempfile.TemporaryDirectory() as tmpdir:
+        safe_env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": tmpdir,
+            "TMPDIR": tmpdir,
+            "PYTHONPATH": "",
+        }
+        try:
+            result = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: subprocess.run(
+                    [sys.executable, "-c", z3_code],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                    env=safe_env,
+                    cwd=tmpdir,
+                    stdin=subprocess.DEVNULL,
+                )
+            )
+            stdout = result.stdout.strip()
+            stderr = result.stderr.strip()
+            
+            if "UNSATISFIABLE" in stdout:
+                return {
+                    "verified": False,
+                    "reason": f"Z3 solver returned UNSATISFIABLE (contradiction found):\n{stderr}",
+                    "answer": None,
+                    "code": z3_code
+                }
+            elif "SATISFIABLE" in stdout:
+                return {
+                    "verified": True,
+                    "reason": "Z3 solver confirmed logical constraints are SATISFIABLE.",
+                    "answer": response,
+                    "code": z3_code
+                }
+            else:
+                # Script didn't output expected tokens, fall back to basic solver
+                return verify_logical_with_z3(question, response)
+        except Exception as e:
+            # Subprocess/sandbox execution failed, fall back
+            return verify_logical_with_z3(question, response)

@@ -231,10 +231,10 @@ const OLLAMA_LOCAL_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
 // glm-5.2 is PRIMARY (Ggs's choice — fastest, most reliable on the Max plan).
 // Others are fallbacks in case glm-5.2 is rate-limited or fails.
 const OLLAMA_MODELS = [
-  'glm-5.2',           // PRIMARY — 756B params, 1M context, fast, reliable
-  'deepseek-v4-pro',   // FALLBACK 1 — 1M context, strong reasoning
-  'kimi-k2.6',         // FALLBACK 2 — 1T params, vision capable
-  'gpt-oss:120b',      // FALLBACK 3 — 116.8B params, 131k context
+  'glm-5.2',           // PRIMARY — best general performance
+  'deepseek-v4-pro',   // FALLBACK 1 — strong reasoning
+  'llama-3.3-70b-instruct', // FALLBACK 2 — open weights specialist
+  'gemini-2.0-flash',  // FALLBACK 3 — fast worker
 ];
 
 // Track which model to use next (round-robin for fallbacks, primary always first)

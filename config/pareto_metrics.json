@@ -1,681 +1,6 @@
 {
   "queries": [
     {
-      "timestamp": "2026-07-07T05:23:32.515718+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T05:53:53.330740+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T05:53:53.331576+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T05:53:53.331984+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:20:34.510771+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:20:34.511397+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:20:34.511875+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:23:53.379501+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:23:53.380130+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:23:53.381002+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:53:53.735077+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:53:53.736001+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T06:53:53.736779+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:23:53.311554+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:23:53.312236+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:23:53.312733+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:53:53.496183+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:53:53.496862+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T07:53:53.497307+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:25:49.276180+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:25:49.276764+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:25:49.277190+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:55:49.479079+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:55:49.479761+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T08:55:49.480351+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:25:49.494507+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:25:49.495029+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:25:49.495506+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:44:27.373294+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:44:27.373818+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:44:27.374265+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:45:09.185733+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:45:09.186238+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:45:09.186710+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:47:02.638817+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:47:02.639688+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:47:02.640829+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:48:47.200004+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:48:47.201167+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T09:48:47.202435+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:05:43.030081+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:05:43.031662+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:05:43.032123+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:07:24.710998+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:07:24.711501+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:07:24.711949+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:09:29.139071+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:09:29.139838+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:09:29.140342+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:11:16.932364+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:11:16.932903+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:11:16.933378+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:56:42.968743+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:56:42.969300+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T10:56:42.969745+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:03:47.433747+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:03:47.435069+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:03:47.435940+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:05:33.115205+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:05:33.116179+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:05:33.117037+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:38:48.137541+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:38:48.138586+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T11:38:48.139442+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T12:34:55.593394+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T12:34:55.594292+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T12:34:55.595063+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:04:56.959946+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:04:56.960880+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:04:56.961650+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:34:55.244604+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:34:55.245879+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T13:34:55.246679+00:00",
-      "tier": "hard",
-      "tokens_used": 8192,
-      "baseline_tokens": 8192,
-      "correct": false,
-      "task_type": "reasoning",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T14:04:55.968175+00:00",
-      "tier": "trivial",
-      "tokens_used": 500,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "math",
-      "strategy": "test"
-    },
-    {
-      "timestamp": "2026-07-07T14:04:55.969171+00:00",
-      "tier": "medium",
-      "tokens_used": 4096,
-      "baseline_tokens": 8192,
-      "correct": true,
-      "task_type": "coding",
-      "strategy": "test"
-    },
-    {
       "timestamp": "2026-07-07T14:04:55.969850+00:00",
       "tier": "hard",
       "tokens_used": 8192,
@@ -899,33 +224,708 @@
       "correct": false,
       "task_type": "reasoning",
       "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:09.153166+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:09.153929+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:09.154564+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:34.965727+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:34.966398+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:34.966868+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:45.154394+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:45.155120+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:45.155659+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:54.009199+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:54.010822+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:42:54.011807+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:10.500604+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:10.501351+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:10.502029+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:45.652108+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:45.653338+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T19:43:45.654413+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:07:21.519456+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:07:38.774390+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:07:38.775063+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:07:38.775675+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:07:46.676138+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:08:26.712345+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:08:26.713203+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:08:26.713948+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:08:34.284603+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:09:58.129524+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:09:58.130299+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:09:58.130971+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:10:05.857542+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:11:39.319889+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:11:39.320801+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:11:39.321555+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:11:46.828785+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:13:45.503507+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:13:45.504645+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:13:45.505681+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:13:53.132386+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:14:21.677251+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:14:21.678118+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:14:21.678879+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:14:29.545715+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:16:24.181793+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:16:24.182522+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:16:24.183192+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:16:32.800136+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:17:10.006263+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:17:10.007007+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:17:10.007763+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:17:18.684267+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:18:02.648737+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:18:02.649585+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:18:02.650334+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:18:10.302993+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:25:45.658724+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:25:45.659590+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:25:45.660348+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:25:53.420066+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T20:43:47.501012+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:43:47.502210+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:43:47.503067+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T20:43:55.855290+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T22:23:48.483690+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:23:48.485007+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:23:48.486011+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:23:56.358317+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-07T22:53:48.770909+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:53:48.772288+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:53:48.773312+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-07T22:53:56.806206+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
+    },
+    {
+      "timestamp": "2026-07-08T02:41:38.830438+00:00",
+      "tier": "trivial",
+      "tokens_used": 500,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "math",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-08T02:41:38.832232+00:00",
+      "tier": "medium",
+      "tokens_used": 4096,
+      "baseline_tokens": 8192,
+      "correct": true,
+      "task_type": "coding",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-08T02:41:38.833518+00:00",
+      "tier": "hard",
+      "tokens_used": 8192,
+      "baseline_tokens": 8192,
+      "correct": false,
+      "task_type": "reasoning",
+      "strategy": "test"
+    },
+    {
+      "timestamp": "2026-07-08T02:41:46.936493+00:00",
+      "tier": "trivial",
+      "tokens_used": 5,
+      "baseline_tokens": 8192,
+      "correct": null,
+      "task_type": "math",
+      "strategy": "direct_frontier_deepseek_v4_pro+trivial+s1_budget_forcing"
     }
   ],
-  "total_queries": 432,
-  "total_tokens_used": 1270670,
-  "total_tokens_baseline": 3538944,
-  "correct": 198,
-  "incorrect": 99,
-  "unknown": 135,
+  "total_queries": 507,
+  "total_tokens_used": 1526505,
+  "total_tokens_baseline": 4153344,
+  "correct": 238,
+  "incorrect": 119,
+  "unknown": 150,
   "tier_stats": {
     "trivial": {
-      "count": 152,
-      "tokens": 50678,
-      "baseline": 1245184,
-      "correct": 99
+      "count": 187,
+      "tokens": 60753,
+      "baseline": 1531904,
+      "correct": 119
     },
     "medium": {
-      "count": 177,
-      "tokens": 408647,
-      "baseline": 1449984,
-      "correct": 99
+      "count": 197,
+      "tokens": 490567,
+      "baseline": 1613824,
+      "correct": 119
     },
     "hard": {
-      "count": 103,
-      "tokens": 811345,
-      "baseline": 843776,
+      "count": 123,
+      "tokens": 975185,
+      "baseline": 1007616,
       "correct": 0
     }
   },
-  "last_updated": "2026-07-07T19:13:45.779499+00:00"
+  "last_updated": "2026-07-08T02:41:46.936503+00:00"
 }
