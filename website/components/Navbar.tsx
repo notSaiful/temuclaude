@@ -2,25 +2,59 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { getStoredSession, isSupabaseConfigured, onAuthSessionChange, signOut, type LocalSession } from '@/lib/auth';
 
 const navItems = [
   { label: 'Models', href: '/models' },
   { label: 'Playground', href: '/playground' },
+  { label: 'Compare', href: '/compare' },
   { label: 'Docs', href: '/docs' },
-  { label: 'Benchmarks', href: '/benchmarks' },
   { label: 'Pricing', href: '/pricing' },
 ];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [session, setSession] = useState<LocalSession | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    let unsubscribe: (() => void) | undefined;
+
+    const syncSession = async () => {
+      if (!isSupabaseConfigured()) {
+        setSession(null);
+        return;
+      }
+
+      try {
+        const stored = await getStoredSession();
+        if (mounted) setSession(stored);
+      } catch {
+        if (mounted) setSession(null);
+      }
+    };
+
+    syncSession();
+    if (isSupabaseConfigured()) {
+      unsubscribe = onAuthSessionChange((nextSession) => {
+        if (mounted) setSession(nextSession);
+      });
+    }
+
+    return () => {
+      mounted = false;
+      unsubscribe?.();
+    };
   }, []);
 
   useEffect(() => {
@@ -31,6 +65,14 @@ export function Navbar() {
     }
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
+
+  const handleSignOut = async () => {
+    await signOut().catch(() => undefined);
+    setMobileOpen(false);
+    if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/playground')) {
+      router.push('/login');
+    }
+  };
 
   return (
     <>
@@ -49,14 +91,14 @@ export function Navbar() {
             {/* The Spark — small core, frontier output */}
             <svg width="28" height="28" viewBox="0 0 100 100" className="shrink-0" aria-hidden="true">
               <circle cx="50" cy="50" r="11" fill="#E25822"/>
-              <line x1="50" y1="50" x2="50" y2="10" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="79" y2="21" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="90" y2="50" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="79" y2="79" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="50" y2="90" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="21" y2="79" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="10" y2="50" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
-              <line x1="50" y1="50" x2="21" y2="21" stroke="#E25822" strokeWidth="4.5" stroke-linecap="round"/>
+              <line x1="50" y1="50" x2="50" y2="10" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="79" y2="21" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="90" y2="50" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="79" y2="79" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="50" y2="90" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="21" y2="79" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="10" y2="50" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+              <line x1="50" y1="50" x2="21" y2="21" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
             </svg>
             <span className="text-lg font-semibold tracking-tight text-text-primary">
               TemuClaude
@@ -83,8 +125,28 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
+            {session ? (
+              <>
+                <Link href="/dashboard" className="btn-secondary !py-2 !px-4 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="9" rx="1" />
+                    <rect x="14" y="3" width="7" height="5" rx="1" />
+                    <rect x="14" y="12" width="7" height="9" rx="1" />
+                    <rect x="3" y="16" width="7" height="5" rx="1" />
+                  </svg>
+                  Dashboard
+                </Link>
+                <button onClick={handleSignOut} className="btn-secondary !py-2 !px-4">
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="btn-secondary !py-2 !px-4">
+                Sign In
+              </Link>
+            )}
             <Link href="/playground" className="btn-primary">
-              Try the Playground
+              Playground
             </Link>
           </div>
 
@@ -140,12 +202,37 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              {session ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="btn-secondary mt-4 w-full"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="btn-secondary mt-2 w-full"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-secondary mt-4 w-full"
+                >
+                  Sign In
+                </Link>
+              )}
               <Link
                 href="/playground"
                 onClick={() => setMobileOpen(false)}
-                className="btn-primary mt-4 w-full"
+                className="btn-primary mt-2 w-full"
               >
-                Try the Playground
+                Playground
               </Link>
             </div>
           </nav>
