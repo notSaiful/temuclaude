@@ -717,34 +717,35 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
 from typing import Optional, Callable, Awaitable, List, Dict
 
 
-def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM") -> List[Dict]:
-    """Build a specialized research prompt for AWQ quantization technique analysis."""
+def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) for LLM inference") -> List[Dict]:
+    """Build a specialized research prompt for AWQ quantization techniques.
+    
+    Generates a comprehensive outline covering AWQ algorithm, comparison with
+    GPTQ/RTN, integration with vLLM/TensorRT-LLM, calibration data strategies,
+    and deployment considerations for production LLM serving.
+    """
     return [
         {"role": "system", "content": (
-            "You are a deep research agent specializing in LLM quantization techniques. "
-            "Focus on AWQ (Activation-aware Weight Quantization) as a competitor to vLLM's quantization approaches. "
-            "Cover: 1) AWQ algorithm fundamentals and activation-aware scaling, "
-            "2) Comparison with vLLM's AWQ implementation and GPTQ, "
-            "3) Performance benchmarks (latency, throughput, memory, accuracy), "
-            "4) Hardware support (GPU kernels, CUDA graphs, tensor cores), "
-            "5) Integration patterns for inference engines, "
-            "6) Production deployment considerations. "
-            "Write at least 2000 words with technical depth and citations."
+            "You are a research planner specializing in LLM quantization. Create a "
+            "comprehensive research outline with at least 7 major sections covering "
+            "AWQ (Activation-aware Weight Quantization). Each section should have "
+            "3-5 subsections. Cover: algorithmic foundations, calibration methodology, "
+            "accuracy preservation, hardware acceleration, comparison with GPTQ/RTN/SmoothQuant, "
+            "integration with vLLM/TensorRT-LLM/llama.cpp, production deployment patterns, "
+            "and future research directions. Output as a numbered list of sections with subsections."
         )},
         {"role": "user", "content": (
-            f"Research Topic: {topic}\n\n"
-            "Produce a comprehensive technical analysis covering:\n"
-            "- AWQ paper methodology (Lin et al., 2023) and key innovations\n"
-            "- vLLM's AWQ kernel implementation vs. original AWQ repo\n"
-            "- Quantization granularity: per-channel vs per-group vs per-token\n"
-            "- Calibration data requirements and sensitivity analysis\n"
-            "- Kernel fusion opportunities (GEMM + dequant + activation)\n"
-            "- Memory bandwidth vs compute tradeoffs at 4-bit/3-bit\n"
-            "- Accuracy recovery techniques (GPTQ-style, AWQ-style, learned rounding)\n"
-            "- Benchmark methodology: MMLU, GSM8K, HumanEval, MT-Bench\n"
-            "- Real-world serving metrics: TTFT, TPOT, batch throughput\n"
-            "- Integration with PagedAttention, continuous batching, prefix caching\n"
-            "Include specific numbers, kernel launch configs, and code-level insights."
+            f"Topic: {topic}\n\n"
+            "Create a detailed research outline specifically for AWQ quantization. "
+            "Include technical depth on: weight-only vs weight-activation quantization, "
+            "per-channel vs per-group scaling, zero-point optimization, "
+            "calibration dataset selection (C4, Pile, WikiText), "
+            "accuracy evaluation benchmarks (MMLU, GSM8K, HumanEval, MT-Bench), "
+            "kernel optimization for Hopper/Ampere/Blackwell GPUs, "
+            "vLLM AWQ kernel integration (marlin, gemm), "
+            "TensorRT-LLM AWQ workflow, "
+            "dynamic vs static quantization tradeoffs, "
+            "and quantization-aware training (QAT) extensions."
         )},
     ]
 def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
