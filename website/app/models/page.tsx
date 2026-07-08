@@ -7,7 +7,7 @@ const models = [
   { name: 'Llama 3.3', role: 'Specialist', context: '131K tokens', iq: '40', capabilities: ['Open Weights', 'Logic', 'Agentic'], desc: 'High-quality 70B open-weights model. Acts as a core expert in the MoA proposal panels and generator in self-play.' },
   { name: 'Gemini 2.5 Flash', role: 'Worker/RAG', context: '1M tokens', iq: '40', capabilities: ['Multimodal', 'Speed', 'Search'], desc: 'Google fast utility model. High speed, multimodal vision capabilities, and deep real-time search integration.' },
   { name: 'Mistral Large 3', role: 'Logic Specialist', context: '262K tokens', iq: '43', capabilities: ['Multilingual', 'Structured', 'Logic'], desc: 'Mistral flagship model. Best for structured instruction compliance and serves as the critic/discriminator in self-play.' },
-  { name: 'Claude Sonnet 4.6', role: 'Frontier Fallback', context: '1M tokens', iq: '53', capabilities: ['Frontier', 'Coding', 'Ultimate'], desc: 'The frontier fallback for failing hard-tier queries. Used selectively when intermediate verifiers fail validation checks.' },
+  { name: 'Private Frontier Fallback', role: 'Frontier Fallback', context: '1M tokens', iq: '53', capabilities: ['Frontier', 'Coding', 'Ultimate'], desc: 'A selective fallback for failing hard-tier queries. Used only when intermediate verifiers fail validation checks.' },
   { name: 'MiMo-V2.5', role: 'Multimodal', context: '1M tokens', iq: '40', capabilities: ['Vision', 'Image', 'Video'], desc: 'Xiaomi omnimodal model. Specialized for multimodal analysis, image-to-text, and video-based queries.' },
   { name: 'Z3 Solver', role: 'Logical Verifier', context: 'Local', iq: '—', capabilities: ['SMT', 'Logic', 'Zero-Error'], desc: 'Programmatic verifier that parses logical steps into SMT constraint formulas, verifying reasoning correctness.' },
 ];
@@ -18,6 +18,7 @@ const routerSignals = [
   { label: 'QA / PRM', value: 'Nemotron 3 Ultra', detail: 'Default quality gate and process verifier' },
   { label: 'Consistency', value: 'Task aggregator', detail: 'Math/coding use DeepSeek; knowledge uses GLM' },
   { label: 'Budget State', value: 'Tracked', detail: 'Initial budget, remaining budget, spent tokens' },
+  { label: 'Active Controller', value: 'Shadow Mode', detail: 'Recommends continue, verify, debate, stop, escalate, or cheap draft' },
   { label: 'Failure Labels', value: 'Tracked', detail: 'Timeouts, model errors, contradictions, failed verification' },
   { label: 'Step Recommendations', value: 'Telemetry gated', detail: 'Switches only after enough observed evidence' },
 ];

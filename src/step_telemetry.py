@@ -114,6 +114,13 @@ def record_step_event(
     progress_delta: Optional[float] = None,
     uncertainty: Optional[float] = None,
     failure_label: Optional[str] = None,
+    controller_action: Optional[str] = None,
+    controller_confidence: Optional[float] = None,
+    controller_reason: Optional[str] = None,
+    cost_risk: Optional[str] = None,
+    verifier_state: Optional[str] = None,
+    prm_label: Optional[str] = None,
+    prm_confidence: Optional[float] = None,
     sequence_index: int = 0,
 ) -> None:
     """Persist a single step event for later router and Pareto analysis."""
@@ -140,6 +147,13 @@ def record_step_event(
         "progress_delta": progress_delta,
         "uncertainty": uncertainty,
         "failure_label": normalize_failure_label(failure_label),
+        "controller_action": controller_action,
+        "controller_confidence": controller_confidence,
+        "controller_reason": controller_reason,
+        "cost_risk": cost_risk,
+        "verifier_state": verifier_state,
+        "prm_label": normalize_failure_label(prm_label),
+        "prm_confidence": prm_confidence,
         "sequence_index": sequence_index,
     }
     data["events"].append(event)
@@ -166,6 +180,13 @@ def record_strategy_steps(
     progress_delta: Optional[float] = None,
     uncertainty: Optional[float] = None,
     failure_label: Optional[str] = None,
+    controller_action: Optional[str] = None,
+    controller_confidence: Optional[float] = None,
+    controller_reason: Optional[str] = None,
+    cost_risk: Optional[str] = None,
+    verifier_state: Optional[str] = None,
+    prm_label: Optional[str] = None,
+    prm_confidence: Optional[float] = None,
 ) -> None:
     """Record one event per strategy fragment from an orchestrator run."""
     steps = split_strategy(strategy)
@@ -190,6 +211,13 @@ def record_strategy_steps(
             progress_delta=progress_delta,
             uncertainty=uncertainty,
             failure_label=failure_label,
+            controller_action=controller_action,
+            controller_confidence=controller_confidence,
+            controller_reason=controller_reason,
+            cost_risk=cost_risk,
+            verifier_state=verifier_state,
+            prm_label=prm_label,
+            prm_confidence=prm_confidence,
             sequence_index=idx,
         )
 
@@ -291,14 +319,39 @@ def build_runtime_step_metadata(
     remaining = None
     if initial_budget is not None and spent is not None:
         remaining = max(0, initial_budget - spent)
+    progress_delta = infer_progress_delta(success, strategy, answer)
+    uncertainty = infer_uncertainty(success, strategy, answer)
+    failure_label = infer_failure_label(success, strategy, answer)
+    remaining_ratio = calculate_remaining_budget_ratio(initial_budget, remaining)
+    verifier_state = "passed" if any(marker in (strategy or "") for marker in ("step_verify", "code_verify", "z3_verified", "qa_passed")) else None
+    try:
+        from .budget_controller import recommend_controller_action
+        decision = recommend_controller_action(
+            tier="unknown",
+            step_type="unknown",
+            remaining_budget_ratio=remaining_ratio,
+            progress_delta=progress_delta,
+            uncertainty=uncertainty,
+            failure_label=failure_label,
+            verifier_passed=verifier_state == "passed",
+            success=success,
+        )
+        controller = decision.as_dict()
+    except Exception:
+        controller = {}
 
     return {
         "initial_budget": initial_budget,
         "remaining_budget": remaining,
         "budget_spent": spent,
-        "progress_delta": infer_progress_delta(success, strategy, answer),
-        "uncertainty": infer_uncertainty(success, strategy, answer),
-        "failure_label": infer_failure_label(success, strategy, answer),
+        "progress_delta": progress_delta,
+        "uncertainty": uncertainty,
+        "failure_label": failure_label,
+        "controller_action": controller.get("action"),
+        "controller_confidence": controller.get("confidence"),
+        "controller_reason": controller.get("reason"),
+        "cost_risk": controller.get("cost_risk"),
+        "verifier_state": verifier_state,
     }
 
 
@@ -319,6 +372,7 @@ def summarize_step_performance() -> dict:
                 "progress_values": [],
                 "budget_ratios": [],
                 "failure_labels": {},
+                "controller_actions": {},
                 "models": {},
             }
         row = summary[key]
@@ -344,6 +398,9 @@ def summarize_step_performance() -> dict:
         failure_label = event.get("failure_label")
         if failure_label:
             row["failure_labels"][failure_label] = row["failure_labels"].get(failure_label, 0) + 1
+        controller_action = event.get("controller_action")
+        if controller_action:
+            row["controller_actions"][controller_action] = row["controller_actions"].get(controller_action, 0) + 1
 
     for row in summary.values():
         count = row["count"] or 1
@@ -368,6 +425,10 @@ def summarize_step_performance() -> dict:
         row["top_failure_label"] = (
             max(row["failure_labels"], key=row["failure_labels"].get)
             if row["failure_labels"] else None
+        )
+        row["top_controller_action"] = (
+            max(row["controller_actions"], key=row["controller_actions"].get)
+            if row["controller_actions"] else None
         )
     return summary
 
@@ -404,6 +465,13 @@ def get_step_dataset(success_only: bool = False) -> list:
             "progress_delta": event.get("progress_delta"),
             "uncertainty": event.get("uncertainty"),
             "failure_label": event.get("failure_label"),
+            "controller_action": event.get("controller_action"),
+            "controller_confidence": event.get("controller_confidence"),
+            "controller_reason": event.get("controller_reason"),
+            "cost_risk": event.get("cost_risk"),
+            "verifier_state": event.get("verifier_state"),
+            "prm_label": event.get("prm_label"),
+            "prm_confidence": event.get("prm_confidence"),
             "sequence_index": event.get("sequence_index", 0),
             "query_words": event.get("query_words", 0),
             "query_length": event.get("query_length", 0),

@@ -68,7 +68,7 @@ export default function DocsPage() {
               <h2 className="text-xl font-semibold text-text-primary mb-3">Quickstart</h2>
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
-              <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — ask anything, get a superior answer. No signup, no setup. 20 free queries/day.</p>
+              <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — sign in, ask anything, and get a superior answer. 20 free queries/day.</p>
               <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
   -H "Content-Type: application/json" \\
@@ -115,12 +115,12 @@ export default function DocsPage() {
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 2.5 Flash</td><td className="py-2 px-3 text-text-secondary">Fast worker + RAG + speed</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Mistral Large 3</td><td className="py-2 px-3 text-text-secondary">Self-play logic verifier</td><td className="py-2 px-3 text-text-secondary">43</td><td className="py-2 px-3 text-text-secondary">262K</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiMo-V2.5</td><td className="py-2 px-3 text-text-secondary">Multimodal (text+image+video)</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Claude Sonnet 4.6</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Private Frontier Fallback</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary font-medium">Z3 Solver</td><td className="py-2 px-3 text-text-secondary">Logical Verifier (SMT equations)</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Local</td></tr>
                   </tbody>
                 </table>
               </div>
-              <Callout type="tip">Claude Sonnet 4.6 (IQ 53) is only used as a selective fallback for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
+              <Callout type="tip">The private frontier fallback is only used for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
             </section>
 
             {/* === FEATURES === */}
@@ -138,7 +138,7 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
                 <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
                 <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 4.6 (IQ 53) for hardest 2%</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to the private frontier fallback for hardest 2%</li>
               </ol>
             </section>
 
@@ -190,6 +190,25 @@ Decision rule:
   If enough telemetry exists -> use observed best model
   Otherwise -> role-aware fallback model`} />
               <Callout type="tip">This is the bridge toward Fugu-style state-aware orchestration: model choice can vary inside the same answer, not just at the first route.</Callout>
+            </section>
+
+            <section id="active-budget-controller" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Active Budget Controller</h2>
+              <p className="text-text-secondary mb-4">TemuClaude now runs a shadow controller that recommends the next orchestration action from budget, progress, uncertainty, verifier, and PRM signals.</p>
+              <CodeBlock lang="text" code={`Controller actions:
+  continue    -> keep the current path
+  verify      -> spend on verifier/PRM checks
+  debate      -> resolve contradiction or disagreement
+  stop        -> avoid unnecessary extra compute
+  escalate    -> use stronger recovery path when budget remains
+  cheap_draft -> use cheaper draft path under budget pressure
+
+Promotion gate:
+  quality non-regression
+  cost reduction
+  latency guardrail
+  failure-label guardrail`} />
+              <Callout type="note">The controller is currently shadow-mode telemetry. Runtime action gates stay conservative until the benchmark-promotion gate proves quality and reliability are preserved.</Callout>
             </section>
 
             <section id="moa-3-layer-fusion" className="mb-12">
@@ -283,7 +302,7 @@ Layer 3: Aggregation
 
             <section id="frontier-fallback" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
-              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to Claude Sonnet 4.6 (IQ 53 — the highest available):</p>
+              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to a private frontier fallback:</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Only triggers when QA score &lt; 0.75 after all retries</li>
                 <li>Query must match frontier criteria (prove, derive, theorem, system design, refactor)</li>
