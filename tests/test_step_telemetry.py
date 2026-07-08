@@ -36,6 +36,13 @@ def test_record_strategy_steps_and_summary(tmp_path, monkeypatch):
         latency_ms=1234,
         tokens_used=256,
         quality_score=0.92,
+        controller_action="stop",
+        controller_confidence=0.9,
+        controller_reason="verifier_passed",
+        cost_risk="low",
+        verifier_state="passed",
+        prm_label="correct",
+        prm_confidence=0.85,
     )
 
     data = json.loads(telemetry_file.read_text())
@@ -53,6 +60,15 @@ def test_record_strategy_steps_and_summary(tmp_path, monkeypatch):
     assert summary["search"]["success_rate"] == 1.0
     assert summary["verification"]["top_model"] == "deepseek-v4-pro+step"
     assert summary["consistency"]["avg_tokens"] == 256
+    assert summary["search"]["top_controller_action"] == "stop"
+
+    dataset = step_telemetry.get_step_dataset()
+    assert dataset[0]["controller_action"] == "stop"
+    assert dataset[0]["controller_confidence"] == 0.9
+    assert dataset[0]["cost_risk"] == "low"
+    assert dataset[0]["verifier_state"] == "passed"
+    assert dataset[0]["prm_label"] == "correct"
+    assert dataset[0]["prm_confidence"] == 0.85
 
 
 def test_event_history_is_bounded(tmp_path, monkeypatch):
@@ -217,6 +233,9 @@ def test_runtime_step_metadata_inference():
     assert success_meta["progress_delta"] > 0.2
     assert success_meta["uncertainty"] == 0.15
     assert success_meta["failure_label"] is None
+    assert success_meta["controller_action"] == "stop"
+    assert success_meta["controller_reason"] == "verifier_passed"
+    assert success_meta["verifier_state"] == "passed"
 
     failure_meta = step_telemetry.build_runtime_step_metadata(
         token_budget=500,
@@ -229,6 +248,8 @@ def test_runtime_step_metadata_inference():
     assert failure_meta["progress_delta"] < 0
     assert failure_meta["uncertainty"] == 0.9
     assert failure_meta["failure_label"] == "model_timeout"
+    assert failure_meta["controller_action"] in {"cheap_draft", "escalate"}
+    assert failure_meta["cost_risk"] == "critical"
 
 
 def test_step_route_recommendations_recency_decay(tmp_path, monkeypatch):

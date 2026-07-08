@@ -16,6 +16,8 @@ This file consolidates the research-to-implementation trail from the current upg
 | Step-aware model selection | Implemented first pass | `get_model_for_step(...)`, hard-tier search/verification/consistency/QA model selection | `tests/test_step_model_routing.py`, py_compile |
 | Structured PRM labels | Implemented first pass | `PRMVerdict`, `_score_step_structured(...)`, primary/peer label parsing in `src/reasoning_tree.py` | `tests/test_v3_breakthroughs.py`, `tests/test_v3_upgrades.py` |
 | ParetoBandit-style recency decay | Implemented first pass | `recency_half_life_days` in `get_step_route_recommendations(...)` with stale-evidence confidence penalty | `tests/test_step_telemetry.py` |
+| Active budget controller | Implemented shadow foundation | `src/budget_controller.py`, controller recommendation fields in step telemetry | `tests/test_budget_controller.py`, `tests/test_step_telemetry.py` |
+| Benchmark-promotion gate | Implemented foundation | `src/benchmark_promotion.py` quality/cost/latency/failure gate | `tests/test_budget_controller.py` |
 | Website/GitHub sync | Implemented first pass | `README.md`, `website/app/models/page.tsx`, `website/app/docs/page.tsx` | Website build/type check pending in this run |
 
 ## Partially Implemented
@@ -23,10 +25,10 @@ This file consolidates the research-to-implementation trail from the current upg
 | Research theme | Current state | Remaining work |
 |---|---|---|
 | ParetoBandit-style non-stationary routing | Recency decay is implemented | Add forced exploration and model registry versioning |
-| SeqRoute-style remaining-budget controller | Remaining budget is recorded; no active action policy yet | Use budget ratio to decide search/verify/debate/stop |
+| SeqRoute-style remaining-budget controller | Shadow action policy implemented; runtime gates still off | Enable only after benchmark-promotion gate passes |
 | AgentPRM / progress reward | Heuristic `progress_delta` exists | Train or prompt a real progress critic over traces |
-| Early-abort / escalation | `get_budget_alerts(...)` exists | Add conservative logging/escalation gate before hard aborts |
-| Cost-aware local benchmark | Research notes exist | Build repo-local benchmark packet with quality, cost, latency, retries |
+| Early-abort / escalation | Shadow controller now recommends stop/escalate/debate actions | Add runtime gate behind config flag after eval |
+| Cost-aware local benchmark | Promotion gate exists | Build repo-local benchmark packet with quality, cost, latency, retries |
 | GEPA trace optimization | Existing `src/gepa.py` remains simplified | Replace first-valid-prompt selection with trace reflection + Pareto frontier |
 | Structured PRM labels | Implemented first pass | Next: feed labels into runtime route/escalation decisions |
 
@@ -34,7 +36,7 @@ This file consolidates the research-to-implementation trail from the current upg
 
 | Research theme | Why not yet | Next safe step |
 |---|---|---|
-| Full topology router | Needs more telemetry and eval guardrails | Train a baseline classifier over `get_step_dataset()` |
+| Full topology router | Needs more telemetry and eval guardrails; controller shadow labels now exist | Train a baseline classifier over `get_step_dataset()` |
 | Provider usage-based token/cost accounting | Current providers do not consistently expose usage in this path | Capture usage metadata from OpenRouter responses where available |
 | Tool-call and wall-clock budgets | Token budget is currently the main budget signal | Add `tool_call_budget`, `verifier_budget`, `wall_clock_budget` fields |
 | Automatic model-pool replacement | Needs live benchmark guardrail to avoid regressions | Add staged model candidates plus benchmark-promotion gate |
@@ -66,7 +68,7 @@ cd website && npm run build
 ## Next Implementation Priority
 
 1. Run the focused verification commands above.
-2. Feed step-router metadata into playground/API orchestration output.
-3. Add a benchmark-promotion gate before changing model defaults.
+2. Feed step-router/controller metadata into playground/API orchestration output.
+3. Run benchmark-promotion gate on a local eval packet before enabling runtime controller gates.
 4. Replace simplified GEPA with trace-based prompt/policy evolution.
 5. Add controlled exploration for new candidate models.

@@ -55,6 +55,12 @@ IMPLEMENTED: ParetoBandit-style recency decay for step router
 - Implemented: recency_half_life_days in get_step_route_recommendations plus stale-evidence confidence penalty
 - Tests: tests/test_step_telemetry.py, tests/test_step_model_routing.py, tests/test_v3_breakthroughs.py, tests/test_v3_upgrades.py pass with PYTHONPATH=.
 
+IMPLEMENTED: Active budget controller shadow foundation
+- Topic: adaptive test-time compute, online process rewards, reward-guided cheap drafting, benchmark-promotion guardrails
+- Key conclusion: TemuClaude should turn step telemetry into active continue/verify/debate/stop/escalate recommendations before enabling runtime control
+- Implemented: src/budget_controller.py, src/benchmark_promotion.py, controller/PRM/verifier telemetry fields, tests/test_budget_controller.py
+- Runtime behavior: shadow mode only; no hard runtime gate until benchmark promotion passes
+
 ## 2026-07-03 11:30 UTC
 Auto-Integrator system created. The swarm now has HANDS — it can read findings, write code, test, and commit without human approval.
 

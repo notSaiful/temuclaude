@@ -2,7 +2,7 @@
 
 > One question. Step-aware model routing. One superior answer.
 
-Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-specialized model pool, routes each task and high-value reasoning step to the best available model, verifies math/code with execution, and self-checks hard responses. You get one answer with budget-aware orchestration metadata.
+Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-specialized model pool, routes each task and high-value reasoning step to the best available model, verifies math/code with execution, and self-checks hard responses. You get one answer with budget-aware orchestration metadata and a shadow active-budget controller that learns when to continue, verify, debate, stop, or escalate.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Website](https://img.shields.io/website?url=https://temuclaude.com)](https://temuclaude.com)
@@ -31,6 +31,8 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-sp
 | Nemotron 3 Ultra | QA Gate (FREE) | 38 | 128K |
 
 Runtime selection is no longer only whole-query routing. TemuClaude records per-step telemetry for search, verification, consistency, QA gates, debate, post-processing, and formal verification, then uses observed success/cost/progress signals to recommend better step-level model choices when enough evidence exists.
+
+The active budget controller now runs in shadow mode. It records recommended actions (`continue`, `verify`, `debate`, `stop`, `escalate`, `cheap_draft`) alongside cost risk and PRM/verifier state, but runtime gates stay disabled until the benchmark-promotion gate proves quality non-regression and cost savings.
 
 ## Pricing
 
@@ -64,6 +66,8 @@ Classify (task type + difficulty)
     ↓
 Step-Aware Model Router
     ↓
+Shadow Active Budget Controller
+    ↓
 ┌──────────────────────────────────────────┐
 │  TRIVIAL (60%)  → Hy3 Preview (cheapest) │
 │  MEDIUM (30%)   → Specialist routing     │
@@ -83,7 +87,7 @@ Step-Aware Model Router
 9. Z3/SMT logical verification
 10. Frontier fallback (Claude Sonnet 5 if QA < 0.75)
     ↓
-Final Answer + Budget/Progress/Failure Telemetry
+Final Answer + Budget/Progress/Failure/Controller Telemetry
 ```
 
 ## Tech Stack
