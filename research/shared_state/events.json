@@ -1,422 +1,6 @@
 {
   "events": [
     {
-      "id": "evt_1783477406729_watchdog",
-      "timestamp": "2026-07-08T07:53:26.729630",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47213), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783477411029_distiller_daemon",
-      "timestamp": "2026-07-08T07:53:31.029919",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783477415483_integrator_daemon",
-      "timestamp": "2026-07-08T07:53:35.483537",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783477419680_research_daemon_2",
-      "timestamp": "2026-07-08T07:53:39.680056",
-      "daemon": "research_daemon_2",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783477420658_coordinator_daemon",
-      "timestamp": "2026-07-08T07:53:40.658854",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 5619.7s",
-      "extra": {
-        "duration": 5619.7
-      }
-    },
-    {
-      "id": "evt_1783477420680_coordinator_daemon",
-      "timestamp": "2026-07-08T07:53:40.680836",
-      "daemon": "coordinator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783477421590_cyber_daemon",
-      "timestamp": "2026-07-08T07:53:41.590007",
-      "daemon": "cyber_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783477421769_watchdog",
-      "timestamp": "2026-07-08T07:53:41.769612",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47213), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478342823_watchdog",
-      "timestamp": "2026-07-08T08:09:02.823545",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47213), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478345018_research_daemon_1",
-      "timestamp": "2026-07-08T08:09:05.018705",
-      "daemon": "research_daemon_1",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478346933_watchdog",
-      "timestamp": "2026-07-08T08:09:06.933861",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_3: process dead (pid 47224), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478347058_distiller_daemon",
-      "timestamp": "2026-07-08T08:09:07.058697",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478348064_research_daemon_3",
-      "timestamp": "2026-07-08T08:09:08.064734",
-      "daemon": "research_daemon_3",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478365033_watchdog",
-      "timestamp": "2026-07-08T08:09:25.033707",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47304), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478377069_distiller_daemon",
-      "timestamp": "2026-07-08T08:09:37.069602",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478380066_watchdog",
-      "timestamp": "2026-07-08T08:09:40.066984",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47304), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478395094_watchdog",
-      "timestamp": "2026-07-08T08:09:55.094236",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47304), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478407082_distiller_daemon",
-      "timestamp": "2026-07-08T08:10:07.082166",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478410121_watchdog",
-      "timestamp": "2026-07-08T08:10:10.121239",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47304), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478411258_research_daemon_1",
-      "timestamp": "2026-07-08T08:10:11.258793",
-      "daemon": "research_daemon_1",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478413186_watchdog",
-      "timestamp": "2026-07-08T08:10:13.186377",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_3: process dead (pid 47309), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478414310_research_daemon_3",
-      "timestamp": "2026-07-08T08:10:14.310048",
-      "daemon": "research_daemon_3",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478431277_watchdog",
-      "timestamp": "2026-07-08T08:10:31.277214",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47391), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478437095_distiller_daemon",
-      "timestamp": "2026-07-08T08:10:37.095282",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478441510_integrator_daemon",
-      "timestamp": "2026-07-08T08:10:41.510023",
-      "daemon": "integrator_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478446307_watchdog",
-      "timestamp": "2026-07-08T08:10:46.307497",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47391), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478456445_efficiency_daemon",
-      "timestamp": "2026-07-08T08:10:56.445255",
-      "daemon": "efficiency_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.02
-      }
-    },
-    {
-      "id": "evt_1783478459506_media_daemon",
-      "timestamp": "2026-07-08T08:10:59.506547",
-      "daemon": "media_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478461338_watchdog",
-      "timestamp": "2026-07-08T08:11:01.338172",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47391), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478467108_distiller_daemon",
-      "timestamp": "2026-07-08T08:11:07.108402",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478476364_watchdog",
-      "timestamp": "2026-07-08T08:11:16.364861",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47391), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478477494_research_daemon_1",
-      "timestamp": "2026-07-08T08:11:17.494671",
-      "daemon": "research_daemon_1",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478479422_watchdog",
-      "timestamp": "2026-07-08T08:11:19.422583",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_3: process dead (pid 47403), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478480508_research_daemon_3",
-      "timestamp": "2026-07-08T08:11:20.508335",
-      "daemon": "research_daemon_3",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478480698_feedback_daemon",
-      "timestamp": "2026-07-08T08:11:20.698460",
-      "daemon": "feedback_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.7s",
-      "extra": {
-        "duration": 0.72
-      }
-    },
-    {
-      "id": "evt_1783478497111_distiller_daemon",
-      "timestamp": "2026-07-08T08:11:37.111582",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478497503_watchdog",
-      "timestamp": "2026-07-08T08:11:37.503743",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47464), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478501047_swot_daemon",
-      "timestamp": "2026-07-08T08:11:41.047994",
-      "daemon": "swot_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.01
-      }
-    },
-    {
-      "id": "evt_1783478507139_meta_auditor_daemon",
-      "timestamp": "2026-07-08T08:11:47.139944",
-      "daemon": "meta_auditor_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 24.1s",
-      "extra": {
-        "duration": 24.11
-      }
-    },
-    {
-      "id": "evt_1783478508635_super_intelligence_daemon",
-      "timestamp": "2026-07-08T08:11:48.635050",
-      "daemon": "super_intelligence_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 4.6s",
-      "extra": {
-        "duration": 4.56
-      }
-    },
-    {
-      "id": "evt_1783478512531_watchdog",
-      "timestamp": "2026-07-08T08:11:52.531764",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47464), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478527124_distiller_daemon",
-      "timestamp": "2026-07-08T08:12:07.124962",
-      "daemon": "distiller_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.0s",
-      "extra": {
-        "duration": 0.0
-      }
-    },
-    {
-      "id": "evt_1783478527555_watchdog",
-      "timestamp": "2026-07-08T08:12:07.555795",
-      "daemon": "watchdog",
-      "type": "restart",
-      "message": "research_daemon_1: process dead (pid 47464), restarting",
-      "extra": {}
-    },
-    {
-      "id": "evt_1783478529917_model_optimizer_daemon",
-      "timestamp": "2026-07-08T08:12:09.917458",
-      "daemon": "model_optimizer_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 1.7s",
-      "extra": {
-        "duration": 1.74
-      }
-    },
-    {
-      "id": "evt_1783478532032_cost_efficiency_daemon",
-      "timestamp": "2026-07-08T08:12:12.032893",
-      "daemon": "cost_efficiency_daemon",
-      "type": "cycle_complete",
-      "message": "Cycle completed in 0.7s",
-      "extra": {
-        "duration": 0.74
-      }
-    },
-    {
       "id": "evt_1783478542578_watchdog",
       "timestamp": "2026-07-08T08:12:22.578299",
       "daemon": "watchdog",
@@ -1827,7 +1411,417 @@
       "extra": {
         "duration": 0.0
       }
+    },
+    {
+      "id": "evt_1783483972535_integrator_daemon",
+      "timestamp": "2026-07-08T09:42:52.535712",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 11.5s",
+      "extra": {
+        "duration": 11.52
+      }
+    },
+    {
+      "id": "evt_1783483973804_watchdog",
+      "timestamp": "2026-07-08T09:42:53.804838",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48808), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783483988835_watchdog",
+      "timestamp": "2026-07-08T09:43:08.835554",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48808), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783483992899_distiller_daemon",
+      "timestamp": "2026-07-08T09:43:12.899808",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484003868_watchdog",
+      "timestamp": "2026-07-08T09:43:23.868184",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48808), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484004987_research_daemon_1",
+      "timestamp": "2026-07-08T09:43:24.987214",
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484005257_coordinator_daemon",
+      "timestamp": "2026-07-08T09:43:25.257223",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.04
+      }
+    },
+    {
+      "id": "evt_1783484006920_watchdog",
+      "timestamp": "2026-07-08T09:43:26.920136",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_3: process dead (pid 48821), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484008041_research_daemon_3",
+      "timestamp": "2026-07-08T09:43:28.041987",
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484022909_distiller_daemon",
+      "timestamp": "2026-07-08T09:43:42.909362",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484025007_watchdog",
+      "timestamp": "2026-07-08T09:43:45.007742",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48898), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484040044_watchdog",
+      "timestamp": "2026-07-08T09:44:00.044731",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48898), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484052923_distiller_daemon",
+      "timestamp": "2026-07-08T09:44:12.923206",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484055077_watchdog",
+      "timestamp": "2026-07-08T09:44:15.077133",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48898), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484063089_cyber_daemon",
+      "timestamp": "2026-07-08T09:44:23.089654",
+      "daemon": "cyber_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783484065269_coordinator_daemon",
+      "timestamp": "2026-07-08T09:44:25.269553",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.05
+      }
+    },
+    {
+      "id": "evt_1783484070112_watchdog",
+      "timestamp": "2026-07-08T09:44:30.112361",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48898), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484071237_research_daemon_1",
+      "timestamp": "2026-07-08T09:44:31.237589",
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484073167_watchdog",
+      "timestamp": "2026-07-08T09:44:33.167942",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_3: process dead (pid 48904), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484074291_research_daemon_3",
+      "timestamp": "2026-07-08T09:44:34.291188",
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484082934_distiller_daemon",
+      "timestamp": "2026-07-08T09:44:42.934958",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484091257_watchdog",
+      "timestamp": "2026-07-08T09:44:51.257481",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48973), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484106293_watchdog",
+      "timestamp": "2026-07-08T09:45:06.293087",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48973), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484112940_distiller_daemon",
+      "timestamp": "2026-07-08T09:45:12.940253",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484121331_watchdog",
+      "timestamp": "2026-07-08T09:45:21.331176",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48973), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484125274_coordinator_daemon",
+      "timestamp": "2026-07-08T09:45:25.274816",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.05
+      }
+    },
+    {
+      "id": "evt_1783484136371_watchdog",
+      "timestamp": "2026-07-08T09:45:36.371085",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 48973), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484137505_research_daemon_1",
+      "timestamp": "2026-07-08T09:45:37.505576",
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484139427_watchdog",
+      "timestamp": "2026-07-08T09:45:39.427090",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_3: process dead (pid 48975), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484140532_research_daemon_3",
+      "timestamp": "2026-07-08T09:45:40.532077",
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484142949_distiller_daemon",
+      "timestamp": "2026-07-08T09:45:42.949493",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484157499_watchdog",
+      "timestamp": "2026-07-08T09:45:57.499025",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 49066), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484172533_watchdog",
+      "timestamp": "2026-07-08T09:46:12.533517",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 49066), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484172955_distiller_daemon",
+      "timestamp": "2026-07-08T09:46:12.955278",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484177215_integrator_daemon",
+      "timestamp": "2026-07-08T09:46:17.215889",
+      "daemon": "integrator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 96.2s",
+      "extra": {
+        "duration": 96.19
+      }
+    },
+    {
+      "id": "evt_1783484185268_coordinator_daemon",
+      "timestamp": "2026-07-08T09:46:25.268227",
+      "daemon": "coordinator_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.04
+      }
+    },
+    {
+      "id": "evt_1783484187566_watchdog",
+      "timestamp": "2026-07-08T09:46:27.566192",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 49066), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484191931_efficiency_daemon",
+      "timestamp": "2026-07-08T09:46:31.931404",
+      "daemon": "efficiency_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783484194997_media_daemon",
+      "timestamp": "2026-07-08T09:46:34.997805",
+      "daemon": "media_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.02
+      }
+    },
+    {
+      "id": "evt_1783484202601_watchdog",
+      "timestamp": "2026-07-08T09:46:42.601502",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 49066), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484202968_distiller_daemon",
+      "timestamp": "2026-07-08T09:46:42.968497",
+      "daemon": "distiller_daemon",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.0
+      }
+    },
+    {
+      "id": "evt_1783484203728_research_daemon_1",
+      "timestamp": "2026-07-08T09:46:43.728314",
+      "daemon": "research_daemon_1",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484205660_watchdog",
+      "timestamp": "2026-07-08T09:46:45.660183",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_3: process dead (pid 49072), restarting",
+      "extra": {}
+    },
+    {
+      "id": "evt_1783484206779_research_daemon_3",
+      "timestamp": "2026-07-08T09:46:46.779967",
+      "daemon": "research_daemon_3",
+      "type": "cycle_complete",
+      "message": "Cycle completed in 0.0s",
+      "extra": {
+        "duration": 0.01
+      }
+    },
+    {
+      "id": "evt_1783484223741_watchdog",
+      "timestamp": "2026-07-08T09:47:03.741274",
+      "daemon": "watchdog",
+      "type": "restart",
+      "message": "research_daemon_1: process dead (pid 49147), restarting",
+      "extra": {}
     }
   ],
-  "last_update": "2026-07-08T09:42:42.892201"
+  "last_update": "2026-07-08T09:47:03.741314"
 }
