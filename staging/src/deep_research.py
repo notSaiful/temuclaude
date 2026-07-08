@@ -717,36 +717,19 @@ def build_technical_comparison_plan_prompt(topic: str, competitors: List[str], n
 from typing import Optional, Callable, Awaitable, List, Dict
 
 
-def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) for LLM inference") -> List[Dict]:
-    """Build a specialized research prompt for AWQ quantization techniques.
-    
-    Generates a comprehensive outline covering AWQ algorithm, comparison with
-    GPTQ/RTN, integration with vLLM/TensorRT-LLM, calibration data strategies,
-    and deployment considerations for production LLM serving.
-    """
+def build_awq_research_prompt(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM", num_sections: int = 6) -> List[Dict]:
+    """Build a specialized research prompt for AWQ quantization technology comparison with vLLM."""
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization. Create a "
-            "comprehensive research outline with at least 7 major sections covering "
-            "AWQ (Activation-aware Weight Quantization). Each section should have "
-            "3-5 subsections. Cover: algorithmic foundations, calibration methodology, "
-            "accuracy preservation, hardware acceleration, comparison with GPTQ/RTN/SmoothQuant, "
-            "integration with vLLM/TensorRT-LLM/llama.cpp, production deployment patterns, "
-            "and future research directions. Output as a numbered list of sections with subsections."
+            "You are a research planner specializing in LLM quantization techniques. Create a comprehensive "
+            f"research outline with at least {num_sections} major sections comparing AWQ (Activation-aware "
+            "Weight Quantization) with vLLM's quantization approaches. Each section should have 3-5 subsections. "
+            "Cover: 1) Technical foundations of AWQ vs vLLM quantization, 2) Accuracy preservation methods, "
+            "3) Inference speed and memory benchmarks, 4) Hardware compatibility (GPU/TPU/CPU), "
+            "5) Integration complexity and developer experience, 6) Production deployment case studies, "
+            "7) Future roadmap and emerging techniques. Output as a numbered list of sections with subsections."
         )},
-        {"role": "user", "content": (
-            f"Topic: {topic}\n\n"
-            "Create a detailed research outline specifically for AWQ quantization. "
-            "Include technical depth on: weight-only vs weight-activation quantization, "
-            "per-channel vs per-group scaling, zero-point optimization, "
-            "calibration dataset selection (C4, Pile, WikiText), "
-            "accuracy evaluation benchmarks (MMLU, GSM8K, HumanEval, MT-Bench), "
-            "kernel optimization for Hopper/Ampere/Blackwell GPUs, "
-            "vLLM AWQ kernel integration (marlin, gemm), "
-            "TensorRT-LLM AWQ workflow, "
-            "dynamic vs static quantization tradeoffs, "
-            "and quantization-aware training (QAT) extensions."
-        )},
+        {"role": "user", "content": f"Topic: {topic}\n\nCreate a detailed comparative research outline."},
     ]
 def build_quantization_comparison_prompt(topic: str, competitors: List[str]) -> List[Dict]:
     """Build a specialized prompt for researching LLM quantization and inference engine comparisons (e.g., AWQ vs vLLM).
