@@ -29,6 +29,7 @@ temuclaude-db.json
 .env
 config/secrets.*
 *secret*
+config/step_telemetry.json
 
 # Website
 website/node_modules/

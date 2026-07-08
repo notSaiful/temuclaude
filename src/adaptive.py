@@ -10,10 +10,29 @@ This is data-driven self-improvement — the system learns from its own results.
 import json
 import os
 from typing import Optional
-from .models import TASK_MODEL_MAP
+from .models import AGGREGATOR_MAP, TASK_MODEL_MAP
 
 
 ADAPTIVE_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "config", "adaptive_routing.json")
+
+
+STEP_MODEL_DEFAULTS = {
+    "cache": "cache",
+    "long_context_retrieval": "kimi-k2.6",
+    "ui_ux_loop": "glm-5.2",
+    "direct_answer": None,  # Task-specific fallback.
+    "shepherding": "deepseek-v4-flash",
+    "search": "deepseek-v4-pro",
+    "repair": "mistral-large-3",
+    "fusion": "glm-5.2",
+    "verification": "nemotron-3-ultra",
+    "consistency": None,  # Aggregator-specific fallback.
+    "qa_gate": "nemotron-3-ultra",
+    "debate": "glm-5.2",
+    "budget_forcing": None,
+    "formal_verification": "z3",
+    "postprocess": "glm-5.2",
+}
 
 
 def get_adaptive_routing() -> dict:
@@ -141,3 +160,64 @@ def get_model_for_task_with_router(query: str, task_type: str, tier: str) -> tup
     # Fall back to default adaptive routing
     model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
     return (model, False, 0.0)
+
+
+def get_fallback_model_for_step(task_type: str, step_type: str) -> str:
+    """Return a role-aware fallback model for an orchestration step."""
+    try:
+        from .step_telemetry import normalize_step_name
+    except Exception:
+        normalize_step_name = lambda value: value  # noqa: E731
+
+    normalized_step = normalize_step_name(step_type)
+    if normalized_step == "verification" and task_type in ("math", "coding"):
+        return TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
+    if normalized_step == "prm_verification":
+        return "nemotron-3-ultra"
+
+    configured = STEP_MODEL_DEFAULTS.get(normalized_step)
+    if configured:
+        return configured
+
+    if normalized_step == "direct_answer":
+        return get_model_for_task(task_type)
+    if normalized_step == "consistency":
+        return AGGREGATOR_MAP.get(task_type, AGGREGATOR_MAP.get("default", "glm-5.2"))
+    if normalized_step == "budget_forcing":
+        return TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
+    return TASK_MODEL_MAP.get(task_type, "glm-5.2")
+
+
+def get_model_for_step(
+    task_type: str,
+    tier: str,
+    step_type: str,
+    min_count: int = 3,
+) -> tuple:
+    """Select a model for a specific orchestration step.
+
+    Uses step telemetry recommendations when enough evidence exists, then falls
+    back to role-aware defaults. This is the first bridge from passive telemetry
+    to state-aware model selection.
+
+    Returns:
+        (model_name, used_step_router, confidence)
+    """
+    fallback = get_fallback_model_for_step(task_type, step_type)
+
+    try:
+        from .step_telemetry import get_step_route_recommendations, normalize_step_name
+        normalized_step = normalize_step_name(step_type)
+        context_key = f"{task_type}:{tier}:{normalized_step}"
+        recommendations = get_step_route_recommendations(min_count=min_count)
+        rec = recommendations.get(context_key, {})
+        if rec.get("recommendation") == "use_observed_best" and rec.get("recommended_model"):
+            candidates = rec.get("candidates", [])
+            confidence = 0.0
+            if candidates:
+                confidence = max(0.0, min(1.0, float(candidates[0].get("utility", 0.0))))
+            return rec["recommended_model"], True, round(confidence, 3)
+    except Exception:
+        pass
+
+    return fallback, False, 0.0

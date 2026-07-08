@@ -2,7 +2,7 @@ import { Navbar } from '@/components/Navbar';
 
 const sections = [
   { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
-  { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
+  { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
@@ -60,7 +60,7 @@ export default function DocsPage() {
             </nav>
 
             <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Documentation</h1>
-            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — 8 models, 10-layer pipeline, one superior answer.</p>
+            <p className="text-text-secondary mb-12">Everything you need to use TemuClaude — role-specialized models, step-aware routing, budget telemetry, and one clean answer.</p>
 
             {/* === OVERVIEW === */}
 
@@ -75,7 +75,7 @@ export default function DocsPage() {
   -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
 
 # Response: SSE stream with answer + orchestration metadata`} />
-              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day, no signup required.</Callout>
+              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
             </section>
 
             <section id="architecture" className="mb-12">
@@ -87,10 +87,11 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Routes</strong> to the best strategy:
                   <ul className="list-disc list-inside ml-4 mt-1">
                     <li>Trivial (60%) → single cheap model (Hy3 Preview, free models)</li>
-                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 3 Flash)</li>
+                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 2.5 Flash)</li>
                     <li>Hard (10%) → full 10-layer fusion stack (3 models parallel + cross-review + aggregate + verify + QA + debate)</li>
                   </ul>
                 </li>
+                <li><strong className="text-text-primary">Adapts step models</strong> for search, verification, consistency, QA gates, debate, and post-processing using telemetry when enough evidence exists</li>
                 <li><strong className="text-text-primary">Returns</strong> one clean answer — orchestration is invisible but visible in the playground</li>
               </ol>
               <Callout type="note">All of this happens server-side. The user never picks models, modes, or parameters. They just ask TemuClaude.</Callout>
@@ -111,15 +112,15 @@ export default function DocsPage() {
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GLM-5.2</td><td className="py-2 px-3 text-text-secondary">Orchestrator + Aggregator</td><td className="py-2 px-3 text-text-secondary">51</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + Math + Coding</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Llama 3.3</td><td className="py-2 px-3 text-text-secondary">MoA panel specialist</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">131K</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 2.0 Flash</td><td className="py-2 px-3 text-text-secondary">Fast worker + RAG + speed</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Mistral Large 2</td><td className="py-2 px-3 text-text-secondary">Self-play logic verifier</td><td className="py-2 px-3 text-text-secondary">43</td><td className="py-2 px-3 text-text-secondary">131K</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 2.5 Flash</td><td className="py-2 px-3 text-text-secondary">Fast worker + RAG + speed</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Mistral Large 3</td><td className="py-2 px-3 text-text-secondary">Self-play logic verifier</td><td className="py-2 px-3 text-text-secondary">43</td><td className="py-2 px-3 text-text-secondary">262K</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiMo-V2.5</td><td className="py-2 px-3 text-text-secondary">Multimodal (text+image+video)</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Claude 3.5 Sonnet</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">200K</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Claude Sonnet 4.6</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary font-medium">Z3 Solver</td><td className="py-2 px-3 text-text-secondary">Logical Verifier (SMT equations)</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Local</td></tr>
                   </tbody>
                 </table>
               </div>
-              <Callout type="tip">Claude 3.5 Sonnet (IQ 53) is only used as a selective fallback for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
+              <Callout type="tip">Claude Sonnet 4.6 (IQ 53) is only used as a selective fallback for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
             </section>
 
             {/* === FEATURES === */}
@@ -129,7 +130,7 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers. Each is independently validated by published research:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li><strong className="text-text-primary">Web Search</strong> — DuckDuckGo for knowledge queries (free, unlimited)</li>
-                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Propose → Cross-Review → Aggregate (65.1% AlpacaEval vs GPT-4o 57.5%)</li>
+                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Propose → Cross-Review → Aggregate (65.1% AlpacaEval in published MoA research)</li>
                 <li><strong className="text-text-primary">Self-Consistency</strong> — PRM-weighted voting across N samples (+18.4% MATH)</li>
                 <li><strong className="text-text-primary">Code Verification</strong> — Execute Python, verify output (ground truth)</li>
                 <li><strong className="text-text-primary">Reflexion</strong> — Verbal reflection on failure, retry with context (91% HumanEval)</li>
@@ -137,7 +138,7 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
                 <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
                 <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude 3.5 Sonnet (IQ 53) for hardest 2%</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 4.6 (IQ 53) for hardest 2%</li>
               </ol>
             </section>
 
@@ -157,13 +158,38 @@ Routing:
   Medium (30% of queries) → 1 specialist model, 4096 tokens
     Math/Coding → DeepSeek Pro
     Knowledge → GLM-5.2
-    Legal/Health → Gemini 2.0 Flash
-    Creative → Mistral Large 2
+    Legal/Health → Gemini 2.5 Flash
+    Creative → Mistral Large 3
     
   Hard (10% of queries) → Full 10-layer fusion stack, 8192 tokens
     3 models in parallel → cross-review → aggregate
     + code verification + self-QA + reflexion + debate`} />
               <Callout type="note">60% of queries cost $0 (free models or cache). 30% cost $0.06-0.14/M. Only 10% use the full pipeline. Average cost: $0.05/M tokens.</Callout>
+            </section>
+
+            <section id="step-aware-model-router" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Step-Aware Model Router</h2>
+              <p className="text-text-secondary mb-4">TemuClaude now records per-step telemetry and can select models for individual orchestration steps when enough evidence exists.</p>
+              <CodeBlock lang="text" code={`Step states:
+  search               -> DeepSeek V4 Pro by default
+  verification         -> Nemotron 3 Ultra by default
+  consistency          -> task-specific aggregator
+  qa_gate              -> Nemotron 3 Ultra by default
+  formal_verification  -> local Z3 solver
+
+Telemetry used:
+  success/failure
+  latency
+  token estimate
+  remaining budget ratio
+  progress delta
+  uncertainty
+  failure label
+
+Decision rule:
+  If enough telemetry exists -> use observed best model
+  Otherwise -> role-aware fallback model`} />
+              <Callout type="tip">This is the bridge toward Fugu-style state-aware orchestration: model choice can vary inside the same answer, not just at the first route.</Callout>
             </section>
 
             <section id="moa-3-layer-fusion" className="mb-12">
@@ -172,17 +198,17 @@ Routing:
               <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
   GLM-5.2 → response A
   DeepSeek Pro → response B
-  Gemini 2.0 Flash → response C
+  Gemini 2.5 Flash → response C
 
 Layer 2: Cross-Review
   GLM-5.2 reviews B and C → improved A'
   DeepSeek Pro reviews A and C → improved B'
-  Gemini 2.0 Flash reviews A and B → improved C'
+  Gemini 2.5 Flash reviews A and B → improved C'
 
 Layer 3: Aggregation
   GLM-5.2 synthesizes A' + B' + C' → final answer
   With structured analysis: consensus, contradictions, insights, blind spots`} />
-              <Callout type="note">Research: 3-layer MoA achieves 65.1% on AlpacaEval 2.0 vs GPT-4o's 57.5%. Each layer adds measurable quality.</Callout>
+              <Callout type="note">Research: 3-layer MoA achieves 65.1% on AlpacaEval 2.0 in the published paper. Each layer adds measurable quality.</Callout>
             </section>
 
             <section id="self-consistency" className="mb-12">
@@ -191,7 +217,7 @@ Layer 3: Aggregation
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math: 3 samples at temperature 0.7</li>
                 <li>Reasoning: 2 samples</li>
-                <li>Each sample scored by Gemini 2.0 Flash (PRM-weighted voting)</li>
+                <li>Each sample scored by Gemini 2.5 Flash (PRM-weighted voting)</li>
                 <li>Highest-scoring answer selected as final</li>
               </ul>
             </section>
@@ -224,14 +250,14 @@ Layer 3: Aggregation
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reflexion</h2>
               <p className="text-text-secondary mb-4">When the QA gate fails, TemuClaude generates a verbal reflection on what went wrong, then retries with that context:</p>
               <CodeBlock lang="text" code={`1. QA gate fails (score < 8/10)
-2. Gemini 2.0 Flash generates reflection:
+2. Gemini 2.5 Flash generates reflection:
    "The answer has a logical error in step 3.
     The formula should use integration by parts,
     not substitution. Fix this and retry."
 3. Original model retries with reflection as context
 4. New answer is re-scored on all 5 rubrics
 5. If still failing, retry once more (max 2 retries)`} />
-              <Callout type="tip">Reflexion achieves 91% on HumanEval (vs 80% without). The difference between a model that gives up and one that learns from mistakes.</Callout>
+              <Callout type="tip">Reflexion achieves 91% on HumanEval in published results. The difference is a model that learns from mistakes instead of giving up.</Callout>
             </section>
 
             <section id="budget-forcing" className="mb-12">
@@ -257,7 +283,7 @@ Layer 3: Aggregation
 
             <section id="frontier-fallback" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
-              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to Claude Sonnet 5 (IQ 53 — the highest available):</p>
+              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to Claude Sonnet 4.6 (IQ 53 — the highest available):</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Only triggers when QA score &lt; 0.75 after all retries</li>
                 <li>Query must match frontier criteria (prove, derive, theorem, system design, refactor)</li>
@@ -300,24 +326,23 @@ python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
 
             <section id="projected-scores" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Projected Scores</h2>
-              <p className="text-text-secondary mb-4">TemuClaude vs frontier models across 8 benchmarks:</p>
+              <p className="text-text-secondary mb-4">TemuClaude vs Fable 5 across 8 benchmarks:</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Benchmark</th>
                     <th className="text-center py-2 px-3 font-semibold text-accent-primary">TemuClaude*</th>
-                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Claude Sonnet 5</th>
-                    <th className="text-center py-2 px-3 font-semibold text-text-muted">GPT-5.5</th>
+                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Fable 5</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPQA Diamond</td><td className="py-2 px-3 text-center font-bold text-accent-primary">95-98%</td><td className="py-2 px-3 text-center text-text-secondary">88%</td><td className="py-2 px-3 text-center text-text-secondary">94%</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">LiveCodeBench</td><td className="py-2 px-3 text-center font-bold text-accent-primary">96-99%</td><td className="py-2 px-3 text-center text-text-secondary">87%</td><td className="py-2 px-3 text-center text-text-secondary">91%</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">SWE-Bench Pro</td><td className="py-2 px-3 text-center font-bold text-accent-primary">75-85%</td><td className="py-2 px-3 text-center text-text-secondary">70%</td><td className="py-2 px-3 text-center text-text-secondary">68%</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Terminal-Bench</td><td className="py-2 px-3 text-center font-bold text-accent-primary">91-96%</td><td className="py-2 px-3 text-center text-text-secondary">85%</td><td className="py-2 px-3 text-center text-text-secondary">82%</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GDPval-AA v2</td><td className="py-2 px-3 text-center font-bold text-accent-primary">1824+</td><td className="py-2 px-3 text-center text-text-secondary">1783</td><td className="py-2 px-3 text-center text-text-secondary">1700</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MultiChallenge</td><td className="py-2 px-3 text-center font-bold text-accent-primary">87-94%</td><td className="py-2 px-3 text-center text-text-secondary">82%</td><td className="py-2 px-3 text-center text-text-secondary">85%</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MRCR v2</td><td className="py-2 px-3 text-center font-bold text-accent-primary">0.8-1.0</td><td className="py-2 px-3 text-center text-text-secondary">0.72</td><td className="py-2 px-3 text-center text-text-secondary">0.68</td></tr>
-                    <tr><td className="py-2 px-3 text-text-primary font-medium">HLE</td><td className="py-2 px-3 text-center font-bold text-accent-primary">45-55%</td><td className="py-2 px-3 text-center text-text-secondary">53%</td><td className="py-2 px-3 text-center text-text-secondary">41%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPQA Diamond</td><td className="py-2 px-3 text-center font-bold text-accent-primary">95-98%</td><td className="py-2 px-3 text-center text-text-secondary">94%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">LiveCodeBench</td><td className="py-2 px-3 text-center font-bold text-accent-primary">96-99%</td><td className="py-2 px-3 text-center text-text-secondary">91%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">SWE-Bench Pro</td><td className="py-2 px-3 text-center font-bold text-accent-primary">75-85%</td><td className="py-2 px-3 text-center text-text-secondary">68%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Terminal-Bench</td><td className="py-2 px-3 text-center font-bold text-accent-primary">91-96%</td><td className="py-2 px-3 text-center text-text-secondary">82%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GDPval-AA v2</td><td className="py-2 px-3 text-center font-bold text-accent-primary">1824+</td><td className="py-2 px-3 text-center text-text-secondary">1700</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MultiChallenge</td><td className="py-2 px-3 text-center font-bold text-accent-primary">87-94%</td><td className="py-2 px-3 text-center text-text-secondary">85%</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MRCR v2</td><td className="py-2 px-3 text-center font-bold text-accent-primary">0.8-1.0</td><td className="py-2 px-3 text-center text-text-secondary">0.68</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">HLE</td><td className="py-2 px-3 text-center font-bold text-accent-primary">45-55%</td><td className="py-2 px-3 text-center text-text-secondary">53%</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -386,9 +411,9 @@ Response: SSE stream
 
             <section id="authentication" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
-              <p className="text-text-secondary mb-4">Free tier: no authentication needed. Paid plans use Bearer token:</p>
+              <p className="text-text-secondary mb-4">Free trial: no authentication needed. Paid developer wallets use the live API key generated from the dashboard:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Authorization: Bearer tc_live_f893d2b10a2c88ef092e10f" \\
   -H "Content-Type: application/json" \\
   -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
             </section>
@@ -400,12 +425,12 @@ Response: SSE stream
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Plan</th>
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Requests/min</th>
-                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Queries/day</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Queries/month</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">20</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">600 (20/day)</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">50,000</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">500,000</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary">Enterprise</td><td className="py-2 px-3 text-text-secondary">10,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
                   </tbody>
                 </table>

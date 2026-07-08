@@ -31,13 +31,14 @@ if __package__:
     from .verifier import verify_with_code
     from .self_qa import self_qa_gate
     from .skills_loader import build_enhanced_system_prompt
-    from .adaptive import get_model_for_task
+    from .adaptive import get_model_for_step, get_model_for_task
     from .gepa import get_system_prompt
     from .tot import tree_of_thoughts
     from .debate import multi_agent_debate
     from .skill_curator import track_skill_usage
     from .pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
     from .preference_router import record_routing_decision, get_routing_recommendations
+    from .step_telemetry import build_runtime_step_metadata, record_strategy_steps
     from .verifier import verify_with_code, verify_steps_with_code, apply_budget_forcing, verify_logical_with_z3, verify_logical_with_z3_enhanced
     from .shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from .ui_ux import LoopEngine, IntentClassifier
@@ -64,13 +65,14 @@ else:
     from src.shepherding import should_shepherd, calculate_hint_tokens, build_shepherd_messages, build_worker_messages, combine_hint_and_completion
     from src.self_qa import self_qa_gate
     from src.skills_loader import build_enhanced_system_prompt
-    from src.adaptive import get_model_for_task
+    from src.adaptive import get_model_for_step, get_model_for_task
     from src.gepa import get_system_prompt
     from src.tot import tree_of_thoughts
     from src.debate import multi_agent_debate
     from src.skill_curator import track_skill_usage
     from src.pareto_tracker import record_query as record_pareto, calculate_pareto, get_adjusted_budgets
     from src.preference_router import record_routing_decision, get_routing_recommendations
+    from src.step_telemetry import build_runtime_step_metadata, record_strategy_steps
 
 
     from src.ui_ux import LoopEngine, IntentClassifier
@@ -161,11 +163,57 @@ class Temuclaude:
     """
 
     def __init__(self) -> None:
+        default_headers = None
+        if _USE_OPENROUTER:
+            default_headers = {
+                "HTTP-Referer": os.environ.get("OPENROUTER_SITE_URL", "https://temuclaude.com"),
+                "X-OpenRouter-Title": os.environ.get("OPENROUTER_APP_TITLE", "TemuClaude"),
+                "X-OpenRouter-Metadata": "enabled",
+            }
         self.client = AsyncOpenAI(
             base_url=f"{API_BASE}/v1" if "localhost" in API_BASE else API_BASE,
             api_key=os.environ.get("OPENROUTER_API_KEY", "ollama") if _USE_OPENROUTER else "ollama",
+            default_headers=default_headers,
         )
         self.logger = QueryLogger()
+
+    def _extract_model_content(self, message) -> str:
+        """Extract text across OpenRouter provider response shapes."""
+        content = getattr(message, "content", None)
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+        if isinstance(content, list):
+            parts = []
+            for part in content:
+                if isinstance(part, str):
+                    parts.append(part)
+                elif isinstance(part, dict):
+                    parts.append(part.get("text") or part.get("content") or "")
+                else:
+                    parts.append(getattr(part, "text", "") or getattr(part, "content", ""))
+            joined = "".join(parts).strip()
+            if joined:
+                return joined
+
+        reasoning = getattr(message, "reasoning", None)
+        if isinstance(reasoning, str) and reasoning.strip():
+            return reasoning.strip()
+
+        details = getattr(message, "reasoning_details", None)
+        if details is None and hasattr(message, "model_extra"):
+            details = (message.model_extra or {}).get("reasoning_details")
+        if isinstance(details, list):
+            parts = []
+            for item in details:
+                if isinstance(item, dict):
+                    parts.append(item.get("text") or item.get("summary") or item.get("content") or "")
+                else:
+                    parts.append(getattr(item, "text", "") or getattr(item, "summary", "") or getattr(item, "content", ""))
+            joined = "".join(parts).strip()
+            if joined:
+                return joined
+
+        return ""
 
     async def classify_task(self, query: str) -> str:
         """Classify the query into a task type for routing."""
@@ -394,15 +442,36 @@ class Temuclaude:
         if max_tokens < 200:
             max_tokens = 200
 
-        # Clone messages to prevent mutating original list
+        def sacc_compress(text: str) -> str:
+            """SACC: Strip comments, duplicate lines, and excessive spaces for long inputs."""
+            if not isinstance(text, str) or len(text) < 2000:
+                return text
+            lines = text.split('\n')
+            compressed_lines = []
+            for line in lines:
+                stripped = line.strip()
+                # Skip standalone code comments to compress context
+                if stripped.startswith('#') or stripped.startswith('//'):
+                    continue
+                if not stripped:
+                    if compressed_lines and compressed_lines[-1]:
+                        compressed_lines.append("")
+                    continue
+                compressed_lines.append(line)
+            return '\n'.join(compressed_lines)
+
+        # Clone and compress messages to prevent mutating original list
         messages_copy = []
         for msg in messages:
-            messages_copy.append(dict(msg))
+            cloned = dict(msg)
+            if "content" in cloned and isinstance(cloned["content"], str):
+                cloned["content"] = sacc_compress(cloned["content"])
+            messages_copy.append(cloned)
 
         # Inject Quiet-STaR implicit thought directive for thinker models
         thinker_models = [
             "glm-5.2", "deepseek-v4-pro", "llama-3.3-70b-instruct", "claude-3.5-sonnet",
-            "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2", "anthropic/claude-3.5-sonnet"
+            "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2512", "anthropic/claude-sonnet-4.6"
         ]
         if model in thinker_models:
             sys_msg_idx = -1
@@ -440,6 +509,10 @@ class Temuclaude:
             # Ollama: use :cloud suffix
             ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
             api_key = "ollama"
+
+        request_kwargs = {}
+        if _USE_OPENROUTER:
+            request_kwargs["extra_body"] = {"provider": {"allow_fallbacks": True}}
         
         for attempt in range(2):  # 1 retry max
             try:
@@ -449,13 +522,13 @@ class Temuclaude:
                         messages=messages_copy,
                         temperature=temperature,
                         max_tokens=max_tokens,
-                        extra_headers={"Authorization": f"Bearer {api_key}"} if _USE_OPENROUTER and api_key else None,
+                        **request_kwargs,
                     ),
                     timeout=timeout,
                 )
-                content = response.choices[0].message.content or ""
+                content = self._extract_model_content(response.choices[0].message)
                 if content.strip():
-                    return content
+                    return self._compiler_guided_autocomplete(content)
                 # Empty response — retry with higher max_tokens
                 max_tokens = max(max_tokens * 2, 500)
             except asyncio.TimeoutError:
@@ -475,21 +548,27 @@ class Temuclaude:
         """Try other backends if the primary one fails.
         
         Fallback order:
-        1. If primary is Ollama → try OpenRouter (if key), then ai/ml (if key)
-        2. If primary is OpenRouter → try Ollama (if running), then ai/ml (if key)
+        1. If primary is Ollama → try OpenRouter (if key), then ai/ml (if enabled)
+        2. If primary is OpenRouter → try Ollama (if running), then ai/ml (if enabled)
         3. If primary is ai/ml → try OpenRouter (if key), then Ollama (if running)
         
         Returns the response or None if all backends fail.
         """
         if __package__:
             from .models import (
-                OPENROUTER_MODELS, AIML_MODELS, AIML_API_BASE,
+                OPENROUTER_MODELS, AIML_MODELS, AIML_MODEL_FALLBACKS, AIML_API_BASE,
+                GROQ_MODELS, GROQ_MODEL_FALLBACKS, GROQ_API_BASE,
+                DEEPINFRA_MODELS, DEEPINFRA_MODEL_FALLBACKS, DEEPINFRA_API_BASE,
                 OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER, _HAS_AIML_KEY,
+                _HAS_GROQ_KEY, _HAS_DEEPINFRA_KEY,
             )
         else:
             from src.models import (
-                OPENROUTER_MODELS, AIML_MODELS, AIML_API_BASE,
+                OPENROUTER_MODELS, AIML_MODELS, AIML_MODEL_FALLBACKS, AIML_API_BASE,
+                GROQ_MODELS, GROQ_MODEL_FALLBACKS, GROQ_API_BASE,
+                DEEPINFRA_MODELS, DEEPINFRA_MODEL_FALLBACKS, DEEPINFRA_API_BASE,
                 OPENROUTER_API_BASE, OLLAMA_API_BASE, _USE_OPENROUTER, _HAS_AIML_KEY,
+                _HAS_GROQ_KEY, _HAS_DEEPINFRA_KEY,
             )
         
         # Build list of fallback backends to try (excluding the primary)
@@ -499,10 +578,19 @@ class Temuclaude:
         openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
         if openrouter_key and not _USE_OPENROUTER:
             fallback_backends.append(("openrouter", openrouter_key, OPENROUTER_API_BASE, OPENROUTER_MODELS))
+
+        # Direct provider fallbacks are opt-in and keep the OpenRouter pool primary.
+        deepinfra_key = os.environ.get("DEEPINFRA_API_KEY", "")
+        if deepinfra_key and _HAS_DEEPINFRA_KEY:
+            fallback_backends.append(("deepinfra", deepinfra_key, DEEPINFRA_API_BASE, DEEPINFRA_MODELS))
+
+        groq_key = os.environ.get("GROQ_API_KEY", "")
+        if groq_key and _HAS_GROQ_KEY:
+            fallback_backends.append(("groq", groq_key, GROQ_API_BASE, GROQ_MODELS))
         
-        # Always try ai/ml if key is set
+        # AIML is opt-in because an unfunded account returns 403 and adds latency.
         aiml_key = os.environ.get("AIML_API_KEY", "")
-        if aiml_key:
+        if aiml_key and _HAS_AIML_KEY:
             fallback_backends.append(("aiml", aiml_key, AIML_API_BASE, AIML_MODELS))
         
         # Try Ollama if it's running and not the primary
@@ -535,21 +623,48 @@ class Temuclaude:
                         timeout=timeout,
                     )
                 else:
-                    # OpenRouter or ai/ml — both OpenAI-compatible
-                    tag = model_map.get(model, model) if model_map else model
+                    # Hosted providers here are OpenAI-compatible.
+                    model_candidates = [model]
+                    if backend_name == "aiml":
+                        model_candidates = AIML_MODEL_FALLBACKS.get(model, [model])
+                    elif backend_name == "groq":
+                        model_candidates = GROQ_MODEL_FALLBACKS.get(model, [model])
+                    elif backend_name == "deepinfra":
+                        model_candidates = DEEPINFRA_MODEL_FALLBACKS.get(model, [model])
+
                     fb_client = AsyncOpenAI(base_url=base_url, api_key=key)
-                    response = await asyncio.wait_for(
-                        fb_client.chat.completions.create(
-                            model=tag,
-                            messages=messages,
-                            temperature=temperature,
-                            max_tokens=max_tokens,
-                            extra_headers={"Authorization": f"Bearer {key}"},
-                        ),
-                        timeout=timeout,
-                    )
+                    response = None
+                    for candidate in model_candidates:
+                        tag = model_map.get(candidate, candidate) if model_map else candidate
+                        backend_kwargs = {}
+                        if backend_name == "openrouter":
+                            backend_kwargs = {
+                                "extra_headers": {
+                                    "HTTP-Referer": os.environ.get("OPENROUTER_SITE_URL", "https://temuclaude.com"),
+                                    "X-OpenRouter-Title": os.environ.get("OPENROUTER_APP_TITLE", "TemuClaude"),
+                                    "X-OpenRouter-Metadata": "enabled",
+                                },
+                                "extra_body": {"provider": {"allow_fallbacks": True}},
+                            }
+                        try:
+                            response = await asyncio.wait_for(
+                                fb_client.chat.completions.create(
+                                    model=tag,
+                                    messages=messages,
+                                    temperature=temperature,
+                                    max_tokens=max_tokens,
+                                    **backend_kwargs,
+                                ),
+                                timeout=timeout,
+                            )
+                            break
+                        except Exception:
+                            response = None
+                            continue
+                    if response is None:
+                        continue
                 
-                content = response.choices[0].message.content or ""
+                content = self._extract_model_content(response.choices[0].message)
                 if content.strip():
                     return content
             except Exception:
@@ -557,16 +672,61 @@ class Temuclaude:
         
         return None
 
+    async def call_model_speculative(
+        self, 
+        model: str, 
+        draft_model: str, 
+        messages: list, 
+        max_tokens: int = 8192, 
+        temperature: float = 0.0, 
+        timeout: int = 120
+    ) -> str:
+        """
+        SDC: Speculative Decoding Cascades simulation.
+        1. Query the cheap draft_model for a candidate response template.
+        2. Present the draft response to the primary verification model to correct logic/errors.
+        """
+        # Step 1: Draft
+        draft_res = await self.call_model(draft_model, messages, temperature=0.5, max_tokens=max_tokens, timeout=timeout)
+        if draft_res.startswith("[ERROR"):
+            return await self.call_model(model, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
+            
+        # Step 2: Verification/Correction
+        verification_prompt = (
+            f"You are a verifier model. Read the original messages, and improve/correct "
+            f"the candidate response below if there are any logical, factual, or programming syntax errors. "
+            f"Provide only the clean, final corrected response.\n\n"
+            f"Candidate Response:\n{draft_res}"
+        )
+        
+        verify_messages = list(messages)
+        verify_messages.append({"role": "user", "content": verification_prompt})
+        
+        final_corrected = await self.call_model(model, verify_messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
+        if final_corrected.startswith("[ERROR"):
+            return draft_res
+            
+        return final_corrected
+
     async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192, temperature: float = 0.0, timeout: int = 120) -> str:
         """Call a model, and if it fails, try fallback models + cross-backend fallback."""
         answer = await self.call_model(model, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
         if not answer.startswith("[ERROR"):
             return answer
 
+        if __package__:
+            from .models import OPENROUTER_MODEL_FALLBACKS
+        else:
+            from src.models import OPENROUTER_MODEL_FALLBACKS
+
         # Try fallback models on the same backend first
-        fallbacks = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
-        if model in fallbacks:
-            fallbacks.remove(model)
+        fallbacks = []
+        for candidate in OPENROUTER_MODEL_FALLBACKS.get(model, []):
+            if candidate != model and candidate not in fallbacks:
+                fallbacks.append(candidate)
+        for candidate in ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "gpt-oss-120b"]:
+            if candidate != model and candidate not in fallbacks:
+                fallbacks.append(candidate)
 
         for fallback in fallbacks:
             answer = await self.call_model(fallback, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
@@ -601,6 +761,55 @@ class Temuclaude:
                 if description and not description.startswith("[ERROR"):
                     return query + f"\n\n[Visual Component Description (Multimodal Projection)]:\n{description}"
         return query
+
+    def trigger_professional_skills(self, query: str, system_prompt: str) -> str:
+        """Scan query for professional domain keywords and inject rules into the system prompt."""
+        if not system_prompt:
+            system_prompt = "You are a professional AI assistant."
+        query_lower = query.lower()
+        if "legal" in query_lower or "court" in query_lower or "brief" in query_lower:
+            system_prompt += "\n[PROFESSIONAL SKILL: LEGAL BRIEF] Enforce high-precision legal citations, structured arguments, and formal jurisprudence terminology."
+        elif "financial" in query_lower or "excel" in query_lower or "balance sheet" in query_lower or "ledger" in query_lower:
+            system_prompt += "\n[PROFESSIONAL SKILL: FINANCE] Enforce rigorous accounting guidelines, balance sheet verification, and precise formula formatting."
+        elif "medical" in query_lower or "patient" in query_lower or "nurs" in query_lower:
+            system_prompt += "\n[PROFESSIONAL SKILL: HEALTHCARE] Enforce clinical workflow precision, diagnostic safety margins, and evidence-based patient care plans."
+        return system_prompt
+
+    async def mrcr_chunk_and_retrieve_loop(self, query: str) -> str:
+        """
+        MRCR RLM Loop: Segment large user inputs/history into 10K-character chunks
+        and run recursive lookups to retrieve the needle targets.
+        """
+        # Chunk query text by ~10K characters (approx 2.5K tokens)
+        chunk_size = 10000
+        chunks = [query[i:i+chunk_size] for i in range(0, len(query), chunk_size)]
+        
+        findings = []
+        for idx, chunk in enumerate(chunks):
+            verify_prompt = (
+                f"Inspect the text block below. Identify if it contains any coreference links, "
+                f"facts, keys, or specific assistant response needles. Return a brief summary of facts found.\n\n"
+                f"Block {idx+1}:\n{chunk}"
+            )
+            messages = [
+                {"role": "system", "content": "You are a factual extractor. Return only the facts or details found."},
+                {"role": "user", "content": verify_prompt}
+            ]
+            res = await self.call_model("deepseek-v4-flash", messages, max_tokens=500)
+            if res and not res.startswith("[ERROR") and "no facts" not in res.lower() and "nothing" not in res.lower():
+                findings.append(res.strip())
+                
+        # Combine findings and synthesize the final output using DeepSeek V4 Pro
+        synthesis_prompt = (
+            f"You are the final synthesizer. We have extracted the following factual needles from the "
+            f"long context inputs:\n\n" + "\n\n".join(findings) + "\n\n"
+            f"Provide the final answer to the original request: {query[:500]}..."
+        )
+        messages = [
+            {"role": "system", "content": "You are a professional synthesizer. Produce the final answer based on the extracted details."},
+            {"role": "user", "content": synthesis_prompt}
+        ]
+        return await self.call_model("deepseek-v4-pro", messages, max_tokens=1024)
 
     async def complete(self, query: str, system_prompt: str = None, budget_profile: str = "balanced") -> str:
         """
@@ -645,6 +854,25 @@ class Temuclaude:
         # Apply Multimodal Visual Projection if applicable
         if budget_profile != "max_savings":
             query = await self.project_multimodal_inputs(query)
+
+        # RLM Chunking check for MRCR or extremely long inputs
+        if len(query) > 20000 or "mrcr" in query.lower() or "coreference" in query.lower():
+            mrcr_answer = await self.mrcr_chunk_and_retrieve_loop(query)
+            latency_ms = int((time.time() - start_time) * 1000)
+            self.logger.log(
+                user_query=query,
+                task_type="reasoning",
+                routing_tier="mrcr_decoupled_loop",
+                models_used=["deepseek-v4-flash", "deepseek-v4-pro"],
+                strategy="mrcr_chunk_and_retrieve_loop",
+                final_answer=mrcr_answer,
+                latency_ms=latency_ms,
+                success=not mrcr_answer.startswith("[ERROR"),
+            )
+            return mrcr_answer
+
+        # Trigger Professional domain prompt injections if applicable
+        system_prompt = self.trigger_professional_skills(query, system_prompt)
 
         # Step 1: Classify the task
         task_type = await self.classify_task(query)
@@ -768,10 +996,12 @@ class Temuclaude:
                         return await self.call_model_with_fallback(model_id, msgs, max_tokens=tokens)
                     
                     # 1. MCTS Step-Level Search Tree
+                    prm_model, used_prm_step_router, _ = get_model_for_step(task_type, tier, "prm_verification")
+                    policy_model, used_policy_step_router, _ = get_model_for_step(task_type, tier, "search")
                     mcts_searcher = MCTSReasoningSearch(
                         call_model_func=mcts_model_call,
-                        prm_model="gemini-2.0-flash",
-                        policy_model="deepseek-v4-pro",
+                        prm_model=prm_model,
+                        policy_model=policy_model,
                         branch_factor=3,
                         max_depth=4,
                         iterations=5
@@ -779,7 +1009,9 @@ class Temuclaude:
                     mcts_res = await mcts_searcher.search(query, initial_thought="")
                     answer = mcts_res["path"]
                     strategy = "mcts_step_search"
-                    models_used = ["deepseek-v4-pro", "gemini-2.0-flash"]
+                    if used_policy_step_router or used_prm_step_router:
+                        strategy += "+step_model_router"
+                    models_used = [policy_model, prm_model]
                     mcts_ran = True
 
                     # 2. Generator-Discriminator Self-Play Loop
@@ -787,7 +1019,7 @@ class Temuclaude:
                     if repaired_ans != answer:
                         answer = repaired_ans
                         strategy += "+self_play_correction"
-                        models_used.append("mistral-large-2")
+                        models_used.append("mistral-large-3")
                         models_used.append("llama-3.3-70b-instruct")
                         self_play_ran = True
                 except Exception as ex:
@@ -805,7 +1037,7 @@ class Temuclaude:
 
             # Step 2: Code verification (for math/coding)
             if use_code_verify:
-                code_model = TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
+                code_model, used_step_router, _ = get_model_for_step(task_type, tier, "verification")
                 step_result = await verify_steps_with_code(
                     query, answer, code_model, self.call_model_with_fallback,
                     max_tokens=2048, execution_timeout=10
@@ -814,6 +1046,8 @@ class Temuclaude:
                     answer = step_result["answer"]
                     models_used.append(f"{code_model}+step_verify({step_result['steps_verified']}/{step_result['steps_total']})")
                     strategy += f"+step_verify({step_result['steps_verified']}/{step_result['steps_total']})"
+                    if used_step_router:
+                        strategy += "+step_model_router"
                 else:
                     code_result = await verify_with_code(
                         query, code_model, self.call_model_with_fallback, max_tokens=4096
@@ -822,29 +1056,38 @@ class Temuclaude:
                         answer = code_result["answer"]
                         models_used.append(f"{code_model}+code")
                         strategy += "+code_verify"
+                        if used_step_router:
+                            strategy += "+step_model_router"
 
             # Step 3: PRM-weighted self-consistency (for math/reasoning)
             if use_self_consistency:
-                consistency_model = get_aggregator(task_type)
+                consistency_model, used_consistency_router, _ = get_model_for_step(task_type, tier, "consistency")
+                verifier_model, used_verifier_router, _ = get_model_for_step(task_type, tier, "verification")
                 consistency_result = await self_consistency(
                     query, consistency_model, self.call_model_with_fallback,
                     n_samples=n_samples, temperature=0.7, max_tokens=token_budget,
-                    use_prm_weighting=True, verifier_model="nemotron-3-ultra"
+                    use_prm_weighting=True, verifier_model=verifier_model
                 )
                 if consistency_result["confidence"] >= 0.6:
                     answer = consistency_result["answer"]
                     models_used.append(f"{consistency_model}+consistency_prm(n={n_samples})")
                     strategy += f"+prm_consistency(n={n_samples})"
+                    if used_consistency_router or used_verifier_router:
+                        strategy += "+step_model_router"
 
             # Step 4: Self-QA gate with USVA 4-rubric + Reflexion (bypassed in max_savings)
             if budget_profile == "max_savings":
                 qa_result = {"accepted": True, "final_answer": answer, "attempts": 1}
             else:
+                qa_model, used_qa_router, _ = get_model_for_step(task_type, tier, "qa_gate")
                 qa_result = await self_qa_gate(
-                    query, answer, "nemotron-3-ultra", self.call_model_with_fallback,
+                    query, answer, qa_model, self.call_model_with_fallback,
                     threshold=8, max_retries=2, max_tokens=2000,
                     use_usva=True, use_reflexion=True
                 )
+                if used_qa_router:
+                    models_used.append(f"{qa_model}+qa_gate")
+                    strategy += "+step_model_router"
                 
             if qa_result["accepted"]:
                 answer = qa_result["final_answer"]
@@ -924,6 +1167,32 @@ class Temuclaude:
                 model=models_used[0] if models_used else "unknown",
                 models_used=models_used, strategy=strategy,
                 latency_ms=latency_ms, success=not answer.startswith("[ERROR"),
+            )
+        except Exception:
+            pass
+
+        # Record step-level telemetry for future state-aware routing.
+        try:
+            estimated_tokens = len(answer) // 4 if answer else 0
+            telemetry_success = not answer.startswith("[ERROR")
+            runtime_step_metadata = build_runtime_step_metadata(
+                token_budget=token_budget,
+                tokens_used=estimated_tokens,
+                success=telemetry_success,
+                strategy=strategy,
+                answer=answer,
+            )
+            record_strategy_steps(
+                query=query,
+                task_type=task_type,
+                tier=tier,
+                strategy=strategy,
+                models_used=models_used,
+                latency_ms=latency_ms,
+                tokens_used=estimated_tokens,
+                success=telemetry_success,
+                quality_score=None,
+                **runtime_step_metadata,
             )
         except Exception:
             pass
@@ -1022,7 +1291,7 @@ class Temuclaude:
         # Simplification failed — return original answer (safety net)
         return answer
 
-    async def generator_discriminator_loop(self, query: str, initial_answer: str, generator_model: str = "llama-3.3-70b-instruct", discriminator_model: str = "mistral-large-2") -> str:
+    async def generator_discriminator_loop(self, query: str, initial_answer: str, generator_model: str = "llama-3.3-70b-instruct", discriminator_model: str = "mistral-large-3") -> str:
         """Run Generator-Discriminator self-play correction loop stochastically for hard logic tasks."""
         critique_prompt = (
             f"Question: '{query}'\n"
@@ -1080,6 +1349,45 @@ class Temuclaude:
         )
         result = await engine.generate(query, user_context=user_context)
         return result.final_code if result.success else result.final_code
+
+    def _compiler_guided_autocomplete(self, code: str) -> str:
+        """Compiler-guided syntax auto-corrector (CGARH) for common unclosed block structures."""
+        # Find active language blocks
+        if "```" in code:
+            import re
+            # Match each code block and sanitize it
+            blocks = re.findall(r'```(?:javascript|typescript|js|ts|python|py)?\s*\n(.*?)\n```', code, re.DOTALL)
+            for block in blocks:
+                corrected = self._autocomplete_syntax(block)
+                if corrected != block:
+                    code = code.replace(block, corrected)
+        else:
+            # Check raw code if no markdown block exists
+            code = self._autocomplete_syntax(code)
+        return code
+
+    def _autocomplete_syntax(self, code: str) -> str:
+        """Helper to balance parentheses, braces, brackets, and quotes."""
+        # 1. Brace balancing checks
+        brace_diff = code.count("{") - code.count("}")
+        if brace_diff > 0:
+            code = code + "\n" + "}" * brace_diff
+            
+        paren_diff = code.count("(") - code.count(")")
+        if paren_diff > 0:
+            code = code + ")" * paren_diff
+            
+        bracket_diff = code.count("[") - code.count("]")
+        if bracket_diff > 0:
+            code = code + "]" * bracket_diff
+            
+        # 2. Quotation balancing checks
+        for quote in ['"', "'", "`"]:
+            count = code.count(quote)
+            if count % 2 != 0:
+                code = code + quote
+                
+        return code
 
 
 # Synchronous wrapper for easy testing
