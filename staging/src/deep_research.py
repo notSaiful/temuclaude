@@ -812,29 +812,41 @@ def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
         )},
     ]
 
-def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM") -> List[Dict]:
+def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM", num_sections: int = 6) -> List[Dict]:
     """
-    Generate a specialized research plan for AWQ quantization technique
+    Generate a specialized research outline for AWQ quantization technology
     comparing against vLLM's quantization approaches.
+    
+    Args:
+        topic: Research topic focused on AWQ
+        num_sections: Number of major sections (default 6 for comprehensive coverage)
+    
+    Returns:
+        List of message dicts for LLM to generate AWQ-focused research plan
     """
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization. Create a comprehensive "
-            "research outline comparing AWQ (Activation-aware Weight Quantization) with vLLM's "
-            "quantization implementations. Cover: 1) AWQ algorithm fundamentals, 2) vLLM quantization "
-            "stack (AWQ, GPTQ, SqueezeLLM, FP8), 3) Performance benchmarks (latency, throughput, "
-            "memory, accuracy), 4) Hardware support (NVIDIA, AMD, Intel), 5) Integration patterns "
-            "for inference engines, 6) Production deployment considerations. Minimum 7 major sections "
-            "with 4-6 subsections each."
+            "You are a research planner specializing in LLM quantization techniques. "
+            "Create a comprehensive research outline comparing AWQ (Activation-aware Weight Quantization) "
+            "against vLLM's quantization implementations (AWQ, GPTQ, SqueezeLLM, FP8). "
+            f"Generate at least {num_sections} major sections with 4-6 subsections each. "
+            "Cover: 1) AWQ algorithm fundamentals & activation-aware scaling, "
+            "2) vLLM's AWQ integration & kernel optimizations, "
+            "3) Benchmark comparisons (latency, throughput, perplexity, memory), "
+            "4) Hardware support (GPU Tensor Cores, CPU, Apple Silicon), "
+            "5) Model compatibility (LLaMA, Mistral, Qwen, Phi, Gemma), "
+            "6) Production deployment considerations (batching, KV cache, speculative decoding), "
+            "7) Future directions (AWQ+FlashAttention, INT4/INT2, dynamic quantization). "
+            "Output as numbered list with subsections."
         )},
         {"role": "user", "content": (
             f"Topic: {topic}\n\n"
-            "Create a detailed research outline for a 15,000+ word technical report. "
-            "Focus on actionable implementation insights for inference engine developers."
+            "Create a detailed research outline for a 10,000+ word technical report "
+            "comparing AWQ implementation in vLLM against standalone AWQ, "
+            "including kernel-level optimizations, benchmark methodologies, "
+            "and production deployment trade-offs."
         )},
     ]
-
-
 def build_awq_section_prompt(section_title: str, subsections: List[str], topic: str) -> List[Dict]:
     """Build a prompt to research one AWQ-specific section with technical depth."""
     sub_text = "\n".join(f"  - {s}" for s in subsections)
