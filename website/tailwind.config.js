@@ -7,31 +7,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Dark glassmorphic palette — Linear/Vercel-inspired
+        // Warm minimal palette — Anthropic-inspired
         bg: {
-          primary: '#08080A',
-          secondary: '#0F0F12',
-          tertiary: '#1B1B1F',
-          dark: '#030304',
+          primary: '#FAF8F5',
+          secondary: '#F0EDE6',
+          tertiary: '#E8E4DC',
+          dark: '#1A1816',
         },
         text: {
-          primary: '#F4F4F6',
-          secondary: '#A1A1A6',
-          muted: '#717178',
-          inverse: '#08080A',
+          primary: '#1A1816',
+          secondary: '#5E5B56',
+          muted: '#8E8B85',
+          inverse: '#FAF8F5',
         },
         accent: {
           primary: '#E25822',
-          hover: '#F26E3A',
-          light: '#2A170F',
-          fig: '#D87C9E',
-          olive: '#8FA673',
-          amber: '#F3C562',
+          hover: '#C56547',
+          light: '#F0D5C8',
+          fig: '#C46686',
+          olive: '#788C5D',
+          amber: '#E8B547',
         },
         border: {
-          subtle: 'rgba(255, 255, 255, 0.05)',
-          default: 'rgba(255, 255, 255, 0.1)',
-          strong: 'rgba(255, 255, 255, 0.18)',
+          subtle: 'rgba(26, 24, 22, 0.08)',
+          default: 'rgba(26, 24, 22, 0.16)',
+          strong: 'rgba(26, 24, 22, 0.24)',
         },
       },
       fontFamily: {
