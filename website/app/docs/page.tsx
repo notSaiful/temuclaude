@@ -326,13 +326,13 @@ python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
 
             <section id="projected-scores" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Projected Scores</h2>
-              <p className="text-text-secondary mb-4">TemuClaude vs Fable 5 across 8 benchmarks:</p>
+              <p className="text-text-secondary mb-4">TemuClaude against a leading frontier baseline across 8 benchmarks:</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Benchmark</th>
                     <th className="text-center py-2 px-3 font-semibold text-accent-primary">TemuClaude*</th>
-                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Fable 5</th>
+                    <th className="text-center py-2 px-3 font-semibold text-text-muted">Frontier Baseline</th>
                   </tr></thead>
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPQA Diamond</td><td className="py-2 px-3 text-center font-bold text-accent-primary">95-98%</td><td className="py-2 px-3 text-center text-text-secondary">94%</td></tr>
