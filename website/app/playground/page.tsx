@@ -36,6 +36,7 @@ export default function PlaygroundPage() {
   const [freeQueriesUsed, setFreeQueriesUsed] = useState(0);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
+  const [showQuickStart, setShowQuickStart] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   // Index of the assistant message currently being streamed — avoids
@@ -313,14 +314,26 @@ export default function PlaygroundPage() {
           {/* Input Bar */}
           <div className="border-t border-border-subtle bg-bg-primary p-4">
             <div className="max-w-3xl mx-auto">
-              {/* Free tier counter */}
+              {/* Free tier counter & API toggle */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-text-muted">
-                  {freeQueriesUsed < 20 ? `${20 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
-                </span>
-                {freeQueriesUsed >= 12 && freeQueriesUsed < 20 && (
-                  <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-text-muted">
+                    {freeQueriesUsed < 20 ? `${20 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
+                  </span>
+                  {freeQueriesUsed >= 12 && freeQueriesUsed < 20 && (
+                    <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
+                  )}
+                </div>
+                <button
+                  onClick={() => setShowQuickStart(prev => !prev)}
+                  className="xl:hidden text-xs text-accent-primary hover:underline flex items-center gap-1 cursor-pointer"
+                  aria-label="Toggle API Code Details"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
+                  </svg>
+                  API Code
+                </button>
               </div>
               <div className="flex gap-2 items-end">
                 <textarea
@@ -362,7 +375,135 @@ export default function PlaygroundPage() {
             </div>
           </div>
         </main>
+        <QuickStartPane isOpen={showQuickStart} onClose={() => setShowQuickStart(false)} />
       </div>
+    </>
+  );
+}
+
+function QuickStartPane({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [activeTab, setActiveTab] = useState<'curl' | 'python' | 'node'>('curl');
+  const [copied, setCopied] = useState(false);
+
+  const snippets = {
+    curl: `curl -X POST https://temuclaude.com/api/chat \\
+  -H "Content-Type: application/json" \\
+  -d '{"messages": [{"role": "user", "content": "hi"}]}'`,
+    python: `import requests
+
+url = "https://temuclaude.com/api/chat"
+payload = {
+    "messages": [
+        {"role": "user", "content": "hi"}
+    ]
+}
+res = requests.post(url, json=payload)
+print(res.json()["choices"][0]["message"]["content"])`,
+    node: `const fetch = require('node-fetch');
+
+const url = "https://temuclaude.com/api/chat";
+const payload = {
+  messages: [
+    { role: 'user', content: 'hi' }
+  ]
+};
+
+fetch(url, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(data => console.log(data.choices[0].message.content));`
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(snippets[activeTab]);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const contentMarkup = (
+    <>
+      <h2 className="text-sm font-semibold text-text-primary mb-3">API Quick Start</h2>
+      <p className="text-xs text-text-secondary mb-4">
+        Integrate TemuClaude's unified 8-model orchestration pipeline in one API call.
+      </p>
+
+      {/* Tabs */}
+      <div className="flex border-b border-border-subtle mb-4">
+        {(['curl', 'python', 'node'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 text-center py-1 text-xs font-mono capitalize cursor-pointer border-b-2 transition-all ${
+              activeTab === tab
+                ? 'border-accent-primary text-accent-primary font-semibold'
+                : 'border-transparent text-text-muted hover:text-text-primary'
+            }`}
+          >
+            {tab === 'node' ? 'NodeJS' : tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Code Area */}
+      <div className="relative bg-bg-dark text-bg-tertiary rounded-md p-3 font-mono text-[10px] leading-normal overflow-x-auto min-h-[160px]">
+        <button
+          onClick={handleCopy}
+          className="absolute top-2 right-2 p-1 bg-white/10 hover:bg-white/20 rounded text-[9px] text-text-inverse transition-colors"
+        >
+          {copied ? 'Copied!' : 'Copy'}
+        </button>
+        <pre className="whitespace-pre">{snippets[activeTab]}</pre>
+      </div>
+
+      <div className="mt-6 border-t border-border-subtle pt-4 space-y-3">
+        <h3 className="text-xs font-semibold text-text-primary">End-to-End Orchestration</h3>
+        <ul className="space-y-2 text-[11px] text-text-secondary">
+          <li className="flex gap-2">
+            <span className="text-accent-olive">✓</span>
+            <span>Mixture of Agents (MoA) synthesis</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-accent-olive">✓</span>
+            <span>Monte Carlo Tree Search (MCTS)</span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-accent-olive">✓</span>
+            <span>Self-Play Logic Verification</span>
+          </li>
+        </ul>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Permanent desktop sidebar layout */}
+      <aside className="hidden xl:flex flex-col w-80 border-l border-border-subtle bg-bg-secondary h-[calc(100vh-4rem)] p-4 overflow-y-auto shrink-0">
+        {contentMarkup}
+      </aside>
+
+      {/* Slide-over mobile drawer layout */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 xl:hidden" onClick={onClose}>
+          <div className="w-80 bg-bg-secondary h-full p-4 overflow-y-auto border-l border-border-subtle flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={onClose} 
+              className="absolute top-4 right-4 text-text-muted hover:text-text-primary cursor-pointer"
+              aria-label="Close API Code Pane"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="pt-8">
+              {contentMarkup}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

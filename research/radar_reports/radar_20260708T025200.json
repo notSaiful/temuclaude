@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-07-08T02:52:00.220301+00:00",
+  "total_signals": 7,
+  "top_signals": [
+    {
+      "title": "First Principles of Model Routing",
+      "source": "hackernews",
+      "score": 27.6,
+      "url": "https://try.works/first-principles-of-model-routing"
+    },
+    {
+      "title": "Show HN: Fortress \u2013 a stealth Chromium so your agents stop getting blocked",
+      "source": "hackernews",
+      "score": 17.5,
+      "url": "https://github.com/tiliondev/fortress"
+    },
+    {
+      "title": "From Hugging Face to Amazon SageMaker Studio in one click",
+      "source": "rss_huggingface",
+      "score": 10,
+      "url": ""
+    },
+    {
+      "title": "We're extending access to Fable 5 on all paid plans through July 12",
+      "source": "hackernews",
+      "score": 5.5,
+      "url": "https://twitter.com/claudeai/status/2074548242386178258"
+    },
+    {
+      "title": "IEEE Rolls Out Large Language Models Training Course",
+      "source": "hackernews",
+      "score": 4.1,
+      "url": "https://spectrum.ieee.org/large-language-models-ieee-course"
+    },
+    {
+      "title": "Tenda firmware (multiple versions) contains hidden authentication backdoor",
+      "source": "hackernews",
+      "score": 4.0,
+      "url": "https://kb.cert.org/vuls/id/213560"
+    },
+    {
+      "title": "Show HN: Free Mermaid Diagram Editor",
+      "source": "hackernews",
+      "score": 1.2,
+      "url": "https://moxiedocs.com/mermaid-diagram-editor"
+    }
+  ]
+}

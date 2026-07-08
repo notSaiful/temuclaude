@@ -66,11 +66,11 @@ const tiers = [
 const faqs = [
   {
     q: 'How are you this cheap?',
-    a: '60% of queries go to Hy3 Preview ($0.06/$0.21 per M). 30% route to specialists. Only 10% trigger the full 3-model fusion. The QA gate is free (Nemotron). You pay for smart routing, not raw frontier compute.',
+    a: '60% of queries go to Llama 3.3 / Gemini 2.0 Flash (cheapest). 30% route to specialized shepherding logic. Only 10% trigger the full MCTS-guided multi-agent fusion. Verifications are fast and secure.',
   },
   {
     q: 'Is quality really frontier-level?',
-    a: 'For hard questions, 3 models answer independently in parallel, and a dynamic aggregator synthesizes the best answer. A free QA gate scores every response on 5 rubrics. If quality is low, it retries with feedback. Live results coming after third-party verification.',
+    a: 'For hard questions, we run MCTS reasoning search and a Generator-Discriminator self-play loop. We execute symbolic code in safe sandboxes and run Z3 constraint solvers. If quality verification checks fail, it falls back to Claude 3.5 Sonnet.',
   },
   {
     q: 'Can I use this in production?',
@@ -231,7 +231,7 @@ export function PricingSection() {
             })}
           </div>
           <p className="text-xs text-text-muted mt-3 text-center">
-            TemuClaude: $0.06 input + $0.21 output (Hy3, trivial tier). Blended ~$1.44/M across all tiers. Others: published API pricing.
+            TemuClaude: $0.06 input + $0.21 output (Llama 3.3, trivial tier). Blended ~$1.44/M across all tiers. Others: published API pricing.
           </p>
         </div>
 

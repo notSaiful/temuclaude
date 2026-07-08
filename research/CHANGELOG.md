@@ -550,3 +550,6 @@ STAGED: deep_research_No_self-hosted_vLLM_—_latency_penalty_20260707T162640 �
 
 ## 2026-07-07 17:11 UTC
 STAGED (not deployed): /Users/saiful/temuclaude/research/findings/deep_research_No_self-hosted_vLLM_—_latency_penalty_20260707T162640.md - waiting for Ggs approval
+
+## 2026-07-08 03:45 UTC
+STAGED: deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260708T025132 — Updated def build_awq_research_plan in deep_research.py

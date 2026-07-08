@@ -775,5 +775,42 @@
         "status": "ok"
       }
     }
+  },
+  {
+    "timestamp": "2026-07-08T02:42:09.915527+00:00",
+    "results": {
+      "gpt-oss:120b:cloud": {
+        "model": "gpt-oss:120b:cloud",
+        "timestamp": "2026-07-08T02:42:08.178732+00:00",
+        "status": "error",
+        "error": "HTTP Error 429: Too Many Requests",
+        "correct": false,
+        "latency_s": 999
+      },
+      "glm-5.2:cloud": {
+        "model": "glm-5.2:cloud",
+        "timestamp": "2026-07-08T02:42:08.671485+00:00",
+        "status": "error",
+        "error": "HTTP Error 429: Too Many Requests",
+        "correct": false,
+        "latency_s": 999
+      },
+      "deepseek-v4-pro:cloud": {
+        "model": "deepseek-v4-pro:cloud",
+        "timestamp": "2026-07-08T02:42:09.064526+00:00",
+        "status": "error",
+        "error": "HTTP Error 429: Too Many Requests",
+        "correct": false,
+        "latency_s": 999
+      },
+      "kimi-k2.6:cloud": {
+        "model": "kimi-k2.6:cloud",
+        "timestamp": "2026-07-08T02:42:09.527566+00:00",
+        "status": "error",
+        "error": "HTTP Error 429: Too Many Requests",
+        "correct": false,
+        "latency_s": 999
+      }
+    }
   }
 ]

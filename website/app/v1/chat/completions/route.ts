@@ -36,12 +36,12 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // ── 8-MODEL POOL ──────────────────────────────────────────────
 const M_GLM = 'z-ai/glm-5.2';                           // IQ 51 — proposer + aggregator
 const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';           // IQ 44 — proposer + self-consistency + reflexion
-const M_GEMINI = 'google/gemini-3.5-flash';              // IQ 50 — proposer (legal/health)
-const M_HY3 = 'tencent/hy3-preview';                     // cheapest — trivial router
-const M_MINIMAX = 'minimax/minimax-m3';                   // IQ 44 — vision + creative
+const M_GEMINI = 'google/gemini-2.0-flash';              // Gemini 2.0 Flash
+const M_HY3 = 'meta-llama/llama-3.3-70b-instruct';       // Llama 3.3 70B
+const M_MINIMAX = 'mistralai/mistral-large-2';           // Mistral Large 2
 const M_MIMO = 'xiaomi/mimo-v2.5';                        // IQ 40 — multimodal
-const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b:free'; // FREE — QA judge
-const M_CLAUDE = 'anthropic/claude-sonnet-5';            // IQ 53 — frontier fallback only
+const M_NEMOTRON = 'google/gemini-2.0-flash';            // Gemini 2.0 Flash QA judge
+const M_CLAUDE = 'anthropic/claude-3.5-sonnet';          // Claude 3.5 Sonnet fallback
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }

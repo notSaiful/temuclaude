@@ -2,14 +2,14 @@ import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
 const models = [
-  { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', iq: '51', capabilities: ['Tools', 'Thinking', '1M Context'], desc: 'The primary orchestrator and fusion aggregator. Highest open-weight IQ (51). Routes queries, aggregates multi-model responses, handles general knowledge at lowest cost.' },
-  { name: 'DeepSeek V4 Pro', role: 'Hard Reasoning', context: '1M tokens', iq: '44', capabilities: ['Math', 'Coding', '#1 Finance'], desc: 'The reasoning powerhouse. Best for hard math, coding, and complex logical problems. #1 in Finance on OpenRouter. Used only when needed.' },
-  { name: 'Hy3 Preview', role: 'Trivial Router', context: '262K tokens', iq: '—', capabilities: ['Cheapest', '#6 Academia', 'Agentic'], desc: 'The cheapest model on OpenRouter ($0.063/$0.21). Handles 60% of queries — trivial questions routed here for maximum cost efficiency.' },
-  { name: 'Gemini 3 Flash', role: 'Legal/Health Specialist', context: '1M tokens', iq: '50', capabilities: ['#1 Legal', '#2 Health', 'Multimodal'], desc: 'Google near-Pro reasoning model. #1 in Legal, #2 in Health. Multimodal (text+image+audio+video+PDF). IQ 50 — nearly matches GLM-5.2.' },
-  { name: 'MiniMax M3', role: 'Vision + Creative', context: '1M tokens', iq: '44', capabilities: ['Vision', 'Creative', 'Best Hallucination Resist'], desc: 'The creative generator and vision specialist. Best GPQA (93%), best instruction following (83%), best hallucination resistance (84%).' },
-  { name: 'MiMo-V2.5', role: 'Multimodal', context: '1M tokens', iq: '40', capabilities: ['Vision', 'Image', 'Video', 'Omnimodal'], desc: 'Native omnimodal model from Xiaomi. Processes text, images, and video. Pro-level agentic performance at half the cost.' },
-  { name: 'Claude Sonnet 5', role: 'Frontier Fallback', context: '1M tokens', iq: '53', capabilities: ['IQ 53', 'Frontier', 'Coding', 'Adaptive'], desc: 'The frontier model for the hardest 2% of queries. IQ 53 — highest in our pool. Used only when fusion + verification + QA all score low.' },
-  { name: 'Nemotron 3 Ultra', role: 'QA Gate (Free)', context: '128K tokens', iq: '38', capabilities: ['Evaluation', '550B MoE', 'FREE'], desc: 'The quality gate. Scores answers on 5 rubrics (USVA). 550B/55B hybrid MoE. Completely free — QA and verification costs nothing.' },
+  { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', iq: '51', capabilities: ['Tools', 'Thinking', '1M Context'], desc: 'The primary orchestrator and fusion aggregator. Highest open-weight IQ (51). Routes queries, aggregates multi-model responses, and handles general knowledge.' },
+  { name: 'DeepSeek Pro', role: 'Hard Reasoning', context: '1M tokens', iq: '44', capabilities: ['Math', 'Coding', 'Reasoning'], desc: 'The reasoning powerhouse. Best for hard math, coding, and complex logical problems. Generates step-by-step reasoning hints.' },
+  { name: 'Llama 3.3', role: 'Specialist', context: '131K tokens', iq: '40', capabilities: ['Open Weights', 'Logic', 'Agentic'], desc: 'High-quality 70B open-weights model. Acts as a core expert in the MoA proposal panels and generator in self-play.' },
+  { name: 'Gemini 2.0 Flash', role: 'Worker/RAG', context: '1M tokens', iq: '40', capabilities: ['Multimodal', 'Speed', 'Search'], desc: 'Google next-gen utility model. High speed, multimodal vision capabilities, and deep real-time search integration.' },
+  { name: 'Mistral Large 2', role: 'Logic Specialist', context: '131K tokens', iq: '43', capabilities: ['Multilingual', 'Structured', 'Logic'], desc: 'Mistral flagship model. Best for structured instruction compliance and serves as the critic/discriminator in self-play.' },
+  { name: 'Claude 3.5 Sonnet', role: 'Frontier Fallback', context: '200K tokens', iq: '53', capabilities: ['Frontier', 'Coding', 'Ultimate'], desc: 'The frontier fallback for failing hard-tier queries. Used selectively when intermediate verifiers fail validation checks.' },
+  { name: 'MiMo-V2.5', role: 'Multimodal', context: '1M tokens', iq: '40', capabilities: ['Vision', 'Image', 'Video'], desc: 'Xiaomi omnimodal model. Specialized for multimodal analysis, image-to-text, and video-based queries.' },
+  { name: 'Z3 Solver', role: 'Logical Verifier', context: 'Local', iq: '—', capabilities: ['SMT', 'Logic', 'Zero-Error'], desc: 'Programmatic verifier that parses logical steps into SMT constraint formulas, verifying reasoning correctness.' },
 ];
 
 export default function ModelsPage() {

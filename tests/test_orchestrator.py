@@ -117,7 +117,7 @@ def test_tier_determination():
     for query, task_type, expected, got in failures:
         print(f"  FAIL: expected={expected}, got={got} | task={task_type} | '{query[:50]}'")
 
-    return failed == 0
+    assert failed == 0, f"Tier determination failures: {failures}"
 
 
 # ============================================================
@@ -180,7 +180,7 @@ def test_model_pool():
     for f in failures:
         print(f"  FAIL: {f}")
 
-    return failed == 0
+    assert failed == 0, f"Model pool failures: {failures}"
 
 
 # ============================================================
@@ -232,7 +232,7 @@ def test_all_models_respond():
     for f in failures:
         print(f"  FAIL: {f}")
 
-    return failed == 0
+    assert failed == 0, f"Model response failures: {failures}"
 
 
 # ============================================================
@@ -333,7 +333,7 @@ def test_error_handling():
 
     all_passed = passed_1 and passed_2 and passed_3 and passed_4 and passed_5
     print(f"\n=== ERROR HANDLING TESTS: {'5/5' if all_passed else 'FAILED'} passed ===")
-    return all_passed
+    assert all_passed, "Error handling test failed"
 
 
 # ============================================================
@@ -384,7 +384,7 @@ def test_end_to_end():
     for f in failures:
         print(f"  FAIL: {f}")
 
-    return failed == 0
+    assert failed == 0, f"End-to-end test failures: {failures}"
 
 
 # ============================================================
@@ -420,7 +420,7 @@ def test_logger():
     shutil.rmtree("/tmp/temuclaude_test_logs", ignore_errors=True)
 
     print(f"\n=== LOGGER TESTS: {'1/1' if passed else '0/1'} passed ===")
-    return passed
+    assert passed, "Logger did not return the logged query"
 
 
 # ============================================================
@@ -455,7 +455,7 @@ def test_cli():
         passed = False
 
     print(f"\n=== CLI TESTS: {'1/1' if passed else '0/1'} passed ===")
-    return passed
+    assert passed, "CLI output unexpected or failed"
 
 
 # ============================================================
@@ -510,7 +510,7 @@ def test_concurrent_logger():
     shutil.rmtree("/tmp/temuclaude_concurrent_test", ignore_errors=True)
 
     print(f"\n=== CONCURRENT LOGGER TESTS: {'1/1' if passed else '0/1'} passed ===")
-    return passed
+    assert passed, "Concurrent logger failed"
 
 
 # ============================================================

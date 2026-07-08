@@ -136,6 +136,7 @@ def build_enhanced_system_prompt(
     task_type: str,
     base_prompt: Optional[str] = None,
     tier: Optional[str] = None,
+    query: Optional[str] = None,
 ) -> str:
     """
     Build a system prompt enhanced with skill principles and clarity guidance.
@@ -144,6 +145,7 @@ def build_enhanced_system_prompt(
         task_type: The classified task type
         base_prompt: The base system prompt (default: clarity-aware Temuclaude prompt)
         tier: The difficulty tier (trivial, medium, hard) for adaptive length guidance
+        query: Optional user query for Voyager skill lookup
     
     Returns:
         Enhanced system prompt with skill principles and length guidance injected
@@ -157,7 +159,19 @@ def build_enhanced_system_prompt(
     
     skill_principles = load_skill_principles(task_type)
     
-    if skill_principles:
-        return f"{base_prompt}\n\nDomain expertise:\n{skill_principles}"
+    # Look up Voyager persistent memory bank skills
+    voyager_skills = ""
+    if query:
+        try:
+            from .memory_bank_v2 import VoyagerMemoryBank
+            bank = VoyagerMemoryBank()
+            matched = bank.find_skills(query, task_type, limit=1)
+            if matched:
+                voyager_skills = "\n\nProven Problem Solving Skill (Voyager Bank):\n" + matched[0]["skill_code"]
+        except Exception:
+            pass
+    
+    if skill_principles or voyager_skills:
+        return f"{base_prompt}\n\nDomain expertise:\n{skill_principles}{voyager_skills}"
     
     return base_prompt

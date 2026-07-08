@@ -811,28 +811,51 @@ def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
         )},
     ]
 
-def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM", num_sections: int = 6) -> List[Dict]:
-    """Build a specialized research plan for AWQ quantization vs vLLM comparison."""
+def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM") -> List[Dict]:
+    """
+    Generate a specialized research plan for AWQ quantization technique
+    comparing against vLLM's quantization approaches.
+    """
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization techniques. "
-            "Create a comprehensive research outline comparing AWQ (Activation-aware Weight Quantization) "
-            "with vLLM's quantization approaches. Include at least 6 major sections with 3-5 subsections each. "
-            "Cover: technical foundations, quantization algorithms, performance benchmarks, "
-            "deployment considerations, integration with inference engines, and future directions. "
-            "Output as a numbered list of sections with subsections."
+            "You are a research planner specializing in LLM quantization. Create a comprehensive "
+            "research outline comparing AWQ (Activation-aware Weight Quantization) with vLLM's "
+            "quantization implementations. Cover: 1) AWQ algorithm fundamentals, 2) vLLM quantization "
+            "stack (AWQ, GPTQ, SqueezeLLM, FP8), 3) Performance benchmarks (latency, throughput, "
+            "memory, accuracy), 4) Hardware support (NVIDIA, AMD, Intel), 5) Integration patterns "
+            "for inference engines, 6) Production deployment considerations. Minimum 7 major sections "
+            "with 4-6 subsections each."
         )},
         {"role": "user", "content": (
             f"Topic: {topic}\n\n"
-            "Create a detailed research outline covering:\n"
-            "1. AWQ algorithm fundamentals and activation-aware scaling\n"
-            "2. vLLM quantization methods (AWQ, GPTQ, SmoothQuant, FP8)\n"
-            "3. Comparative benchmarks: perplexity, latency, throughput, memory\n"
-            "4. Hardware support: GPU (H100, A100, RTX 4090), CPU, Apple Silicon\n"
-            "5. Integration patterns: vLLM AWQ backend, llama.cpp, TensorRT-LLM\n"
-            "6. Production deployment: model serving, batching, KV cache quantization\n"
-            "7. Temuclaude integration strategy for AWQ model orchestration\n\n"
-            "Write as a numbered outline with subsections."
+            "Create a detailed research outline for a 15,000+ word technical report. "
+            "Focus on actionable implementation insights for inference engine developers."
+        )},
+    ]
+
+
+def build_awq_section_prompt(section_title: str, subsections: List[str], topic: str) -> List[Dict]:
+    """Build a prompt to research one AWQ-specific section with technical depth."""
+    sub_text = "\n".join(f"  - {s}" for s in subsections)
+    return [
+        {"role": "system", "content": (
+            "You are a deep research agent specializing in LLM quantization. Write a technically "
+            "rigorous section with: mathematical formulations where relevant, kernel-level "
+            "optimization details, benchmark numbers with citations, code snippets for key "
+            "algorithms, and comparison tables. Target 2000+ words. Use prose with structured "
+            "technical content. Cite papers (arXiv IDs), GitHub repos, and vendor docs."
+        )},
+        {"role": "user", "content": (
+            f"Research Topic: {topic}\n"
+            f"Section: {section_title}\n"
+            f"Subsections to cover:\n{sub_text}\n\n"
+            "Write this section with maximum technical depth. Include:\n"
+            "- AWQ's per-channel scaling with activation outliers protection\n"
+            "- vLLM's PagedAttention interaction with quantized weights\n"
+            "- Kernel fusion opportunities (GEMM + dequant + activation)\n"
+            "- Memory bandwidth calculations for H100/A100/H200\n"
+            "- Accuracy recovery techniques (GPTQ-style fine-tuning, LoRA)\n"
+            "Write in full."
         )},
     ]
 

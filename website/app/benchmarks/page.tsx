@@ -61,10 +61,10 @@ export default function BenchmarksPage() {
           <div className="mb-12 max-w-2xl">
             <h2 className="text-xl font-semibold text-text-primary mb-4">What we can tell you</h2>
             <div className="space-y-2 text-sm text-text-secondary">
-              <p><strong className="text-text-primary">8 models</strong> in the pool — GLM-5.2, DeepSeek V4 Pro, Gemini 3.5 Flash, Hy3 Preview, MiniMax M3, MiMo-V2.5, Nemotron, Claude Sonnet 5</p>
-              <p><strong className="text-text-primary">6 quality layers</strong> for hard questions — parallel proposal, aggregation, QA gate, reflexion, frontier fallback</p>
-              <p><strong className="text-text-primary">Self-consistency</strong> for math — 3 DeepSeek samples, majority vote</p>
-              <p><strong className="text-text-primary">4x cheaper</strong> than Claude Sonnet 5 — 60% of queries go to free or ultra-cheap models</p>
+              <p><strong className="text-text-primary">Unified model pool</strong> — GLM-5.2, DeepSeek Pro, Llama 3.3, Gemini 2.0 Flash, Mistral Large 2, Claude 3.5 Sonnet, MiMo-V2.5, Z3 Solver</p>
+              <p><strong className="text-text-primary">6 quality layers</strong> for hard questions — parallel proposal, aggregation, logic/math verifiers, reflexion, frontier fallback</p>
+              <p><strong className="text-text-primary">Self-consistency</strong> for math — MCTS tree reasoning search with SymPy code-augmented sandboxes</p>
+              <p><strong className="text-text-primary">4x cheaper</strong> than Claude 3.5 Sonnet — 60% of queries go to free or ultra-cheap models</p>
               <p><strong className="text-text-primary">Open source</strong> — the entire pipeline is visible on GitHub, MIT licensed</p>
             </div>
           </div>

@@ -109,17 +109,17 @@ export default function DocsPage() {
                   </tr></thead>
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GLM-5.2</td><td className="py-2 px-3 text-text-secondary">Orchestrator + Aggregator</td><td className="py-2 px-3 text-text-secondary">51</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + Math + Coding</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Hy3 Preview</td><td className="py-2 px-3 text-text-secondary">Trivial router (cheapest)</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">262K</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 3 Flash</td><td className="py-2 px-3 text-text-secondary">Legal + Health specialist</td><td className="py-2 px-3 text-text-secondary">50</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiniMax M3</td><td className="py-2 px-3 text-text-secondary">Vision + Creative</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + Math + Coding</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Llama 3.3</td><td className="py-2 px-3 text-text-secondary">MoA panel specialist</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">131K</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 2.0 Flash</td><td className="py-2 px-3 text-text-secondary">Fast worker + RAG + speed</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Mistral Large 2</td><td className="py-2 px-3 text-text-secondary">Self-play logic verifier</td><td className="py-2 px-3 text-text-secondary">43</td><td className="py-2 px-3 text-text-secondary">131K</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiMo-V2.5</td><td className="py-2 px-3 text-text-secondary">Multimodal (text+image+video)</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Claude Sonnet 5</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr><td className="py-2 px-3 text-text-primary font-medium">Nemotron 3 Ultra</td><td className="py-2 px-3 text-text-secondary">QA Gate (FREE, 550B MoE)</td><td className="py-2 px-3 text-text-secondary">38</td><td className="py-2 px-3 text-text-secondary">128K</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Claude 3.5 Sonnet</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">200K</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Z3 Solver</td><td className="py-2 px-3 text-text-secondary">Logical Verifier (SMT equations)</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Local</td></tr>
                   </tbody>
                 </table>
               </div>
-              <Callout type="tip">Nemotron 3 Ultra is free on OpenRouter — the quality gate costs nothing. Claude Sonnet 5 (IQ 53) is only used for the hardest 2% of queries where all other layers fail.</Callout>
+              <Callout type="tip">Claude 3.5 Sonnet (IQ 53) is only used as a selective fallback for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
             </section>
 
             {/* === FEATURES === */}
@@ -137,7 +137,7 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
                 <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
                 <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude Sonnet 5 (IQ 53) for hardest 2%</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to Claude 3.5 Sonnet (IQ 53) for hardest 2%</li>
               </ol>
             </section>
 
@@ -152,13 +152,13 @@ export default function DocsPage() {
 
 Routing:
   Trivial (60% of queries) → 1 cheap model, 500 tokens
-    Models: Hy3 Preview, free models ($0.00)
+    Models: Llama 3.3 70B, free models ($0.00)
     
   Medium (30% of queries) → 1 specialist model, 4096 tokens
-    Math/Coding → DeepSeek V4 Pro
+    Math/Coding → DeepSeek Pro
     Knowledge → GLM-5.2
-    Legal/Health → Gemini 3 Flash
-    Creative → MiniMax M3
+    Legal/Health → Gemini 2.0 Flash
+    Creative → Mistral Large 2
     
   Hard (10% of queries) → Full 10-layer fusion stack, 8192 tokens
     3 models in parallel → cross-review → aggregate
@@ -171,13 +171,13 @@ Routing:
               <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
               <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
   GLM-5.2 → response A
-  DeepSeek V4 Pro → response B
-  Gemini 3 Flash → response C
+  DeepSeek Pro → response B
+  Gemini 2.0 Flash → response C
 
 Layer 2: Cross-Review
   GLM-5.2 reviews B and C → improved A'
-  DeepSeek reviews A and C → improved B'
-  Gemini reviews A and B → improved C'
+  DeepSeek Pro reviews A and C → improved B'
+  Gemini 2.0 Flash reviews A and B → improved C'
 
 Layer 3: Aggregation
   GLM-5.2 synthesizes A' + B' + C' → final answer
@@ -191,7 +191,7 @@ Layer 3: Aggregation
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math: 3 samples at temperature 0.7</li>
                 <li>Reasoning: 2 samples</li>
-                <li>Each sample scored by Nemotron (PRM-weighted voting)</li>
+                <li>Each sample scored by Gemini 2.0 Flash (PRM-weighted voting)</li>
                 <li>Highest-scoring answer selected as final</li>
               </ul>
             </section>
@@ -224,7 +224,7 @@ Layer 3: Aggregation
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reflexion</h2>
               <p className="text-text-secondary mb-4">When the QA gate fails, TemuClaude generates a verbal reflection on what went wrong, then retries with that context:</p>
               <CodeBlock lang="text" code={`1. QA gate fails (score < 8/10)
-2. Nemotron generates reflection:
+2. Gemini 2.0 Flash generates reflection:
    "The answer has a logical error in step 3.
     The formula should use integration by parts,
     not substitution. Fix this and retry."
