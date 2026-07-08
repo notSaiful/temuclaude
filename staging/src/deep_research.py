@@ -812,39 +812,27 @@ def build_efficiency_evaluation_prompt(finding: str, topic: str) -> List[Dict]:
         )},
     ]
 
-def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) vs vLLM", num_sections: int = 6) -> List[Dict]:
+def build_awq_research_plan(topic: str = "AWQ (Activation-aware Weight Quantization) for LLM Inference", num_sections: int = 6) -> List[Dict]:
     """
-    Generate a specialized research outline for AWQ quantization technology
-    comparing against vLLM's quantization approaches.
-    
-    Args:
-        topic: Research topic focused on AWQ
-        num_sections: Number of major sections (default 6 for comprehensive coverage)
-    
-    Returns:
-        List of message dicts for LLM to generate AWQ-focused research plan
+    Generate a specialized research plan for AWQ quantization technique.
+    Covers: background, algorithm details, comparison with vLLM/GPTQ, implementation, benchmarks, deployment.
     """
     return [
         {"role": "system", "content": (
-            "You are a research planner specializing in LLM quantization techniques. "
-            "Create a comprehensive research outline comparing AWQ (Activation-aware Weight Quantization) "
-            "against vLLM's quantization implementations (AWQ, GPTQ, SqueezeLLM, FP8). "
-            f"Generate at least {num_sections} major sections with 4-6 subsections each. "
-            "Cover: 1) AWQ algorithm fundamentals & activation-aware scaling, "
-            "2) vLLM's AWQ integration & kernel optimizations, "
-            "3) Benchmark comparisons (latency, throughput, perplexity, memory), "
-            "4) Hardware support (GPU Tensor Cores, CPU, Apple Silicon), "
-            "5) Model compatibility (LLaMA, Mistral, Qwen, Phi, Gemma), "
-            "6) Production deployment considerations (batching, KV cache, speculative decoding), "
-            "7) Future directions (AWQ+FlashAttention, INT4/INT2, dynamic quantization). "
-            "Output as numbered list with subsections."
+            "You are a research planner specializing in LLM quantization. Create a comprehensive "
+            f"research outline with at least {num_sections} major sections for AWQ (Activation-aware "
+            "Weight Quantization). Each section should have 3-5 subsections. Cover: "
+            "1) Quantization fundamentals & motivation, 2) AWQ algorithm & salience metric, "
+            "3) Comparison with GPTQ, vLLM AWQ, SmoothQuant, 4) Implementation details (kernels, "
+            "weight packing, gemm), 5) Benchmark results (perplexity, latency, memory), "
+            "6) Production deployment (TensorRT-LLM, vLLM backend, llama.cpp). "
+            "Output as a numbered list of sections with subsections."
         )},
         {"role": "user", "content": (
             f"Topic: {topic}\n\n"
-            "Create a detailed research outline for a 10,000+ word technical report "
-            "comparing AWQ implementation in vLLM against standalone AWQ, "
-            "including kernel-level optimizations, benchmark methodologies, "
-            "and production deployment trade-offs."
+            "Create a detailed research outline for AWQ quantization. Include specific "
+            "technical details: per-channel scaling, zero-point quantization, "
+            "weight-only INT4/INT3, activation-aware clipping, fused kernels."
         )},
     ]
 def build_awq_section_prompt(section_title: str, subsections: List[str], topic: str) -> List[Dict]:
