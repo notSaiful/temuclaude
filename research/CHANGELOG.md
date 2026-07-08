@@ -2,6 +2,59 @@
 
 All automatic integrations logged here.
 
+## 2026-07-08
+RESEARCH COMPLETED: deep_research_frontier_orchestration_20260708.md
+- Topic: frontier orchestration, adaptive test-time compute, verifier-guided reasoning, GEPA, cost-aware coding-agent evaluation, KV-cache economics
+- Key conclusion: the highest-leverage path is a per-step cost-aware controller, not another isolated routing or prompt trick
+- Sources: Sakana Fugu Technical Report (arXiv:2606.21228), rStar-Math (arXiv:2501.04519), ThinkPRM (arXiv:2504.16828), Reward-Guided Speculative Decoding (arXiv:2501.19324), Claw-SWE-Bench (arXiv:2606.12344), GEPA (arXiv:2507.19457), KV Cache Optimization Strategies (arXiv:2603.20397)
+- Recommended queue: step-level telemetry, Pareto promotion gate, structured PRM labels, real GEPA loop, cost-aware local coding-agent eval
+
+RESEARCH + IMPLEMENTATION COMPLETED: deep_research_state_aware_routing_prm_20260708.md
+- Topic: state-aware routing, adaptive orchestration topology, synthetic router cold start, adaptive test-time compute, AgentPRM/FreePRM/AURORA/PAPO
+- Key conclusion: TemuClaude needs state-action-outcome-cost telemetry before it can learn Fugu-style per-step orchestration
+- Implemented: src/step_telemetry.py, non-blocking orchestrator hook, tests/test_step_telemetry.py
+- Sources: STRMAC (arXiv:2511.02200), AdaptOrch (arXiv:2602.16873), TRouter (arXiv:2604.09377), OI-MAS (arXiv:2601.04861), Adaptive TTC Allocation (arXiv:2604.14853), AgentPRM (arXiv:2502.10325 and 2511.08325), FreePRM (arXiv:2506.03570), AURORA (arXiv:2502.11520), PAPO (arXiv:2603.26535)
+
+RESEARCH + IMPLEMENTATION COMPLETED: deep_research_budget_aware_step_router_20260708.md
+- Topic: budget-aware sequential routing, non-stationary Pareto routing, progress advantage, environment-aware PRMs
+- Key conclusion: TemuClaude needs a sequential controller that spends compute by state, remaining budget, and expected value rather than by static query difficulty alone
+- Implemented: step telemetry dataset builder and transparent step-route recommendations in src/step_telemetry.py
+- Sources: STRMAC v2 (arXiv:2511.02200), SeqRoute (arXiv:2605.25424), ParetoBandit (arXiv:2604.00136), Progress Advantage (arXiv:2606.26080), DataPRM (arXiv:2604.24198)
+
+RESEARCH + IMPLEMENTATION COMPLETED: deep_research_budget_progress_failure_telemetry_20260708.md
+- Topic: budget-conditioned search, active budget awareness, value-of-information control, verifier fragility, early abort, signed credit assignment
+- Key conclusion: step traces need remaining budget, progress delta, uncertainty, and typed failure labels before TemuClaude can safely learn abort/escalation and budget-aware search policies
+- Implemented: optional budget/progress/failure fields, progress-aware step utility, failure-label summaries, and low-budget failure alerts in src/step_telemetry.py
+- Sources: BAVT (arXiv:2603.12634), BAGEN (arXiv:2606.00198), Inference-Time Budget Control (arXiv:2605.05701), Verification Horizon (arXiv:2606.26300), Early Abort (arXiv:2607.06503), Evaluation-Aligned Training Signals (arXiv:2511.10687)
+
+RESEARCH + IMPLEMENTATION COMPLETED: deep_research_runtime_budget_signal_wiring_20260708.md
+- Topic: runtime budget signal wiring, progress heuristics, uncertainty heuristics, coarse failure attribution
+- Key conclusion: budget-aware controllers need populated trace fields, not just schemas; TemuClaude now records coarse runtime budget/progress/failure metadata from orchestrator completions
+- Implemented: build_runtime_step_metadata, infer_failure_label, infer_progress_delta, infer_uncertainty, and orchestrator hook wiring
+- Sources: BAGEN (arXiv:2606.00198), Inference-Time Budget Control (arXiv:2605.05701), BAVT (arXiv:2603.12634), AgentAtlas (arXiv:2605.20530), Early Diagnosis of Wasted Computation (arXiv:2606.01365), Silent Failures taxonomy (arXiv:2606.14589)
+
+RESEARCH + IMPLEMENTATION COMPLETED: deep_research_step_aware_model_router_20260708.md
+- Topic: model-pool upgrades, step-aware model routing, telemetry-gated model overrides, public docs sync
+- Key conclusion: whole-query model selection is too coarse; TemuClaude now selects role defaults per orchestration step and can use observed telemetry when enough evidence exists
+- Implemented: get_model_for_step, hard-tier step model selection, tests/test_step_model_routing.py, README/model/docs website updates
+- Sources: OpenRouter June 2026 open-weight analysis, Dynamic Model Routing and Cascading (arXiv:2603.04445), TRouter (arXiv:2604.09377), ParetoBandit (arXiv:2604.00136), STRMAC (arXiv:2511.02200)
+
+IMPLEMENTATION STATUS CONSOLIDATED: IMPLEMENTATION_STATUS_20260708.md
+- Consolidated all current research themes into implemented, partially implemented, and queued work
+- Added verification commands and next implementation priorities
+
+IMPLEMENTED: Structured PRM labels in reasoning tree
+- Topic: process reward model labels, verifier escalation, failure attribution for MCTS reasoning
+- Key conclusion: scalar PRM scores are not enough for routing; TemuClaude now preserves score compatibility while exposing structured verdicts
+- Implemented: PRMVerdict dataclass, _score_step_structured, primary PRM parser, peer-consensus labels/confidence/escalation flags
+- Tests: tests/test_v3_breakthroughs.py and tests/test_v3_upgrades.py pass with PYTHONPATH=.
+
+IMPLEMENTED: ParetoBandit-style recency decay for step router
+- Topic: non-stationary model routing, stale-evidence decay, online routing robustness
+- Key conclusion: old model wins should lose authority as providers, prices, and model quality drift
+- Implemented: recency_half_life_days in get_step_route_recommendations plus stale-evidence confidence penalty
+- Tests: tests/test_step_telemetry.py, tests/test_step_model_routing.py, tests/test_v3_breakthroughs.py, tests/test_v3_upgrades.py pass with PYTHONPATH=.
+
 ## 2026-07-03 11:30 UTC
 Auto-Integrator system created. The swarm now has HANDS — it can read findings, write code, test, and commit without human approval.
 
@@ -577,3 +630,6 @@ STAGED (not deployed): /Users/saiful/temuclaude/research/findings/deep_research_
 
 ## 2026-07-08 04:17 UTC
 STAGED: deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260708T034256 — Updated def build_awq_research_prompt in deep_research.py
+
+## 2026-07-08 04:17 UTC
+STAGED (not deployed): /Users/saiful/temuclaude/research/findings/deep_research_Research_and_implement:_AWQ_(competitor:_vLLM)_20260708T034256.md - waiting for Ggs approval

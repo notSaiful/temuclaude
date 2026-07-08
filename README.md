@@ -1,8 +1,8 @@
 # TemuClaude
 
-> One question. Eight minds. One superior answer.
+> One question. Step-aware model routing. One superior answer.
 
-Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates 8 AI models in parallel, fuses their best answers, verifies math with code execution, and self-checks every response. You get one answer — smarter than any single model, at 6-25x lower cost.
+Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-specialized model pool, routes each task and high-value reasoning step to the best available model, verifies math/code with execution, and self-checks hard responses. You get one answer with budget-aware orchestration metadata.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Website](https://img.shields.io/website?url=https://temuclaude.com)](https://temuclaude.com)
@@ -17,7 +17,7 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates 8 AI mode
 - **Benchmarks**: https://temuclaude.com/benchmarks
 - **Models**: https://temuclaude.com/models
 
-## Model Pool (8 models)
+## Model Pool + Step Router
 
 | Model | Role | IQ | Context |
 |-------|------|-----|---------|
@@ -29,6 +29,8 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates 8 AI mode
 | MiMo-V2.5 | Multimodal | 40 | 1M |
 | Claude Sonnet 5 | Frontier Fallback (2%) | 53 | 1M |
 | Nemotron 3 Ultra | QA Gate (FREE) | 38 | 128K |
+
+Runtime selection is no longer only whole-query routing. TemuClaude records per-step telemetry for search, verification, consistency, QA gates, debate, post-processing, and formal verification, then uses observed success/cost/progress signals to recommend better step-level model choices when enough evidence exists.
 
 ## Pricing
 
@@ -60,6 +62,8 @@ User Query
     ↓
 Classify (task type + difficulty)
     ↓
+Step-Aware Model Router
+    ↓
 ┌──────────────────────────────────────────┐
 │  TRIVIAL (60%)  → Hy3 Preview (cheapest) │
 │  MEDIUM (30%)   → Specialist routing     │
@@ -79,7 +83,7 @@ Classify (task type + difficulty)
 9. Z3/SMT logical verification
 10. Frontier fallback (Claude Sonnet 5 if QA < 0.75)
     ↓
-Final Answer + Full Orchestration Metadata
+Final Answer + Budget/Progress/Failure Telemetry
 ```
 
 ## Tech Stack
