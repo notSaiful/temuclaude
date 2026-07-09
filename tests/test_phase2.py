@@ -21,10 +21,22 @@ _SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
 skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
 
 
+def _run_manual_test(test_func):
+    try:
+        test_func()
+        return True
+    except pytest.skip.Exception as e:
+        print(f"  SKIP: {e}")
+        return True
+    except Exception as e:
+        print(f"  FAIL: {e}")
+        return False
+
+
 # ============================================================
 # TEST 1: Panel Selection
 # ============================================================
-def test_panel_selection() -> bool:
+def test_panel_selection():
     """Test that get_panel returns the right models for each task type."""
     print("\n=== PANEL SELECTION TESTS ===")
     
@@ -57,13 +69,12 @@ def test_panel_selection() -> bool:
     print(f"  OK: default panel = {panel}")
     
     print(f"  5/5 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Dynamic Aggregator Selection
 # ============================================================
-def test_aggregator_selection() -> bool:
+def test_aggregator_selection():
     """Test that get_aggregator returns the right model per task type (Fugu pattern)."""
     print("\n=== AGGREGATOR SELECTION TESTS ===")
     
@@ -87,13 +98,13 @@ def test_aggregator_selection() -> bool:
             print(f"  FAIL: {task_type:15} → expected {expected}, got {result}")
     
     print(f"  {passed}/{len(test_cases)} passed")
-    return passed == len(test_cases)
+    assert passed == len(test_cases)
 
 
 # ============================================================
 # TEST 3: Answer Extraction (for self-consistency)
 # ============================================================
-def test_answer_extraction() -> bool:
+def test_answer_extraction():
     """Test that extract_answer correctly parses model responses."""
     print("\n=== ANSWER EXTRACTION TESTS ===")
     
@@ -115,13 +126,13 @@ def test_answer_extraction() -> bool:
             print(f"  FAIL: '{response[:40]}...' → expected '{expected}', got '{result}'")
     
     print(f"  {passed}/{len(test_cases)} passed")
-    return passed == len(test_cases)
+    assert passed == len(test_cases)
 
 
 # ============================================================
 # TEST 4: Majority Vote
 # ============================================================
-def test_majority_vote() -> bool:
+def test_majority_vote():
     """Test that majority_vote correctly picks the most common answer."""
     print("\n=== MAJORITY VOTE TESTS ===")
     
@@ -142,13 +153,13 @@ def test_majority_vote() -> bool:
             print(f"  FAIL: {answers} → expected '{expected}', got '{result}'")
     
     print(f"  {passed}/{len(test_cases)} passed")
-    return passed == len(test_cases)
+    assert passed == len(test_cases)
 
 
 # ============================================================
 # TEST 5: Code Extraction
 # ============================================================
-def test_code_extraction() -> bool:
+def test_code_extraction():
     """Test that extract_code correctly parses model responses."""
     print("\n=== CODE EXTRACTION TESTS ===")
     
@@ -169,13 +180,13 @@ def test_code_extraction() -> bool:
             print(f"  FAIL: expected '{expected}', got '{result}'")
     
     print(f"  {passed}/{len(test_cases)} passed")
-    return passed == len(test_cases)
+    assert passed == len(test_cases)
 
 
 # ============================================================
 # TEST 6: Fusion Prompt Builder
 # ============================================================
-def test_fusion_prompt() -> bool:
+def test_fusion_prompt():
     """Test that build_fusion_prompt creates a valid prompt."""
     print("\n=== FUSION PROMPT TESTS ===")
     
@@ -201,7 +212,6 @@ def test_fusion_prompt() -> bool:
     
     print(f"  OK: Prompt built correctly with question and {len(panel)} responses")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
@@ -244,7 +254,7 @@ def test_code_verification():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
@@ -288,7 +298,7 @@ def test_fusion_live():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
@@ -331,7 +341,7 @@ def test_hard_tier():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
@@ -344,17 +354,20 @@ if __name__ == "__main__":
 
     results = []
     # Non-live tests (fast, no model calls)
-    results.append(("Panel Selection", test_panel_selection()))
-    results.append(("Aggregator Selection", test_aggregator_selection()))
-    results.append(("Answer Extraction", test_answer_extraction()))
-    results.append(("Majority Vote", test_majority_vote()))
-    results.append(("Code Extraction", test_code_extraction()))
-    results.append(("Fusion Prompt", test_fusion_prompt()))
+    results.append(("Panel Selection", _run_manual_test(test_panel_selection)))
+    results.append(("Aggregator Selection", _run_manual_test(test_aggregator_selection)))
+    results.append(("Answer Extraction", _run_manual_test(test_answer_extraction)))
+    results.append(("Majority Vote", _run_manual_test(test_majority_vote)))
+    results.append(("Code Extraction", _run_manual_test(test_code_extraction)))
+    results.append(("Fusion Prompt", _run_manual_test(test_fusion_prompt)))
     
     # Live tests (slow, call real models)
-    results.append(("Code Verification", test_code_verification()))
-    results.append(("Fusion Live", test_fusion_live()))
-    results.append(("Hard Tier", test_hard_tier()))
+    if _SKIP_API:
+        print("\nSkipping live tests (SKIP_API_TESTS=1)")
+    else:
+        results.append(("Code Verification", _run_manual_test(test_code_verification)))
+        results.append(("Fusion Live", _run_manual_test(test_fusion_live)))
+        results.append(("Hard Tier", _run_manual_test(test_hard_tier)))
 
     print("\n" + "=" * 60)
     print("SUMMARY")

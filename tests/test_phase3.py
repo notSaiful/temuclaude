@@ -23,10 +23,22 @@ _SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
 skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
 
 
+def _run_manual_test(test_func):
+    try:
+        test_func()
+        return True
+    except pytest.skip.Exception as e:
+        print(f"  SKIP: {e}")
+        return True
+    except Exception as e:
+        print(f"  FAIL: {e}")
+        return False
+
+
 # ============================================================
 # TEST 1: Self-QA Prompt Builder
 # ============================================================
-def test_qa_prompt_builder() -> bool:
+def test_qa_prompt_builder():
     """Test that build_qa_prompt creates valid messages."""
     print("\n=== SELF-QA PROMPT TESTS ===")
     
@@ -41,13 +53,12 @@ def test_qa_prompt_builder() -> bool:
     
     print("  OK: Prompt built correctly")
     print("  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Score Extraction
 # ============================================================
-def test_score_extraction() -> bool:
+def test_score_extraction():
     """Test that extract_score correctly parses verifier responses."""
     print("\n=== SCORE EXTRACTION TESTS ===")
     
@@ -69,13 +80,13 @@ def test_score_extraction() -> bool:
             print(f"  FAIL: expected {expected[0]}, got {score} from '{response[:40]}'")
     
     print(f"  {passed}/{len(test_cases)} passed")
-    return passed == len(test_cases)
+    assert passed == len(test_cases)
 
 
 # ============================================================
 # TEST 3: Skill Loading
 # ============================================================
-def test_skill_loading() -> bool:
+def test_skill_loading():
     """Test that skill principles are loaded for relevant task types."""
     print("\n=== SKILL LOADING TESTS ===")
     
@@ -126,13 +137,13 @@ def test_skill_loading() -> bool:
     
     all_ok = coding_ok and creative_ok and math_ok and knowledge_ok and enhanced_ok
     print(f"  {'5/5' if all_ok else 'FAILED'} passed")
-    return all_ok
+    assert all_ok
 
 
 # ============================================================
 # TEST 4: Log Analysis
 # ============================================================
-def test_log_analysis() -> bool:
+def test_log_analysis():
     """Test that analyze_logs correctly parses and analyzes logs."""
     print("\n=== LOG ANALYSIS TESTS ===")
     
@@ -174,13 +185,12 @@ def test_log_analysis() -> bool:
     shutil.rmtree(test_log_dir, ignore_errors=True)
     
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 5: Adaptive Routing
 # ============================================================
-def test_adaptive_routing() -> bool:
+def test_adaptive_routing():
     """Test that adaptive routing loads, saves, and resets correctly."""
     print("\n=== ADAPTIVE ROUTING TESTS ===")
     
@@ -227,13 +237,12 @@ def test_adaptive_routing() -> bool:
     print(f"  OK: reset clears adaptive routing")
     
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 6: GEPA Prompt Loading
 # ============================================================
-def test_gepa_prompt_loading() -> bool:
+def test_gepa_prompt_loading():
     """Test that evolved prompts load correctly."""
     print("\n=== GEPA PROMPT LOADING TESTS ===")
     
@@ -258,7 +267,6 @@ def test_gepa_prompt_loading() -> bool:
     os.remove(EVOLVED_PROMPTS_PATH)
     
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
@@ -309,7 +317,7 @@ def test_self_qa_gate_live():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
@@ -345,7 +353,7 @@ def test_integration_live():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
@@ -358,16 +366,19 @@ if __name__ == "__main__":
 
     results = []
     # Non-live tests
-    results.append(("QA Prompt Builder", test_qa_prompt_builder()))
-    results.append(("Score Extraction", test_score_extraction()))
-    results.append(("Skill Loading", test_skill_loading()))
-    results.append(("Log Analysis", test_log_analysis()))
-    results.append(("Adaptive Routing", test_adaptive_routing()))
-    results.append(("GEPA Prompt Loading", test_gepa_prompt_loading()))
+    results.append(("QA Prompt Builder", _run_manual_test(test_qa_prompt_builder)))
+    results.append(("Score Extraction", _run_manual_test(test_score_extraction)))
+    results.append(("Skill Loading", _run_manual_test(test_skill_loading)))
+    results.append(("Log Analysis", _run_manual_test(test_log_analysis)))
+    results.append(("Adaptive Routing", _run_manual_test(test_adaptive_routing)))
+    results.append(("GEPA Prompt Loading", _run_manual_test(test_gepa_prompt_loading)))
     
     # Live tests
-    results.append(("Self-QA Gate Live", test_self_qa_gate_live()))
-    results.append(("Integration Live", test_integration_live()))
+    if _SKIP_API:
+        print("\nSkipping live tests (SKIP_API_TESTS=1)")
+    else:
+        results.append(("Self-QA Gate Live", _run_manual_test(test_self_qa_gate_live)))
+        results.append(("Integration Live", _run_manual_test(test_integration_live)))
 
     print("\n" + "=" * 60)
     print("SUMMARY")
