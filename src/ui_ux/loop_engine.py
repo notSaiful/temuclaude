@@ -268,10 +268,10 @@ class LoopEngine:
                     intent, i, None
                 )
             else:
-                # Subsequent iterations: refine with feedback
+                # Subsequent iterations: refine with feedback (passing previous code for APRH)
                 current_code = await self._generate_with_design_rules(
                     spec.markdown + pattern_context + "\n\n" + notes_context,
-                    intent, i, current_feedback
+                    intent, i, current_feedback, previous_code=current_code
                 )
 
             # Step 2: VALIDATE
@@ -358,14 +358,42 @@ class LoopEngine:
             stop_reason=stop_reason,
         )
 
-    async def _generate_with_design_rules(self, spec_markdown: str, intent: Intent, iteration: int, feedback: str) -> str:
-        """Generate code with design rules enforced."""
+    async def _generate_with_design_rules(self, spec_markdown: str, intent: Intent, iteration: int, feedback: str, previous_code: str = None) -> str:
+        """Generate code with design rules enforced, using APRH component refactoring for iteration > 1."""
         model_choice = self.model_router.route(intent, phase="generation")
 
         # Build system prompt with design rules
         design_rules = self.design_enforcer.build_system_prompt(intent.category, iteration)
         system_prompt = f"You are Temuclaude UI/UX, a frontier-level code generator.\n{design_rules}"
 
+        target_component = None
+        if iteration > 1 and feedback and previous_code:
+            import re
+            # Look for class or function names in feedback
+            match = re.search(r'\b(?:in|class|function|component|element)\s+([a-zA-Z0-9_]+)\b', feedback)
+            if match:
+                target_component = match.group(1)
+
+        extracted_block = None
+        if target_component:
+            extracted_block = self._extract_component(previous_code, target_component)
+
+        if extracted_block:
+            # APRH (AST-Level Partial Code Regeneration)
+            user_prompt = (
+                f"You are modifying the component '{target_component}' within a larger application codebase.\n\n"
+                f"Current Component Code:\n```\n{extracted_block}\n```\n\n"
+                f"Visual/Code Feedback to fix:\n{feedback}\n\n"
+                f"Output ONLY the corrected '{target_component}' component block code. No markdown explanations, no surrounding code:"
+            )
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+            refined_block = await self.call_model_fn(model_choice.model, messages, max_tokens=model_choice.max_tokens)
+            return self._hydrate_component(previous_code, target_component, refined_block)
+
+        # Fallback to standard full-code generation
         user_prompt = f"Spec:\n{spec_markdown}\n\n"
         if feedback:
             user_prompt += f"Previous critique (fix these issues):\n{feedback}\n\n"
@@ -378,6 +406,54 @@ class LoopEngine:
 
         code = await self.call_model_fn(model_choice.model, messages, max_tokens=model_choice.max_tokens)
         return code
+
+    def _extract_component(self, code: str, name: str) -> Optional[str]:
+        """Surgically extract a component class or function block from code (APRH component extraction)."""
+        import re
+        patterns = [
+            rf"(class\s+{name}\b.*?)(?=\bclass\s+|\bfunction\s+|$)",
+            rf"(function\s+{name}\b.*?)(?=\bclass\s+|\bfunction\s+|$)",
+            rf"(const\s+{name}\s*=\s*(?:\([^)]*\)|[a-zA-Z0-9_]+)\s*=>.*?)(?=\bconst\s+|\bclass\s+|\bfunction\s+|$)"
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, code, re.DOTALL)
+            if match:
+                block = match.group(1)
+                open_braces = block.count("{")
+                close_braces = block.count("}")
+                if open_braces == close_braces and open_braces > 0:
+                    return block
+                start_idx = code.find(block)
+                if start_idx == -1:
+                    continue
+                brace_count = 0
+                started = False
+                end_idx = start_idx
+                for idx in range(start_idx, len(code)):
+                    char = code[idx]
+                    if char == "{":
+                        brace_count += 1
+                        started = True
+                    elif char == "}":
+                        brace_count -= 1
+                    end_idx = idx + 1
+                    if started and brace_count == 0:
+                        break
+                return code[start_idx:end_idx]
+        return None
+
+    def _hydrate_component(self, full_code: str, name: str, refined_block: str) -> str:
+        """Inject refined component block back into the full source code (APRH component hydration)."""
+        original_block = self._extract_component(full_code, name)
+        if original_block and refined_block.strip():
+            # If the refined block is wrapped in code blocks, strip them
+            if "```" in refined_block:
+                import re
+                match = re.search(r'```(?:javascript|typescript|js|ts|python|py)?\s*(.*?)\s*```', refined_block, re.DOTALL)
+                if match:
+                    refined_block = match.group(1)
+            return full_code.replace(original_block, refined_block.strip())
+        return full_code
 
     async def _validate_code(self, generated_code: str, intent_category: str) -> tuple:
         """Validate generated code with quality gates and visual validator."""
