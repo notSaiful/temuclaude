@@ -24,10 +24,22 @@ _SKIP_API = os.environ.get("SKIP_API_TESTS", "1") == "1"
 skip_no_api = pytest.mark.skipif(_SKIP_API, reason="SKIP_API_TESTS=1")
 
 
+def _run_manual_test(test_func):
+    try:
+        test_func()
+        return True
+    except pytest.skip.Exception as e:
+        print(f"  SKIP: {e}")
+        return True
+    except Exception as e:
+        print(f"  FAIL: {e}")
+        return False
+
+
 # ============================================================
 # TEST 1: Dataset Loading
 # ============================================================
-def test_dataset_loading() -> bool:
+def test_dataset_loading():
     """Test that datasets load correctly."""
     print("\n=== DATASET LOADING TESTS ===")
     
@@ -61,13 +73,12 @@ def test_dataset_loading() -> bool:
     os.unlink(temp_path)
     
     print(f"  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Judges
 # ============================================================
-def test_judges() -> bool:
+def test_judges():
     """Test that judges work correctly."""
     print("\n=== JUDGE TESTS ===")
     
@@ -117,7 +128,6 @@ confidence: 90
     print(f"  OK: judgment extracted — correct={judgment2['correct']}")
     
     print(f"  6/6 passed")
-    return True
 
 
 # ============================================================
@@ -168,13 +178,13 @@ def test_benchmark_runner_live():
     
     loop.close()
     print(f"  {'1/1' if passed else '0/1'} passed")
-    return passed
+    assert passed
 
 
 # ============================================================
 # TEST 4: Results Reporter
 # ============================================================
-def test_results_reporter() -> bool:
+def test_results_reporter():
     """Test that the results reporter works correctly."""
     print("\n=== RESULTS REPORTER TESTS ===")
     
@@ -234,13 +244,12 @@ def test_results_reporter() -> bool:
     os.unlink(temp_path)
     
     print(f"  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 5: Save and Load Results
 # ============================================================
-def test_save_load_results() -> bool:
+def test_save_load_results():
     """Test that results can be saved and loaded."""
     print("\n=== SAVE/LOAD TESTS ===")
     
@@ -271,7 +280,6 @@ def test_save_load_results() -> bool:
     os.unlink(temp_path)
     
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
@@ -284,13 +292,16 @@ if __name__ == "__main__":
     
     results = []
     # Non-live tests
-    results.append(("Dataset Loading", test_dataset_loading()))
-    results.append(("Judges", test_judges()))
-    results.append(("Results Reporter", test_results_reporter()))
-    results.append(("Save/Load", test_save_load_results()))
+    results.append(("Dataset Loading", _run_manual_test(test_dataset_loading)))
+    results.append(("Judges", _run_manual_test(test_judges)))
+    results.append(("Results Reporter", _run_manual_test(test_results_reporter)))
+    results.append(("Save/Load", _run_manual_test(test_save_load_results)))
     
     # Live tests
-    results.append(("Benchmark Runner Live", test_benchmark_runner_live()))
+    if _SKIP_API:
+        print("\nSkipping live tests (SKIP_API_TESTS=1)")
+    else:
+        results.append(("Benchmark Runner Live", _run_manual_test(test_benchmark_runner_live)))
     
     print("\n" + "=" * 60)
     print("SUMMARY")

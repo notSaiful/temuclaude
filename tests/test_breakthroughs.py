@@ -30,7 +30,7 @@ from src.orchestrator import Temuclaude
 # ============================================================
 # TEST 1: PRM-Weighted Self-Consistency
 # ============================================================
-def test_prm_weighted_vote() -> bool:
+def test_prm_weighted_vote():
     """Test that PRM-weighted voting actually works differently from majority vote."""
     print("\n=== PRM-WEIGHTED VOTE TESTS ===")
     
@@ -59,13 +59,12 @@ def test_prm_weighted_vote() -> bool:
     print(f"  OK: Edge cases handled (empty, missing scores)")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Adaptive Sample Count
 # ============================================================
-def test_adaptive_n_samples() -> bool:
+def test_adaptive_n_samples():
     """Test that adaptive N samples returns correct values per difficulty."""
     print("\n=== ADAPTIVE N SAMPLES TESTS ===")
     
@@ -84,13 +83,12 @@ def test_adaptive_n_samples() -> bool:
     print(f"  OK: trivial=1, medium=3, hard=10, extreme=20")
     print(f"  OK: Cost savings — trivial uses {ADAPTIVE_N_SAMPLES['trivial']}/{ADAPTIVE_N_SAMPLES['extreme']} = {ADAPTIVE_N_SAMPLES['trivial']/ADAPTIVE_N_SAMPLES['extreme']*100:.0f}% of extreme")
     print("  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 3: USVA 4-Rubric Verification
 # ============================================================
-def test_usva_scoring() -> bool:
+def test_usva_scoring():
     """Test that USVA 4-rubric scoring produces correct scores."""
     print("\n=== USVA 4-RUBRIC TESTS ===")
     
@@ -121,13 +119,12 @@ def test_usva_scoring() -> bool:
     assert len(USVA_RUBRICS) >= 4, f"Should have at least 4 rubrics, has {len(USVA_RUBRICS)}"
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 4: Reflexion Memory
 # ============================================================
-def test_reflexion_memory() -> bool:
+def test_reflexion_memory():
     """Test that reflexion memory accumulates and is included in retry prompts."""
     print("\n=== REFLEXION MEMORY TESTS ===")
     
@@ -157,13 +154,12 @@ def test_reflexion_memory() -> bool:
     print(f"  OK: Third attempt — both prior reflections accumulated")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 5: 3-Layer MoA Fusion
 # ============================================================
-def test_moa_3layer() -> bool:
+def test_moa_3layer():
     """Test that 3-layer MoA fusion is configured and cross-review prompt works."""
     print("\n=== 3-LAYER MoA FUSION TESTS ===")
     
@@ -195,13 +191,12 @@ def test_moa_3layer() -> bool:
     print(f"  OK: fuse() has moa_layers parameter (default=3)")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 6: Self-MoA Mode
 # ============================================================
-def test_self_moa() -> bool:
+def test_self_moa():
     """Test Self-MoA mode function exists and is callable."""
     print("\n=== SELF-MoA MODE TESTS ===")
     
@@ -217,13 +212,12 @@ def test_self_moa() -> bool:
     print(f"  OK: Self-MoA — True for trivial/medium, False for hard (diversity needed)")
     
     print("  1/1 passed (with note)")
-    return True
 
 
 # ============================================================
 # TEST 7: ATTS Adaptive Compute
 # ============================================================
-def test_atts_adaptive_compute() -> bool:
+def test_atts_adaptive_compute():
     """Test that adaptive token budgets are correct per tier."""
     print("\n=== ATTS ADAPTIVE COMPUTE TESTS ===")
     
@@ -252,13 +246,12 @@ def test_atts_adaptive_compute() -> bool:
     print(f"  OK: Adaptive N samples work from orchestrator")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
 # TEST 8: Unified Routing + Cascading
 # ============================================================
-def test_unified_routing() -> bool:
+def test_unified_routing():
     """Test that the orchestrator uses adaptive tokens and PRM in complete()."""
     print("\n=== UNIFIED ROUTING + CASCADING TESTS ===")
     
@@ -285,7 +278,6 @@ def test_unified_routing() -> bool:
     print(f"  OK: complete() uses adaptive tokens, PRM, USVA, reflexion, 3-layer MoA")
     
     print("  3/3 passed")
-    return True
 
 
 # ============================================================
@@ -313,11 +305,8 @@ def main():
     
     for name, test_func in tests:
         try:
-            if test_func():
-                passed += 1
-            else:
-                failed += 1
-                print(f"  FAILED: {name}")
+            test_func()
+            passed += 1
         except Exception as e:
             failed += 1
             print(f"  FAILED: {name} — {e}")

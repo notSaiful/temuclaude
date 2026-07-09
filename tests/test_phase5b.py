@@ -14,10 +14,24 @@ from src.models import (
 )
 
 
+def _fail(message):
+    print(f"  FAIL: {message}")
+    raise AssertionError(message)
+
+
+def _run_manual_test(test_func):
+    try:
+        test_func()
+        return True
+    except Exception as e:
+        print(f"  FAIL: {e}")
+        return False
+
+
 # ============================================================
 # TEST 1: OpenRouter Config Exists and is Valid
 # ============================================================
-def test_openrouter_config() -> bool:
+def test_openrouter_config():
     """Test that OpenRouter config exists and is valid YAML."""
     print("\n=== OPENROUTER CONFIG TESTS ===")
     
@@ -25,8 +39,7 @@ def test_openrouter_config() -> bool:
     
     config_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm-openrouter.yaml")
     if not os.path.isfile(config_path):
-        print(f"  FAIL: litellm-openrouter.yaml missing")
-        return False
+        _fail("litellm-openrouter.yaml missing")
     
     with open(config_path) as f:
         config = yaml.safe_load(f)
@@ -38,55 +51,48 @@ def test_openrouter_config() -> bool:
     
     for m in expected:
         if m not in model_names:
-            print(f"  FAIL: missing model {m}")
-            return False
+            _fail(f"missing model {m}")
     
     # Check uses OpenRouter
     for m in config["model_list"]:
         model_str = m["litellm_params"]["model"]
         if "openrouter" not in model_str:
-            print(f"  FAIL: {m['model_name']} doesn't use OpenRouter: {model_str}")
-            return False
+            _fail(f"{m['model_name']} doesn't use OpenRouter: {model_str}")
     
     # Check fallbacks
     if "fallbacks" not in config:
-        print(f"  FAIL: no fallbacks")
-        return False
+        _fail("no fallbacks")
     
     print(f"  OK: {len(model_names)} models, all OpenRouter, fallbacks present")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 2: Ollama Config Still Exists
 # ============================================================
-def test_ollama_config() -> bool:
+def test_ollama_config():
     """Test that only OpenRouter config exists (Ollama removed)."""
     print("\n=== CONFIG CLEANUP TESTS ===")
     
     # Ollama config should NOT exist (we shifted to OpenRouter)
     ollama_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm-ollama.yaml")
     if os.path.isfile(ollama_path):
-        print(f"  FAIL: litellm-ollama.yaml should not exist (OpenRouter only)")
-        return False
+        _fail("litellm-ollama.yaml should not exist (OpenRouter only)")
     
     print(f"  OK: no Ollama config (OpenRouter only)")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 3: Default Config Auto-Detects Backend
 # ============================================================
-def test_auto_detect_config() -> bool:
+def test_auto_detect_config():
     """Test that default litellm.yaml is OpenRouter config."""
     print("\n=== DEFAULT CONFIG TESTS ===")
     
     config_path = os.path.join(os.path.dirname(__file__), "..", "config", "litellm.yaml")
     if not os.path.isfile(config_path):
-        print(f"  FAIL: litellm.yaml missing")
-        return False
+        _fail("litellm.yaml missing")
     
     import yaml
     with open(config_path) as f:
@@ -98,29 +104,25 @@ def test_auto_detect_config() -> bool:
     
     for m in expected:
         if m not in model_names:
-            print(f"  FAIL: missing model {m}")
-            return False
+            _fail(f"missing model {m}")
     
     if "fallbacks" not in config:
-        print(f"  FAIL: no fallbacks")
-        return False
+        _fail("no fallbacks")
     
     # Verify it's the OpenRouter config (models use openrouter/ prefix)
     for m in config["model_list"]:
         model_str = m["litellm_params"]["model"]
         if "openrouter" not in model_str:
-            print(f"  FAIL: {m['model_name']} doesn't use OpenRouter: {model_str}")
-            return False
+            _fail(f"{m['model_name']} doesn't use OpenRouter: {model_str}")
     
     print(f"  OK: litellm.yaml is OpenRouter config ({len(model_names)} models, all OpenRouter, fallbacks present)")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 4: Model IDs Correct
 # ============================================================
-def test_model_ids() -> bool:
+def test_model_ids():
     """Test that OpenRouter model IDs are correct."""
     print("\n=== MODEL ID TESTS ===")
     
@@ -136,39 +138,34 @@ def test_model_ids() -> bool:
     for name, expected_id in expected_ids.items():
         actual = OPENROUTER_MODELS.get(name)
         if actual != expected_id:
-            print(f"  FAIL: {name} expected {expected_id}, got {actual}")
-            return False
+            _fail(f"{name} expected {expected_id}, got {actual}")
         print(f"  OK: {name} → {actual}")
     
     print(f"  {len(expected_ids)}/{len(expected_ids)} passed")
-    return True
 
 
 # ============================================================
 # TEST 5: Free Models Available
 # ============================================================
-def test_free_models() -> bool:
+def test_free_models():
     """Test that free model IDs are defined."""
     print("\n=== FREE MODELS TESTS ===")
     
     if len(OPENROUTER_FREE_MODELS) < 2:
-        print(f"  FAIL: only {len(OPENROUTER_FREE_MODELS)} free models")
-        return False
+        _fail(f"only {len(OPENROUTER_FREE_MODELS)} free models")
     
     for name, model_id in OPENROUTER_FREE_MODELS.items():
         if ":free" not in model_id:
-            print(f"  FAIL: {name} ({model_id}) doesn't end with :free")
-            return False
+            _fail(f"{name} ({model_id}) doesn't end with :free")
         print(f"  OK: {name} → {model_id}")
     
     print(f"  {len(OPENROUTER_FREE_MODELS)}/{len(OPENROUTER_FREE_MODELS)} passed")
-    return True
 
 
 # ============================================================
 # TEST 6: API Base Auto-Detect
 # ============================================================
-def test_api_base() -> bool:
+def test_api_base():
     """Test that API_BASE is set correctly based on OPENROUTER_API_KEY."""
     print("\n=== API BASE TESTS ===")
     
@@ -181,13 +178,12 @@ def test_api_base() -> bool:
         print(f"  OK: no OPENROUTER_API_KEY → Ollama ({API_BASE})")
     
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 7: .env.example Has OpenRouter Key
 # ============================================================
-def test_env_example() -> bool:
+def test_env_example():
     """Test that .env.example includes OPENROUTER_API_KEY."""
     print("\n=== ENV EXAMPLE TESTS ===")
     
@@ -196,22 +192,19 @@ def test_env_example() -> bool:
         content = f.read()
     
     if "OPENROUTER_API_KEY" not in content:
-        print(f"  FAIL: .env.example missing OPENROUTER_API_KEY")
-        return False
+        _fail(".env.example missing OPENROUTER_API_KEY")
     
     if "TEMUCLAUDE_MASTER_KEY" not in content:
-        print(f"  FAIL: .env.example missing TEMUCLAUDE_MASTER_KEY")
-        return False
+        _fail(".env.example missing TEMUCLAUDE_MASTER_KEY")
     
     print(f"  OK: .env.example has both OPENROUTER_API_KEY and TEMUCLAUDE_MASTER_KEY")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 8: Dockerfile Uses Auto-Detect Config
 # ============================================================
-def test_dockerfile_config() -> bool:
+def test_dockerfile_config():
     """Test that Dockerfile references the correct config."""
     print("\n=== DOCKERFILE CONFIG TESTS ===")
     
@@ -220,18 +213,16 @@ def test_dockerfile_config() -> bool:
         content = f.read()
     
     if "config/litellm.yaml" not in content:
-        print(f"  FAIL: Dockerfile doesn't reference litellm.yaml")
-        return False
+        _fail("Dockerfile doesn't reference litellm.yaml")
     
     print(f"  OK: Dockerfile uses config/litellm.yaml (auto-detect)")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
 # TEST 9: Landing Page Has Updated Pricing
 # ============================================================
-def test_landing_pricing() -> bool:
+def test_landing_pricing():
     """Test that landing page has updated pricing ($15, $99, $499)."""
     print("\n=== LANDING PRICING TESTS ===")
     
@@ -241,12 +232,10 @@ def test_landing_pricing() -> bool:
     
     for price in ["$15", "$99", "$499"]:
         if price not in content:
-            print(f"  FAIL: landing page missing {price}")
-            return False
+            _fail(f"landing page missing {price}")
     
     print(f"  OK: landing page has updated pricing ($15, $99, $499)")
     print(f"  1/1 passed")
-    return True
 
 
 # ============================================================
@@ -258,15 +247,15 @@ if __name__ == "__main__":
     print("=" * 60)
     
     results = []
-    results.append(("OpenRouter Config", test_openrouter_config()))
-    results.append(("Ollama Config", test_ollama_config()))
-    results.append(("Auto-Detect Config", test_auto_detect_config()))
-    results.append(("Model IDs", test_model_ids()))
-    results.append(("Free Models", test_free_models()))
-    results.append(("API Base", test_api_base()))
-    results.append(("Env Example", test_env_example()))
-    results.append(("Dockerfile Config", test_dockerfile_config()))
-    results.append(("Landing Pricing", test_landing_pricing()))
+    results.append(("OpenRouter Config", _run_manual_test(test_openrouter_config)))
+    results.append(("Ollama Config", _run_manual_test(test_ollama_config)))
+    results.append(("Auto-Detect Config", _run_manual_test(test_auto_detect_config)))
+    results.append(("Model IDs", _run_manual_test(test_model_ids)))
+    results.append(("Free Models", _run_manual_test(test_free_models)))
+    results.append(("API Base", _run_manual_test(test_api_base)))
+    results.append(("Env Example", _run_manual_test(test_env_example)))
+    results.append(("Dockerfile Config", _run_manual_test(test_dockerfile_config)))
+    results.append(("Landing Pricing", _run_manual_test(test_landing_pricing)))
     
     print("\n" + "=" * 60)
     print("SUMMARY")
