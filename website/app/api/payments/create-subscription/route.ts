@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PLANS } from '@/lib/plans';
 import { createSubscription, createCustomer } from '@/lib/razorpay';
-import { createUser, getUserByEmail, updateUserRazorpayCustomer, createSubscriptionRecord } from '@/lib/db';
+import { createSubscriptionRecordAsync, getOrCreateUserByEmailAsync, updateUserRazorpayCustomerAsync } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,34 +20,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing planId or email' }, { status: 400 });
     }
 
-    const plan = PLANS[planId as 'pro' | 'enterprise'];
+    const plan = PLANS[planId as 'developer' | 'pro' | 'enterprise'];
     if (!plan || plan.id === 'free') {
-      return NextResponse.json({ error: 'Invalid plan. Choose pro or enterprise.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid plan. Choose developer, pro, or enterprise.' }, { status: 400 });
     }
 
     // Get Razorpay plan ID from environment (server-side only)
-    const razorpayPlanId: string | undefined = planId === 'pro'
+    const razorpayPlanId: string | undefined = planId === 'developer'
+      ? (process.env.RAZORPAY_PLAN_DEV_ID || process.env.RAZORPAY_PLAN_DEVELOPER_ID)
+      : planId === 'pro'
       ? process.env.RAZORPAY_PLAN_PRO_ID
       : process.env.RAZORPAY_PLAN_ENTERPRISE_ID;
 
     if (!razorpayPlanId) {
       return NextResponse.json({
-        error: `Razorpay plan ID not configured for ${planId}. Set RAZORPAY_PLAN_${planId.toUpperCase()}_ID in environment.`,
+        error: `Razorpay plan ID not configured for ${planId}. Set RAZORPAY_PLAN_DEV_ID, RAZORPAY_PLAN_PRO_ID, or RAZORPAY_PLAN_ENTERPRISE_ID in environment.`,
       }, { status: 500 });
     }
 
     const planIdConfirmed: string = razorpayPlanId;
 
-    // Find or create user
-    let user = getUserByEmail(email);
-    if (!user) {
-      try {
-        user = createUser(email, name);
-      } catch (e) {
-        // DB write might fail on serverless — create a temporary user object
-        user = { id: `tmc_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`, email, name: name || null, plan: 'free', razorpay_customer_id: null, created_at: Math.floor(Date.now()/1000), updated_at: Math.floor(Date.now()/1000) };
-      }
-    }
+    const user = await getOrCreateUserByEmailAsync(email, name);
 
     // Create Razorpay customer if not exists (skip if already exists)
     if (!user.razorpay_customer_id) {
@@ -57,7 +50,7 @@ export async function POST(req: NextRequest) {
           email,
           notes: { user_id: user.id, plan: planId },
         });
-        try { updateUserRazorpayCustomer(user.id, customer.id); } catch {}
+        try { await updateUserRazorpayCustomerAsync(user.id, customer.id); } catch {}
       } catch (custErr: any) {
         // Customer might already exist in Razorpay — that's fine, continue without customer ID
         console.log('Customer creation skipped:', custErr.message);
@@ -76,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     // Record in DB (non-critical — subscription still works if DB write fails)
     try {
-      createSubscriptionRecord({
+      await createSubscriptionRecordAsync({
         userId: user.id,
         razorpaySubscriptionId: subscription.id,
         razorpayPlanId: planIdConfirmed,

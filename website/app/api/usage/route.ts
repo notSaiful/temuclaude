@@ -3,7 +3,7 @@
 // Headers: Authorization: Bearer <api_key> OR x-api-key: <api_key>
 
 import { NextRequest, NextResponse } from 'next/server';
-import { validateApiKey, getTodayUsage, getMonthUsage, getUser } from '@/lib/db';
+import { validateApiKeyAsync, getTodayUsageAsync, getMonthUsageAsync } from '@/lib/db';
 import { QUERY_LIMITS, PLANS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
@@ -19,15 +19,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing API key' }, { status: 401 });
     }
 
-    const valid = validateApiKey(apiKey);
+    const valid = await validateApiKeyAsync(apiKey);
     if (!valid) {
       return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
     }
 
     const { userId, user } = valid;
     const plan = PLANS[user.plan as keyof typeof PLANS] || PLANS.free;
-    const todayUsage = getTodayUsage(userId);
-    const monthUsage = getMonthUsage(userId);
+    const todayUsage = await getTodayUsageAsync(userId);
+    const monthUsage = await getMonthUsageAsync(userId);
     const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
 
     return NextResponse.json({

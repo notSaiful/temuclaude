@@ -5,13 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/razorpay';
-import { updateSubscriptionStatus, updateUserPlan, getUser, getActiveSubscription, updatePaymentStatus } from '@/lib/db';
+import { updatePaymentStatusAsync, updateSubscriptionStatusAsync, updateUserPlanAsync } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // Get plan from Razorpay subscription plan_id (matched against env vars)
 function getPlanByRazorpayPlanIdLocal(razorpayPlanId: string): { id: string } | null {
+  if ((process.env.RAZORPAY_PLAN_DEV_ID || process.env.RAZORPAY_PLAN_DEVELOPER_ID) === razorpayPlanId) return { id: 'developer' };
   if (process.env.RAZORPAY_PLAN_PRO_ID === razorpayPlanId) return { id: 'pro' };
   if (process.env.RAZORPAY_PLAN_ENTERPRISE_ID === razorpayPlanId) return { id: 'enterprise' };
   return null;
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
     switch (eventType) {
       case 'subscription.activated': {
         const sub = payload.subscription.entity;
-        updateSubscriptionStatus(sub.id, 'active');
+        await updateSubscriptionStatusAsync(sub.id, 'active');
 
         // Update user plan
         const plan = getPlanByRazorpayPlanIdLocal(sub.plan_id);
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
           // Find user from notes
           const userId = sub.notes?.user_id;
           if (userId) {
-            updateUserPlan(userId, plan.id);
+            await updateUserPlanAsync(userId, plan.id);
           }
         }
         break;
@@ -58,13 +59,13 @@ export async function POST(req: NextRequest) {
 
       case 'subscription.charged': {
         const sub = payload.subscription.entity;
-        updateSubscriptionStatus(sub.id, 'active');
+        await updateSubscriptionStatusAsync(sub.id, 'active');
 
         const plan = getPlanByRazorpayPlanIdLocal(sub.plan_id);
         if (plan) {
           const userId = sub.notes?.user_id;
           if (userId) {
-            updateUserPlan(userId, plan.id);
+            await updateUserPlanAsync(userId, plan.id);
           }
         }
         break;
@@ -72,32 +73,32 @@ export async function POST(req: NextRequest) {
 
       case 'subscription.cancelled': {
         const sub = payload.subscription.entity;
-        updateSubscriptionStatus(sub.id, 'cancelled');
+        await updateSubscriptionStatusAsync(sub.id, 'cancelled');
 
         // Downgrade user to free
         const userId = sub.notes?.user_id;
         if (userId) {
-          updateUserPlan(userId, 'free');
+          await updateUserPlanAsync(userId, 'free');
         }
         break;
       }
 
       case 'subscription.paused': {
         const sub = payload.subscription.entity;
-        updateSubscriptionStatus(sub.id, 'paused');
+        await updateSubscriptionStatusAsync(sub.id, 'paused');
         break;
       }
 
       case 'subscription.resumed': {
         const sub = payload.subscription.entity;
-        updateSubscriptionStatus(sub.id, 'active');
+        await updateSubscriptionStatusAsync(sub.id, 'active');
         break;
       }
 
       case 'payment.captured': {
         const payment = payload.payment.entity;
         if (payment.order_id) {
-          updatePaymentStatus(payment.order_id, 'captured', payment.id);
+          await updatePaymentStatusAsync(payment.order_id, 'captured', payment.id);
         }
         break;
       }
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest) {
       case 'payment.failed': {
         const payment = payload.payment.entity;
         if (payment.order_id) {
-          updatePaymentStatus(payment.order_id, 'failed', payment.id);
+          await updatePaymentStatusAsync(payment.order_id, 'failed', payment.id);
         }
         break;
       }
