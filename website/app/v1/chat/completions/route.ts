@@ -5,12 +5,12 @@
  * 8 models, each assigned the role it's best at:
  * 1. GLM-5.2 (IQ 51)     — proposer + aggregator (strongest synthesizes)
  * 2. DeepSeek V4 Pro (IQ 44) — proposer + self-consistency + reflexion
- * 3. Gemini 3.5 Flash (IQ 50) — proposer (legal/health specialist)
+ * 3. Gemini 2.5 Flash (IQ 50) — proposer (legal/health specialist)
  * 4. Hy3 Preview (cheapest) — trivial router (60% of queries, lowest cost)
- * 5. MiniMax M3 (IQ 44)  — vision + creative specialist
+ * 5. Mistral Large 3 (IQ 44)  — vision + creative specialist
  * 6. MiMo-V2.5 (IQ 40)   — multimodal (image/video specialist)
  * 7. Nemotron (FREE)      — QA gate (independent judge, 5-rubric score)
- * 8. Claude Sonnet 5 (IQ 53) — frontier fallback (hardest 2% only)
+ * 8. Fable 5 fallback — frontier fallback (hardest 2% only)
  *
  * Pipeline:
  * 1. Classify difficulty (heuristic, no API call)
@@ -20,69 +20,94 @@
  * 5. Layer 3: Aggregation — analyze consensus, contradictions (1 call)
  * 6. Layer 4: QA gate — 5-rubric score by Nemotron (FREE, independent)
  * 7. Layer 5: Reflexion if QA < 8 — retry with feedback (1 call)
- * 8. Layer 6: Frontier fallback if QA < 6 — Claude Sonnet 5 (1 call)
+ * 8. Layer 6: Frontier fallback if QA < 6 — Claude Sonnet 4.6 (1 call)
  * Timeout: 45s race → single GLM fallback
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { validateApiKey, getTodayUsage, incrementUsage, getUserByEmail, createUser, getUser } from '@/lib/db';
-import { QUERY_LIMITS, PLANS } from '@/lib/plans';
+import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync } from '@/lib/db';
+import { QUERY_LIMITS } from '@/lib/plans';
+import { callOpenRouter } from '@/lib/openrouter';
+import { callModalChatCompletions, isModalConfigured, isModalRequired } from '@/lib/modal';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-
 // ── 8-MODEL POOL ──────────────────────────────────────────────
 const M_GLM = 'z-ai/glm-5.2';                           // IQ 51 — proposer + aggregator
 const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';           // IQ 44 — proposer + self-consistency + reflexion
-const M_GEMINI = 'google/gemini-2.0-flash';              // Gemini 2.0 Flash
+const M_GEMINI = 'google/gemini-2.5-flash';              // Gemini 2.5 Flash
 const M_HY3 = 'meta-llama/llama-3.3-70b-instruct';       // Llama 3.3 70B
-const M_MINIMAX = 'mistralai/mistral-large-2';           // Mistral Large 2
-const M_MIMO = 'xiaomi/mimo-v2.5';                        // IQ 40 — multimodal
-const M_NEMOTRON = 'google/gemini-2.0-flash';            // Gemini 2.0 Flash QA judge
-const M_CLAUDE = 'anthropic/claude-3.5-sonnet';          // Claude 3.5 Sonnet fallback
+const M_MINIMAX = 'mistralai/mistral-large-2512';        // Mistral Large 3
+const M_MIMO = 'xiaomi/mimo-v2.5';                       // IQ 40 — multimodal
+const M_NEMOTRON = 'google/gemini-2.5-flash';            // Gemini 2.5 Flash QA judge
+const M_CLAUDE = 'anthropic/claude-sonnet-4.6';          // Fable 5 fallback
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
+interface OrchestrationResult { content: string; tokens: number; tier: string; time: number }
+
+function hasUsableContent(content: unknown): content is string {
+  return typeof content === 'string' && content.trim().length > 0;
+}
+
+function promptTokenEstimate(messages: Msg[]): number {
+  return messages.reduce((sum, message) => sum + Math.ceil(String(message.content || '').length / 4), 0);
+}
+
+function completionTokenEstimate(content: string): number {
+  return Math.ceil(content.length / 4);
+}
+
+function upstreamFailure(message: string, status = 503) {
+  return NextResponse.json(
+    { error: { message, type: 'server_error' } },
+    { status },
+  );
+}
+
+function extractAssistantContent(data: any): string {
+  return data?.choices?.[0]?.message?.content || '';
+}
 
 /**
  * Call a model via OpenRouter with reasoning field fallback.
  * Prepends English enforcement system prompt to ensure consistent English output.
  */
 async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): Promise<Result> {
-  try {
-    // Prepend English system prompt if user didn't provide one
-    let msgs = messages;
-    if (!messages.some(m => m.role === 'system')) {
-      msgs = [{ role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' }, ...messages];
-    }
-    const r = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, messages: msgs, temperature: temp, max_tokens: maxTok }),
-    });
-    if (!r.ok) return { success: false, content: '', tokens: 0 };
-    const d = await r.json();
-    let c = d.choices?.[0]?.message?.content || '';
-    if (!c) {
-      // Fallback 1: reasoning field (some models put answer here)
-      c = d.choices?.[0]?.message?.reasoning || '';
-    }
-    if (!c) {
-      // Fallback 2: reasoning_details array
-      const rd = d.choices?.[0]?.message?.reasoning_details;
-      if (Array.isArray(rd)) {
-        // Try to get the last element (usually the final answer, not the thinking process)
-        c = rd.map((x: { text?: string }) => x.text || '').join('');
-      }
-    }
-    // Strip leading/trailing whitespace
-    c = (c || '').trim();
-    return { success: !!c, content: c, tokens: d.usage?.total_tokens || 0 };
-  } catch {
-    return { success: false, content: '', tokens: 0 };
+  let msgs = messages;
+  const effectiveMaxTokens = Math.max(64, maxTok);
+  if (!messages.some(m => m.role === 'system')) {
+    msgs = [{ role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' }, ...messages];
   }
+
+  const result = await callOpenRouter(model, msgs, {
+    temperature: temp,
+    maxTokens: effectiveMaxTokens,
+    timeoutMs: 60000,
+    sessionId: `v1-${Buffer.from(messages[messages.length - 1]?.content || '').toString('base64url').slice(0, 64)}`,
+  });
+  return { success: result.success, content: result.content, tokens: result.tokens };
+}
+
+async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
+  const start = Date.now();
+  const fallbacks = [M_GLM, M_HY3, M_DEEPSEEK];
+  let tokens = 0;
+
+  for (const model of fallbacks) {
+    const result = await call(model, messages, temp, maxTok);
+    tokens += result.tokens;
+    if (result.success && hasUsableContent(result.content)) {
+      return {
+        content: result.content.trim(),
+        tokens,
+        tier: 'rescue-fallback',
+        time: Date.now() - start,
+      };
+    }
+  }
+
+  return { content: '', tokens, tier: 'failed-empty', time: Date.now() - start };
 }
 
 /**
@@ -283,7 +308,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     const l1: { name: string; content: string }[] = [];
     if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
     if (sc.answer) l1.push({ name: 'Model B (DeepSeek, self-consistency)', content: sc.answer });
-    if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content });
+    if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 2.5 Flash)', content: r3.content });
 
     if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -370,7 +395,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   const l1: { name: string; content: string }[] = [];
   if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
   if (r2.success && r2.content) l1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content });
-  if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 3.5 Flash)', content: r3.content });
+  if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 2.5 Flash)', content: r3.content });
 
   if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -424,6 +449,7 @@ export async function POST(request: NextRequest) {
     let userId: string | null = null;
     let userPlan = 'free';
     let isEvalMode = false; // open access for benchmarking platforms
+    const allowAnonymousApi = process.env.TEMUCLAUDE_ALLOW_PUBLIC_API === 'true';
 
     if (apiKey) {
       // Check master key first (for evaluation platforms — AA, LMSys, LiveBench, etc.)
@@ -431,7 +457,7 @@ export async function POST(request: NextRequest) {
         isEvalMode = true;
       } else {
         // Validate against DB
-        const valid = validateApiKey(apiKey);
+        const valid = await validateApiKeyAsync(apiKey);
         if (!valid) {
           return NextResponse.json(
             { error: { message: 'Invalid API key', type: 'authentication_error' } },
@@ -440,14 +466,25 @@ export async function POST(request: NextRequest) {
         }
         userId = valid.userId;
         userPlan = valid.user.plan || 'free';
+        if (userPlan === 'free') {
+          return NextResponse.json(
+            { error: { message: 'API access requires a Developer, Pro, or Enterprise plan.', type: 'permission_error' } },
+            { status: 403 }
+          );
+        }
       }
+    } else if (!allowAnonymousApi) {
+      return NextResponse.json(
+        { error: { message: 'Missing API key', type: 'authentication_error' } },
+        { status: 401 }
+      );
     }
-    // No API key = free tier (playground users, eval platforms testing without key)
-    // Free tier: 20 queries/day, tracked by IP or anonymous identifier
+    // Anonymous API access is disabled by default. Set TEMUCLAUDE_ALLOW_PUBLIC_API=true
+    // only for temporary benchmarking or public evaluation windows.
 
     // Check usage limits for non-eval users
     if (!isEvalMode && userId) {
-      const todayUsage = getTodayUsage(userId);
+      const todayUsage = await getTodayUsageAsync(userId);
       const limits = QUERY_LIMITS[userPlan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
 
       if (userPlan === 'free' && limits.perDay !== Infinity) {
@@ -458,24 +495,82 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+
+      if (limits.perMonth >= 0) {
+        const monthUsage = await getMonthUsageAsync(userId);
+        if (monthUsage.totalQueries >= limits.perMonth) {
+          return NextResponse.json(
+            { error: { message: 'Monthly API quota exceeded.', type: 'rate_limit_error' } },
+            { status: 429 }
+          );
+        }
+      }
     }
 
-    // Timeout safeguard: 90s → single GLM fallback (within Vercel's 120s limit)
+    if (isModalConfigured()) {
+      const modal = await callModalChatCompletions({
+        model: model || 'temuclaude',
+        messages,
+        temperature: temperature ?? 0.6,
+        max_tokens: max_tokens ?? 4096,
+      });
+
+      if (modal.ok) {
+        const modalContent = extractAssistantContent(modal.data);
+        if (!hasUsableContent(modalContent)) {
+          if (isModalRequired()) {
+            return upstreamFailure('Modal backend returned an empty completion.', 503);
+          }
+
+          console.warn('Modal backend returned an empty completion, falling back to in-process pipeline.');
+        } else {
+          if (!isEvalMode && userId) {
+            const usage = modal.data?.usage || {};
+            const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
+            const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
+            try { await incrementUsageAsync(userId, promptTokens, completionTokens); } catch {}
+          }
+          return NextResponse.json(modal.data, { status: modal.status });
+        }
+      }
+
+      if (!modal.ok && isModalRequired()) {
+        return NextResponse.json(
+          { error: { message: modal.error || 'Modal backend unavailable', type: 'server_error' } },
+          { status: modal.status || 503 }
+        );
+      }
+
+      if (!modal.ok) {
+        console.warn('Modal backend unavailable, falling back to in-process pipeline:', modal.error);
+      }
+    }
+
+    // Timeout safeguard: 90s -> single GLM fallback (within Vercel's 120s limit)
     const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
-    const timeout = new Promise<{ content: string; tokens: number; tier: string; time: number }>(resolve => {
+    const timeout = new Promise<OrchestrationResult>(resolve => {
       setTimeout(async () => {
         const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096);
         resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 90000 });
       }, 90000);
     });
 
-    const result = await Promise.race([pipeline, timeout]);
+    let result = await Promise.race([pipeline, timeout]);
+    if (!hasUsableContent(result.content)) {
+      result = await finalRescue(messages, temperature ?? 0.6, max_tokens ?? 4096);
+    }
+
+    if (!hasUsableContent(result.content)) {
+      return upstreamFailure('TemuClaude could not produce a non-empty completion. Please retry shortly.', 503);
+    }
+
+    const finalContent = result.content.trim();
 
     // Track usage for authenticated users
     if (!isEvalMode && userId) {
-      const promptTokens = messages.reduce((s, m) => s + Math.ceil(m.content.length / 4), 0);
-      const completionTokens = Math.ceil(result.content.length / 4);
-      try { incrementUsage(userId, promptTokens, completionTokens); } catch {}
+      const promptTokens = promptTokenEstimate(messages);
+      const completionTokens = completionTokenEstimate(finalContent);
+      try { await incrementUsageAsync(userId, promptTokens, completionTokens); } catch {}
     }
 
     return NextResponse.json({
@@ -485,13 +580,13 @@ export async function POST(request: NextRequest) {
       model: model || 'temuclaude',
       choices: [{
         index: 0,
-        message: { role: 'assistant', content: result.content },
+        message: { role: 'assistant', content: finalContent },
         finish_reason: 'stop',
       }],
       usage: {
-        prompt_tokens: messages.reduce((s, m) => s + Math.ceil(m.content.length / 4), 0),
-        completion_tokens: Math.ceil(result.content.length / 4),
-        total_tokens: result.tokens,
+        prompt_tokens: promptTokenEstimate(messages),
+        completion_tokens: completionTokenEstimate(finalContent),
+        total_tokens: result.tokens || promptTokenEstimate(messages) + completionTokenEstimate(finalContent),
       },
     });
   } catch {
@@ -510,12 +605,12 @@ export async function GET() {
     models: [
       { name: 'GLM-5.2', role: 'Orchestrator + Aggregator', iq: 51 },
       { name: 'DeepSeek V4 Pro', role: 'Reasoning + Self-Consistency + Reflexion', iq: 44 },
-      { name: 'Gemini 3.5 Flash', role: 'Legal/Health Specialist', iq: 50 },
+      { name: 'Gemini 2.5 Flash', role: 'Legal/Health Specialist', iq: 50 },
       { name: 'Hy3 Preview', role: 'Trivial Router (cheapest)', iq: null },
       { name: 'MiniMax M3', role: 'Vision + Creative', iq: 44 },
       { name: 'MiMo-V2.5', role: 'Multimodal', iq: 40 },
       { name: 'Nemotron', role: 'QA Gate (FREE)', iq: 38 },
-      { name: 'Claude Sonnet 5', role: 'Frontier Fallback', iq: 53 },
+      { name: 'Fable 5', role: 'Frontier Fallback', iq: 53 },
     ],
     pipeline: ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback'],
   });
