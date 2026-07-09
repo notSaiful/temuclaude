@@ -1,15 +1,21 @@
 // Setup script: Create Razorpay plans for Developer, Pro, and Enterprise
 // GET /api/setup-plans — creates plans in Razorpay, returns plan IDs to add to .env
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createPlan } from '@/lib/razorpay';
 import { PLANS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const masterKey = process.env.TEMUCLAUDE_MASTER_KEY;
+    const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim();
+    if (!masterKey || token !== masterKey) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const results: any = {};
 
     // Create Developer plan
@@ -50,6 +56,7 @@ export async function GET() {
       message: 'Add these plan IDs to your .env file',
       plans: results,
       envVars: {
+        RAZORPAY_PLAN_DEV_ID: results.developer.id,
         RAZORPAY_PLAN_DEVELOPER_ID: results.developer.id,
         RAZORPAY_PLAN_PRO_ID: results.pro.id,
         RAZORPAY_PLAN_ENTERPRISE_ID: results.enterprise.id,

@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPaymentSignature } from '@/lib/razorpay';
-import { updatePaymentStatus, updateSubscriptionStatus, updateUserPlan, getUser } from '@/lib/db';
+import { updatePaymentStatusAsync, updateSubscriptionStatusAsync, updateUserPlanAsync } from '@/lib/db';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,16 +30,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Update payment record
-    updatePaymentStatus(razorpayOrderId, 'paid', razorpayPaymentId, razorpaySignature);
+    await updatePaymentStatusAsync(razorpayOrderId, 'paid', razorpayPaymentId, razorpaySignature);
 
     // If subscription, update subscription status
     if (subscriptionId) {
-      updateSubscriptionStatus(subscriptionId, 'active');
+      await updateSubscriptionStatusAsync(subscriptionId, 'active');
     }
 
     // Update user plan
     if (userId && planId) {
-      updateUserPlan(userId, planId);
+      await updateUserPlanAsync(userId, planId);
     }
 
     return NextResponse.json({

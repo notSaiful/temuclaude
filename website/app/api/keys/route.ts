@@ -1,34 +1,55 @@
 // Create a new API key for the authenticated user
 // POST /api/keys
-// Body: { email, name? }
+// Headers: Authorization: Bearer <supabase_access_token>
+// Body: { name? }
 // Returns: { key, id } — key is only shown once
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, createApiKey, listApiKeys, revokeApiKey } from '@/lib/db';
+import { createApiKeyAsync, getOrCreateUserByEmailAsync, listApiKeysAsync, revokeApiKeyAsync } from '@/lib/db';
+import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+async function getAppUser(req: NextRequest) {
+  const auth = await getAuthenticatedSupabaseUser(req);
+  if ('error' in auth) {
+    return { error: auth.error, status: auth.status } as const;
+  }
+
+  const { user: supabaseUser } = auth;
+  const email = supabaseUser.email?.trim().toLowerCase();
+  if (!email) {
+    return { error: 'Authenticated Supabase user has no email address', status: 400 } as const;
+  }
+
+  const metadata = supabaseUser.user_metadata || {};
+  const name =
+    metadata.full_name ||
+    metadata.name ||
+    metadata.user_name ||
+    metadata.preferred_username ||
+    email.split('@')[0].replace(/[._-]+/g, ' ');
+
+  return { user: await getOrCreateUserByEmailAsync(email, name) } as const;
+}
 
 // POST: Create new API key
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, name } = body;
-
-    if (!email) {
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    const { name } = body;
+    const auth = await getAppUser(req);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const user = getUserByEmail(email);
-    if (!user) {
-      return NextResponse.json({ error: 'User not found. Subscribe to a plan first.' }, { status: 404 });
-    }
-
+    const user = auth.user;
     if (user.plan === 'free') {
-      return NextResponse.json({ error: 'Upgrade to Pro or Enterprise to get API access' }, { status: 403 });
+      return NextResponse.json({ error: 'Upgrade to Developer, Pro, or Enterprise to get API access' }, { status: 403 });
     }
 
-    const result = createApiKey(user.id, name || 'default');
+    const result = await createApiKeyAsync(user.id, name || 'default');
 
     return NextResponse.json({
       key: result.key,
@@ -44,17 +65,12 @@ export async function POST(req: NextRequest) {
 // GET: List API keys for a user
 export async function GET(req: NextRequest) {
   try {
-    const email = req.nextUrl.searchParams.get('email');
-    if (!email) {
-      return NextResponse.json({ error: 'Email required' }, { status: 400 });
+    const auth = await getAppUser(req);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    const user = getUserByEmail(email);
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const keys = listApiKeys(user.id);
+    const keys = await listApiKeysAsync(auth.user.id);
     return NextResponse.json({ keys });
   } catch (error: any) {
     console.error('List API keys error:', error);
@@ -66,18 +82,23 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const body = await req.json();
-    const { keyId, email } = body;
+    const { keyId } = body;
 
-    if (!keyId || !email) {
-      return NextResponse.json({ error: 'keyId and email required' }, { status: 400 });
+    if (!keyId) {
+      return NextResponse.json({ error: 'keyId required' }, { status: 400 });
     }
 
-    const user = getUserByEmail(email);
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const auth = await getAppUser(req);
+    if ('error' in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
-    revokeApiKey(keyId);
+    const keyBelongsToUser = (await listApiKeysAsync(auth.user.id)).some((key) => key.id === keyId);
+    if (!keyBelongsToUser) {
+      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+    }
+
+    await revokeApiKeyAsync(keyId);
     return NextResponse.json({ revoked: true });
   } catch (error: any) {
     console.error('Revoke API key error:', error);

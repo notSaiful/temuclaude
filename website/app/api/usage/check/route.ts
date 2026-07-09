@@ -4,7 +4,7 @@
 // Returns: { allowed: boolean, remaining: number, plan: string, message?: string }
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByEmail, getTodayUsage, incrementUsage, createUser } from '@/lib/db';
+import { getOrCreateUserByEmailAsync, getTodayUsageAsync, incrementUsageAsync } from '@/lib/db';
 import { QUERY_LIMITS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
@@ -20,12 +20,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Find or create user by email (for free tier, we use email as identifier)
-    let user = getUserByEmail(identifier);
-    if (!user) {
-      user = createUser(identifier);
-    }
+    const user = await getOrCreateUserByEmailAsync(identifier);
 
-    const todayUsage = getTodayUsage(user.id);
+    const todayUsage = await getTodayUsageAsync(user.id);
     const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
 
     // Check daily limit for free tier
@@ -72,14 +69,11 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Identifier required' }, { status: 400 });
     }
 
-    let user = getUserByEmail(identifier);
-    if (!user) {
-      user = createUser(identifier);
-    }
+    const user = await getOrCreateUserByEmailAsync(identifier);
 
-    incrementUsage(user.id, inputTokens || 1000, outputTokens || 1000);
+    await incrementUsageAsync(user.id, inputTokens || 1000, outputTokens || 1000);
 
-    const todayUsage = getTodayUsage(user.id);
+    const todayUsage = await getTodayUsageAsync(user.id);
     const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
 
     return NextResponse.json({
