@@ -243,12 +243,12 @@ Safety Constraints:
               <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
   GLM-5.2 → response A
   DeepSeek Pro → response B
-  Gemini 2.5 Flash → response C
+  Gemini 3.5 Flash → response C
 
 Layer 2: Cross-Review
   GLM-5.2 reviews B and C → improved A'
   DeepSeek Pro reviews A and C → improved B'
-  Gemini 2.5 Flash reviews A and B → improved C'
+  Gemini 3.5 Flash reviews A and B → improved C'
 
 Layer 3: Aggregation
   GLM-5.2 synthesizes A' + B' + C' → final answer
@@ -262,7 +262,7 @@ Layer 3: Aggregation
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li>Math: 3 samples at temperature 0.7</li>
                 <li>Reasoning: 2 samples</li>
-                <li>Each sample scored by Gemini 2.5 Flash (PRM-weighted voting)</li>
+                <li>Each sample scored by Gemini 3.5 Flash (PRM-weighted voting)</li>
                 <li>Highest-scoring answer selected as final</li>
               </ul>
             </section>
@@ -295,7 +295,7 @@ Layer 3: Aggregation
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reflexion</h2>
               <p className="text-text-secondary mb-4">When the QA gate fails, TemuClaude generates a verbal reflection on what went wrong, then retries with that context:</p>
               <CodeBlock lang="text" code={`1. QA gate fails (score < 8/10)
-2. Gemini 2.5 Flash generates reflection:
+2. Gemini 3.5 Flash generates reflection:
    "The answer has a logical error in step 3.
     The formula should use integration by parts,
     not substitution. Fix this and retry."
