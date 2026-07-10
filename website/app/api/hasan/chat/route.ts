@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { callOpenRouter as callOpenRouterRequest } from '@/lib/openrouter';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -234,7 +235,7 @@ const OLLAMA_MODELS = [
   'glm-5.2',           // PRIMARY — best general performance
   'deepseek-v4-pro',   // FALLBACK 1 — strong reasoning
   'llama-3.3-70b-instruct', // FALLBACK 2 — open weights specialist
-  'gemini-2.0-flash',  // FALLBACK 3 — fast worker
+  'gemini-2.5-flash',  // FALLBACK 3 — fast worker
 ];
 
 // Track which model to use next (round-robin for fallbacks, primary always first)
@@ -383,9 +384,6 @@ async function callOpenRouter(
   systemPrompt: string,
   message: string,
 ): Promise<OllamaResult | null> {
-  const key = process.env.OPENROUTER_API_KEY || '';
-  if (!key) return null;
-
   const orModels = [
     'nvidia/nemotron-3-ultra-550b-a55b:free',
     'google/gemma-4-31b-it:free',
@@ -394,30 +392,13 @@ async function callOpenRouter(
 
   for (const orModel of orModels) {
     try {
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${key}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: orModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message },
-          ],
-          max_tokens: 800,
-          temperature: 0.3,
-        }),
-        signal: AbortSignal.timeout(8000),
-      });
+      const result = await callOpenRouterRequest(orModel, [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message },
+      ], { temperature: 0.3, maxTokens: 800, timeoutMs: 8000 });
 
-      if (res.ok) {
-        const data = await res.json();
-        const content = data?.choices?.[0]?.message?.content || '';
-        if (content) {
-          return { response: content, model: orModel, source: 'openrouter' };
-        }
+      if (result.success) {
+        return { response: result.content, model: orModel, source: 'openrouter' };
       }
     } catch {
       // Try next model
@@ -463,13 +444,13 @@ PROJECT OVERVIEW:
 
     const systemPrompt = `You are Hasan, an autonomous AI system for TemuClaude.
 
-You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve TemuClaude — the most intelligent, most affordable AI that beats frontier models at 25x lower cost.
+You were created by Mohammad Saiful Haque (Ggs) from Nagpur, India. Your purpose is to build and improve TemuClaude — an intelligent, affordable AI that competes on quality, reliability, and transparent cost.
 
 Your mission (in priority order):
 1. Never destroy what works — all tests must pass before any change
 2. Build the most intelligent model possible — never sacrifice quality
 3. Build the most cost-efficient model possible — cheaper, free models first
-4. Beat frontier models — GPT-5.6, Gemini, Claude
+4. Lead on value, reliability, and transparent orchestration
 5. Make it accessible to normal people — affordable for developing countries
 6. Build toward a sustainable company — revenue serves the mission
 7. Give back to the community — 25% of profit funds food relief, clinics, and education

@@ -1,27 +1,25 @@
 /**
- * Comparison API — TemuClaude (full orchestration) vs Single Model (GLM-5.2 alone)
+ * Comparison API — TemuClaude (full orchestration) vs a frontier direct baseline
  * POST /api/compare
  * Body: { messages: Msg[], temperature?: number, max_tokens?: number }
  * Returns: { temuclaude: { content, tokens, time }, single: { content, tokens, time } }
  *
  * This lets people see the difference between the full 8-model orchestration
- * and a single model with their own eyes.
+ * and a frontier direct baseline with their own eyes.
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { callOpenRouter } from '@/lib/openrouter';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
-const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-
-const M_GLM = 'z-ai/glm-5.2';
+const M_FRONTIER_BASELINE = 'openai/gpt-5.6-luna';
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface CompareResult { content: string; tokens: number; time: number; error?: string }
 
 /**
- * Call a single model directly via OpenRouter (no orchestration)
+ * Call the frontier direct baseline via OpenRouter (no orchestration).
  */
 async function callSingle(model: string, messages: Msg[], temp: number, maxTok: number): Promise<CompareResult> {
   const start = Date.now();
@@ -31,21 +29,17 @@ async function callSingle(model: string, messages: Msg[], temp: number, maxTok: 
     if (!messages.some(m => m.role === 'system')) {
       msgs = [{ role: 'system', content: 'You are a helpful AI assistant. Always respond in clear, professional English.' }, ...messages];
     }
-    const r = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, messages: msgs, temperature: temp, max_tokens: maxTok }),
+    const result = await callOpenRouter(model, msgs, {
+      temperature: temp,
+      maxTokens: maxTok,
+      timeoutMs: 60000,
+      sessionId: `compare-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
     });
     const elapsed = Date.now() - start;
-    if (!r.ok) return { content: '', tokens: 0, time: elapsed, error: `API error: ${r.status}` };
-    const d = await r.json();
-    let c = d.choices?.[0]?.message?.content || '';
-    if (!c) c = d.choices?.[0]?.message?.reasoning || '';
-    if (!c) {
-      const rd = d.choices?.[0]?.message?.reasoning_details;
-      if (Array.isArray(rd)) c = rd.map((x: { text?: string }) => x.text || '').join('');
+    if (!result.success) {
+      return { content: '', tokens: 0, time: elapsed, error: result.error || `API error: ${result.status}` };
     }
-    return { content: (c || '').trim(), tokens: d.usage?.total_tokens || 0, time: elapsed };
+    return { content: result.content, tokens: result.tokens, time: elapsed };
   } catch (e) {
     return { content: '', tokens: 0, time: Date.now() - start, error: String(e) };
   }
@@ -87,16 +81,16 @@ export async function POST(request: NextRequest) {
     const temp = temperature ?? 0.6;
     const maxTok = max_tokens ?? 2048;
 
-    // Run both in parallel: TemuClaude (full pipeline) vs GLM alone (single model)
+    // Run both in parallel: TemuClaude (full pipeline) vs a direct baseline.
     const [temuclaudeResult, singleResult] = await Promise.all([
       callTemuClaude(messages, temp, maxTok),
-      callSingle(M_GLM, messages, temp, maxTok),
+      callSingle(M_FRONTIER_BASELINE, messages, temp, maxTok),
     ]);
 
     return NextResponse.json({
       temuclaude: temuclaudeResult,
       single: singleResult,
-      model_name: 'GLM-5.2',
+      model_name: 'GPT-5.6 Luna direct',
     });
   } catch (e) {
     return NextResponse.json(

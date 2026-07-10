@@ -2,45 +2,53 @@
  * TemuClaude OpenAI-Compatible API — 8-Model Full Pipeline
  * POST /v1/chat/completions
  *
- * 8 models, each assigned the role it's best at:
- * 1. GLM-5.2 (IQ 51)     — proposer + aggregator (strongest synthesizes)
- * 2. DeepSeek V4 Pro (IQ 44) — proposer + self-consistency + reflexion
- * 3. Gemini 2.5 Flash (IQ 50) — proposer (legal/health specialist)
- * 4. Hy3 Preview (cheapest) — trivial router (60% of queries, lowest cost)
- * 5. Mistral Large 3 (IQ 44)  — vision + creative specialist
- * 6. MiMo-V2.5 (IQ 40)   — multimodal (image/video specialist)
- * 7. Nemotron (FREE)      — QA gate (independent judge, 5-rubric score)
- * 8. Fable 5 fallback — frontier fallback (hardest 2% only)
+ * Eight models, each assigned to a bounded capability role:
+ * 1. DeepSeek V4 Flash — low-cost trivial requests
+ * 2. DeepSeek V4 Pro — math, code, and hard reasoning
+ * 3. GLM-5.2 — knowledge, agentic work, and synthesis
+ * 4. MiniMax M3 — creative and long-context generation
+ * 5. Gemini 3.5 Flash — multimodal work
+ * 6. GPT-5.6 Luna — QA-failure escalation only
+ * 7. Grok 4.5 — code-repair escalation only
+ * 8. Nemotron 3 Ultra — independent QA verifier
+ *
+ * GPT-5.6 Terra is deliberately outside the normal pool and is attempted
+ * only as the last emergency rescue after the open-core routes fail.
  *
  * Pipeline:
  * 1. Classify difficulty (heuristic, no API call)
- * 2. Trivial → Hy3 Preview (cheapest) | Medium → GLM or DeepSeek | Hard → full MoA
- * 3. Layer 1: 3 models propose in parallel (GLM + DeepSeek + Gemini)
+ * 2. Trivial → DeepSeek Flash | Medium → best bounded specialist | Hard → full MoA
+ * 3. Layer 1: 3 models propose in parallel (GLM + DeepSeek Pro + Nemotron)
  * 4. Layer 2: Self-consistency for math (3 samples, parallel with Layer 1)
  * 5. Layer 3: Aggregation — analyze consensus, contradictions (1 call)
  * 6. Layer 4: QA gate — 5-rubric score by Nemotron (FREE, independent)
  * 7. Layer 5: Reflexion if QA < 8 — retry with feedback (1 call)
- * 8. Layer 6: Frontier fallback if QA < 6 — Claude Sonnet 4.6 (1 call)
+ * 8. Layer 6: QA-failure escalation if QA < 6 — GPT-5.6 Luna (1 call)
  * Timeout: 45s race → single GLM fallback
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync } from '@/lib/db';
-import { QUERY_LIMITS } from '@/lib/plans';
+import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync, getRollingWindowUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
+import { PLAN_LIMITS } from '@/lib/plans';
 import { callOpenRouter } from '@/lib/openrouter';
 import { callModalChatCompletions, isModalConfigured, isModalRequired } from '@/lib/modal';
+
+// Global in-memory circuit breaker state (retained during warm serverless container instances)
+let consecutiveFailures = 0;
+let circuitTrippedUntil = 0;
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
 
 // ── 8-MODEL POOL ──────────────────────────────────────────────
-const M_GLM = 'z-ai/glm-5.2';                           // IQ 51 — proposer + aggregator
-const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';           // IQ 44 — proposer + self-consistency + reflexion
-const M_GEMINI = 'google/gemini-2.5-flash';              // Gemini 2.5 Flash
-const M_HY3 = 'meta-llama/llama-3.3-70b-instruct';       // Llama 3.3 70B
-const M_MINIMAX = 'mistralai/mistral-large-2512';        // Mistral Large 3
-const M_MIMO = 'xiaomi/mimo-v2.5';                       // IQ 40 — multimodal
-const M_NEMOTRON = 'google/gemini-2.5-flash';            // Gemini 2.5 Flash QA judge
-const M_CLAUDE = 'anthropic/claude-sonnet-4.6';          // Fable 5 fallback
+const M_FLASH = 'deepseek/deepseek-v4-flash';
+const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';
+const M_GLM = 'z-ai/glm-5.2';
+const M_MINIMAX = 'minimax/minimax-m3';
+const M_GEMINI = 'google/gemini-3.5-flash';
+const M_LUNA = 'openai/gpt-5.6-luna';
+const M_GROK = 'x-ai/grok-4.5';
+const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b';
+const M_TERRA = 'openai/gpt-5.6-terra'; // emergency rescue only
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
@@ -91,7 +99,7 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): 
 
 async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
   const start = Date.now();
-  const fallbacks = [M_GLM, M_HY3, M_DEEPSEEK];
+  const fallbacks = [M_FLASH, M_GLM, M_DEEPSEEK, M_TERRA];
   let tokens = 0;
 
   for (const model of fallbacks) {
@@ -126,16 +134,16 @@ function classify(text: string): 'trivial' | 'medium' | 'hard' {
   if (/\b(then|after|next|finally|step by step|how long|how many|show your work)\b/i.test(l)) s += 2;
   if ((text.match(/[;,.]/g) || []).length > 3) s += 1;
   if (/\b(if|when|where|given|assuming|suppose)\b/i.test(l)) s += 1;
-  
+
   // Code generation detection — route to medium (single model), not hard (MoA).
   // Code needs one strong model with high max_tokens, not 3 models debating.
   const isCodeGen = /\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b/i.test(l) &&
                     /\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b/i.test(l);
   if (isCodeGen) return 'medium';
-  
+
   // General coding keywords still add to score but won't force hard if code gen detected
   if (/\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(l)) s += 3;
-  
+
   if (s >= 7) return 'hard';
   if (s >= 3) return 'medium';
   return 'trivial';
@@ -217,7 +225,7 @@ Provide ONE definitive answer. Do NOT mention the analysis. Output ONLY the fina
 }
 
 /**
- * QA Gate: 5-rubric score by Nemotron (FREE, independent judge).
+ * QA Gate: 5-rubric score by the independent Nemotron verifier.
  */
 async function qaGate(q: string, a: string): Promise<{ score: number; tokens: number; feedback: string }> {
   const r = await call(M_NEMOTRON, [
@@ -253,7 +261,8 @@ FEEDBACK: <one sentence>` },
  * Research: 91% on HumanEval vs 80% without (arXiv:2303.11366).
  */
 async function reflexion(q: string, prevAnswer: string, feedback: string, maxTok: number): Promise<Result> {
-  return call(M_DEEPSEEK, [
+  const repairModel = isCodeGen(q) ? M_GROK : M_DEEPSEEK;
+  return call(repairModel, [
     { role: 'system', content: 'You are answering a question. A previous attempt received feedback. Use it to improve. Output ONLY the improved answer.' },
     { role: 'user', content: `Question: ${q}\n\nPrevious answer: ${prevAnswer}\n\nFeedback: ${feedback}\n\nImproved answer:` },
   ], 0.4, maxTok);
@@ -271,13 +280,13 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   const creative = isCreative(q);
   const multimodal = isMultimodal(q);
 
-  // ── TRIVIAL: Hy3 Preview (cheapest model, $0.063/$0.21 per M) ──
+  // ── TRIVIAL: DeepSeek V4 Flash ──
   if (diff === 'trivial') {
-    const r = await call(M_HY3, messages, temp, maxTok);
+    const r = await call(M_FLASH, messages, temp, maxTok);
     if (r.success && r.content) {
       return { content: r.content, tokens: r.tokens, tier: 'trivial', time: Date.now() - start };
     }
-    // Fallback to GLM if Hy3 fails
+    // Fallback to GLM if Flash fails
     const r2 = await call(M_GLM, messages, temp, maxTok);
     return { content: r2.content, tokens: r2.tokens, tier: 'trivial-fallback', time: Date.now() - start };
   }
@@ -287,7 +296,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     let model = M_GLM; // default to GLM (strongest overall)
     if (math) model = M_DEEPSEEK;
     else if (creative) model = M_MINIMAX;
-    else if (multimodal) model = M_MIMO;
+    else if (multimodal) model = M_GEMINI;
     // Code generation uses GLM (best at following complex instructions)
     // isCodeGen already detected by classifier, routing here is automatic via medium
     const r = await call(model, messages, temp, maxTok);
@@ -300,7 +309,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   if (math) {
     const [r1, r3, sc] = await Promise.all([
       call(M_GLM, messages, temp, maxTok),
-      call(M_GEMINI, messages, temp, maxTok),
+      call(M_NEMOTRON, messages, temp, maxTok),
       selfConsistency(q, maxTok),
     ]);
     tokens += r1.tokens + r3.tokens + sc.tokens;
@@ -308,7 +317,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     const l1: { name: string; content: string }[] = [];
     if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
     if (sc.answer) l1.push({ name: 'Model B (DeepSeek, self-consistency)', content: sc.answer });
-    if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 2.5 Flash)', content: r3.content });
+    if (r3.success && r3.content) l1.push({ name: 'Model C (Nemotron 3 Ultra)', content: r3.content });
 
     if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -328,7 +337,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
         if (qa2.score > qa.score) final = ref.content;
       }
       if (qa.score < 6) {
-        const frontier = await call(M_CLAUDE, messages, temp, maxTok);
+        const frontier = await call(M_LUNA, messages, temp, maxTok);
         tokens += frontier.tokens;
         if (frontier.success && frontier.content) {
           const qa3 = await qaGate(q, frontier.content);
@@ -372,7 +381,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
         if (qa2.score > qa.score) final = ref.content;
       }
       if (qa.score < 6) {
-        const frontier = await call(M_CLAUDE, messages, temp, maxTok);
+        const frontier = await call(M_LUNA, messages, temp, maxTok);
         tokens += frontier.tokens;
         if (frontier.success && frontier.content) {
           const qa3 = await qaGate(q, frontier.content);
@@ -384,18 +393,18 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     return { content: final, tokens, tier: 'hard-creative', time: Date.now() - start };
   }
 
-  // HARD (general): 3 proposals from GLM + DeepSeek + Gemini
+  // HARD (general): core three-model panel only; premium models do not join by default.
   const [r1, r2, r3] = await Promise.all([
     call(M_GLM, messages, temp, maxTok),
     call(M_DEEPSEEK, messages, temp, maxTok),
-    call(M_GEMINI, messages, temp, maxTok),
+    call(M_NEMOTRON, messages, temp, maxTok),
   ]);
   tokens += r1.tokens + r2.tokens + r3.tokens;
 
   const l1: { name: string; content: string }[] = [];
   if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
   if (r2.success && r2.content) l1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content });
-  if (r3.success && r3.content) l1.push({ name: 'Model C (Gemini 2.5 Flash)', content: r3.content });
+  if (r3.success && r3.content) l1.push({ name: 'Model C (Nemotron 3 Ultra)', content: r3.content });
 
   if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -415,7 +424,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
       if (qa2.score > qa.score) final = ref.content;
     }
     if (qa.score < 6) {
-      const frontier = await call(M_CLAUDE, messages, temp, maxTok);
+      const frontier = await call(M_LUNA, messages, temp, maxTok);
       tokens += frontier.tokens;
       if (frontier.success && frontier.content) {
         const qa3 = await qaGate(q, frontier.content);
@@ -484,65 +493,88 @@ export async function POST(request: NextRequest) {
 
     // Check usage limits for non-eval users
     if (!isEvalMode && userId) {
-      const todayUsage = await getTodayUsageAsync(userId);
-      const limits = QUERY_LIMITS[userPlan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
+      // Dynamic weekly renewal check
+      const user = await verifyAndRenewWeeklyCreditsAsync(userId);
+      const creditBalance = user ? user.credit_balance : 0;
 
-      if (userPlan === 'free' && limits.perDay !== Infinity) {
-        if (todayUsage.query_count >= limits.perDay) {
-          return NextResponse.json(
-            { error: { message: `Rate limit exceeded. Free tier allows ${limits.perDay} queries/day. Upgrade at temuclaude.com/pricing`, type: 'rate_limit_error' } },
-            { status: 429 }
-          );
-        }
-      }
-
-      if (limits.perMonth >= 0) {
-        const monthUsage = await getMonthUsageAsync(userId);
-        if (monthUsage.totalQueries >= limits.perMonth) {
-          return NextResponse.json(
-            { error: { message: 'Monthly API quota exceeded.', type: 'rate_limit_error' } },
-            { status: 429 }
-          );
-        }
-      }
-    }
-
-    if (isModalConfigured()) {
-      const modal = await callModalChatCompletions({
-        model: model || 'temuclaude',
-        messages,
-        temperature: temperature ?? 0.6,
-        max_tokens: max_tokens ?? 4096,
-      });
-
-      if (modal.ok) {
-        const modalContent = extractAssistantContent(modal.data);
-        if (!hasUsableContent(modalContent)) {
-          if (isModalRequired()) {
-            return upstreamFailure('Modal backend returned an empty completion.', 503);
-          }
-
-          console.warn('Modal backend returned an empty completion, falling back to in-process pipeline.');
-        } else {
-          if (!isEvalMode && userId) {
-            const usage = modal.data?.usage || {};
-            const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
-            const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
-            try { await incrementUsageAsync(userId, promptTokens, completionTokens); } catch {}
-          }
-          return NextResponse.json(modal.data, { status: modal.status });
-        }
-      }
-
-      if (!modal.ok && isModalRequired()) {
+      if (creditBalance <= 0) {
         return NextResponse.json(
-          { error: { message: modal.error || 'Modal backend unavailable', type: 'server_error' } },
-          { status: modal.status || 503 }
+          { error: { message: 'Credit balance exhausted. Please purchase a top-up or wait for weekly renewal.', type: 'rate_limit_error' } },
+          { status: 429 }
         );
       }
 
-      if (!modal.ok) {
-        console.warn('Modal backend unavailable, falling back to in-process pipeline:', modal.error);
+      const limits = PLAN_LIMITS[userPlan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+      const rollingUsage = await getRollingWindowUsageAsync(userId, 5);
+
+      if (limits.rollingQueries !== Infinity && rollingUsage.query_count >= limits.rollingQueries) {
+        return NextResponse.json(
+          { error: { message: `Rate limit exceeded. Rolling limit is ${limits.rollingQueries} queries per 5 hours. Upgrade at temuclaude.com/pricing`, type: 'rate_limit_error' } },
+          { status: 429 }
+        );
+      }
+    }
+
+    let useFallbackRoute = false;
+    if (Date.now() < circuitTrippedUntil) {
+      console.warn('Circuit breaker is TRIPPED. Routing to fallback pool directly.');
+      useFallbackRoute = true;
+    }
+
+    let modalSuccess = false;
+    let modal;
+
+    if (!useFallbackRoute && isModalConfigured()) {
+      try {
+        modal = await callModalChatCompletions({
+          model: model || 'temuclaude',
+          messages,
+          temperature: temperature ?? 0.6,
+          max_tokens: max_tokens ?? 4096,
+        });
+
+        if (modal.ok) {
+          modalSuccess = true;
+          consecutiveFailures = 0; // Reset failures on success
+
+          const modalContent = extractAssistantContent(modal.data);
+          if (!hasUsableContent(modalContent)) {
+            if (isModalRequired()) {
+              return upstreamFailure('Modal backend returned an empty completion.', 503);
+            }
+            console.warn('Modal backend returned an empty completion, falling back to in-process pipeline.');
+          } else {
+            if (!isEvalMode && userId) {
+              const usage = modal.data?.usage || {};
+              const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
+              const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
+              try { await incrementUsageAsync(userId, promptTokens, completionTokens, 'glm-5.2'); } catch {}
+            }
+            return NextResponse.json(modal.data, { status: modal.status });
+          }
+        } else {
+          consecutiveFailures += 1;
+          console.warn(`Upstream Modal call failed. Consecutive failure count: ${consecutiveFailures}`);
+        }
+      } catch (e: any) {
+        consecutiveFailures += 1;
+        console.error(`Error during Modal execution: ${e.message}. Failure count: ${consecutiveFailures}`);
+      }
+
+      if (consecutiveFailures >= 3) {
+        circuitTrippedUntil = Date.now() + 60000; // Trip for 60 seconds
+        console.warn(`Circuit breaker TRIPPED until ${new Date(circuitTrippedUntil).toISOString()}`);
+      }
+
+      if (!modalSuccess && isModalRequired()) {
+        return NextResponse.json(
+          { error: { message: (modal && modal.error) || 'Modal backend unavailable', type: 'server_error' } },
+          { status: (modal && modal.status) || 503 }
+        );
+      }
+
+      if (!modalSuccess) {
+        console.warn('Modal backend failed/unavailable, falling back to in-process pipeline.');
       }
     }
 
@@ -570,7 +602,8 @@ export async function POST(request: NextRequest) {
     if (!isEvalMode && userId) {
       const promptTokens = promptTokenEstimate(messages);
       const completionTokens = completionTokenEstimate(finalContent);
-      try { await incrementUsageAsync(userId, promptTokens, completionTokens); } catch {}
+      const modelName = result.tier || 'temuclaude-standard';
+      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelName); } catch {}
     }
 
     return NextResponse.json({
@@ -603,14 +636,14 @@ export async function GET() {
     model: 'temuclaude',
     description: 'TemuClaude — 8-Model Multi-Model AI Orchestration (OpenAI-compatible)',
     models: [
-      { name: 'GLM-5.2', role: 'Orchestrator + Aggregator', iq: 51 },
-      { name: 'DeepSeek V4 Pro', role: 'Reasoning + Self-Consistency + Reflexion', iq: 44 },
-      { name: 'Gemini 2.5 Flash', role: 'Legal/Health Specialist', iq: 50 },
-      { name: 'Hy3 Preview', role: 'Trivial Router (cheapest)', iq: null },
-      { name: 'MiniMax M3', role: 'Vision + Creative', iq: 44 },
-      { name: 'MiMo-V2.5', role: 'Multimodal', iq: 40 },
-      { name: 'Nemotron', role: 'QA Gate (FREE)', iq: 38 },
-      { name: 'Fable 5', role: 'Frontier Fallback', iq: 53 },
+      { name: 'DeepSeek V4 Flash', role: 'Trivial routing', iq: null },
+      { name: 'DeepSeek V4 Pro', role: 'Reasoning + math + code', iq: null },
+      { name: 'GLM-5.2', role: 'Knowledge + synthesis', iq: null },
+      { name: 'MiniMax M3', role: 'Creative + long context', iq: null },
+      { name: 'Gemini 3.5 Flash', role: 'Multimodal', iq: null },
+      { name: 'GPT-5.6 Luna', role: 'QA-failure escalation', iq: null },
+      { name: 'Grok 4.5', role: 'Code-repair escalation', iq: null },
+      { name: 'Nemotron 3 Ultra', role: 'Independent QA', iq: null },
     ],
     pipeline: ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback'],
   });
