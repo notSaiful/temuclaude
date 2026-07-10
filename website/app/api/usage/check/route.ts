@@ -1,11 +1,16 @@
-// Check if user can send a query (free tier limit check)
+// Check if user can send a query (rolling rate checks & weekly credits)
 // POST /api/usage/check
 // Body: { identifier: string } — email or anonymous fingerprint
 // Returns: { allowed: boolean, remaining: number, plan: string, message?: string }
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrCreateUserByEmailAsync, getTodayUsageAsync, incrementUsageAsync } from '@/lib/db';
-import { QUERY_LIMITS } from '@/lib/plans';
+import {
+  getOrCreateUserByEmailAsync,
+  incrementUsageAsync,
+  getRollingWindowUsageAsync,
+  verifyAndRenewWeeklyCreditsAsync
+} from '@/lib/db';
+import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,38 +24,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Identifier required' }, { status: 400 });
     }
 
-    // Find or create user by email (for free tier, we use email as identifier)
-    const user = await getOrCreateUserByEmailAsync(identifier);
+    const initialUser = await getOrCreateUserByEmailAsync(identifier);
 
-    const todayUsage = await getTodayUsageAsync(user.id);
-    const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
+    // Dynamic weekly reset check
+    const user = (await verifyAndRenewWeeklyCreditsAsync(initialUser.id)) || initialUser;
 
-    // Check daily limit for free tier
-    if (user.plan === 'free' && limits.perDay !== Infinity) {
-      if (todayUsage.query_count >= limits.perDay) {
-        return NextResponse.json({
-          allowed: false,
-          remaining: 0,
-          plan: user.plan,
-          message: `You've reached your free tier limit of ${limits.perDay} queries/day. Upgrade to Developer for 50,000 queries/month.`,
-          upgradeUrl: '/pricing',
-        });
-      }
+    const limits = PLAN_LIMITS[user.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    const rollingUsage = await getRollingWindowUsageAsync(user.id, ROLLING_WINDOW_HOURS);
+
+    // 1. Check absolute credit exhaustion
+    if (user.credit_balance <= 0) {
+      return NextResponse.json({
+        allowed: false,
+        remaining: 0,
+        plan: user.plan,
+        creditBalance: 0,
+        message: `You've run out of credits. Please purchase a credit top-up or wait for your weekly allocation to renew.`,
+        upgradeUrl: '/pricing',
+      });
     }
 
-    // Check monthly limit for paid tiers
-    if (limits.perMonth !== Infinity) {
-      // For monthly check, we need to sum all days this month
-      // This is a simplified check — full month usage is tracked separately
-      // For now, just check daily limit (which is Infinity for paid)
+    // 2. Check rolling window query limits (primarily for Free tier)
+    if (limits.rollingQueries !== Infinity && rollingUsage.query_count >= limits.rollingQueries) {
+      return NextResponse.json({
+        allowed: false,
+        remaining: 0,
+        plan: user.plan,
+        creditBalance: user.credit_balance,
+        message: `You've reached your rolling limit of ${limits.rollingQueries} queries per 5 hours. Capacity recovers gradually as older queries age out.`,
+        upgradeUrl: '/pricing',
+      });
     }
 
     return NextResponse.json({
       allowed: true,
-      remaining: limits.perDay === Infinity ? null : limits.perDay - todayUsage.query_count,
+      remaining: limits.rollingQueries === Infinity ? null : limits.rollingQueries - rollingUsage.query_count,
       plan: user.plan,
-      queriesToday: todayUsage.query_count,
-      dailyLimit: limits.perDay === Infinity ? null : limits.perDay,
+      creditBalance: user.credit_balance,
+      rollingQueries: rollingUsage.query_count,
+      rollingLimit: limits.rollingQueries === Infinity ? null : limits.rollingQueries,
+      creditsResetAt: user.credits_reset_at,
     });
   } catch (error: any) {
     console.error('Usage check error:', error);
@@ -59,11 +72,11 @@ export async function POST(req: NextRequest) {
 }
 
 // Increment usage after a query is sent
-// POST /api/usage/increment
+// PUT /api/usage/check
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { identifier, inputTokens, outputTokens } = body;
+    const { identifier, inputTokens, outputTokens, modelName } = body;
 
     if (!identifier) {
       return NextResponse.json({ error: 'Identifier required' }, { status: 400 });
@@ -71,15 +84,16 @@ export async function PUT(req: NextRequest) {
 
     const user = await getOrCreateUserByEmailAsync(identifier);
 
-    await incrementUsageAsync(user.id, inputTokens || 1000, outputTokens || 1000);
+    // Deduct credits and log timestamped event with model metadata
+    await incrementUsageAsync(user.id, inputTokens || 1000, outputTokens || 1000, modelName);
 
-    const todayUsage = await getTodayUsageAsync(user.id);
-    const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
+    const rollingUsage = await getRollingWindowUsageAsync(user.id, ROLLING_WINDOW_HOURS);
+    const limits = PLAN_LIMITS[user.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
 
     return NextResponse.json({
       success: true,
-      queriesToday: todayUsage.query_count,
-      remaining: limits.perDay === Infinity ? null : Math.max(0, limits.perDay - todayUsage.query_count),
+      rollingQueries: rollingUsage.query_count,
+      remaining: limits.rollingQueries === Infinity ? null : Math.max(0, limits.rollingQueries - rollingUsage.query_count),
     });
   } catch (error: any) {
     console.error('Usage increment error:', error);

@@ -3,8 +3,14 @@
 // Headers: Authorization: Bearer <api_key> OR x-api-key: <api_key>
 
 import { NextRequest, NextResponse } from 'next/server';
-import { validateApiKeyAsync, getTodayUsageAsync, getMonthUsageAsync } from '@/lib/db';
-import { QUERY_LIMITS, PLANS } from '@/lib/plans';
+import {
+  validateApiKeyAsync,
+  getTodayUsageAsync,
+  getMonthUsageAsync,
+  getRollingWindowUsageAsync,
+  verifyAndRenewWeeklyCreditsAsync
+} from '@/lib/db';
+import { PLAN_LIMITS, PLANS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,20 +30,30 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
     }
 
-    const { userId, user } = valid;
+    const { userId, user: initialUser } = valid;
+
+    // Check/renew weekly credits
+    const user = (await verifyAndRenewWeeklyCreditsAsync(userId)) || initialUser;
+
     const plan = PLANS[user.plan as keyof typeof PLANS] || PLANS.free;
+    const limits = PLAN_LIMITS[user.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
     const todayUsage = await getTodayUsageAsync(userId);
     const monthUsage = await getMonthUsageAsync(userId);
-    const limits = QUERY_LIMITS[user.plan as keyof typeof QUERY_LIMITS] || QUERY_LIMITS.free;
+    const rollingUsage = await getRollingWindowUsageAsync(userId, 5);
 
     return NextResponse.json({
       plan: plan.id,
       planName: plan.name,
+      creditBalance: user.credit_balance,
+      weeklyCreditAllocation: user.weekly_credit_allocation,
+      creditsResetAt: user.credits_reset_at,
       queriesToday: todayUsage.query_count,
       queriesThisMonth: monthUsage.totalQueries,
-      dailyLimit: limits.perDay === Infinity ? null : limits.perDay,
-      monthlyLimit: limits.perMonth,
-      remainingQueries: limits.perMonth === Infinity ? null : Math.max(0, limits.perMonth - monthUsage.totalQueries),
+      rollingQueries: rollingUsage.query_count,
+      rollingLimit: limits.rollingQueries === Infinity ? null : limits.rollingQueries,
+      weeklyCredits: limits.weeklyCredits,
+      monthlyCredits: plan.monthlyCredits,
+      overagePerMillionCreditsUSD: plan.overagePerMillionCreditsUSD,
       tokensThisMonth: {
         input: monthUsage.totalInputTokens,
         output: monthUsage.totalOutputTokens,
