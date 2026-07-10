@@ -127,8 +127,11 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {session ? (
               <>
-                <Link href="/dashboard" className="btn-secondary !py-2 !px-4 flex items-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <Link
+                  href="/dashboard"
+                  className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 flex items-center gap-1.5 text-xs font-semibold"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="7" height="9" rx="1" />
                     <rect x="14" y="3" width="7" height="5" rx="1" />
                     <rect x="14" y="12" width="7" height="9" rx="1" />
@@ -136,14 +139,19 @@ export function Navbar() {
                   </svg>
                   Dashboard
                 </Link>
-                <button onClick={handleSignOut} className="btn-secondary !py-2 !px-4">
+                <button
+                  onClick={handleSignOut}
+                  className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 text-xs font-semibold cursor-pointer"
+                >
                   Sign Out
                 </button>
               </>
             ) : (
-              <Link href="/login" className="btn-secondary !py-2 !px-4">
-                Sign In
-              </Link>
+              <>
+                <Link href="/login" className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 text-xs font-semibold">
+                  Sign In
+                </Link>
+              </>
             )}
             <Link href="/playground" className="btn-primary">
               Playground
@@ -207,25 +215,27 @@ export function Navbar() {
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileOpen(false)}
-                    className="btn-secondary mt-4 w-full"
+                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-4 w-full text-center py-2.5 text-sm font-semibold"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="btn-secondary mt-2 w-full"
+                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-2 w-full py-2.5 text-sm font-semibold cursor-pointer"
                   >
                     Sign Out
                   </button>
                 </>
               ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="btn-secondary mt-4 w-full"
-                >
-                  Sign In
-                </Link>
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-4 w-full text-center py-2.5 text-sm font-semibold"
+                  >
+                    Sign In
+                  </Link>
+                </>
               )}
               <Link
                 href="/playground"
