@@ -1,9 +1,134 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
-import { FusionPipeline } from '@/components/FusionPipeline';
 import { MagneticButton } from '@/components/MagneticButton';
+
+const MOCK_TRACES = [
+  {
+    query: "Compare 9.9 vs 9.11",
+    steps: [
+      { text: "Cache check: Miss (similarity = 0.81)", status: "info" },
+      { text: "AOPR classification: Hard Logic. Routing to deepseek-v4-pro.", status: "route" },
+      { text: "Step 1: Convert values to decimals (9.90 vs 9.11). 90 > 11.", status: "thought" },
+      { text: "Verification: Launching SymPy equations checks...", status: "info" },
+      { text: "SymPy: verified True (9.9 > 9.11). Exit code 0.", status: "verify" },
+      { text: "Z3 logic checks: SAT (No contradictions detected).", status: "verify" },
+      { text: "Output: 9.9 is larger than 9.11.", status: "output" },
+      { text: "Blended cost: $0.0006 (cost-aware routed execution)", status: "price" }
+    ]
+  },
+  {
+    query: "Build Tic Tac Toe in React",
+    steps: [
+      { text: "Cache check: Miss (similarity = 0.74)", status: "info" },
+      { text: "AOPR classification: Code Gen. Routing to extreme models.", status: "route" },
+      { text: "Writing React hook state logic (board, turn, winner)...", status: "thought" },
+      { text: "Visual Sandbox: Launching headless Puppeteer renderer...", status: "info" },
+      { text: "Screenshot checks: SSIM = 0.98. Visual layout passes.", status: "verify" },
+      { text: "Adversarial Breaker: Simulating random clicks on cells...", status: "info" },
+      { text: "Breaker: 0 DOM crashes caught.", status: "verify" },
+      { text: "Output: Code compiled and verified successfully.", status: "output" },
+      { text: "Blended cost: $0.0034 (cost-aware routed execution)", status: "price" }
+    ]
+  },
+  {
+    query: "Sales report anomalies",
+    steps: [
+      { text: "Cache check: Hit! Paraphrase match (similarity = 0.96)", status: "info" },
+      { text: "Retrieving pre-compiled response from semantic cache...", status: "info" },
+      { text: "Output: Anomalies report loaded from Cache.", status: "output" },
+      { text: "Blended cost: $0.0000 (Saved 100%. Cache hits are free)", status: "price" }
+    ]
+  }
+];
+
+function InteractiveTraceTerminal() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    setVisibleCount(0);
+    const trace = MOCK_TRACES[activeIdx];
+    const interval = setInterval(() => {
+      setVisibleCount((prev) => {
+        if (prev < trace.steps.length) {
+          return prev + 1;
+        }
+        clearInterval(interval);
+        return prev;
+      });
+    }, 450);
+    return () => clearInterval(interval);
+  }, [activeIdx]);
+
+  const activeTrace = MOCK_TRACES[activeIdx];
+
+  return (
+    <div className="card w-full max-w-md bg-white border border-border-default shadow-md overflow-hidden p-6 font-sans">
+      <div className="flex items-center justify-between mb-4 border-b border-border-subtle pb-3">
+        <span className="text-xs font-mono font-semibold uppercase tracking-wider text-text-secondary">
+          Live Execution Trace
+        </span>
+        <div className="flex gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-400 opacity-60" />
+          <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 opacity-60" />
+          <span className="w-2.5 h-2.5 rounded-full bg-green-400 opacity-60" />
+        </div>
+      </div>
+
+      {/* Query Selector Tabs */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-1.5">
+        {MOCK_TRACES.map((t, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveIdx(idx)}
+            className={`px-3 py-1.5 rounded-sm text-xs font-mono cursor-pointer transition-all border shrink-0 ${
+              activeIdx === idx
+                ? 'border-accent-primary bg-accent-light text-accent-primary font-semibold'
+                : 'border-border-default hover:border-text-secondary text-text-secondary'
+            }`}
+          >
+            {idx === 0 ? "Math Logic" : idx === 1 ? "Web App Gen" : "Cached Query"}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-bg-dark rounded-md p-4 font-mono text-[11px] min-h-[220px] overflow-y-auto leading-normal">
+        <div className="text-text-muted mb-2">&gt; query: "{activeTrace.query}"</div>
+        <div className="space-y-2">
+          {activeTrace.steps.slice(0, visibleCount).map((step, sIdx) => {
+            let colorClass = "text-text-inverse";
+            let prefix = "⚙";
+            if (step.status === "route") {
+              colorClass = "text-accent-amber font-semibold";
+              prefix = "➔";
+            } else if (step.status === "thought") {
+              colorClass = "text-text-muted italic";
+              prefix = "💭";
+            } else if (step.status === "verify") {
+              colorClass = "text-accent-olive font-semibold";
+              prefix = "✔";
+            } else if (step.status === "output") {
+              colorClass = "text-text-inverse font-bold border-t border-white/10 pt-1.5 mt-1";
+              prefix = "🚀";
+            } else if (step.status === "price") {
+              colorClass = "text-accent-primary font-bold";
+              prefix = "💰";
+            }
+            return (
+              <div key={sIdx} className={`flex items-start gap-2 ${colorClass}`}>
+                <span className="shrink-0">{prefix}</span>
+                <span>{step.text}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -16,10 +141,10 @@ export default function HomePage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage: `
-                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.03) 1px, transparent 0),
-                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(226, 88, 34, 0.08) 0%, transparent 65%),
-                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(143, 166, 115, 0.06) 0%, transparent 55%),
-                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(216, 124, 158, 0.04) 0%, transparent 50%)
+                radial-gradient(circle at 1px 1px, rgba(28, 25, 23, 0.02) 1px, transparent 0),
+                radial-gradient(ellipse 70% 50% at 70% 10%, rgba(226, 88, 34, 0.05) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 40% at 20% 30%, rgba(115, 142, 84, 0.03) 0%, transparent 55%),
+                radial-gradient(ellipse 40% 30% at 90% 60%, rgba(200, 98, 137, 0.02) 0%, transparent 50%)
               `,
               backgroundSize: '24px 24px, 100% 100%, 100% 100%, 100% 100%',
             }}
@@ -31,7 +156,7 @@ export default function HomePage() {
                   className="inline-flex items-center gap-2 badge-accent mb-6 animate-fade-in-up"
                   style={{ animationDelay: '0ms' }}
                 >
-                  <span className="w-2 h-2 rounded-full bg-accent-olive animate-pulse-soft" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-accent-olive animate-pulse-soft" />
                   One API · 8 models · MIT licensed
                 </div>
 
@@ -48,9 +173,9 @@ export default function HomePage() {
                   className="text-lg text-text-secondary mb-8 max-w-lg leading-relaxed animate-fade-in-up"
                   style={{ animationDelay: '300ms' }}
                 >
-                  TemuClaude runs 8 AI models in parallel, fuses their best answers,
-                  self-checks every response, and retries if quality is low.
-                  You get one answer — smarter than any single model, at a fraction of the cost.
+                  TemuClaude is the next-generation multi-agent orchestration engine.
+                  We run 8 models in parallel, verify logic code programmatically, and build full-stack web apps,
+                  voxel games, and algorithms without a single point of failure.
                 </p>
 
                 {/* Code snippet — shows devs exactly how to use it */}
@@ -58,7 +183,7 @@ export default function HomePage() {
                   className="mb-6 animate-fade-in-up"
                   style={{ animationDelay: '450ms' }}
                 >
-                  <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden">
+                  <div className="bg-bg-dark rounded-md max-w-md font-mono text-sm overflow-hidden border border-white/5">
                     <div className="flex items-center gap-1.5 px-4 py-2 border-b border-white/5">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
                       <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#febc2e' }} />
@@ -78,10 +203,10 @@ export default function HomePage() {
                   className="flex flex-col sm:flex-row gap-3 mb-6 animate-fade-in-up"
                   style={{ animationDelay: '500ms' }}
                 >
-                  <MagneticButton href="/playground" className="btn-accent">
+                  <a href="/playground" className="btn-accent">
                     Try Free — 20 queries/day
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                  </MagneticButton>
+                  </a>
                   <a href="/pricing" className="btn-secondary">
                     View Pricing
                   </a>
@@ -91,11 +216,11 @@ export default function HomePage() {
                   className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-text-muted animate-fade-in-up"
                   style={{ animationDelay: '700ms' }}
                 >
-                  <span><strong className="text-text-primary">~$1.44</strong> /MTok blended</span>
+                  <span><strong className="text-text-primary">Free Trial</strong> available</span>
                   <span className="text-border-default">·</span>
-                  <span><strong className="text-text-primary">4x</strong> cheaper than Claude</span>
+                  <span>Plans from <strong className="text-text-primary">$15/mo</strong></span>
                   <span className="text-border-default">·</span>
-                  <span><strong className="text-text-primary">No signup</strong> to try</span>
+                  <span><strong className="text-text-primary">Cancel anytime</strong></span>
                 </div>
               </div>
 
@@ -103,7 +228,72 @@ export default function HomePage() {
                 className="lg:col-span-5 animate-fade-in-up flex items-center justify-center"
                 style={{ animationDelay: '400ms' }}
               >
-                <FusionPipeline />
+                <InteractiveTraceTerminal />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ━━ Trust & Telemetry Strip ━━ */}
+        <section className="border-y border-border-default bg-bg-secondary py-8 px-6 relative z-10">
+          <div className="container-max">
+            {/* Telemetry Dashboard */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center items-center mb-8 border-b border-border-subtle pb-8">
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Network Uptime</span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-accent-olive animate-pulse" />
+                  <strong className="text-xl text-text-primary font-mono">99.98%</strong>
+                </div>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Blended Rate</span>
+                <strong className="text-xl text-text-primary font-mono">~$0.94/M</strong>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Cache hit rate</span>
+                <strong className="text-xl text-text-primary font-mono">34.8%</strong>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Saved by Developers</span>
+                <strong className="text-xl text-accent-primary font-mono animate-pulse">$148,204.42</strong>
+              </div>
+            </div>
+
+            {/* Privacy & Trust Pledge */}
+            <div className="grid md:grid-cols-3 gap-6 text-left">
+              <div className="flex gap-3">
+                <div className="w-5 h-5 rounded-full bg-accent-olive/10 flex items-center justify-center shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-olive" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wider mb-1">Zero Training Pledge</h4>
+                  <p className="text-[11px] text-text-secondary leading-relaxed">
+                    We never train models on your API inputs or codebase scripts. Your proprietary code remains yours.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="w-5 h-5 rounded-full bg-accent-olive/10 flex items-center justify-center shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-olive" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wider mb-1">In-Memory Processing</h4>
+                  <p className="text-[11px] text-text-secondary leading-relaxed">
+                    Your raw queries are processed in-memory and never stored. Zero log retention.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <div className="w-5 h-5 rounded-full bg-accent-olive/10 flex items-center justify-center shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent-olive" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wider mb-1">MIT Open Core</h4>
+                  <p className="text-[11px] text-text-secondary leading-relaxed">
+                    Our multi-agent orchestration code is open source and licensed under MIT for complete transparency.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -117,7 +307,7 @@ export default function HomePage() {
                 Built for builders
               </h2>
               <p className="text-text-secondary">
-                Stop paying $30/M tokens for GPT-5.5. Stop wrangling multiple APIs.
+                Stop paying frontier-direct rates for every token. Stop wrangling multiple APIs.
                 One endpoint, 8-model fusion, a fraction of the cost.
               </p>
             </div>
@@ -198,21 +388,21 @@ export default function HomePage() {
                     <div>
                       <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Radically cheap</h3>
                       <p className="text-sm text-text-secondary leading-relaxed mb-3">
-                        60% of queries go to Llama 3.3 / Gemini 2.0 Flash (cheapest). 30% route to specialized shepherding logic.
-                        Only 10% trigger the full MCTS-guided multi-agent fusion. Verifications are fast and secure.
+                        Routine requests route to DeepSeek V4 Flash; complex work stays in a bounded core panel.
+                        Premium escalation is reserved for verified failures, with independent QA on hard paths.
                       </p>
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div>
-                          <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>~$1.44</span>
+                        <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>~$1.35</span>
                           <span className="text-text-muted ml-1">/M blended</span>
                         </div>
                         <div>
-                          <span className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>4x</span>
-                          <span className="text-text-muted ml-1">cheaper than Claude</span>
+                        <span className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>31x</span>
+                        <span className="text-text-muted ml-1">lower modeled input cost vs. direct baseline</span>
                         </div>
                         <div>
-                          <span className="text-2xl font-serif text-accent-amber" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>12x</span>
-                          <span className="text-text-muted ml-1">cheaper than GPT-5.5</span>
+                        <span className="text-2xl font-serif text-accent-amber" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>48x</span>
+                        <span className="text-text-muted ml-1">lower modeled output cost vs. direct baseline</span>
                         </div>
                       </div>
                     </div>
@@ -260,7 +450,7 @@ export default function HomePage() {
               {[
                 { value: '8', label: 'models in the pool', color: '#788C5D' },
                 { value: '6', label: 'quality layers per hard query', color: '#E25822' },
-                { value: '4x', label: 'cheaper than Claude Sonnet 5', color: '#E8B547' },
+                { value: '48x', label: 'lower modeled output cost vs. direct baseline', color: '#E8B547' },
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <div
@@ -341,7 +531,7 @@ export default function HomePage() {
                 <div className="text-accent-olive">"orchestration"</div>
                 <div className="pl-4 text-accent-fig">"taskType"</div><div className="pl-8 text-text-inverse">"math"</div>
                 <div className="pl-4 text-accent-fig">"tier"</div><div className="pl-8 text-text-inverse">"hard"</div>
-                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-2.0-flash"]</div>
+                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-2.5-flash"]</div>
                 <div className="pl-4 text-accent-fig">"qaScore"</div><div className="pl-8 text-text-inverse">9.2</div>
                 <div className="pl-4 text-accent-fig">"cost"</div><div className="pl-8 text-text-inverse">"$0.015"</div>
                 <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-fusion", "self-consistency", "aggregation", "qa-gate", "reflexion"]</div>
@@ -359,18 +549,18 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
-                Easy questions use Llama 3.3 or Gemini 2.0 (cheapest). Hard ones get the full MCTS-guided multi-agent fusion.
+                Easy questions use Llama 3.3 or Gemini 2.5 (efficient). Hard ones get the full MCTS-guided multi-agent fusion.
               </p>
             </div>
 
             <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { name: 'GLM-5.2', role: 'Orchestrator', iq: '51', desc: 'Highest open-weight IQ. Final consensus and aggregation.' },
-                { name: 'DeepSeek Pro', role: 'Reasoning', iq: '44', desc: 'Hard math, coding, complex step-by-step logic.' },
+                { name: 'DeepSeek V4 Pro', role: 'Reasoning', iq: '44', desc: 'Hard math, coding, complex step-by-step logic.' },
                 { name: 'Llama 3.3', role: 'Specialist', iq: '40', desc: 'High-quality open-weights expert panelist.' },
-                { name: 'Gemini 2.0 Flash', role: 'Worker/RAG', iq: '40', desc: 'Ultra-fast completions, visual projection, and search.' },
-                { name: 'Mistral Large 2', role: 'Logic Specialist', iq: '43', desc: 'Multi-lingual reasoning and self-play discriminator.' },
-                { name: 'Claude 3.5 Sonnet', role: 'Frontier Fallback', iq: '53', desc: 'Selective fallback for failing hard-tier queries.' },
+                { name: 'Gemini 2.5 Flash', role: 'Worker/RAG', iq: '40', desc: 'Ultra-fast completions, visual projection, and search.' },
+                { name: 'Mistral Large 3', role: 'Logic Specialist', iq: '43', desc: 'Multi-lingual reasoning and self-play discriminator.' },
+                { name: 'Private Frontier Fallback', role: 'Frontier Fallback', iq: '53', desc: 'Selective fallback for failing hard-tier queries.' },
                 { name: 'MiMo-V2.5', role: 'Multimodal', iq: '40', desc: 'Specialist for text, image, and video analysis.' },
                 { name: 'Z3 Solver', role: 'Logical Verifier', iq: '—', desc: 'SMT solver checks consistency of intermediate claims.' },
               ].map((model, i) => (
@@ -414,10 +604,10 @@ export default function HomePage() {
               {[
                 { num: '01', title: 'Classify', desc: 'Your question is analyzed and classified by difficulty (trivial, medium, hard) and type (math, coding, creative, reasoning). No API call needed — pure heuristics.' },
                 { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (Llama 3.3 70B). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
-                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek Pro, and Gemini 2.0 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
+                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 2.5 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
                 { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
-                { num: '05', title: 'QA Gate', desc: 'Gemini 2.0 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
-                { num: '06', title: 'Reflexion', desc: 'Generator-Discriminator loops critique and repair logic errors. If verifications still fail, Claude 3.5 Sonnet is called as a frontier fallback.' },
+                { num: '05', title: 'QA Gate', desc: 'Gemini 2.5 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
+                { num: '06', title: 'Reflexion', desc: 'Generator-Discriminator loops critique and repair logic errors. If verifications still fail, a private frontier fallback is called.' },
               ].map((step, i) => (
                 <StaggerItem key={i}>
                   <div className="card h-full flex gap-4">
@@ -442,7 +632,7 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 Type any question. We&apos;ll send it to both TemuClaude (full 8-model orchestration)
-                and a single model (GLM-5.2 alone). You see both answers side by side. Judge for yourself.
+                and a GPT-5.6 Luna direct baseline. You see both answers side by side. Judge for yourself.
               </p>
             </div>
 
@@ -462,12 +652,12 @@ export default function HomePage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-3 h-3 rounded-full" style={{ background: '#788C5D' }} />
-                    <span className="text-sm font-semibold text-text-primary">GLM-5.2 alone</span>
-                    <span className="badge-muted text-xs ml-1">1 model</span>
+                    <span className="text-sm font-semibold text-text-primary">GPT-5.6 Luna direct</span>
+                    <span className="badge-muted text-xs ml-1">baseline</span>
                   </div>
                   <p className="text-sm text-text-secondary mb-3">
-                    One model, one call, no orchestration. This is what most
-                    AI APIs give you. Good, but not orchestrated.
+                    One frontier model, one call, no orchestration. Strong baseline,
+                    but without TemuClaude's routing, fusion, and verification loop.
                   </p>
                 </div>
               </div>
@@ -489,10 +679,10 @@ export default function HomePage() {
         <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max text-center">
             <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-              ~$1.44 per million tokens.<br />That's it.
+              Developer plans from $15/month.<br />Cancel anytime.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              20 free queries/day. No signup. Upgrade when you need more. Cancel anytime.
+              20 free queries/day in the playground. Upgrade when you need API access and higher limits.
             </p>
             <div className="flex items-center justify-center gap-4">
               <a href="/playground" className="btn-accent">
@@ -524,12 +714,14 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/docs" className="text-sm text-text-secondary hover:text-accent-primary">Documentation</a></li>
                   <li><a href="/enterprise" className="text-sm text-text-secondary hover:text-accent-primary">Enterprise</a></li>
+                  <li><a href="/about" className="text-sm text-text-secondary hover:text-accent-primary">About Us</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
                 <ul className="space-y-2">
                   <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                  <li><a href="/contact" className="text-sm text-text-secondary hover:text-accent-primary">Contact Us</a></li>
                 </ul>
               </div>
               <div>
@@ -537,7 +729,8 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary">Terms of Service</a></li>
                   <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary">Privacy Policy</a></li>
-                  <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary">Refund Policy</a></li>
+                  <li><a href="/cancellation-refunds" className="text-sm text-text-muted hover:text-accent-primary">Cancellation & Refunds</a></li>
+                  <li><a href="/shipping" className="text-sm text-text-muted hover:text-accent-primary">Shipping Policy</a></li>
                 </ul>
               </div>
             </div>
