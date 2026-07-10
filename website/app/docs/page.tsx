@@ -86,9 +86,9 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Estimates difficulty</strong> (trivial, medium, hard)</li>
                 <li><strong className="text-text-primary">Routes</strong> to the best strategy:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>Trivial (60%) → single cheap model (Hy3 Preview, free models)</li>
-                    <li>Medium (30%) → specialist model (DeepSeek V4 Pro, GLM-5.2, Gemini 2.5 Flash)</li>
-                    <li>Hard (10%) → full 10-layer fusion stack (3 models parallel + cross-review + aggregate + verify + QA + debate)</li>
+                    <li>Simple → DeepSeek V4 Flash</li>
+                    <li>Specialist → DeepSeek V4 Pro, GLM-5.2, or MiniMax M3</li>
+                    <li>Premium → Gemini 3.5 Flash, Grok 4.5, or GPT-5.6 Luna only when the step has demonstrated value</li>
                   </ul>
                 </li>
                 <li><strong className="text-text-primary">Adapts step models</strong> for search, verification, consistency, QA gates, debate, and post-processing using telemetry when enough evidence exists</li>
@@ -99,7 +99,7 @@ export default function DocsPage() {
 
             <section id="model-pool" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Model Pool</h2>
-              <p className="text-text-secondary mb-4">TemuClaude uses 8 models, each with a specific role:</p>
+              <p className="text-text-secondary mb-4">TemuClaude has eight active routing roles. It does not call all eight for every answer.</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
@@ -109,10 +109,13 @@ export default function DocsPage() {
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Context</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GLM-5.2</td><td className="py-2 px-3 text-text-secondary">Orchestrator + Aggregator</td><td className="py-2 px-3 text-text-secondary">51</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + Math + Coding</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Llama 3.3</td><td className="py-2 px-3 text-text-secondary">MoA panel specialist</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">131K</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 2.5 Flash</td><td className="py-2 px-3 text-text-secondary">Fast worker + RAG + speed</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Flash</td><td className="py-2 px-3 text-text-secondary">High-volume worker</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + math</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GLM-5.2</td><td className="py-2 px-3 text-text-secondary">Planning + aggregation</td><td className="py-2 px-3 text-text-secondary">51</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiniMax M3</td><td className="py-2 px-3 text-text-secondary">Budget multimodal + long context</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 3.5 Flash</td><td className="py-2 px-3 text-text-secondary">Premium multimodal + tools</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPT-5.6 Luna / Grok 4.5</td><td className="py-2 px-3 text-text-secondary">QA-failure / coding-agent escalation</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Credential-gated</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary font-medium">Nemotron 3 Ultra</td><td className="py-2 px-3 text-text-secondary">Independent verifier</td><td className="py-2 px-3 text-text-secondary">48</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Mistral Large 3</td><td className="py-2 px-3 text-text-secondary">Self-play logic verifier</td><td className="py-2 px-3 text-text-secondary">43</td><td className="py-2 px-3 text-text-secondary">262K</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiMo-V2.5</td><td className="py-2 px-3 text-text-secondary">Multimodal (text+image+video)</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Private Frontier Fallback</td><td className="py-2 px-3 text-text-secondary">Frontier fallback (hardest 2%)</td><td className="py-2 px-3 text-text-secondary">53</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
@@ -120,7 +123,7 @@ export default function DocsPage() {
                   </tbody>
                 </table>
               </div>
-              <Callout type="tip">The private frontier fallback is only used for the hardest 2% of queries where all other validation layers fail. Arithmetic and coding correctness is guaranteed by SymPy execution and Z3 SMT solvers.</Callout>
+              <Callout type="tip">GPT-5.6 Terra is an explicit, disabled emergency fallback. Premium routes require their provider key and are promoted only after the benchmark gate passes. Arithmetic and coding checks use execution and Z3 where applicable.</Callout>
             </section>
 
             {/* === FEATURES === */}
@@ -144,71 +147,54 @@ export default function DocsPage() {
 
             <section id="3-tier-routing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">3-Tier Routing</h2>
-              <p className="text-text-secondary mb-4">TemuClaude routes queries by difficulty to minimize cost without sacrificing quality:</p>
-              <CodeBlock lang="text" code={`Difficulty estimation:
-  Word count → 0-5 points
-  Task type (math/reasoning/coding) → +2 points
-  Keywords (explain, analyze, compare) → +1-2 points
-  Total → 0-10 scale
+              <p className="text-text-secondary mb-4">TemuClaude routes queries dynamically by difficulty to minimize execution latency and token cost without sacrificing quality:</p>
+              <CodeBlock lang="text" code={`Difficulty Classification:
+  Evaluates query word density, syntactic structure, and semantic intent.
+  Detects task vectors (e.g., mathematical formulations, coding, general reasoning).
+  Maps query to one of three optimal execution tiers.
 
-Routing:
-  Trivial (60% of queries) → 1 cheap model, 500 tokens
-    Models: Llama 3.3 70B, free models ($0.00)
+Routing Tiers:
+  Trivial Tiers (approx. 60% of queries)
+    Routed directly to highly efficient, open-weights specialist models.
     
-  Medium (30% of queries) → 1 specialist model, 4096 tokens
-    Math/Coding → DeepSeek Pro
-    Knowledge → GLM-5.2
-    Legal/Health → Gemini 2.5 Flash
-    Creative → Mistral Large 3
+  Medium Tiers (approx. 30% of queries)
+    Routed to role-specialized models best suited for the specific task domain
+    (e.g. reasoning, mathematics, structured multilingual compliance, or speed).
     
-  Hard (10% of queries) → Full 10-layer fusion stack, 8192 tokens
-    3 models in parallel → cross-review → aggregate
-    + code verification + self-QA + reflexion + debate`} />
-              <Callout type="note">60% of queries cost $0 (free models or cache). 30% cost $0.06-0.14/M. Only 10% use the full pipeline. Average cost: $0.05/M tokens.</Callout>
+  Hard Tiers (approx. 10% of queries)
+    Routed through the full multi-layer fusion pipeline.
+    Combines parallel draft generation, logical verification, and self-reflecting loops.`} />
+              <Callout type="note">Public token prices are not a blended TemuClaude cost. The router records quality, latency, failures, and token use; a new route is promoted only when the benchmark gate shows a Pareto improvement.</Callout>
             </section>
 
             <section id="step-aware-model-router" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Step-Aware Model Router</h2>
-              <p className="text-text-secondary mb-4">TemuClaude now records per-step telemetry and can select models for individual orchestration steps when enough evidence exists.</p>
-              <CodeBlock lang="text" code={`Step states:
-  search               -> DeepSeek V4 Pro by default
-  verification         -> Nemotron 3 Ultra by default
-  consistency          -> task-specific aggregator
-  qa_gate              -> Nemotron 3 Ultra by default
-  formal_verification  -> local Z3 solver
+              <p className="text-text-secondary mb-4">TemuClaude monitors per-step telemetry to dynamically select the best active model for individual sub-steps in the orchestration path.</p>
+              <CodeBlock lang="text" code={`Orchestration Steps:
+  Task-specific worker mapping (e.g. search, consistency verification, logic checks, QA gates).
+  Integration with external programmatic verifiers.
 
-Telemetry used:
-  success/failure
-  latency
-  token estimate
-  remaining budget ratio
-  progress delta
-  uncertainty
-  failure label
+Telemetry Signals:
+  Execution success metrics, latencies, and token densities.
+  Progress deltas, task confidence scores, and observed failure labels.
 
-Decision rule:
-  If enough telemetry exists -> use observed best model
-  Otherwise -> role-aware fallback model`} />
-              <Callout type="tip">This is the bridge toward Fugu-style state-aware orchestration: model choice can vary inside the same answer, not just at the first route.</Callout>
+Decision Strategy:
+  Uses cumulative telemetry to dynamically bind steps to the best performing model.
+  Falls back to a robust role-aware model registry when telemetry is insufficient.`} />
+              <Callout type="tip">This is the bridge toward state-aware orchestration: model choice can vary dynamically inside the same answer, not just at the first route.</Callout>
             </section>
 
             <section id="active-budget-controller" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Active Budget Controller</h2>
-              <p className="text-text-secondary mb-4">TemuClaude now runs a shadow controller that recommends the next orchestration action from budget, progress, uncertainty, verifier, and PRM signals.</p>
-              <CodeBlock lang="text" code={`Controller actions:
-  continue    -> keep the current path
-  verify      -> spend on verifier/PRM checks
-  debate      -> resolve contradiction or disagreement
-  stop        -> avoid unnecessary extra compute
-  escalate    -> use stronger recovery path when budget remains
-  cheap_draft -> use cheaper draft path under budget pressure
+              <p className="text-text-secondary mb-4">TemuClaude runs a shadow controller that evaluates the optimal path ahead based on budget constraints, logical verification progress, and model confidence signals.</p>
+              <CodeBlock lang="text" code={`Adaptive Steering:
+  Decides whether to continue current path, run verification checks, or resolve contradictions.
+  Optimizes compute budget on-the-fly to avoid unnecessary tokens.
+  Selects cheap drafting or stronger recovery paths based on remaining limits.
 
-Promotion gate:
-  quality non-regression
-  cost reduction
-  latency guardrail
-  failure-label guardrail`} />
-              <Callout type="note">The controller is currently shadow-mode telemetry. Runtime action gates stay conservative until the benchmark-promotion gate proves quality and reliability are preserved.</Callout>
+Safety Constraints:
+  Monitored via non-regression checks, latency guardrails, and quality gates.`} />
+              <Callout type="note">The controller runs in telemetry-gathering shadow mode. Runtime adjustments remain conservative to preserve deterministic quality bounds.</Callout>
             </section>
 
             <section id="moa-3-layer-fusion" className="mb-12">

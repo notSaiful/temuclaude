@@ -263,17 +263,17 @@ class TestModelRouter:
         self.router = ModelRouter()
 
     def test_route_game_3d(self):
-        """Should route game_3d to frontier model."""
+        """Should route complex game generation to the coding escalation role."""
         intent = type("I", (), {"category": "game_3d"})()
         choice = self.router.route(intent, phase="generation")
-        assert choice.model == "claude-sonnet-5"
+        assert choice.model == "grok-4.5"
         assert choice.max_tokens >= 12000
 
     def test_route_physics_demo(self):
-        """Should route physics_demo to frontier model."""
+        """Should route physics demos to the coding escalation role."""
         intent = type("I", (), {"category": "physics_demo"})()
         choice = self.router.route(intent, phase="generation")
-        assert choice.model == "claude-sonnet-5"
+        assert choice.model == "grok-4.5"
 
     def test_route_dashboard(self):
         """Should route dashboard to precision coding model."""
@@ -313,7 +313,7 @@ class TestModelRouter:
     def test_get_model_for_intent(self):
         """Should return model name for intent category."""
         model = self.router.get_model_for_intent("game_3d")
-        assert model == "claude-sonnet-5"
+        assert model == "grok-4.5"
         model = self.router.get_model_for_intent("landing_page")
         assert model == "minimax-m3"
 
@@ -908,7 +908,7 @@ class TestIntegration:
 
         # Step 3: Route model
         choice = router.route(intent, phase="generation")
-        assert choice.model == "claude-sonnet-5"
+        assert choice.model == "grok-4.5"
 
         # Step 4: Validate a sample output
         sample_code = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width"></head><body><header><nav><a href="#">Menu</a></nav></header><main><section><canvas id="game"></canvas><button>Play</button></section></main><footer>©</footer></body></html>'
@@ -946,7 +946,7 @@ class TestIntegration:
         assert "raw webgl" in spec.markdown.lower()
 
         choice = router.route(intent, phase="generation")
-        assert choice.model == "claude-sonnet-5"
+        assert choice.model == "grok-4.5"
 
     def test_three_layer_stack(self):
         """Test the three-layer engineering stack."""

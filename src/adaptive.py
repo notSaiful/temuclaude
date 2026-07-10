@@ -10,7 +10,7 @@ This is data-driven self-improvement — the system learns from its own results.
 import json
 import os
 from typing import Optional
-from .models import AGGREGATOR_MAP, TASK_MODEL_MAP
+from .models import AGGREGATOR_MAP, TASK_MODEL_MAP, get_runtime_model
 
 
 ADAPTIVE_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "config", "adaptive_routing.json")
@@ -18,17 +18,19 @@ ADAPTIVE_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "config", "
 
 STEP_MODEL_DEFAULTS = {
     "cache": "cache",
-    "long_context_retrieval": "kimi-k2.6",
-    "ui_ux_loop": "glm-5.2",
+    "long_context_retrieval": "minimax-m3",
+    "ui_ux_loop": "gemini-3.5-flash",
     "direct_answer": None,  # Task-specific fallback.
     "shepherding": "deepseek-v4-flash",
     "search": "deepseek-v4-pro",
-    "repair": "mistral-large-3",
+    "repair": "grok-4.5",
     "fusion": "glm-5.2",
     "verification": "nemotron-3-ultra",
     "consistency": None,  # Aggregator-specific fallback.
     "qa_gate": "nemotron-3-ultra",
     "debate": "glm-5.2",
+    "premium_escalation": "gpt-5.6-luna",
+    "frontier_fallback": "gpt-5.6-terra",
     "budget_forcing": None,
     "formal_verification": "z3",
     "postprocess": "glm-5.2",
@@ -71,10 +73,10 @@ def get_model_for_task(task_type: str) -> str:
     
     # Check if adaptive routing has an override for this task type
     if task_type in adaptive:
-        return adaptive[task_type]
+        return get_runtime_model(adaptive[task_type])
     
     # Fall back to default
-    return TASK_MODEL_MAP.get(task_type, "glm-5.2")
+    return get_runtime_model(TASK_MODEL_MAP.get(task_type, "glm-5.2"))
 
 
 def update_adaptive_routing(analysis: dict) -> dict:
@@ -148,18 +150,18 @@ def get_model_for_task_with_router(query: str, task_type: str, tier: str) -> tup
     """
     # For trivial tier, always use cheap model
     if tier == "trivial":
-        return ("gpt-oss-120b", False, 1.0)
+        return (get_runtime_model("deepseek-v4-flash"), False, 1.0)
     
     # Try to use trained router
     from .preference_router import route_with_trained_model
     model, confidence, used_trained = route_with_trained_model(query, task_type, tier)
     
     if used_trained and model:
-        return (model, True, confidence)
+        return (get_runtime_model(model), True, confidence)
     
     # Fall back to default adaptive routing
     model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
-    return (model, False, 0.0)
+    return (get_runtime_model(model), False, 0.0)
 
 
 def get_fallback_model_for_step(task_type: str, step_type: str) -> str:
@@ -171,21 +173,21 @@ def get_fallback_model_for_step(task_type: str, step_type: str) -> str:
 
     normalized_step = normalize_step_name(step_type)
     if normalized_step == "verification" and task_type in ("math", "coding"):
-        return TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
+        return get_runtime_model(TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro"))
     if normalized_step == "prm_verification":
-        return "nemotron-3-ultra"
+        return get_runtime_model("nemotron-3-ultra")
 
     configured = STEP_MODEL_DEFAULTS.get(normalized_step)
     if configured:
-        return configured
+        return get_runtime_model(configured)
 
     if normalized_step == "direct_answer":
         return get_model_for_task(task_type)
     if normalized_step == "consistency":
-        return AGGREGATOR_MAP.get(task_type, AGGREGATOR_MAP.get("default", "glm-5.2"))
+        return get_runtime_model(AGGREGATOR_MAP.get(task_type, AGGREGATOR_MAP.get("default", "glm-5.2")))
     if normalized_step == "budget_forcing":
-        return TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro")
-    return TASK_MODEL_MAP.get(task_type, "glm-5.2")
+        return get_runtime_model(TASK_MODEL_MAP.get(task_type, "deepseek-v4-pro"))
+    return get_runtime_model(TASK_MODEL_MAP.get(task_type, "glm-5.2"))
 
 
 def get_model_for_step(
@@ -216,7 +218,7 @@ def get_model_for_step(
             confidence = 0.0
             if candidates:
                 confidence = max(0.0, min(1.0, float(candidates[0].get("utility", 0.0))))
-            return rec["recommended_model"], True, round(confidence, 3)
+            return get_runtime_model(rec["recommended_model"]), True, round(confidence, 3)
     except Exception:
         pass
 
