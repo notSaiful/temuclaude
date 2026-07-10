@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
-import { getAccessToken, getStoredSession, signOut, syncAuthenticatedUser, type LocalSession } from '@/lib/auth';
+import { getAccessToken, getStoredSession, syncAuthenticatedUser, type LocalSession } from '@/lib/auth';
 
 type ApiKeyRecord = {
   id: string;
@@ -247,10 +247,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleDashboardSignOut = () => {
-    signOut().finally(() => router.push('/login'));
-  };
-
   const activePlan = dashboardData?.plan;
   const creditBalance = dashboardData?.user.credit_balance ?? 12500;
   const weeklyAllocation = dashboardData?.user.weekly_credit_allocation ?? 12500;
@@ -286,12 +282,14 @@ export default function DashboardPage() {
       <main className="min-h-screen pt-28 pb-24 px-6 bg-bg-primary">
         <div className="container-max">
           <div className="mb-10">
-            <h1 className="text-4xl font-serif text-text-primary mb-1.5" style={{ fontWeight: 300 }}>
-              Developer Dashboard
-            </h1>
-            <p className="text-sm text-text-secondary">
-              Live account data from your authenticated TemuClaude profile, API credentials, and usage records.
-            </p>
+            <div>
+              <h1 className="text-4xl font-serif text-text-primary mb-1.5" style={{ fontWeight: 300 }}>
+                Developer Dashboard
+              </h1>
+              <p className="text-sm text-text-secondary">
+                Live account data from your authenticated TemuClaude profile, API credentials, and usage records.
+              </p>
+            </div>
           </div>
 
           {dataError && (
