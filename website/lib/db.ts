@@ -12,6 +12,7 @@ interface DBSchema {
   subscriptions: Record<string, SubscriptionRecord>;
   api_keys: Record<string, ApiKeyRecord>;
   usage: Record<string, UsageRecord>; // key: userId_date
+  events: Record<string, UsageEvent>; // key: eventId
   payments: Record<string, PaymentRecord>;
 }
 
@@ -21,6 +22,16 @@ interface UsageRecord {
   query_count: number;
   input_tokens: number;
   output_tokens: number;
+}
+
+export interface UsageEvent {
+  id: string;
+  user_id: string;
+  created_at: number;
+  credits_spent: number;
+  query_count: number;
+  model_name?: string;
+  saved_usd?: number;
 }
 
 interface PaymentRecord {
@@ -99,6 +110,9 @@ function loadDB(): DBSchema {
   try {
     const data = fs.readFileSync(DB_PATH, 'utf-8');
     dbCache = JSON.parse(data);
+    if (dbCache && !dbCache.events) {
+      dbCache.events = {};
+    }
   } catch {
     // File doesn't exist, create empty DB
     dbCache = {
@@ -106,6 +120,7 @@ function loadDB(): DBSchema {
       subscriptions: {},
       api_keys: {},
       usage: {},
+      events: {},
       payments: {},
     };
     saveDB();
@@ -143,6 +158,9 @@ export function createUser(email: string, name?: string): User {
     name: name || null,
     plan: 'free',
     razorpay_customer_id: null,
+    credit_balance: 50000,
+    credits_reset_at: now + 7 * 24 * 3600,
+    weekly_credit_allocation: 50000,
     created_at: now,
     updated_at: now,
   };
@@ -167,7 +185,11 @@ export function getUserByEmail(email: string): User | null {
 export function updateUserPlan(userId: string, plan: string): void {
   const db = loadDB();
   if (db.users[userId]) {
+    const weeklyAllocation = plan === 'developer' ? 5000000 : plan === 'pro' ? 25000000 : plan === 'max' ? 100000000 : plan === 'enterprise' ? 300000000 : 50000;
     db.users[userId].plan = plan;
+    db.users[userId].weekly_credit_allocation = weeklyAllocation;
+    db.users[userId].credit_balance = weeklyAllocation;
+    db.users[userId].credits_reset_at = Math.floor(Date.now() / 1000) + 7 * 24 * 3600;
     db.users[userId].updated_at = Math.floor(Date.now() / 1000);
     saveDB();
   }
@@ -311,11 +333,13 @@ export function getMonthUsage(userId: string): { totalQueries: number; totalInpu
   return { totalQueries, totalInputTokens, totalOutputTokens };
 }
 
-export function incrementUsage(userId: string, inputTokens: number, outputTokens: number): void {
+export function incrementUsage(userId: string, inputTokens: number, outputTokens: number, modelName?: string): void {
   const db = loadDB();
   const today = new Date().toISOString().split('T')[0];
   const key = `${userId}_${today}`;
+  const now = Math.floor(Date.now() / 1000);
 
+  // 1. Maintain old daily summaries for safety/compat
   if (db.usage[key]) {
     db.usage[key].query_count += 1;
     db.usage[key].input_tokens += inputTokens;
@@ -329,6 +353,28 @@ export function incrementUsage(userId: string, inputTokens: number, outputTokens
       output_tokens: outputTokens,
     };
   }
+
+  // 2. Add high-res rolling window event
+  const eventId = generateId();
+  const creditsSpent = inputTokens + outputTokens;
+  const savedUsd = creditsSpent * 0.00004906;
+  if (!db.events) db.events = {};
+  db.events[eventId] = {
+    id: eventId,
+    user_id: userId,
+    created_at: now,
+    credits_spent: creditsSpent,
+    query_count: 1,
+    model_name: modelName || 'temuclaude-standard',
+    saved_usd: savedUsd,
+  };
+
+  // 3. Deduct from credit balance
+  if (db.users[userId]) {
+    db.users[userId].credit_balance = Math.max(0, (db.users[userId].credit_balance ?? 50000) - creditsSpent);
+    db.users[userId].updated_at = now;
+  }
+
   saveDB();
 }
 
@@ -393,6 +439,9 @@ function mapUser(row: any): User {
     name: row.name ?? null,
     plan: row.plan || 'free',
     razorpay_customer_id: row.razorpay_customer_id ?? null,
+    credit_balance: Number(row.credit_balance ?? 50000),
+    credits_reset_at: Number(row.credits_reset_at ?? (nowUnix() + 7 * 24 * 3600)),
+    weekly_credit_allocation: Number(row.weekly_credit_allocation ?? 50000),
     created_at: Number(row.created_at || nowUnix()),
     updated_at: Number(row.updated_at || nowUnix()),
   };
@@ -451,6 +500,9 @@ export async function createUserAsync(email: string, name?: string): Promise<Use
     name: name || null,
     plan: 'free',
     razorpay_customer_id: null,
+    credit_balance: 50000,
+    credits_reset_at: now + 7 * 24 * 3600,
+    weekly_credit_allocation: 50000,
     created_at: now,
     updated_at: now,
   };
@@ -481,9 +533,16 @@ export async function updateUserPlanAsync(userId: string, plan: string): Promise
     return;
   }
 
+  const weeklyAllocation = plan === 'developer' ? 5000000 : plan === 'pro' ? 25000000 : plan === 'max' ? 100000000 : plan === 'enterprise' ? 300000000 : 50000;
   const { error } = await client
     .from('temuclaude_users')
-    .update({ plan, updated_at: nowUnix() })
+    .update({
+      plan,
+      weekly_credit_allocation: weeklyAllocation,
+      credit_balance: weeklyAllocation,
+      credits_reset_at: nowUnix() + 7 * 24 * 3600,
+      updated_at: nowUnix()
+    })
     .eq('id', userId);
 
   if (error) throw error;
@@ -686,13 +745,63 @@ export async function getMonthUsageAsync(userId: string): Promise<{ totalQueries
   );
 }
 
-export async function incrementUsageAsync(userId: string, inputTokens: number, outputTokens: number): Promise<void> {
+export async function incrementUsageAsync(userId: string, inputTokens: number, outputTokens: number, modelName?: string): Promise<void> {
   const client = getSupabaseAdminClient();
   if (!client) {
-    incrementUsage(userId, inputTokens, outputTokens);
+    incrementUsage(userId, inputTokens, outputTokens, modelName);
     return;
   }
 
+  const now = nowUnix();
+  const creditsSpent = inputTokens + outputTokens;
+  const savedUsd = creditsSpent * 0.00004906;
+  const resolvedModel = modelName || 'temuclaude-standard';
+
+  // 1. Log high-res rolling window event
+  const { error: eventErr } = await client
+    .from('temuclaude_usage_events')
+    .insert({
+      id: generateId(),
+      user_id: userId,
+      created_at: now,
+      credits_spent: creditsSpent,
+      query_count: 1,
+      model_name: resolvedModel,
+      saved_usd: savedUsd,
+    });
+
+  if (eventErr) {
+    console.warn('Logging usage event with model metadata failed, falling back to core schema...', eventErr.message);
+    const { error: fallbackErr } = await client
+      .from('temuclaude_usage_events')
+      .insert({
+        id: generateId(),
+        user_id: userId,
+        created_at: now,
+        credits_spent: creditsSpent,
+        query_count: 1,
+      });
+    if (fallbackErr) {
+      console.error('Core usage event fallback insert failed:', fallbackErr.message);
+    }
+  }
+
+  // 2. Deduct credits from user profile
+  const { data: userRow } = await client
+    .from('temuclaude_users')
+    .select('credit_balance')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (userRow) {
+    const newBalance = Math.max(0, Number(userRow.credit_balance ?? 0) - creditsSpent);
+    await client
+      .from('temuclaude_users')
+      .update({ credit_balance: newBalance, updated_at: now })
+      .eq('id', userId);
+  }
+
+  // 3. Keep old daily usage summaries in sync
   const today = new Date().toISOString().split('T')[0];
   const current = await getTodayUsageAsync(userId);
   const { error } = await client
@@ -706,6 +815,123 @@ export async function incrementUsageAsync(userId: string, inputTokens: number, o
     }, { onConflict: 'user_id,query_date' });
 
   if (error) throw error;
+}
+
+export async function getRollingWindowUsageAsync(userId: string, hours = 5): Promise<{ query_count: number; credits_spent: number }> {
+  const client = getSupabaseAdminClient();
+  const cutoff = nowUnix() - hours * 3600;
+
+  if (!client) {
+    const db = loadDB();
+    let query_count = 0;
+    let credits_spent = 0;
+
+    for (const event of Object.values(db.events || {})) {
+      if (event.user_id === userId && event.created_at >= cutoff) {
+        query_count += event.query_count;
+        credits_spent += event.credits_spent;
+      }
+    }
+    return { query_count, credits_spent };
+  }
+
+  const { data, error } = await client
+    .from('temuclaude_usage_events')
+    .select('query_count, credits_spent')
+    .eq('user_id', userId)
+    .gte('created_at', cutoff);
+
+  if (error) {
+    console.warn('Supabase usage events read failed (falling back to daily):', error.message);
+    const today = await getTodayUsageAsync(userId);
+    return { query_count: today.query_count, credits_spent: today.input_tokens + today.output_tokens };
+  }
+
+  let query_count = 0;
+  let credits_spent = 0;
+  for (const row of data || []) {
+    query_count += Number(row.query_count || 0);
+    credits_spent += Number(row.credits_spent || 0);
+  }
+  return { query_count, credits_spent };
+}
+
+export async function verifyAndRenewWeeklyCreditsAsync(userId: string): Promise<User | null> {
+  const client = getSupabaseAdminClient();
+  const now = nowUnix();
+
+  if (!client) {
+    const db = loadDB();
+    const user = db.users[userId];
+    if (!user) return null;
+
+    if (now >= (user.credits_reset_at || 0)) {
+      user.credit_balance = user.weekly_credit_allocation || 50000;
+      user.credits_reset_at = now + 7 * 24 * 3600;
+      user.updated_at = now;
+      saveDB();
+    }
+    return user;
+  }
+
+  const { data: userRow, error: fetchErr } = await client
+    .from('temuclaude_users')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (fetchErr || !userRow) return null;
+  const user = mapUser(userRow);
+
+  if (now >= user.credits_reset_at) {
+    const newBalance = user.weekly_credit_allocation;
+    const newReset = now + 7 * 24 * 3600;
+
+    const { data: updatedRow, error: updateErr } = await client
+      .from('temuclaude_users')
+      .update({
+        credit_balance: newBalance,
+        credits_reset_at: newReset,
+        updated_at: now
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (updateErr) throw updateErr;
+    return mapUser(updatedRow);
+  }
+
+  return user;
+}
+
+export async function addCreditsToUserAsync(userId: string, amount: number): Promise<void> {
+  const client = getSupabaseAdminClient();
+  const now = nowUnix();
+
+  if (!client) {
+    const db = loadDB();
+    if (db.users[userId]) {
+      db.users[userId].credit_balance = (db.users[userId].credit_balance || 0) + amount;
+      db.users[userId].updated_at = now;
+      saveDB();
+    }
+    return;
+  }
+
+  const { data: userRow } = await client
+    .from('temuclaude_users')
+    .select('credit_balance')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (userRow) {
+    const newBalance = Number(userRow.credit_balance ?? 0) + amount;
+    await client
+      .from('temuclaude_users')
+      .update({ credit_balance: newBalance, updated_at: now })
+      .eq('id', userId);
+  }
 }
 
 export async function recordPaymentAsync(params: {
@@ -761,6 +987,49 @@ export async function updatePaymentStatusAsync(razorpayOrderId: string, status: 
   if (error) throw error;
 }
 
+export async function getSavingsAndModelMixAsync(userId: string): Promise<{
+  totalSavedUSD: number;
+  modelMix: Record<string, number>;
+}> {
+  const client = getSupabaseAdminClient();
+  let events: UsageEvent[] = [];
+
+  if (!client) {
+    // Read from mock filesystem
+    const db = loadDB();
+    if (db.events) {
+      events = Object.values(db.events).filter((e) => e.user_id === userId);
+    }
+  } else {
+    // Read from production database
+    const { data, error } = await client
+      .from('temuclaude_usage_events')
+      .select('model_name, saved_usd, credits_spent')
+      .eq('user_id', userId);
+
+    if (!error && data) {
+      events = data as UsageEvent[];
+    }
+  }
+
+  let totalSavedUSD = 0;
+  const modelMix: Record<string, number> = {};
+
+  for (const event of events) {
+    // Fallback: calculate saved_usd dynamically from credits_spent if it's not stored
+    const saved = event.saved_usd !== undefined ? Number(event.saved_usd) : Number(event.credits_spent || 0) * 0.00004906;
+    totalSavedUSD += saved;
+
+    const model = event.model_name || 'temuclaude-standard';
+    modelMix[model] = (modelMix[model] || 0) + 1;
+  }
+
+  return {
+    totalSavedUSD,
+    modelMix,
+  };
+}
+
 // === TYPES ===
 
 export interface User {
@@ -769,6 +1038,9 @@ export interface User {
   name: string | null;
   plan: string;
   razorpay_customer_id: string | null;
+  credit_balance: number;
+  credits_reset_at: number;
+  weekly_credit_allocation: number;
   created_at: number;
   updated_at: number;
 }
