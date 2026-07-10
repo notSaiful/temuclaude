@@ -201,7 +201,7 @@ class ScreenshotFeedback:
         generated_code: str,
         quality_report,
         call_model_fn: Callable[..., Awaitable[str]],
-        model: str = "nemotron-3-ultra",
+        model: str = None,
     ) -> str:
         """Full feedback loop: screenshot → build prompt → get critique from model.
 
@@ -213,10 +213,33 @@ class ScreenshotFeedback:
         # Build feedback prompt
         feedback_prompt = self.build_feedback_prompt(screenshot, quality_report, generated_code)
 
+        # A screenshot needs a vision-capable reviewer. Gemini 3.5 Flash is
+        # selected only when its direct provider is configured; otherwise the
+        # normal runtime resolver chooses the budget multimodal fallback. If
+        # Playwright could not capture an image, use the text verifier instead.
+        if model is None:
+            if screenshot.captured and screenshot.screenshot_base64:
+                from ..models import get_runtime_model
+                model = get_runtime_model("gemini-3.5-flash")
+            else:
+                model = "nemotron-3-ultra"
+
+        user_content = feedback_prompt
+        if screenshot.captured and screenshot.screenshot_base64:
+            user_content = [
+                {"type": "text", "text": feedback_prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{screenshot.screenshot_base64}",
+                    },
+                },
+            ]
+
         # Get model critique
         messages = [
             {"role": "system", "content": "You are a UI/UX code reviewer. Analyze the screenshot and quality report. Give specific, actionable feedback on what to fix."},
-            {"role": "user", "content": feedback_prompt},
+            {"role": "user", "content": user_content},
         ]
 
         critique = await call_model_fn(model, messages, max_tokens=2000)

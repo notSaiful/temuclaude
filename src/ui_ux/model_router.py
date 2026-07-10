@@ -1,23 +1,11 @@
 """
 Model Router — Routes to the right model based on intent and task.
 
-Research finding (Section 5.3):
-| Task Tier                         | Model         | Rationale                              |
-|-----------------------------------|---------------|----------------------------------------|
-| Spec generation / intent clarif  | Fable 5       | Best reasoning, understands builders   |
-| Complex game/app implementation   | Fable 5       | ViBench #1, vision-native, one-shot    |
-| Precision refactoring / bug fixes| Opus / GPT-5.5| SWE-Bench leadership                    |
-| Computer-use automation (testing)| GPT-5.5       | OSWorld 78.7%, Codex integration        |
-| Cost-sensitive / high-volume      | Kimi K2.6     | 80% SWE-Verified, free                 |
-| Design token / component extract  | GPT-5.5       | Vision + structure understanding        |
-
-Since we use OpenRouter with Temuclaude's 8-model pool, we map:
-- Fable 5 -> claude-sonnet-5 (frontier fallback, highest quality)
-- GPT-5.5 -> deepseek-v4-pro (precision coding)
-- Kimi K2.6 -> kimi-k2.6 (cost-sensitive, free-ish)
-- Default generation -> glm-5.2 (orchestrator, best general)
-- Creative/landing -> minimax-m3 (generation specialist)
-- Verification -> nemotron-3-ultra (verifier role)
+The UI/UX path follows the same role-based model policy as the core router:
+GLM plans, DeepSeek implements precision code, MiniMax performs budget visual
+generation, Nemotron critiques, Grok repairs difficult code, and Gemini is
+reserved for screenshot-grounded visual review. Direct-provider routes are
+resolved safely by the orchestrator when their provider credentials are absent.
 """
 from dataclasses import dataclass
 from typing import Optional
@@ -37,18 +25,18 @@ class ModelChoice:
 ROUTING_STRATEGY = {
     # Generation tasks — need creativity and quality
     "game_3d": {
-        "model": "claude-sonnet-5",  # Closest to Fable 5 (frontier)
+        "model": "grok-4.5",
         "role": "generation",
         "max_tokens": 16000,
         "temperature": 0.7,
-        "rationale": "Frontier model for complex game generation (Fable 5 equivalent)",
+        "rationale": "Conditional coding-agent escalation for complex interactive generation; safely falls back to GLM when unavailable.",
     },
     "physics_demo": {
-        "model": "claude-sonnet-5",  # Frontier for physics sims
+        "model": "grok-4.5",
         "role": "generation",
         "max_tokens": 12000,
         "temperature": 0.7,
-        "rationale": "Frontier model for physics/WebGL demos (Fable 5 equivalent)",
+        "rationale": "Conditional coding-agent escalation for complex physics and WebGL implementation.",
     },
     "dashboard_saas": {
         "model": "deepseek-v4-pro",  # Precision coding

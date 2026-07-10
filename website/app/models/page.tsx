@@ -2,25 +2,14 @@ import { Navbar } from '@/components/Navbar';
 import { StaggerReveal, StaggerItem } from '@/components/Animations';
 
 const models = [
-  { name: 'GLM-5.2', role: 'Orchestrator', context: '1M tokens', iq: '51', capabilities: ['Tools', 'Thinking', '1M Context'], desc: 'The primary orchestrator and fusion aggregator. Highest open-weight IQ (51). Routes queries, aggregates multi-model responses, and handles general knowledge.' },
-  { name: 'DeepSeek V4 Pro', role: 'Hard Reasoning', context: '1M tokens', iq: '44', capabilities: ['Math', 'Coding', 'Reasoning'], desc: 'The reasoning powerhouse. Best for hard math, coding, and complex logical problems. Generates step-by-step reasoning hints.' },
-  { name: 'Llama 3.3', role: 'Specialist', context: '131K tokens', iq: '40', capabilities: ['Open Weights', 'Logic', 'Agentic'], desc: 'High-quality 70B open-weights model. Acts as a core expert in the MoA proposal panels and generator in self-play.' },
-  { name: 'Gemini 2.5 Flash', role: 'Worker/RAG', context: '1M tokens', iq: '40', capabilities: ['Multimodal', 'Speed', 'Search'], desc: 'Google fast utility model. High speed, multimodal vision capabilities, and deep real-time search integration.' },
-  { name: 'Mistral Large 3', role: 'Logic Specialist', context: '262K tokens', iq: '43', capabilities: ['Multilingual', 'Structured', 'Logic'], desc: 'Mistral flagship model. Best for structured instruction compliance and serves as the critic/discriminator in self-play.' },
-  { name: 'Private Frontier Fallback', role: 'Frontier Fallback', context: '1M tokens', iq: '53', capabilities: ['Frontier', 'Coding', 'Ultimate'], desc: 'A selective fallback for failing hard-tier queries. Used only when intermediate verifiers fail validation checks.' },
-  { name: 'MiMo-V2.5', role: 'Multimodal', context: '1M tokens', iq: '40', capabilities: ['Vision', 'Image', 'Video'], desc: 'Xiaomi omnimodal model. Specialized for multimodal analysis, image-to-text, and video-based queries.' },
-  { name: 'Z3 Solver', role: 'Logical Verifier', context: 'Local', iq: '—', capabilities: ['SMT', 'Logic', 'Zero-Error'], desc: 'Programmatic verifier that parses logical steps into SMT constraint formulas, verifying reasoning correctness.' },
-];
-
-const routerSignals = [
-  { label: 'Search', value: 'DeepSeek V4 Pro', detail: 'Tree search and MCTS policy model' },
-  { label: 'Code Verification', value: 'DeepSeek V4 Pro', detail: 'Generates executable checks for math and coding' },
-  { label: 'QA / PRM', value: 'Nemotron 3 Ultra', detail: 'Default quality gate and process verifier' },
-  { label: 'Consistency', value: 'Task aggregator', detail: 'Math/coding use DeepSeek; knowledge uses GLM' },
-  { label: 'Budget State', value: 'Tracked', detail: 'Initial budget, remaining budget, spent tokens' },
-  { label: 'Active Controller', value: 'Shadow Mode', detail: 'Recommends continue, verify, debate, stop, escalate, or cheap draft' },
-  { label: 'Failure Labels', value: 'Tracked', detail: 'Timeouts, model errors, contradictions, failed verification' },
-  { label: 'Step Recommendations', value: 'Telemetry gated', detail: 'Switches only after enough observed evidence' },
+  { name: 'DeepSeek V4 Flash', role: 'High-volume Worker', context: '1M tokens', iq: '40', capabilities: ['Drafting', 'Extraction', 'Tools'], desc: 'The low-cost default for routine steps. TemuClaude begins here whenever the confidence and risk policy permit.' },
+  { name: 'DeepSeek V4 Pro', role: 'Reasoning Specialist', context: '1M tokens', iq: '44', capabilities: ['Math', 'Coding', 'Reasoning'], desc: 'The reasoning route for hard math, technical analysis, and code verification.' },
+  { name: 'GLM-5.2', role: 'Planner + Aggregator', context: '1M tokens', iq: '51', capabilities: ['Planning', 'Thinking', 'Tools'], desc: 'The primary open-weight planner and synthesis model for long-horizon work.' },
+  { name: 'MiniMax M3', role: 'Budget Multimodal', context: '1M tokens', iq: '44', capabilities: ['Vision', 'Video', 'Long Context'], desc: 'The low-cost multimodal route for screenshots, diagrams, video, and long context.' },
+  { name: 'Gemini 3.5 Flash', role: 'Premium Multimodal', context: '1M tokens', iq: '—', capabilities: ['UI Control', 'Tools', 'Multimodal'], desc: 'Credential-gated specialist for high-value multimodal and tool-use work; never the blanket default.' },
+  { name: 'GPT-5.6 Luna', role: 'Quality Escalation', context: 'Preview access', iq: '—', capabilities: ['Reasoning', 'Coding', 'Fallback'], desc: 'Used only after a hard answer fails QA and only when direct API access is configured.' },
+  { name: 'Grok 4.5', role: 'Coding-Agent Escalation', context: 'Provider dependent', iq: '—', capabilities: ['Coding', 'Repair', 'Agents'], desc: 'Credential-gated repair specialist for difficult coding-agent work.' },
+  { name: 'Nemotron 3 Ultra', role: 'Independent Verifier', context: '1M tokens', iq: '48', capabilities: ['Verification', 'Reasoning', 'Open Weights'], desc: 'A conditional independent critic and QA route, rather than a permanent ensemble member.' },
 ];
 
 export default function ModelsPage() {
@@ -31,23 +20,8 @@ export default function ModelsPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Model Pool</h1>
           <p className="text-text-secondary mb-8 max-w-2xl">
-            A role-specialized model pool plus a step-aware router. TemuClaude selects models for
-            the task, then adapts high-value steps like search, verification, consistency, and QA
-            gates from telemetry.
+            Eight active routing roles, selected per step rather than called as an always-on ensemble. Premium routes require explicit provider access and are promoted only after quality, cost, latency, and reliability evaluation.
           </p>
-
-          <div className="mb-10">
-            <h2 className="text-xl font-semibold text-text-primary mb-3">Step-Aware Router</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {routerSignals.map((signal, i) => (
-                <div key={i} className="border border-border-subtle rounded-md p-4">
-                  <div className="text-xs text-text-muted uppercase tracking-wide mb-1">{signal.label}</div>
-                  <div className="text-sm font-semibold text-text-primary mb-1">{signal.value}</div>
-                  <p className="text-xs text-text-secondary">{signal.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
 
           <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {models.map((model, i) => (
@@ -69,7 +43,6 @@ export default function ModelsPage() {
                     ))}
                   </div>
                   <div className="text-xs text-text-muted">Context: <span className="text-text-secondary">{model.context}</span></div>
-                  <a href="/playground" className="btn-secondary w-full mt-4 text-xs">Try in Playground</a>
                 </div>
               </StaggerItem>
             ))}

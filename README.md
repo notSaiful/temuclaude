@@ -17,18 +17,27 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-sp
 - **Benchmarks**: https://temuclaude.com/benchmarks
 - **Models**: https://temuclaude.com/models
 
-## Model Pool + Step Router
+## Updated Model Stack + Step Router
 
-| Model | Role | IQ | Context |
-|-------|------|-----|---------|
-| GLM-5.2 | Orchestrator + Aggregator | 51 | 1M |
-| DeepSeek V4 Pro | Hard Reasoning + Math | 44 | 1M |
-| Hy3 Preview | Trivial Router (cheapest) | — | 262K |
-| Gemini 3 Flash | Legal + Health | 50 | 1M |
-| MiniMax M3 | Vision + Creative | 44 | 1M |
-| MiMo-V2.5 | Multimodal | 40 | 1M |
-| Claude Sonnet 5 | Frontier Fallback (2%) | 53 | 1M |
-| Nemotron 3 Ultra | QA Gate (FREE) | 38 | 128K |
+TemuClaude uses eight active *roles*, not an always-on eight-model ensemble.
+The router begins on the least-expensive model expected to succeed and only
+adds specialists after uncertainty, verifier failure, or a clear modality need.
+
+| Model | Role | Route policy |
+|-------|------|--------------|
+| DeepSeek V4 Flash | High-volume worker | Default for simple drafting, extraction, and low-risk steps |
+| DeepSeek V4 Pro | Reasoning specialist | Math, technical analysis, and difficult code reasoning |
+| GLM-5.2 | Planner + aggregator | Long-horizon planning, orchestration, and synthesis |
+| MiniMax M3 | Budget multimodal | Image/video, UI, and long-context work |
+| Gemini 3.5 Flash | Premium multimodal | Only when its tools/UI-control capability has expected value |
+| GPT-5.6 Luna | Closed-model escalation | Only after a hard response fails the QA gate |
+| Grok 4.5 | Coding-agent escalation | Targeted repair for difficult coding-agent work |
+| Nemotron 3 Ultra | Independent verifier | Conditional QA and verification, never an always-on panel member |
+
+GPT-5.6 Terra is a disabled emergency fallback. It needs both approved API
+access and `TEMUCLAUDE_ENABLE_TERRA_FALLBACK=true`; GPT-5.6 Sol is excluded.
+Kimi K2.6 and legacy models remain compatibility fallbacks while they are
+evaluated against this stack.
 
 Runtime selection is no longer only whole-query routing. TemuClaude records per-step telemetry for search, verification, consistency, QA gates, debate, post-processing, and formal verification, then uses observed success/cost/progress signals to recommend better step-level model choices when enough evidence exists.
 
@@ -48,14 +57,17 @@ The active budget controller now runs in shadow mode. It records recommended act
 
 | Model | Input $/1M | Output $/1M | vs TemuClaude |
 |-------|-----------|------------|-------------|
-| Claude Fable 5 | $10.00 | $50.00 | 20-25x more |
-| GPT-5.5 | $5.00 | $30.00 | 10-15x more |
-| Claude Sonnet 5 | $3.00 | $15.00 | 6-7.5x more |
-| Gemini 3.5 Flash | $1.50 | $9.00 | 3-4.5x more |
-| GLM-5.2 | $1.40 | $4.40 | 2.2-2.8x more |
-| **TemuClaude** | **$0.50** | **$2.00** | **—** |
+| Claude Fable 5 | $10.00 | $50.00 | Peak single-model reference |
+| GPT-5.6 Luna | $1.00 | $6.00 | General escalation candidate |
+| Grok 4.5 | $2.00 | $6.00 | Coding-agent escalation candidate |
+| Gemini 3.5 Flash | $1.50 | $9.00 | Premium multimodal candidate |
+| GLM-5.2 | $1.40 | $4.40 | Open planning/synthesis route |
+| DeepSeek V4 Flash | $0.14 | $0.28 | High-volume worker route |
 
-Blended cost: ~$0.05/MTok (60% free models + 30% cheap + 10% premium).
+Public API prices are not a blended TemuClaude cost. Production promotion is
+blocked until shadow telemetry shows quality, cost, latency, and reliability
+meet the benchmark-promotion gate. TemuClaude does not claim to outperform
+Fable 5 until that evaluation has passed.
 
 ## Architecture
 
@@ -69,15 +81,15 @@ Step-Aware Model Router
 Shadow Active Budget Controller
     ↓
 ┌──────────────────────────────────────────┐
-│  TRIVIAL (60%)  → Hy3 Preview (cheapest) │
-│  MEDIUM (30%)   → Specialist routing     │
-│  HARD (10%)     → 10-layer fusion stack  │
-│  FRONTIER (2%)  → Claude Sonnet 5        │
+│  SIMPLE          → DeepSeek V4 Flash     │
+│  SPECIALIST      → DeepSeek Pro / GLM / M3│
+│  PREMIUM         → Gemini / Grok / Luna  │
+│  EMERGENCY       → Terra (explicit opt-in)│
 └──────────────────────────────────────────┘
     ↓
 10-Layer Stack (hard queries):
 1. Web search (knowledge augmentation)
-2. MoA 3-layer (propose → cross-review → aggregate)
+2. MoA panel + aggregate (third review layer only in max-quality mode)
 3. Self-consistency (N samples, PRM-weighted voting)
 4. Code verification (sandboxed execution)
 5. USVA 5-rubric QA gate
@@ -85,7 +97,7 @@ Shadow Active Budget Controller
 7. s1 budget forcing (extend short responses)
 8. Step-level code verification (rStar-Math)
 9. Z3/SMT logical verification
-10. Frontier fallback (Claude Sonnet 5 if QA < 0.75)
+10. Luna escalation after failed QA; Terra only as an explicit emergency fallback
     ↓
 Final Answer + Budget/Progress/Failure/Controller Telemetry
 ```
@@ -147,7 +159,7 @@ temuclaude/
 ## Status
 
 - **Website**: Live at temuclaude.com
-- **Models**: 8 models deployed via OpenRouter
+- **Models**: eight active routing roles; premium routes are shadow/promotion-gated
 - **Legal**: Terms, Privacy, Refunds all live
 - **Email**: 8 automated email types via Resend
 - **Build**: Passing
@@ -155,7 +167,7 @@ temuclaude/
 
 ## Author
 
-Mohammad Saiful Haque — built with Hermes Agent. One developer in Nagpur, India, proving that orchestrated models beat any single model at a fraction of the cost. 25% of profit goes to charity.
+Mohammad Saiful Haque — built with Hermes Agent. One developer in Nagpur, India, building measured orchestration that earns quality/cost claims through evaluation. 25% of profit goes to charity.
 
 ## License
 

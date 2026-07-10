@@ -470,7 +470,8 @@ class Temuclaude:
 
         # Inject Quiet-STaR implicit thought directive for thinker models
         thinker_models = [
-            "glm-5.2", "deepseek-v4-pro", "llama-3.3-70b-instruct", "claude-3.5-sonnet",
+            "glm-5.2", "deepseek-v4-pro", "gpt-5.6-luna", "gpt-5.6-terra", "grok-4.5",
+            "llama-3.3-70b-instruct", "claude-3.5-sonnet",
             "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2512", "anthropic/claude-sonnet-4.6"
         ]
         if model in thinker_models:
@@ -492,11 +493,29 @@ class Temuclaude:
 
         # Determine which backend and model ID to use
         if __package__:
-            from .models import OPENROUTER_MODELS, OPENROUTER_FREE_MODELS, _USE_OPENROUTER
+            from .models import (
+                OPENROUTER_MODELS, OPENROUTER_FREE_MODELS, _USE_OPENROUTER,
+                get_direct_model_provider,
+            )
         else:
-            from src.models import OPENROUTER_MODELS, OPENROUTER_FREE_MODELS, _USE_OPENROUTER
-        
-        if _USE_OPENROUTER:
+            from src.models import (
+                OPENROUTER_MODELS, OPENROUTER_FREE_MODELS, _USE_OPENROUTER,
+                get_direct_model_provider,
+            )
+
+        direct_provider = get_direct_model_provider(model)
+        if direct_provider:
+            # The current premium candidates are served by their native,
+            # OpenAI-compatible APIs. They are never attempted without an
+            # explicit credential; get_runtime_model/call_model_with_fallback
+            # resolves them to open-model routes otherwise.
+            request_client = AsyncOpenAI(
+                base_url=direct_provider["base_url"],
+                api_key=os.environ[direct_provider["env"]],
+            )
+            ollama_tag = direct_provider["model"]
+            request_kwargs = {}
+        elif _USE_OPENROUTER:
             # OpenRouter: use provider/model format
             # For trivial-tier models, prefer the FREE variant (:free suffix)
             # This routes 60% of queries to $0 cost models
@@ -505,19 +524,19 @@ class Temuclaude:
             else:
                 ollama_tag = OPENROUTER_MODELS.get(model, model)
             api_key = os.environ.get("OPENROUTER_API_KEY", "")
+            request_client = self.client
+            request_kwargs = {"extra_body": {"provider": {"allow_fallbacks": True}}}
         else:
             # Ollama: use :cloud suffix
             ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
             api_key = "ollama"
-
-        request_kwargs = {}
-        if _USE_OPENROUTER:
-            request_kwargs["extra_body"] = {"provider": {"allow_fallbacks": True}}
+            request_client = self.client
+            request_kwargs = {}
         
         for attempt in range(2):  # 1 retry max
             try:
                 response = await asyncio.wait_for(
-                    self.client.chat.completions.create(
+                    request_client.chat.completions.create(
                         model=ollama_tag,
                         messages=messages_copy,
                         temperature=temperature,
@@ -710,6 +729,14 @@ class Temuclaude:
 
     async def call_model_with_fallback(self, model: str, messages: list, max_tokens: int = 8192, temperature: float = 0.0, timeout: int = 120) -> str:
         """Call a model, and if it fails, try fallback models + cross-backend fallback."""
+        if __package__:
+            from .models import get_runtime_model
+        else:
+            from src.models import get_runtime_model
+
+        # A premium alias with no configured provider is resolved before the
+        # first network call, avoiding both failed calls and surprise spend.
+        model = get_runtime_model(model)
         answer = await self.call_model(model, messages, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
         if not answer.startswith("[ERROR"):
             return answer
@@ -722,9 +749,11 @@ class Temuclaude:
         # Try fallback models on the same backend first
         fallbacks = []
         for candidate in OPENROUTER_MODEL_FALLBACKS.get(model, []):
+            candidate = get_runtime_model(candidate)
             if candidate != model and candidate not in fallbacks:
                 fallbacks.append(candidate)
-        for candidate in ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "gpt-oss-120b"]:
+        for candidate in ["glm-5.2", "deepseek-v4-pro", "deepseek-v4-flash", "minimax-m3"]:
+            candidate = get_runtime_model(candidate)
             if candidate != model and candidate not in fallbacks:
                 fallbacks.append(candidate)
 
@@ -912,7 +941,7 @@ class Temuclaude:
 
         # Step 2: Route based on tier (unified routing + cascading)
         if tier == "trivial":
-            model = "deepseek-v4-pro"  # IQ 44, frontier quality
+            model = "deepseek-v4-flash"
             enhanced_prompt = build_enhanced_system_prompt(task_type, system_prompt, tier=tier, query=query)
             track_skill_usage(task_type)
             messages = [
@@ -921,7 +950,7 @@ class Temuclaude:
             ]
             answer = await self.call_model_with_fallback(model, messages, max_tokens=token_budget)
             models_used = [model]
-            strategy = "direct_frontier_deepseek_v4_pro+trivial"
+            strategy = "direct_deepseek_v4_flash+trivial"
         elif tier == "medium":
             model = get_model_for_task(task_type)
             evolved_prompt = get_system_prompt(task_type, system_prompt)
@@ -982,7 +1011,8 @@ class Temuclaude:
 
             models_used = [model]
         else:
-            # Hard tier: full orchestration with 3-layer MoA + adaptive compute + MCTS + Self-Play
+            # Hard tier: verified, step-aware orchestration. Expensive premium
+            # routes are conditional repairs/escalations, never a blanket panel.
             use_code_verify = task_type in ("math", "coding") and budget_profile != "max_savings"
             use_self_consistency = task_type in ("math", "reasoning") and budget_profile != "max_savings"
 
@@ -1015,25 +1045,32 @@ class Temuclaude:
                     mcts_ran = True
 
                     # 2. Generator-Discriminator Self-Play Loop
-                    repaired_ans = await self.generator_discriminator_loop(query, answer)
+                    repair_model, _, _ = get_model_for_step(task_type, tier, "repair")
+                    repaired_ans = await self.generator_discriminator_loop(
+                        query,
+                        answer,
+                        generator_model=repair_model if task_type == "coding" else "deepseek-v4-pro",
+                        discriminator_model="nemotron-3-ultra",
+                    )
                     if repaired_ans != answer:
                         answer = repaired_ans
                         strategy += "+self_play_correction"
-                        models_used.append("mistral-large-3")
-                        models_used.append("llama-3.3-70b-instruct")
+                        models_used.extend(["nemotron-3-ultra", repair_model])
                         self_play_ran = True
                 except Exception as ex:
                     logger.warning(f"MCTS/Self-Play pipeline failed: {ex}. Falling back to standard MoA.")
 
             if not mcts_ran:
-                # Step 1: Run 3-layer MoA Fusion panel
+                # A third MoA review layer is reserved for the explicit
+                # max-quality mode; it otherwise doubles panel spend.
+                moa_layers = 3 if budget_profile == "max_quality" else 2
                 fusion_result = await fuse(
                     query, task_type, self.call_model_with_fallback,
-                    max_tokens=token_budget, moa_layers=3
+                    max_tokens=token_budget, moa_layers=moa_layers
                 )
                 answer = fusion_result["answer"]
                 models_used = fusion_result["panel"] + [fusion_result["aggregator"]]
-                strategy = f"fusion_3L_MoA({fusion_result['moa_layers']}layers)"
+                strategy = f"fusion_MoA({fusion_result['moa_layers']}layers)"
 
             # Step 2: Code verification (for math/coding)
             if use_code_verify:
@@ -1093,15 +1130,31 @@ class Temuclaude:
                 answer = qa_result["final_answer"]
                 strategy += "+usva_qa_passed"
             elif qa_result["attempts"] > 1:
-                debate_result = await multi_agent_debate(
-                    query, self.call_model_with_fallback,
-                    panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
-                    rounds=2, aggregator="nemotron-3-ultra",
-                    max_tokens=token_budget
-                )
-                answer = debate_result["answer"]
-                models_used.append("debate_panel+nemotron")
-                strategy += f"+debate_escalation({debate_result['rounds']}r)"
+                escalation_model, _, _ = get_model_for_step(task_type, tier, "premium_escalation")
+                if escalation_model == "gpt-5.6-luna":
+                    escalation_messages = [
+                        {"role": "system", "content": "You are a senior verifier. Correct the candidate answer using the original request. Return only a precise, final answer."},
+                        {"role": "user", "content": f"Original request:\n{query}\n\nCandidate answer that failed QA:\n{answer}"},
+                    ]
+                    escalated = await self.call_model_with_fallback(
+                        escalation_model, escalation_messages, max_tokens=token_budget
+                    )
+                    if not escalated.startswith("[ERROR"):
+                        answer = escalated
+                        models_used.append(escalation_model)
+                        strategy += "+luna_quality_escalation"
+                    else:
+                        strategy += "+luna_escalation_failed"
+                else:
+                    debate_result = await multi_agent_debate(
+                        query, self.call_model_with_fallback,
+                        panel=["glm-5.2", "deepseek-v4-pro", "nemotron-3-ultra"],
+                        rounds=2, aggregator="glm-5.2",
+                        max_tokens=token_budget
+                    )
+                    answer = debate_result["answer"]
+                    models_used.append("debate_panel+glm")
+                    strategy += f"+debate_escalation({debate_result['rounds']}r)"
 
         # Step 5: s1 Budget Forcing (arXiv:2501.19393) — applies to ALL tiers except savings
         if task_type in ("math", "reasoning") and len(answer.split()) < 50 and budget_profile != "max_savings":
@@ -1125,8 +1178,8 @@ class Temuclaude:
                     if "debate" not in strategy:
                         debate_result = await multi_agent_debate(
                             query, self.call_model_with_fallback,
-                            panel=["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"],
-                            rounds=2, aggregator="nemotron-3-ultra",
+                            panel=["glm-5.2", "deepseek-v4-pro", "nemotron-3-ultra"],
+                            rounds=2, aggregator="glm-5.2",
                             max_tokens=token_budget if tier == "hard" else 4096
                         )
                         answer = debate_result["answer"]
@@ -1333,7 +1386,7 @@ class Temuclaude:
         landing pages, mobile apps) through the specialized LoopEngine which:
         1. Classifies intent (game_3d, physics_demo, dashboard_saas, etc.)
         2. Generates detailed spec from intent
-        3. Routes to right model (Fable 5 equiv for generation, precision for refine)
+        3. Routes to the strongest available role (conditional coding escalation, precision refinement)
         4. Runs quality gates (HTML valid, a11y, responsive, no placeholders)
         5. Visual validation (Playwright + screenshot diff + axe-core + Lighthouse)
         6. Iterates: GENERATE -> VALIDATE -> CRITIQUE -> REFINE until quality threshold

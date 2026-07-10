@@ -13,7 +13,7 @@ This is the KEY advantage over Fable 5:
 - We spawn HETEROGENEOUS specialized models:
   - DeepSeek V4 Pro for physics/reasoning code
   - MiniMax M3 for visual/creative code
-  - Kimi K2.6 for research (long context)
+  - DeepSeek V4 Flash for low-cost research and implementation support
   - Nemotron for verification
   - GLM-5.2 synthesizes as orchestrator
 """
@@ -77,7 +77,7 @@ class SubagentOrchestrator:
             ))
             subtasks.append(Subtask(
                 name="research",
-                model="kimi-k2.6",
+                model="deepseek-v4-flash",
                 role="Research best practices and provide reference code snippets",
                 prompt=self._build_research_prompt(spec_markdown, intent_category),
                 max_tokens=3000,
@@ -104,7 +104,7 @@ class SubagentOrchestrator:
             ))
             subtasks.append(Subtask(
                 name="data",
-                model="kimi-k2.6",
+                model="deepseek-v4-flash",
                 role="Generate the data layer (mock data, API routes, types)",
                 prompt=self._build_data_prompt(spec_markdown),
                 max_tokens=4000,

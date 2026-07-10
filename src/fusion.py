@@ -24,14 +24,17 @@ from .models import (
     FUSION_PANEL,
     AGGREGATOR_MAP,
     OLLAMA_API_BASE,
+    get_runtime_model,
 )
 
 
 # Configurable panel size (3 for Ollama Pro, 5 for Ollama Max)
 DEFAULT_PANEL_SIZE = 3
 
-# MoA layer count: 2 = panel+judge (original), 3 = panel+cross-review+judge (MoA upgrade)
-DEFAULT_MOA_LAYERS = 3
+# A third cross-review layer doubles panel calls. Keep the default at two
+# layers; callers can explicitly request three only for a benchmarked premium
+# path where the measured quality gain justifies its cost and latency.
+DEFAULT_MOA_LAYERS = 2
 
 
 def get_panel(task_type: str, panel_size: int = DEFAULT_PANEL_SIZE) -> list:
@@ -44,17 +47,29 @@ def get_panel(task_type: str, panel_size: int = DEFAULT_PANEL_SIZE) -> list:
     For creative: prioritize MiniMax
     For agentic: prioritize GLM-5.2
     """
+    # Keep ordinary fusion to diverse, proven open routes.  Premium models are
+    # deliberately absent here: Grok is a conditional repair model and Gemini
+    # is a visual-review model.  Adding either to every hard request whenever a
+    # key is present quietly defeats the cost-aware cascade.
     priority_map = {
-        "math": ["deepseek-v4-pro", "glm-5.2", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"],
-        "coding": ["deepseek-v4-pro", "kimi-k2.6", "glm-5.2", "minimax-m3", "nemotron-3-ultra"],
-        "knowledge": ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"],
-        "reasoning": ["deepseek-v4-pro", "glm-5.2", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"],
-        "creative": ["minimax-m3", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "nemotron-3-ultra"],
-        "agentic": ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"],
+        "math": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
+        "coding": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
+        "knowledge": ["glm-5.2", "deepseek-v4-pro", "deepseek-v4-flash"],
+        "reasoning": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
+        "creative": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
+        "agentic": ["glm-5.2", "deepseek-v4-pro", "nemotron-3-ultra"],
+        "vision": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
+        "ui_ux": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
     }
-    
-    panel = priority_map.get(task_type, FUSION_PANEL)
-    return panel[:panel_size]
+
+    resolved = []
+    for candidate in priority_map.get(task_type, FUSION_PANEL):
+        model = get_runtime_model(candidate)
+        if model not in resolved:
+            resolved.append(model)
+        if len(resolved) >= panel_size:
+            break
+    return resolved
 
 
 def get_aggregator(task_type: str) -> str:
@@ -66,7 +81,7 @@ def get_aggregator(task_type: str) -> str:
     return AGGREGATOR_MAP.get(task_type, AGGREGATOR_MAP["default"])
 
 
-def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> list:
+def build_fusion_prompt(question: str, responses: dict, panel_models: list, task_type: str = "default") -> list:
     """Build the synthesis prompt for the aggregator model.
     
     The aggregator receives:
@@ -77,10 +92,11 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> l
     model_labels = {
         "glm-5.2": "Model A (GLM-5.2)",
         "deepseek-v4-pro": "Model B (DeepSeek V4 Pro)",
-        "kimi-k2.6": "Model C (Kimi K2.6)",
+        "deepseek-v4-flash": "Model C (DeepSeek V4 Flash)",
         "minimax-m3": "Model D (MiniMax M3)",
-        "nemotron-3-ultra": "Model E (Nemotron 3 Ultra)",
-        "gpt-oss-120b": "Model F (GPT-OSS 120B)",
+        "gemini-3.5-flash": "Model E (Gemini 3.5 Flash)",
+        "grok-4.5": "Model F (Grok 4.5)",
+        "nemotron-3-ultra": "Model G (Nemotron 3 Ultra)",
     }
 
     response_text = ""
@@ -92,6 +108,14 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> l
             response = response[:2000] + "... [truncated]"
         response_text += f"\n\n{label}:\n{response}"
 
+    priority_notes = {
+        "math": "Model B (DeepSeek V4 Pro) is our prime math reasoning specialist and should be given 1.5x weight in your synthesis.",
+        "coding": "DeepSeek V4 Pro is the prime reasoning specialist. Prefer independently verified details over ungrounded consensus.",
+        "knowledge": "Model A (GLM-5.2) is our prime general knowledge specialist and should be given 1.5x weight in your synthesis.",
+        "reasoning": "Model B (DeepSeek V4 Pro) is our prime logical reasoning specialist and should be given 1.5x weight in your synthesis.",
+    }
+    priority_note = priority_notes.get(task_type, "")
+
     system_prompt = (
         "You are Temuclaude, an AI synthesis engine. You are reviewing answers "
         "from multiple AI models that attempted the same question. Your job is to:\n"
@@ -102,6 +126,8 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list) -> l
         "5. If models disagree, use your expertise to determine the correct answer.\n"
         "Provide a single, clear, final answer. Do not mention which model said what."
     )
+    if priority_note:
+        system_prompt += f"\n\n[CS-DVW WEIGHTING]: {priority_note}"
 
     user_prompt = f"Here is the question:\n{question}\n\nHere are the responses from {len(panel_models)} models:{response_text}\n\nProvide the best synthesized answer:"
 
@@ -121,10 +147,11 @@ def build_cross_review_prompt(question: str, model_name: str, all_responses: dic
     model_labels = {
         "glm-5.2": "GLM-5.2",
         "deepseek-v4-pro": "DeepSeek V4 Pro",
-        "kimi-k2.6": "Kimi K2.6",
+        "deepseek-v4-flash": "DeepSeek V4 Flash",
         "minimax-m3": "MiniMax M3",
+        "gemini-3.5-flash": "Gemini 3.5 Flash",
+        "grok-4.5": "Grok 4.5",
         "nemotron-3-ultra": "Nemotron 3 Ultra",
-        "gpt-oss-120b": "GPT-OSS 120B",
     }
     
     other_responses = ""
@@ -228,7 +255,7 @@ async def fuse(
             responses[model] = cross_review_responses[i]
 
     # Final Layer: Aggregator synthesizes
-    synthesis_messages = build_fusion_prompt(question, responses, panel)
+    synthesis_messages = build_fusion_prompt(question, responses, panel, task_type=task_type)
     final_answer = await call_model_func(aggregator, synthesis_messages, max_tokens=max_tokens)
 
     return {
