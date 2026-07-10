@@ -531,7 +531,7 @@ export default function HomePage() {
                 <div className="text-accent-olive">"orchestration"</div>
                 <div className="pl-4 text-accent-fig">"taskType"</div><div className="pl-8 text-text-inverse">"math"</div>
                 <div className="pl-4 text-accent-fig">"tier"</div><div className="pl-8 text-text-inverse">"hard"</div>
-                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-2.5-flash"]</div>
+                <div className="pl-4 text-accent-fig">"models"</div><div className="pl-8 text-text-inverse">["glm-5.2", "deepseek-v4-pro", "gemini-3.5-flash"]</div>
                 <div className="pl-4 text-accent-fig">"qaScore"</div><div className="pl-8 text-text-inverse">9.2</div>
                 <div className="pl-4 text-accent-fig">"cost"</div><div className="pl-8 text-text-inverse">"$0.015"</div>
                 <div className="pl-4 text-accent-fig">"techniques"</div><div className="pl-8 text-text-inverse">["moa-fusion", "self-consistency", "aggregation", "qa-gate", "reflexion"]</div>
@@ -549,7 +549,7 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
-                Easy questions use Llama 3.3 or Gemini 2.5 (efficient). Hard ones get the full MCTS-guided multi-agent fusion.
+                Easy questions use DeepSeek V4 Flash or Gemini 3.5 Flash (efficient). Hard ones get the full MCTS-guided multi-agent fusion.
               </p>
             </div>
 
@@ -557,12 +557,12 @@ export default function HomePage() {
               {[
                 { name: 'GLM-5.2', role: 'Orchestrator', iq: '51', desc: 'Highest open-weight IQ. Final consensus and aggregation.' },
                 { name: 'DeepSeek V4 Pro', role: 'Reasoning', iq: '44', desc: 'Hard math, coding, complex step-by-step logic.' },
-                { name: 'Llama 3.3', role: 'Specialist', iq: '40', desc: 'High-quality open-weights expert panelist.' },
-                { name: 'Gemini 2.5 Flash', role: 'Worker/RAG', iq: '40', desc: 'Ultra-fast completions, visual projection, and search.' },
-                { name: 'Mistral Large 3', role: 'Logic Specialist', iq: '43', desc: 'Multi-lingual reasoning and self-play discriminator.' },
-                { name: 'Private Frontier Fallback', role: 'Frontier Fallback', iq: '53', desc: 'Selective fallback for failing hard-tier queries.' },
-                { name: 'MiMo-V2.5', role: 'Multimodal', iq: '40', desc: 'Specialist for text, image, and video analysis.' },
-                { name: 'Z3 Solver', role: 'Logical Verifier', iq: '—', desc: 'SMT solver checks consistency of intermediate claims.' },
+                { name: 'DeepSeek V4 Flash', role: 'Worker', iq: '40', desc: 'High-volume default for simple drafting, extraction, and routine steps.' },
+                { name: 'MiniMax M3', role: 'Multimodal', iq: '44', desc: 'Low-cost multimodal route for screenshots, diagrams, and video.' },
+                { name: 'Gemini 3.5 Flash', role: 'Specialist/RAG', iq: '—', desc: 'Credential-gated specialist for high-value multimodal and tool-use work.' },
+                { name: 'GPT-5.6 Luna', role: 'Escalation', iq: '—', desc: 'Used only after a hard answer fails QA and direct API is configured.' },
+                { name: 'Grok 4.5', role: 'Coding Escalation', iq: '—', desc: 'Credential-gated repair specialist for difficult coding-agent work.' },
+                { name: 'Nemotron 3 Ultra', role: 'Verifier', iq: '48', desc: 'Independent critic and conditional QA/verification route.' },
               ].map((model, i) => (
                 <StaggerItem key={i}>
                   <div className="card" style={{ padding: '20px 16px' }}>
@@ -603,10 +603,10 @@ export default function HomePage() {
             <StaggerReveal className="grid md:grid-cols-2 gap-4">
               {[
                 { num: '01', title: 'Classify', desc: 'Your question is analyzed and classified by difficulty (trivial, medium, hard) and type (math, coding, creative, reasoning). No API call needed — pure heuristics.' },
-                { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (Llama 3.3 70B). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
-                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 2.5 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
+                { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (DeepSeek V4 Flash). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
+                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
                 { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
-                { num: '05', title: 'QA Gate', desc: 'Gemini 2.5 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
+                { num: '05', title: 'QA Gate', desc: 'Gemini 3.5 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
                 { num: '06', title: 'Reflexion', desc: 'Generator-Discriminator loops critique and repair logic errors. If verifications still fail, a private frontier fallback is called.' },
               ].map((step, i) => (
                 <StaggerItem key={i}>
