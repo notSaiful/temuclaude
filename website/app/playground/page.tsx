@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
+import { getAccessToken, getStoredSession, type LocalSession } from '@/lib/auth';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -17,8 +18,15 @@ type OrchestrationData = {
   consensus: number;
   qaScore: number;
   codeVerified: boolean;
-  totalLatency: number;
+  totalLatency: string | number;
   cost: string;
+  techniques?: string[];
+};
+
+type ProgressStep = {
+  label: string;
+  detail?: string;
+  status: 'active' | 'done' | 'error';
 };
 
 const EXAMPLE_PROMPTS = [
@@ -29,6 +37,8 @@ const EXAMPLE_PROMPTS = [
 ];
 
 export default function PlaygroundPage() {
+  const [session, setSession] = useState<LocalSession | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
@@ -36,7 +46,7 @@ export default function PlaygroundPage() {
   const [freeQueriesUsed, setFreeQueriesUsed] = useState(0);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
-  const [showQuickStart, setShowQuickStart] = useState(false);
+  const [progressSteps, setProgressSteps] = useState<ProgressStep[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   // Index of the assistant message currently being streamed — avoids
@@ -45,21 +55,35 @@ export default function PlaygroundPage() {
   // chunk pushed a new message and the response repeated N times).
   const streamingIdxRef = useRef<number>(-1);
 
-  // Generate or retrieve anonymous identifier (stored in localStorage)
-  const getIdentifier = useCallback(() => {
-    if (typeof window === 'undefined') return 'anonymous';
-    let id = localStorage.getItem('temuclaude_id');
-    if (!id) {
-      id = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-      localStorage.setItem('temuclaude_id', id);
-    }
-    return id;
+  useEffect(() => {
+    let mounted = true;
+
+    getStoredSession()
+      .then((stored) => {
+        if (!mounted) return;
+        setSession(stored);
+        setSessionChecked(true);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setSession(null);
+        setSessionChecked(true);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const getIdentifier = useCallback(() => {
+    return session?.email || '';
+  }, [session]);
 
   // Check usage on mount and after each query
   const checkUsage = useCallback(async () => {
     try {
       const identifier = getIdentifier();
+      if (!identifier) return;
       const res = await fetch('/api/usage/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,10 +107,23 @@ export default function PlaygroundPage() {
   }, [messages]);
 
   useEffect(() => {
-    checkUsage();
-  }, [checkUsage]);
+    if (session) checkUsage();
+  }, [checkUsage, session]);
+
+  const addProgress = useCallback((step: ProgressStep) => {
+    setProgressSteps((prev) => {
+      const next = prev.map((item) =>
+        item.status === 'active' && step.status === 'active' ? { ...item, status: 'done' as const } : item
+      );
+      return [...next, step].slice(-8);
+    });
+  }, []);
 
   const handleSend = useCallback(async () => {
+    if (!session) {
+      window.location.href = '/login?returnTo=/playground';
+      return;
+    }
     if (!input.trim() || status === 'submitted' || status === 'streaming') return;
 
     // Check if user has reached free tier limit
@@ -99,6 +136,8 @@ export default function PlaygroundPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setStatus('submitted');
+    setProgressSteps([{ label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' }]);
+    abortControllerRef.current = new AbortController();
 
     // Increment usage counter (fire and forget)
     const identifier = getIdentifier();
@@ -109,9 +148,18 @@ export default function PlaygroundPage() {
     }).then(() => checkUsage()).catch(() => {});
 
     try {
+      const token = await getAccessToken();
+      if (!token) {
+        window.location.href = '/login?returnTo=/playground';
+        return;
+      }
+
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ messages: [...messages, userMessage] }),
         signal: abortControllerRef.current?.signal,
       });
@@ -124,6 +172,7 @@ export default function PlaygroundPage() {
       const decoder = new TextDecoder();
       let assistantContent = '';
       let orchestrationData: OrchestrationData | undefined;
+      let streamBuffer = '';
 
       // Insert placeholder assistant bubble once
       streamingIdxRef.current = -1;
@@ -138,13 +187,15 @@ export default function PlaygroundPage() {
           const { done, value } = await reader.read();
           if (done) break;
 
-          const text = decoder.decode(value, { stream: true });
-          const lines = text.split('\n');
+          streamBuffer += decoder.decode(value, { stream: true });
+          const lines = streamBuffer.split('\n');
+          streamBuffer = lines.pop() || '';
 
           for (const line of lines) {
-            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            const trimmedLine = line.trimEnd();
+            if (trimmedLine.startsWith('data: ') && trimmedLine !== 'data: [DONE]') {
               try {
-                const data = JSON.parse(line.slice(6));
+                const data = JSON.parse(trimmedLine.slice(6));
                 if (data.chunk) {
                   assistantContent += data.chunk;
                   const idx = streamingIdxRef.current;
@@ -157,6 +208,13 @@ export default function PlaygroundPage() {
                 }
                 if (data.orchestration) {
                   orchestrationData = data.orchestration;
+                }
+                if (data.progress) {
+                  addProgress({
+                    label: data.progress.label || 'Working',
+                    detail: data.progress.detail,
+                    status: data.progress.status || 'active',
+                  });
                 }
               } catch {}
             }
@@ -176,29 +234,52 @@ export default function PlaygroundPage() {
       }
 
       streamingIdxRef.current = -1;
+      abortControllerRef.current = null;
+      setProgressSteps((prev) => prev.map((item) => item.status === 'active' ? { ...item, status: 'done' } : item));
       setStatus('ready');
     } catch (err) {
+      abortControllerRef.current = null;
       if (err instanceof Error && err.name === 'AbortError') {
         setStatus('ready');
       } else {
         setStatus('error');
+        setProgressSteps((prev) => [...prev, { label: 'Generation failed', detail: 'Please retry or simplify the request.', status: 'error' }]);
         setMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
       }
     }
-  }, [input, status, messages, limitMessage, getIdentifier, checkUsage]);
+  }, [input, status, messages, limitMessage, getIdentifier, checkUsage, session, addProgress]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
     setStatus('ready');
   };
 
+  if (sessionChecked && !session) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen pt-28 px-6 bg-bg-primary" id="main-content">
+          <div className="container-max">
+            <div className="card max-w-xl mx-auto text-center">
+              <h1 className="text-2xl font-serif text-text-primary mb-3">Sign in to use the playground</h1>
+              <p className="text-sm text-text-secondary mb-6">
+                Playground usage is now tied to your account so chat history, credits, logs, and API activity stay together.
+              </p>
+              <a href="/login?returnTo=/playground" className="btn-accent">Sign In</a>
+            </div>
+          </div>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
-      <div className="flex h-screen pt-16">
+      <div className="flex h-screen pt-16 bg-bg-primary">
         <h1 className="sr-only">TemuClaude Playground</h1>
 
-        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)]" aria-label="TemuClaude Playground" id="main-content">
+        <main className="flex-1 flex flex-col h-[calc(100vh-4rem)] bg-bg-primary" aria-label="TemuClaude Playground" id="main-content">
           {/* Free tier limit banner */}
           {showUpgradeBanner && limitMessage && (
             <div className="bg-accent-primary/10 border-b border-accent-primary/20 px-4 py-3">
@@ -220,7 +301,7 @@ export default function PlaygroundPage() {
               {/* Empty State */}
               {messages.length === 0 && (
                 <div className="text-center pt-12">
-                  <h2 className="text-2xl font-semibold text-text-primary mb-2">
+                  <h2 className="text-2xl font-serif text-text-primary mb-2" style={{ fontWeight: 300 }}>
                     Ask TemuClaude anything
                   </h2>
                   <p className="text-text-secondary mb-8">
@@ -314,7 +395,27 @@ export default function PlaygroundPage() {
           {/* Input Bar */}
           <div className="border-t border-border-subtle bg-bg-primary p-4">
             <div className="max-w-3xl mx-auto">
-              {/* Free tier counter & API toggle */}
+              {progressSteps.length > 0 && (status === 'submitted' || status === 'streaming') && (
+                <div className="mb-3 border border-border-subtle rounded-sm bg-bg-secondary/70 overflow-hidden">
+                  <div className="px-3 py-2 border-b border-border-subtle text-xs font-semibold text-text-primary">
+                    Live working progress
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-0">
+                    {progressSteps.map((step, i) => (
+                      <div key={`${step.label}-${i}`} className="flex items-start gap-2 px-3 py-2 text-xs">
+                        <span className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${
+                          step.status === 'error' ? 'bg-accent-fig' : step.status === 'done' ? 'bg-accent-olive' : 'bg-accent-primary animate-pulse'
+                        }`} />
+                        <span>
+                          <span className="font-medium text-text-primary">{step.label}</span>
+                          {step.detail && <span className="block text-text-muted">{step.detail}</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Free tier counter */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-text-muted">
@@ -324,16 +425,6 @@ export default function PlaygroundPage() {
                     <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
                   )}
                 </div>
-                <button
-                  onClick={() => setShowQuickStart(prev => !prev)}
-                  className="xl:hidden text-xs text-accent-primary hover:underline flex items-center gap-1 cursor-pointer"
-                  aria-label="Toggle API Code Details"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-                  </svg>
-                  API Code
-                </button>
               </div>
               <div className="flex gap-2 items-end">
                 <textarea
@@ -375,135 +466,7 @@ export default function PlaygroundPage() {
             </div>
           </div>
         </main>
-        <QuickStartPane isOpen={showQuickStart} onClose={() => setShowQuickStart(false)} />
       </div>
-    </>
-  );
-}
-
-function QuickStartPane({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [activeTab, setActiveTab] = useState<'curl' | 'python' | 'node'>('curl');
-  const [copied, setCopied] = useState(false);
-
-  const snippets = {
-    curl: `curl -X POST https://temuclaude.com/api/chat \\
-  -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "hi"}]}'`,
-    python: `import requests
-
-url = "https://temuclaude.com/api/chat"
-payload = {
-    "messages": [
-        {"role": "user", "content": "hi"}
-    ]
-}
-res = requests.post(url, json=payload)
-print(res.json()["choices"][0]["message"]["content"])`,
-    node: `const fetch = require('node-fetch');
-
-const url = "https://temuclaude.com/api/chat";
-const payload = {
-  messages: [
-    { role: 'user', content: 'hi' }
-  ]
-};
-
-fetch(url, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(payload)
-})
-.then(res => res.json())
-.then(data => console.log(data.choices[0].message.content));`
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(snippets[activeTab]);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const contentMarkup = (
-    <>
-      <h2 className="text-sm font-semibold text-text-primary mb-3">API Quick Start</h2>
-      <p className="text-xs text-text-secondary mb-4">
-        Integrate TemuClaude's unified 8-model orchestration pipeline in one API call.
-      </p>
-
-      {/* Tabs */}
-      <div className="flex border-b border-border-subtle mb-4">
-        {(['curl', 'python', 'node'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 text-center py-1 text-xs font-mono capitalize cursor-pointer border-b-2 transition-all ${
-              activeTab === tab
-                ? 'border-accent-primary text-accent-primary font-semibold'
-                : 'border-transparent text-text-muted hover:text-text-primary'
-            }`}
-          >
-            {tab === 'node' ? 'NodeJS' : tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Code Area */}
-      <div className="relative bg-bg-dark text-bg-tertiary rounded-md p-3 font-mono text-[10px] leading-normal overflow-x-auto min-h-[160px]">
-        <button
-          onClick={handleCopy}
-          className="absolute top-2 right-2 p-1 bg-white/10 hover:bg-white/20 rounded text-[9px] text-text-inverse transition-colors"
-        >
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
-        <pre className="whitespace-pre">{snippets[activeTab]}</pre>
-      </div>
-
-      <div className="mt-6 border-t border-border-subtle pt-4 space-y-3">
-        <h3 className="text-xs font-semibold text-text-primary">End-to-End Orchestration</h3>
-        <ul className="space-y-2 text-[11px] text-text-secondary">
-          <li className="flex gap-2">
-            <span className="text-accent-olive">✓</span>
-            <span>Mixture of Agents (MoA) synthesis</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-accent-olive">✓</span>
-            <span>Monte Carlo Tree Search (MCTS)</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="text-accent-olive">✓</span>
-            <span>Self-Play Logic Verification</span>
-          </li>
-        </ul>
-      </div>
-    </>
-  );
-
-  return (
-    <>
-      {/* Permanent desktop sidebar layout */}
-      <aside className="hidden xl:flex flex-col w-80 border-l border-border-subtle bg-bg-secondary h-[calc(100vh-4rem)] p-4 overflow-y-auto shrink-0">
-        {contentMarkup}
-      </aside>
-
-      {/* Slide-over mobile drawer layout */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 xl:hidden" onClick={onClose}>
-          <div className="w-80 bg-bg-secondary h-full p-4 overflow-y-auto border-l border-border-subtle flex flex-col relative" onClick={(e) => e.stopPropagation()}>
-            <button 
-              onClick={onClose} 
-              className="absolute top-4 right-4 text-text-muted hover:text-text-primary cursor-pointer"
-              aria-label="Close API Code Pane"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <div className="pt-8">
-              {contentMarkup}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

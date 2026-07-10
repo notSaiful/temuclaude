@@ -1,12 +1,32 @@
 import { Navbar } from '@/components/Navbar';
 
-const sections = [
-  { title: 'Overview', items: ['Quickstart', 'Architecture', 'Model Pool'] },
+type DocSectionItem = string | { label: string; href: string };
+
+type DocSection = {
+  title: string;
+  items: DocSectionItem[];
+};
+
+const sections: DocSection[] = [
+  { title: 'Overview', items: ['Quickstart', 'Data Privacy', 'Architecture', 'Model Pool'] },
   { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
-  { title: 'Self-Hosting', items: ['Docker', 'Fly.io', 'Environment Variables'] },
+  { title: 'Self-Hosting', items: ['Docker', 'Fly.io', 'Modal', 'Environment Variables'] },
+  {
+    title: 'Legal & Info',
+    items: [
+      { label: 'About Us', href: '/about' },
+      { label: 'Pricing', href: '/pricing' },
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Shipping Policy', href: '/shipping' },
+      { label: 'Cancellation & Refunds', href: '/cancellation-refunds' },
+      { label: 'Refund Policy', href: '/refunds' },
+    ],
+  },
 ];
 
 function CodeBlock({ lang, code }: { lang: string; code: string }) {
@@ -45,9 +65,21 @@ export default function DocsPage() {
             <div key={i} className="mb-6">
               <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">{s.title}</h3>
               <ul className="space-y-1">
-                {s.items.map((item, j) => (
-                  <li key={j}><a href={'#' + item.toLowerCase().replace(/[\s/]+/g, '-')} className="text-sm text-text-secondary hover:text-accent-primary transition-colors block py-1">{item}</a></li>
-                ))}
+                {s.items.map((item, j) => {
+                  const isString = typeof item === 'string';
+                  const label = isString ? item : item.label;
+                  const href = isString ? '#' + item.toLowerCase().replace(/[\s/]+/g, '-') : item.href;
+                  return (
+                    <li key={j}>
+                      <a
+                        href={href}
+                        className="text-sm text-text-secondary hover:text-accent-primary transition-colors block py-1"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -76,6 +108,16 @@ export default function DocsPage() {
 
 # Response: SSE stream with answer + orchestration metadata`} />
               <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
+            </section>
+
+            <section id="data-privacy" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Data Privacy & Sovereignty</h2>
+              <p className="text-text-secondary mb-4">TemuClaude is built on a foundation of absolute data safety and developer trust:</p>
+              <ul className="list-disc list-inside text-sm text-text-secondary space-y-2 mb-4">
+                <li><strong className="text-text-primary">Zero Log Retention</strong> — We process all requests in-memory. Your raw query content and code outputs are never persisted to any databases or disk logs.</li>
+                <li><strong className="text-text-primary">API Key Encrypted Storage</strong> — All custom API keys and session credentials are encrypted in-transit and at-rest using AES-256 standard encryption.</li>
+                <li><strong className="text-text-primary">No Data Reselling</strong> — Your training vectors and query histories belong 100% to you and are never used to train internal models or sold to third-party resellers.</li>
+              </ul>
             </section>
 
             <section id="architecture" className="mb-12">
@@ -430,16 +472,18 @@ Response: SSE stream
                   <thead><tr className="border-b border-border-default">
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Plan</th>
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Requests/min</th>
-                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Queries/month</th>
+                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Monthly credits</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">600 (20/day)</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">100</td><td className="py-2 px-3 text-text-secondary">50,000</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">500,000</td></tr>
-                    <tr><td className="py-2 px-3 text-text-primary">Enterprise</td><td className="py-2 px-3 text-text-secondary">10,000</td><td className="py-2 px-3 text-text-secondary">Unlimited</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">50K credits (20 queries/day)</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">60</td><td className="py-2 px-3 text-text-secondary">5M credits</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">300</td><td className="py-2 px-3 text-text-secondary">25M credits</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Max</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">100M credits</td></tr>
+                    <tr><td className="py-2 px-3 text-text-primary">Enterprise</td><td className="py-2 px-3 text-text-secondary">10,000</td><td className="py-2 px-3 text-text-secondary">300M credits + contract overages</td></tr>
                   </tbody>
                 </table>
               </div>
+              <Callout type="note">Credits are weighted by route: trivial 1x, standard 1.5x, hard multi-model 4x, frontier fallback 15x, and deep research up to 20x.</Callout>
             </section>
 
             <section id="error-codes" className="mb-12">
@@ -601,6 +645,34 @@ fly secrets set OPENROUTER_API_KEY=your-key`} />
               <Callout type="tip">Fly.io's Mumbai region gives ~20ms latency to India.</Callout>
             </section>
 
+            <section id="modal" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Modal</h2>
+              <p className="text-text-secondary mb-4">
+                Deploy the multi-model AI orchestration pipeline to a serverless backend running on <a href="https://modal.com" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Modal</a>.
+                The serverless deployment configuration is located in <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">modal_app.py</code>.
+              </p>
+              <p className="text-sm text-text-secondary mb-2">Step 1 — Install and authenticate Modal CLI:</p>
+              <CodeBlock lang="bash" code={`pip install modal
+modal setup`} />
+              <p className="text-sm text-text-secondary mb-2">Step 2 — Configure environment secrets in Modal:</p>
+              <p className="text-xs text-text-secondary mb-2">
+                Create a secret group named <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">temuclaude-prod</code> containing:
+              </p>
+              <ul className="list-disc list-inside text-xs text-text-secondary space-y-1 mb-4">
+                <li><code className="font-mono">OPENROUTER_API_KEY</code> — OpenRouter API key</li>
+                <li><code className="font-mono">SUPABASE_URL</code> — Supabase database URL</li>
+                <li><code className="font-mono">SUPABASE_SERVICE_ROLE_KEY</code> — Supabase secret key/service role key</li>
+                <li><code className="font-mono">TEMUCLAUDE_MASTER_KEY</code> — Secret master key for authenticating the web gateway</li>
+              </ul>
+              <p className="text-sm text-text-secondary mb-2">Step 3 — Deploy the serverless app:</p>
+              <CodeBlock lang="bash" code={`modal deploy modal_app.py`} />
+              <p className="text-sm text-text-secondary mb-2">Step 4 — Configure Next.js frontend:</p>
+              <p className="text-xs text-text-secondary mb-4">
+                After deployment, set the <code className="font-mono">TEMUCLAUDE_MODAL_URL</code> environment variable on your website frontend to the generated Modal web endpoint URL and match the <code className="font-mono">TEMUCLAUDE_MASTER_KEY</code>.
+              </p>
+              <Callout type="tip">Using Modal isolates compute-heavy 10-layer steps and provides sub-second scaling from zero to handle large spike loads.</Callout>
+            </section>
+
             <section id="environment-variables" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Environment Variables</h2>
               <div className="overflow-x-auto mb-4">
@@ -613,7 +685,9 @@ fly secrets set OPENROUTER_API_KEY=your-key`} />
                   <tbody>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">OPENROUTER_API_KEY</td><td className="py-2 px-3 text-text-secondary">Yes</td><td className="py-2 px-3 text-text-secondary">OpenRouter API key for model access</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">AIML_API_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">AIML API key (fallback backend)</td></tr>
-                    <tr><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MASTER_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Master key for API authentication</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MASTER_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Master key for authorizing Next.js and Modal communications</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MODAL_URL</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">The web URL of your deployed Modal application endpoint</td></tr>
+                    <tr><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MODAL_REQUIRED</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Set to true if API completions must fail closed if Modal is down</td></tr>
                   </tbody>
                 </table>
               </div>
