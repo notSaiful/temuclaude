@@ -1,9 +1,8 @@
 // Central pricing configuration — single source of truth
-// All amounts in INR paise (Razorpay requirement) and USD
-// Updated July 7, 2026 — based on verified competitor pricing research
-// See PRICING-RESEARCH-REPORT.md for full analysis
+// All amounts in USD and INR paise for future checkout provider integration.
+// Updated July 9, 2026 — Credit-based pricing for profitable frontier orchestration.
 
-export type PlanId = 'free' | 'developer' | 'pro' | 'enterprise';
+export type PlanId = 'free' | 'developer' | 'pro' | 'max' | 'enterprise';
 
 export interface Plan {
   id: PlanId;
@@ -16,10 +15,12 @@ export interface Plan {
   features: string[];
   cta: string;
   featured: boolean;
+  monthlyCredits: number;
+  overagePerMillionCreditsUSD: number | null;
   queriesPerMonth: number;
   apiAccess: boolean;
   support: string;
-  razorpayPlanId?: string; // set after creating plans in Razorpay dashboard
+  razorpayPlanId?: string; // optional: set when hosted checkout is enabled
 }
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -30,9 +31,10 @@ export const PLANS: Record<PlanId, Plan> = {
     priceINR: 0,
     priceLabel: '$0',
     period: 'forever',
-    description: 'Try TemuClaude in the playground. No signup required.',
+    description: 'Sign in and try TemuClaude in the playground.',
     features: [
-      '20 queries/day',
+      'Standard usage limits apply',
+      'Standard Mixture-of-Agents access',
       'Full 10-layer orchestration',
       'All 8 models',
       'Visible orchestration panel',
@@ -40,6 +42,8 @@ export const PLANS: Record<PlanId, Plan> = {
     ],
     cta: 'Start Free',
     featured: false,
+    monthlyCredits: 50000,
+    overagePerMillionCreditsUSD: null,
     queriesPerMonth: 600, // 20/day * 30
     apiAccess: false,
     support: 'Community',
@@ -47,22 +51,25 @@ export const PLANS: Record<PlanId, Plan> = {
   developer: {
     id: 'developer',
     name: 'Developer',
-    priceUSD: 15,
-    priceINR: 1250, // ~₹1,040
-    priceLabel: '$15',
+    priceUSD: 19,
+    priceINR: 159900, // ~₹1,599
+    priceLabel: '$19',
     period: '/month',
-    description: 'For indie developers, researchers, and startups.',
+    description: 'For indie developers, researchers, and prototypes.',
     features: [
-      '50,000 queries/month',
-      'API access',
+      '5x more usage than Free plan',
+      'Full API Access enabled',
       'All 8 models, full orchestration',
       'Email support (48h)',
-      'Usage dashboard',
-      '100 requests/min',
+      'Usage dashboard + metrics',
+      '60 requests/min rate limit',
+      'Developer overage support',
     ],
-    cta: 'Get Developer',
+    cta: 'Request Developer',
     featured: true,
-    queriesPerMonth: 50000,
+    monthlyCredits: 5000000,
+    overagePerMillionCreditsUSD: 4,
+    queriesPerMonth: 50000, // compatibility only; credits are the billing source of truth
     apiAccess: true,
     support: 'Email (48h)',
     razorpayPlanId: undefined,
@@ -71,69 +78,116 @@ export const PLANS: Record<PlanId, Plan> = {
     id: 'pro',
     name: 'Pro',
     priceUSD: 49,
-    priceINR: 4100, // ~₹3,410
+    priceINR: 410000, // ₹4,100
     priceLabel: '$49',
     period: '/month',
     description: 'For power users and small teams who need more.',
     features: [
-      '500,000 queries/month',
-      'API access',
+      '5x more usage than Developer plan',
+      'Full API Access enabled',
       'Priority routing + faster latency',
       'Email support (24h)',
       'Usage dashboard + analytics',
-      '1,000 requests/min',
+      '300 requests/min rate limit',
+      'Dedicated overage support',
     ],
-    cta: 'Get Pro',
+    cta: 'Request Pro',
     featured: false,
-    queriesPerMonth: 500000,
+    monthlyCredits: 25000000,
+    overagePerMillionCreditsUSD: 3,
+    queriesPerMonth: 500000, // compatibility only; credits are the billing source of truth
     apiAccess: true,
     support: 'Email (24h) + Dashboard',
+    razorpayPlanId: undefined,
+  },
+  max: {
+    id: 'max',
+    name: 'Max',
+    priceUSD: 149,
+    priceINR: 1249900, // ~₹12,499
+    priceLabel: '$149',
+    period: '/month',
+    description: 'For power users doing heavy coding, research, and agentic work.',
+    features: [
+      '10x more usage than Pro plan',
+      'Full API Access enabled',
+      'High-priority routing',
+      'Priority support',
+      'Advanced analytics',
+      '1,000 requests/min rate limit',
+      'Dedicated overage support',
+    ],
+    cta: 'Request Max',
+    featured: false,
+    monthlyCredits: 100000000,
+    overagePerMillionCreditsUSD: 2,
+    queriesPerMonth: 1000000, // compatibility only; credits are the billing source of truth
+    apiAccess: true,
+    support: 'Priority support + Dashboard',
     razorpayPlanId: undefined,
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
     priceUSD: 499,
-    priceINR: 41500, // ~₹34,500
+    priceINR: 4150000, // ₹41,500
     priceLabel: '$499',
     period: '/month',
     description: 'For teams and organizations at scale.',
     features: [
-      'Unlimited queries',
-      'SSO/SAML',
+      'Custom usage allocations',
+      'SSO/SAML integration',
       'SLA 99.9% guarantee',
-      'Dedicated support + Slack',
+      'Dedicated support + Slack channel',
       '10 seats included',
       'Custom integrations + models',
-      '10,000 requests/min',
+      '10,000 requests/min rate limit',
     ],
     cta: 'Contact Sales',
     featured: false,
-    queriesPerMonth: -1, // unlimited
+    monthlyCredits: 300000000,
+    overagePerMillionCreditsUSD: 1.5,
+    queriesPerMonth: -1, // compatibility only; credits are the billing source of truth
     apiAccess: true,
     support: 'Dedicated + Slack + SLA',
     razorpayPlanId: undefined,
   },
 };
 
-// Pay-as-you-go token pricing (per 1M tokens)
-// Blended average based on routing: 60% trivial (cheapest), 30% medium, 10% hard (full MoA)
-// Positioned at ~4x cheaper than Claude Sonnet 5, ~12x cheaper than GPT-5.5
-export const PAYG_PRICING = {
-  inputPerMillion: 0.50,   // $0.50 per 1M input tokens (average)
-  outputPerMillion: 2.00,  // $2.00 per 1M output tokens (average)
-  blendedPerMillion: 1.44, // ~$1.44 per 1M blended (actual cost varies by difficulty)
-  cachedInputPerMillion: 0.05, // $0.05 per 1M cached input tokens (90% discount)
-  currency: 'USD',
+export const ROLLING_WINDOW_HOURS = 5;
+
+// Query and credit limits for the 5-hour rolling window and weekly allocations
+// Calibrated as ~monthly credit allocation divided by 4 to preserve margin calculations
+export const PLAN_LIMITS = {
+  free: {
+    rollingQueries: 20,               // Max 20 queries per 5 hours
+    weeklyCredits: 12500,             // Weekly allocation: 12.5K credits
+  },
+  developer: {
+    rollingQueries: Infinity,
+    weeklyCredits: 1250000,           // Weekly allocation: 1.25M credits
+  },
+  pro: {
+    rollingQueries: Infinity,
+    weeklyCredits: 6000000,           // Weekly allocation: 6M credits
+  },
+  max: {
+    rollingQueries: Infinity,
+    weeklyCredits: 25000000,          // Weekly allocation: 25M credits
+  },
+  enterprise: {
+    rollingQueries: Infinity,
+    weeklyCredits: 75000000,          // Weekly allocation: 75M credits
+  },
 };
 
-// Query limits per plan (per day for free, per month for paid)
-export const QUERY_LIMITS = {
-  free: { perDay: 20, perMonth: 600 },
-  developer: { perDay: Infinity, perMonth: 50000 },
-  pro: { perDay: Infinity, perMonth: 500000 },
-  enterprise: { perDay: Infinity, perMonth: -1 }, // unlimited
-};
+export const CREDIT_MULTIPLIERS = {
+  trivial: 1,
+  standard: 1.5,
+  hard: 4,
+  frontier: 15,
+  deepResearch: 20,
+} as const;
 
 // Get plan by ID
 export function getPlan(id: string): Plan | null {
