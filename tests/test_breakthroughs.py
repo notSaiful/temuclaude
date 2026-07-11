@@ -157,38 +157,38 @@ def test_reflexion_memory():
 
 
 # ============================================================
-# TEST 5: 3-Layer MoA Fusion
+# TEST 5: Budget-capped MoA Fusion
 # ============================================================
-def test_moa_3layer():
-    """Test that 3-layer MoA fusion is configured and cross-review prompt works."""
-    print("\n=== 3-LAYER MoA FUSION TESTS ===")
+def test_moa_budget_capped():
+    """Default fusion is two passes; a third pass is opt-in for benchmarked cases."""
+    print("\n=== BUDGET-CAPPED MoA FUSION TESTS ===")
     
-    # Test DEFAULT_MOA_LAYERS is 3
-    assert DEFAULT_MOA_LAYERS == 3, f"Default MoA layers should be 3, got {DEFAULT_MOA_LAYERS}"
+    # Two passes retain cross-review while preventing the default from doubling panel calls.
+    assert DEFAULT_MOA_LAYERS == 2, f"Default MoA layers should be 2, got {DEFAULT_MOA_LAYERS}"
     print(f"  OK: DEFAULT_MOA_LAYERS = {DEFAULT_MOA_LAYERS}")
     
     # Test cross-review prompt builder
     mock_responses = {
         "glm-5.2": "The answer is 42.",
         "deepseek-v4-pro": "42 is the answer.",
-        "kimi-k2.6": "I believe the answer is 42.",
+        "nemotron-3-ultra": "I believe the answer is 42.",
     }
-    panel = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
+    panel = ["glm-5.2", "deepseek-v4-pro", "nemotron-3-ultra"]
     
     messages = build_cross_review_prompt("What is the answer?", "glm-5.2", mock_responses, panel)
     assert len(messages) == 2, "Should have 2 messages"
     assert "GLM-5.2" in messages[0]["content"], "Should identify the model"
     # Should NOT include own response in other responses
     assert "DeepSeek V4 Pro" in messages[1]["content"], "Should show DeepSeek's response"
-    assert "Kimi K2.6" in messages[1]["content"], "Should show Kimi's response"
+    assert "Nemotron 3 Ultra" in messages[1]["content"], "Should show Nemotron's response"
     print(f"  OK: Cross-review prompt includes other models' responses")
     
     # Test that fuse function accepts moa_layers parameter
     import inspect
     sig = inspect.signature(fuse)
     assert "moa_layers" in sig.parameters, "fuse() should accept moa_layers parameter"
-    assert sig.parameters["moa_layers"].default == 3, "moa_layers default should be 3"
-    print(f"  OK: fuse() has moa_layers parameter (default=3)")
+    assert sig.parameters["moa_layers"].default == 2, "moa_layers default should be 2"
+    print(f"  OK: fuse() has moa_layers parameter (default=2)")
     
     print("  3/3 passed")
 

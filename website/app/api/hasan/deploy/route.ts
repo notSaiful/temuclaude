@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { hasInternalAdminAccess } from '@/lib/internal-admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,7 +23,8 @@ async function writeDeploy(data: any): Promise<void> {
 }
 
 // GET — return deployment queue status (pending findings, agent scaling, last approval)
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!hasInternalAdminAccess(req)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   try {
     const data = await readDeploy();
     if (!data) {
@@ -55,6 +57,7 @@ export async function GET() {
 
 // POST — approve/reject findings, or scale agents
 export async function POST(req: NextRequest) {
+  if (!hasInternalAdminAccess(req)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   try {
     const body = await req.json();
     const { action } = body;

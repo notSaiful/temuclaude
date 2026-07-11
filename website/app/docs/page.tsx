@@ -10,10 +10,10 @@ type DocSection = {
 const sections: DocSection[] = [
   { title: 'Overview', items: ['Quickstart', 'Data Privacy', 'Architecture', 'Model Pool'] },
   { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
-  { title: 'Benchmarks', items: ['Methodology', 'Reproducibility', 'Projected Scores'] },
+  { title: 'Benchmarks', items: ['Methodology', 'Evaluation & Trust', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
-  { title: 'Self-Hosting', items: ['Docker', 'Fly.io', 'Modal', 'Environment Variables'] },
+  { title: 'Enterprise', items: ['Self-Hosting & Private VPC'] },
   {
     title: 'Legal & Info',
     items: [
@@ -136,7 +136,19 @@ export default function DocsPage() {
                 <li><strong className="text-text-primary">Adapts step models</strong> for search, verification, consistency, QA gates, debate, and post-processing using telemetry when enough evidence exists</li>
                 <li><strong className="text-text-primary">Returns</strong> one clean answer — orchestration is invisible but visible in the playground</li>
               </ol>
-              <Callout type="note">All of this happens server-side. The user never picks models, modes, or parameters. They just ask TemuClaude.</Callout>
+              <Callout type="note">All routing happens server-side. In the Playground, users can choose the TemuClaude Pro or TemuClaude Lite product profile; individual model and parameter selection remains controlled by the router.</Callout>
+            </section>
+
+            <section id="lite-profile" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">TemuClaude Lite</h2>
+              <p className="text-text-secondary mb-4">Lite keeps the same authenticated Playground, task classification, answer trace, and safety policy as Pro, with a bounded model cascade designed for lower cost.</p>
+              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
+                <li><strong className="text-text-primary">DeepSeek V4 Flash</strong> is the default worker.</li>
+                <li><strong className="text-text-primary">Qwen3 235B Thinking</strong> handles hard structured reasoning.</li>
+                <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> handles vision, UI, long-context, and agentic work.</li>
+                <li><strong className="text-text-primary">Nemotron 3 Ultra</strong> is a conditional independent verifier for high-risk, explicit-check, and small audit-sample requests.</li>
+              </ul>
+              <Callout type="note">Lite is not an always-on ensemble: it permits one primary model call, one same-profile availability fallback, and a verifier/corrective pass only when the risk gate requires it.</Callout>
             </section>
 
             <section id="model-pool" className="mb-12">
@@ -170,171 +182,107 @@ export default function DocsPage() {
 
             <section id="10-layer-pipeline" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Pipeline</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers. Each is independently validated by published research:</p>
+              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers to guarantee logical soundness and accuracy:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li><strong className="text-text-primary">Web Search</strong> — DuckDuckGo for knowledge queries (free, unlimited)</li>
-                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Propose → Cross-Review → Aggregate (65.1% AlpacaEval in published MoA research)</li>
-                <li><strong className="text-text-primary">Self-Consistency</strong> — PRM-weighted voting across N samples (+18.4% MATH)</li>
-                <li><strong className="text-text-primary">Code Verification</strong> — Execute Python, verify output (ground truth)</li>
-                <li><strong className="text-text-primary">Reflexion</strong> — Verbal reflection on failure, retry with context (91% HumanEval)</li>
-                <li><strong className="text-text-primary">Self-QA Gate</strong> — 5-rubric score (LC, FC, CM, GA, CL), retry if &lt; 8/10</li>
-                <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Logical consistency check with SMT solver</li>
-                <li><strong className="text-text-primary">Budget Forcing</strong> — Append "Wait" to force longer reasoning (s1 paper)</li>
-                <li><strong className="text-text-primary">Step-Level Verification</strong> — Verify each reasoning step independently (rStar-Math)</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Escalate to the private frontier fallback for hardest 2%</li>
+                <li><strong className="text-text-primary">Web Search</strong> — Dynamic knowledge retrieval for real-time information query enhancement.</li>
+                <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Layered peer reviews where multiple specialist models refine each other's outputs before aggregation.</li>
+                <li><strong className="text-text-primary">Self-Consistency</strong> — Weighted voting frameworks selecting the most logically consistent path.</li>
+                <li><strong className="text-text-primary">Code Verification</strong> — Sandboxed programmatic execution to mathematically verify logical outputs.</li>
+                <li><strong className="text-text-primary">Reflexion</strong> — Verbal correction logic to automatically re-evaluate reasoning steps when validation indicators flag errors.</li>
+                <li><strong className="text-text-primary">Self-QA Gate</strong> — Multi-dimensional quality scoring system assessing logical coherence, completeness, and goal alignment.</li>
+                <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Boolean logic validation checking for internal contradictions in structured arguments.</li>
+                <li><strong className="text-text-primary">Budget Forcing</strong> — Adaptive token management extending system computation time on complex derivations.</li>
+                <li><strong className="text-text-primary">Step-Level Verification</strong> — Independent validation of intermediate logical statements.</li>
+                <li><strong className="text-text-primary">Frontier Fallback</strong> — Quality escalation paths routing to elite networks on high-difficulty edge cases.</li>
               </ol>
             </section>
 
             <section id="3-tier-routing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">3-Tier Routing</h2>
-              <p className="text-text-secondary mb-4">TemuClaude routes queries dynamically by difficulty to minimize execution latency and token cost without sacrificing quality:</p>
-              <CodeBlock lang="text" code={`Difficulty Classification:
-  Evaluates query word density, syntactic structure, and semantic intent.
-  Detects task vectors (e.g., mathematical formulations, coding, general reasoning).
-  Maps query to one of three optimal execution tiers.
-
-Routing Tiers:
-  Trivial Tiers (approx. 60% of queries)
-    Routed directly to highly efficient, open-weights specialist models.
-    
-  Medium Tiers (approx. 30% of queries)
-    Routed to role-specialized models best suited for the specific task domain
-    (e.g. reasoning, mathematics, structured multilingual compliance, or speed).
-    
-  Hard Tiers (approx. 10% of queries)
-    Routed through the full multi-layer fusion pipeline.
-    Combines parallel draft generation, logical verification, and self-reflecting loops.`} />
+              <p className="text-text-secondary mb-4">
+                TemuClaude classifies queries dynamically using semantic analysis. Queries are mapped to the most efficient tier that can guarantee optimal response quality:
+              </p>
+              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
+                <li><strong className="text-text-primary">Standard Tiers</strong> — High-speed, focused specialist engines for trivial and factual inquiries.</li>
+                <li><strong className="text-text-primary">Advanced Tiers</strong> — Domain-specific reasoning engines best suited for structural or complex contexts.</li>
+                <li><strong className="text-text-primary">Elite Tiers</strong> — Full multi-layer consensus loops with logical validation and parallel generation.</li>
+              </ul>
               <Callout type="note">Public token prices are not a blended TemuClaude cost. The router records quality, latency, failures, and token use; a new route is promoted only when the benchmark gate shows a Pareto improvement.</Callout>
             </section>
 
             <section id="step-aware-model-router" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Step-Aware Model Router</h2>
-              <p className="text-text-secondary mb-4">TemuClaude monitors per-step telemetry to dynamically select the best active model for individual sub-steps in the orchestration path.</p>
-              <CodeBlock lang="text" code={`Orchestration Steps:
-  Task-specific worker mapping (e.g. search, consistency verification, logic checks, QA gates).
-  Integration with external programmatic verifiers.
-
-Telemetry Signals:
-  Execution success metrics, latencies, and token densities.
-  Progress deltas, task confidence scores, and observed failure labels.
-
-Decision Strategy:
-  Uses cumulative telemetry to dynamically bind steps to the best performing model.
-  Falls back to a robust role-aware model registry when telemetry is insufficient.`} />
+              <p className="text-text-secondary mb-4">
+                Instead of static routing, TemuClaude continuously evaluates routing paths. The model selection varies dynamically across different steps within a single query response path, ensuring each logical task is handled by the most optimized resource.
+              </p>
               <Callout type="tip">This is the bridge toward state-aware orchestration: model choice can vary dynamically inside the same answer, not just at the first route.</Callout>
             </section>
 
             <section id="active-budget-controller" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Active Budget Controller</h2>
-              <p className="text-text-secondary mb-4">TemuClaude runs a shadow controller that evaluates the optimal path ahead based on budget constraints, logical verification progress, and model confidence signals.</p>
-              <CodeBlock lang="text" code={`Adaptive Steering:
-  Decides whether to continue current path, run verification checks, or resolve contradictions.
-  Optimizes compute budget on-the-fly to avoid unnecessary tokens.
-  Selects cheap drafting or stronger recovery paths based on remaining limits.
-
-Safety Constraints:
-  Monitored via non-regression checks, latency guardrails, and quality gates.`} />
+              <p className="text-text-secondary mb-4">
+                Our controller analyzes safety margins and reasoning path indicators to steer queries dynamically. It cuts off dead-end reasoning loops early and allocates computation resources precisely where they provide the greatest quality return.
+              </p>
               <Callout type="note">The controller runs in telemetry-gathering shadow mode. Runtime adjustments remain conservative to preserve deterministic quality bounds.</Callout>
             </section>
 
             <section id="moa-3-layer-fusion" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">MoA 3-Layer Fusion</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude uses Mixture-of-Agents (MoA) with 3 layers:</p>
-              <CodeBlock lang="text" code={`Layer 1: 3 models propose independently
-  GLM-5.2 → response A
-  DeepSeek Pro → response B
-  Gemini 3.5 Flash → response C
-
-Layer 2: Cross-Review
-  GLM-5.2 reviews B and C → improved A'
-  DeepSeek Pro reviews A and C → improved B'
-  Gemini 3.5 Flash reviews A and B → improved C'
-
-Layer 3: Aggregation
-  GLM-5.2 synthesizes A' + B' + C' → final answer
-  With structured analysis: consensus, contradictions, insights, blind spots`} />
+              <p className="text-text-secondary mb-4">
+                For high-complexity tasks, TemuClaude runs a multi-stage consensus process. Specialist models independently generate draft solutions, exchange peer reviews to highlight blind spots and contradictions, and synthesize a single, optimized consensus response.
+              </p>
               <Callout type="note">Research: 3-layer MoA achieves 65.1% on AlpacaEval 2.0 in the published paper. Each layer adds measurable quality.</Callout>
             </section>
 
             <section id="self-consistency" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-Consistency</h2>
-              <p className="text-text-secondary mb-4">For math and reasoning questions, TemuClaude generates N samples and votes:</p>
-              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Math: 3 samples at temperature 0.7</li>
-                <li>Reasoning: 2 samples</li>
-                <li>Each sample scored by Gemini 3.5 Flash (PRM-weighted voting)</li>
-                <li>Highest-scoring answer selected as final</li>
-              </ul>
+              <p className="text-text-secondary mb-4">
+                For quantitative and reasoning tasks, the system generates multiple candidate pathways. A weighted voting classifier selects the final path based on logic consistency, mitigating hallucination spikes.
+              </p>
             </section>
 
             <section id="code-verification" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Code Verification</h2>
-              <p className="text-text-secondary mb-4">For math and coding questions, TemuClaude generates Python code, executes it in a sandbox, and returns the verified output:</p>
-              <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li>Model generates code to solve the problem</li>
-                <li>Code executed in sandboxed subprocess (no network, temp dir, timeout)</li>
-                <li>If output matches → answer is verified (ground truth)</li>
-                <li>If execution fails → trigger Reflexion: model reflects, retries</li>
-              </ol>
+              <p className="text-text-secondary mb-4">
+                When solving programming or mathematical problems, TemuClaude writes and runs scripts inside isolated sandbox environments. It parses output values to verify accuracy. If the execution errors, the system triggers the reflexion loop to rewrite and correct the script.
+              </p>
             </section>
 
             <section id="self-qa-gate" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-QA Gate</h2>
-              <p className="text-text-secondary mb-4">Every answer is scored on 5 rubrics (USVA framework, extended from ATTS):</p>
-              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li><strong className="text-text-primary">LC</strong> — Logical Coherence (is the reasoning consistent?)</li>
-                <li><strong className="text-text-primary">FC</strong> — Factual Correctness (are the facts right?)</li>
-                <li><strong className="text-text-primary">CM</strong> — Completeness (does it address all parts?)</li>
-                <li><strong className="text-text-primary">GA</strong> — Goal Alignment (does it answer what was asked?)</li>
-                <li><strong className="text-text-primary">CL</strong> — Clarity (is it clear, concise, accessible?)</li>
-              </ul>
-              <p className="text-sm text-text-secondary mb-4">Score = average × 10. If score &lt; 8/10, TemuClaude retries with Reflexion feedback — up to 2 times.</p>
+              <p className="text-text-secondary mb-4">
+                All generated answers pass through an automated quality gate evaluating logical consistency, factual correctness, and goal alignment. If the safety thresholds are not met, the response is rejected and sent back to the pipeline for refinement.
+              </p>
             </section>
 
             <section id="reflexion" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Reflexion</h2>
-              <p className="text-text-secondary mb-4">When the QA gate fails, TemuClaude generates a verbal reflection on what went wrong, then retries with that context:</p>
-              <CodeBlock lang="text" code={`1. QA gate fails (score < 8/10)
-2. Gemini 3.5 Flash generates reflection:
-   "The answer has a logical error in step 3.
-    The formula should use integration by parts,
-    not substitution. Fix this and retry."
-3. Original model retries with reflection as context
-4. New answer is re-scored on all 5 rubrics
-5. If still failing, retry once more (max 2 retries)`} />
+              <p className="text-text-secondary mb-4">
+                When the quality check flags a discrepancy, the system generates detailed critique logs. The generator models use these critique logs to reformulate their response, correcting logical missteps.
+              </p>
               <Callout type="tip">Reflexion achieves 91% on HumanEval in published results. The difference is a model that learns from mistakes instead of giving up.</Callout>
             </section>
 
             <section id="budget-forcing" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Budget Forcing</h2>
-              <p className="text-text-secondary mb-4">If the answer is suspiciously short for a hard problem, TemuClaude appends "Wait" to force the model to continue reasoning (s1 paper, arXiv:2501.19393):</p>
-              <CodeBlock lang="text" code={`Model answer: "The answer is 42."
-  → Too short for a hard math problem
-  → Append "Wait"
-  → Model continues: "Let me verify... [longer reasoning]"`} />
+              <p className="text-text-secondary mb-4">
+                To handle deep reasoning queries, TemuClaude can dynamically extend the thought process. This forces models to generate comprehensive step-by-step proofs instead of jumping directly to short, unverified conclusions.
+              </p>
             </section>
 
             <section id="z3-verification" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Z3 Logical Verification</h2>
-              <p className="text-text-secondary mb-4">For reasoning questions, TemuClaude extracts logical claims and checks them with a Z3 SMT solver:</p>
-              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Extracts "if X then Y", "X implies Y" patterns</li>
-                <li>Encodes as Z3 boolean constraints</li>
-                <li>Checks satisfiability (no contradictions)</li>
-                <li>If contradiction found → triggers multi-agent debate</li>
-              </ul>
-              <Callout type="note">Requires z3-solver: <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">pip install z3-solver</code>. Falls back gracefully if not installed.</Callout>
+              <p className="text-text-secondary mb-4">
+                For structural logic questions, TemuClaude translates key relationships into symbolic constraints. It runs these constraints through a logic solver to verify satisfiability. If any logical contradictions are detected, a multi-agent debate is triggered to resolve them.
+              </p>
+              <Callout type="note">Requires z3-solver constraints. Falls back gracefully if unavailable.</Callout>
             </section>
 
             <section id="frontier-fallback" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
-              <p className="text-text-secondary mb-4">For the hardest 2% of queries where all other layers score low, TemuClaude escalates to a private frontier fallback:</p>
-              <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
-                <li>Only triggers when QA score &lt; 0.75 after all retries</li>
-                <li>Query must match frontier criteria (prove, derive, theorem, system design, refactor)</li>
-                <li>Frontier model gets the previous best answer as context</li>
-                <li>Re-scored — if better, replaces the answer</li>
-              </ul>
+              <p className="text-text-secondary mb-4">
+                In rare edge cases where intermediate logical validation fails to reach confidence targets, the query escalates to elite frontier backup nodes. These nodes leverage the cumulative context of the previous attempts to formulate the final response.
+              </p>
             </section>
 
             {/* === BENCHMARKS === */}
@@ -351,22 +299,19 @@ Layer 3: Aggregation
               <Callout type="warning">These are projected scores, not live-verified. We will publish live results after ArtificialAnalysis testing. We are committed to transparency.</Callout>
             </section>
 
-            <section id="reproducibility" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Reproducibility</h2>
-              <p className="text-text-secondary mb-4">Full benchmark scripts are available on GitHub (MIT licensed). Run them yourself:</p>
-              <CodeBlock lang="bash" code={`# Clone the repo
-git clone https://github.com/notSaiful/temuclaude.git
-cd temuclaude-research
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run TemuClaude on HLE benchmark
-python benchmarks/run_temuclaude.py --dataset hle --sample 100
-
-# Run on GPQA Diamond
-python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
-              <p className="text-sm text-text-secondary"><a href="https://github.com/notSaiful/temuclaude" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">View full results on GitHub →</a></p>
+            <section id="evaluation-&-trust" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Evaluation & Trust</h2>
+              <p className="text-text-secondary mb-4">
+                We believe in rigorous scientific evaluations and absolute transparency. While the core orchestration weights and routing heuristics are proprietary to prevent direct duplication of our infrastructure, we provide extensive validation data:
+              </p>
+              <ul className="list-disc list-inside text-sm text-text-secondary space-y-2 mb-4">
+                <li><strong className="text-text-primary">Independent Audits</strong> — Enterprise clients can request access to sandbox evaluation environments to run custom test suites.</li>
+                <li><strong className="text-text-primary">Benchmark Logs</strong> — Full transaction traces, model outputs, and logical consensus trees are logged during evaluations to verify reproducibility.</li>
+                <li><strong className="text-text-primary">Custom Verification</strong> — We support zero-knowledge auditing tools to verify that our routing runs exactly as documented without exposing proprietary models.</li>
+              </ul>
+              <Callout type="note">
+                For detailed auditing logs or to request access to the validation framework, contact our engineering team at <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a>.
+              </Callout>
             </section>
 
             <section id="projected-scores" className="mb-12">
@@ -403,6 +348,7 @@ python benchmarks/run_temuclaude.py --dataset gpqa --sample 100`} />
 
 Request:
 {
+  "profile": "lite",
   "messages": [
     {"role": "user", "content": "What is 9.9 vs 9.11?"}
   ]
@@ -415,6 +361,7 @@ Response: SSE stream
   ...
   data: {"orchestration": {...}}
   data: [DONE]`} />
+              <p className="text-sm text-text-secondary">Set <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">profile</code> to <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"pro"</code> (default) or <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"lite"</code>. The server validates the profile and keeps model selection internal.</p>
             </section>
 
             <section id="streaming" className="mb-12">
@@ -610,88 +557,44 @@ curl -X POST https://temuclaude.com/api/media/generate \\
               <Callout type="tip">All music models support lyrics input. TemuClaude's judge scores musicality, prompt adherence, vocal quality, audio quality, and structure — same 5-rubric quality gate as the LLM pipeline.</Callout>
             </section>
 
-            {/* === SELF-HOSTING === */}
+            {/* === ENTERPRISE === */}
 
-            <section id="docker" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Docker</h2>
-              <p className="text-text-secondary mb-4">Run TemuClaude with Docker (MIT licensed):</p>
-              <CodeBlock lang="bash" code={`# Build the image
-docker build -t temuclaude .
-
-# Run on port 8000 with OpenRouter
-docker run -p 8000:8000 -e OPENROUTER_API_KEY=your-key temuclaude
-
-# Or with Ollama backend
-docker run -p 8000:8000 -e OLLAMA_API_BASE=http://host.docker.internal:11434 temuclaude`} />
-            </section>
-
-            <section id="fly.io" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Fly.io</h2>
-              <p className="text-text-secondary mb-4">Deploy to Fly.io (Mumbai region for lowest latency to India):</p>
-              <CodeBlock lang="bash" code={`# Install flyctl
-curl -L https://fly.io/install.sh | sh
-
-# Login and create app
-fly auth login
-fly launch --image temuclaude
-
-# Deploy
-fly deploy
-
-# Set secrets
-fly secrets set OPENROUTER_API_KEY=your-key`} />
-              <Callout type="tip">Fly.io's Mumbai region gives ~20ms latency to India.</Callout>
-            </section>
-
-            <section id="modal" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Modal</h2>
+            <section id="self-hosting-&-private-vpc" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Self-Hosting & Private VPC</h2>
               <p className="text-text-secondary mb-4">
-                Deploy the multi-model AI orchestration pipeline to a serverless backend running on <a href="https://modal.com" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Modal</a>.
-                The serverless deployment configuration is located in <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">modal_app.py</code>.
+                For organization-wide rollouts, high-throughput applications, or strict compliance frameworks, TemuClaude can be hosted in your own cloud infrastructure:
               </p>
-              <p className="text-sm text-text-secondary mb-2">Step 1 — Install and authenticate Modal CLI:</p>
-              <CodeBlock lang="bash" code={`pip install modal
-modal setup`} />
-              <p className="text-sm text-text-secondary mb-2">Step 2 — Configure environment secrets in Modal:</p>
-              <p className="text-xs text-text-secondary mb-2">
-                Create a secret group named <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">temuclaude-prod</code> containing:
-              </p>
-              <ul className="list-disc list-inside text-xs text-text-secondary space-y-1 mb-4">
-                <li><code className="font-mono">OPENROUTER_API_KEY</code> — OpenRouter API key</li>
-                <li><code className="font-mono">SUPABASE_URL</code> — Supabase database URL</li>
-                <li><code className="font-mono">SUPABASE_SERVICE_ROLE_KEY</code> — Supabase secret key/service role key</li>
-                <li><code className="font-mono">TEMUCLAUDE_MASTER_KEY</code> — Secret master key for authenticating the web gateway</li>
+              <ul className="list-disc list-inside text-sm text-text-secondary space-y-2 mb-6">
+                <li><strong className="text-text-primary">Isolated Compute</strong> — Deploy the MoA pipeline inside your private AWS VPC, GCP project, or Azure subscription.</li>
+                <li><strong className="text-text-primary">Data Sovereignty</strong> — Ensure no transaction payloads ever leave your security perimeter by integrating with private frontier model instances (e.g., Azure OpenAI, AWS Bedrock).</li>
+                <li><strong className="text-text-primary">High Availability</strong> — Scalable Kubernetes templates and Serverless configurations optimized for zero-cold-start spikes.</li>
               </ul>
-              <p className="text-sm text-text-secondary mb-2">Step 3 — Deploy the serverless app:</p>
-              <CodeBlock lang="bash" code={`modal deploy modal_app.py`} />
-              <p className="text-sm text-text-secondary mb-2">Step 4 — Configure Next.js frontend:</p>
-              <p className="text-xs text-text-secondary mb-4">
-                After deployment, set the <code className="font-mono">TEMUCLAUDE_MODAL_URL</code> environment variable on your website frontend to the generated Modal web endpoint URL and match the <code className="font-mono">TEMUCLAUDE_MASTER_KEY</code>.
+
+              <h3 className="text-base font-semibold text-text-primary mb-2">Supported Environments</h3>
+              <p className="text-sm text-text-secondary mb-4">
+                We provide officially supported deployment assets for the following platforms to commercial licensees:
               </p>
-              <Callout type="tip">Using Modal isolates compute-heavy 10-layer steps and provides sub-second scaling from zero to handle large spike loads.</Callout>
-            </section>
-
-            <section id="environment-variables" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Environment Variables</h2>
-              <div className="overflow-x-auto mb-4">
-                <table className="w-full text-sm">
-                  <thead><tr className="border-b border-border-default">
-                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Variable</th>
-                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Required</th>
-                    <th className="text-left py-2 px-3 font-semibold text-text-primary">Description</th>
-                  </tr></thead>
-                  <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">OPENROUTER_API_KEY</td><td className="py-2 px-3 text-text-secondary">Yes</td><td className="py-2 px-3 text-text-secondary">OpenRouter API key for model access</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">AIML_API_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">AIML API key (fallback backend)</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MASTER_KEY</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Master key for authorizing Next.js and Modal communications</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MODAL_URL</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">The web URL of your deployed Modal application endpoint</td></tr>
-                    <tr><td className="py-2 px-3 font-mono text-text-primary">TEMUCLAUDE_MODAL_REQUIRED</td><td className="py-2 px-3 text-text-secondary">No</td><td className="py-2 px-3 text-text-secondary">Set to true if API completions must fail closed if Modal is down</td></tr>
-                  </tbody>
-                </table>
+              <div className="grid sm:grid-cols-3 gap-4 mb-6">
+                <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
+                  <strong className="text-sm text-text-primary block mb-1">Docker & Kubernetes</strong>
+                  <span className="text-xs text-text-muted">Standard containerized microservice layouts.</span>
+                </div>
+                <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
+                  <strong className="text-sm text-text-primary block mb-1">Serverless (Modal / Lambda)</strong>
+                  <span className="text-xs text-text-muted">Highly cost-efficient, zero-scale architectures.</span>
+                </div>
+                <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
+                  <strong className="text-sm text-text-primary block mb-1">Private VPC Orchestrators</strong>
+                  <span className="text-xs text-text-muted">Tailored templates for secure cloud providers.</span>
+                </div>
               </div>
+
+              <Callout type="note">
+                VPC deployment configurations, proprietary docker files, and Kubernetes Helm charts are available under our Enterprise Agreement. To initiate an architecture review, email <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a>.
+              </Callout>
             </section>
 
-            <p className="text-sm text-text-muted mt-12 mb-6"><a href="https://github.com/notSaiful/temuclaude" className="text-accent-primary hover:underline" target="_blank" rel="noopener noreferrer">Edit this page on GitHub →</a> · MIT Licensed</p>
+            <p className="text-sm text-text-muted mt-12 mb-6">© 2026 TemuClaude. All rights reserved.</p>
           </div>
         </main>
       </div>

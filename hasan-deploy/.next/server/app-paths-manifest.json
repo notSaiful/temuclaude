@@ -1,6 +1,0 @@
-{
-  "/api/hasan/route": "app/api/hasan/route.js",
-  "/api/hasan/power/route": "app/api/hasan/power/route.js",
-  "/api/hasan/deploy/route": "app/api/hasan/deploy/route.js",
-  "/hasan/page": "app/hasan/page.js"
-}

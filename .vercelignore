@@ -1,0 +1,12 @@
+# Reproducible local caches and autonomous research traces are not deployment
+# inputs. Keeping them out of the upload reduces deploy time and prevents
+# internal run history from reaching production bundles.
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+**/tsconfig.tsbuildinfo
+hasan-deploy/
+research/raw/
+research/audit_reports/
+research/cost_reports/
+config/ui_ux_memory/iteration_notes/

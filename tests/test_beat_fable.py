@@ -233,11 +233,11 @@ class TestSubagentOrchestrator:
         ui_task = next(t for t in subtasks if t.name == "ui")
         assert ui_task.model == "minimax-m3"
 
-    def test_decompose_research_uses_long_context_model(self):
-        """Research subtask should use Kimi K2.6 (long context)."""
+    def test_decompose_research_uses_cost_effective_research_model(self):
+        """Research uses DeepSeek V4 Flash under the current routing policy."""
         subtasks = self.orchestrator.decompose_spec("# Game", "game_3d")
         research_task = next(t for t in subtasks if t.name == "research")
-        assert research_task.model == "kimi-k2.6"
+        assert research_task.model == "deepseek-v4-flash"
 
     def test_execute_parallel_runs_all_subtasks(self):
         """All subtasks should execute when run in parallel."""
@@ -264,7 +264,7 @@ class TestSubagentOrchestrator:
                           code="function physics() {}", summary="engine", success=True),
             SubtaskResult(task_name="ui", model="minimax-m3",
                           code="<div>UI</div>", summary="ui", success=True),
-            SubtaskResult(task_name="research", model="kimi-k2.6",
+            SubtaskResult(task_name="research", model="deepseek-v4-flash",
                           code="Use Verlet", summary="research", success=True),
         ]
         synthesized = asyncio.run(self.orchestrator.synthesize(results, "game_3d", "# Spec"))
@@ -927,7 +927,7 @@ class TestFullSevenLayerStack:
         models = [t.model for t in subtasks]
         assert "deepseek-v4-pro" in models  # Engine specialist
         assert "minimax-m3" in models  # UI specialist
-        assert "kimi-k2.6" in models  # Research specialist
+        assert "deepseek-v4-flash" in models  # Cost-effective research specialist
 
         # Dashboard
         subtasks = orchestrator.decompose_spec("# Dashboard", "dashboard_saas")

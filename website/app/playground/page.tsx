@@ -8,6 +8,9 @@ type Message = {
   role: 'user' | 'assistant';
   content: string;
   orchestration?: OrchestrationData;
+  activity?: ActivityEvent[];
+  startedAt?: number;
+  completedAt?: number;
 };
 
 type OrchestrationData = {
@@ -29,6 +32,24 @@ type ProgressStep = {
   status: 'active' | 'done' | 'error';
 };
 
+type ActivityEvent = {
+  heading: string;
+  detail?: string;
+  kind: 'intent' | 'routing' | 'research' | 'model' | 'verification' | 'result' | 'error';
+  status: 'active' | 'done' | 'error';
+};
+
+type Conversation = {
+  id: string;
+  title: string;
+  messages: Message[];
+  updatedAt: number;
+  pinned?: boolean;
+  profile?: ModelProfile;
+};
+
+type ModelProfile = 'pro' | 'lite';
+
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -40,10 +61,13 @@ export default function PlaygroundPage() {
   const [session, setSession] = useState<LocalSession | null>(null);
   const [sessionChecked, setSessionChecked] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
-  const [freeQueriesUsed, setFreeQueriesUsed] = useState(0);
+  const [expandedActivity, setExpandedActivity] = useState<string | null>(null);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
   const [progressSteps, setProgressSteps] = useState<ProgressStep[]>([]);
@@ -54,6 +78,7 @@ export default function PlaygroundPage() {
   // for an assistant with content === '' which never existed, so every
   // chunk pushed a new message and the response repeated N times).
   const streamingIdxRef = useRef<number>(-1);
+  const historyReadyRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -75,19 +100,56 @@ export default function PlaygroundPage() {
     };
   }, []);
 
-  const getIdentifier = useCallback(() => {
-    return session?.email || '';
-  }, [session]);
+  useEffect(() => {
+    if (!session?.email) return;
+    const key = conversationStorageKey(session.id);
+    const saved = window.localStorage.getItem(key) || window.localStorage.getItem(legacyConversationStorageKey(session.email));
+    try {
+      const parsed = saved ? JSON.parse(saved) as Conversation[] : [];
+      if (parsed.length > 0) {
+        const ordered = sortConversations(parsed);
+        setConversations(ordered);
+        setActiveConversationId(ordered[0].id);
+        setMessages(ordered[0].messages || []);
+        setModelProfile(ordered[0].profile === 'lite' ? 'lite' : 'pro');
+        window.localStorage.setItem(key, JSON.stringify(ordered));
+      } else {
+        const initial = createConversation();
+        setConversations([initial]);
+        setActiveConversationId(initial.id);
+        setMessages([]);
+        setModelProfile('pro');
+      }
+    } catch {
+      const initial = createConversation();
+      setConversations([initial]);
+      setActiveConversationId(initial.id);
+      setMessages([]);
+      setModelProfile('pro');
+    }
+    historyReadyRef.current = true;
+  }, [session?.email, session?.id]);
+
+  useEffect(() => {
+    if (!session?.id || !historyReadyRef.current || !activeConversationId) return;
+    setConversations((previous) => {
+      const next = previous.map((conversation) => conversation.id === activeConversationId
+        ? { ...conversation, messages, profile: modelProfile, updatedAt: Date.now() }
+        : conversation);
+      window.localStorage.setItem(conversationStorageKey(session.id), JSON.stringify(next));
+      return next;
+    });
+  }, [activeConversationId, messages, modelProfile, session?.id]);
 
   // Check usage on mount and after each query
   const checkUsage = useCallback(async () => {
     try {
-      const identifier = getIdentifier();
-      if (!identifier) return;
+      const token = await getAccessToken();
+      if (!token) return;
       const res = await fetch('/api/usage/check', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({}),
       });
       const data = await res.json();
       if (data.allowed === false) {
@@ -95,12 +157,11 @@ export default function PlaygroundPage() {
         setShowUpgradeBanner(true);
       } else {
         setLimitMessage(null);
-        setFreeQueriesUsed(data.queriesToday || 0);
       }
     } catch (err) {
       // Silently fail — don't block the user if the check endpoint is down
     }
-  }, [getIdentifier]);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -119,6 +180,31 @@ export default function PlaygroundPage() {
     });
   }, []);
 
+  const addActivity = useCallback((messageIndex: number, step: ProgressStep) => {
+    const event = toActivityEvent(step);
+    setMessages((prev) => {
+      if (messageIndex < 0 || messageIndex >= prev.length) return prev;
+      const updated = [...prev];
+      const activity = [...(updated[messageIndex].activity || [])];
+      const lastMatchingIndex = [...activity].map((item) => item.heading).lastIndexOf(event.heading);
+
+      if (step.status === 'done' && lastMatchingIndex >= 0) {
+        activity[lastMatchingIndex] = { ...activity[lastMatchingIndex], ...event, status: 'done' };
+      } else {
+        for (let index = activity.length - 1; index >= 0; index -= 1) {
+          if (activity[index].status === 'active') {
+            activity[index] = { ...activity[index], status: 'done' };
+            break;
+          }
+        }
+        activity.push(event);
+      }
+
+      updated[messageIndex] = { ...updated[messageIndex], activity };
+      return updated;
+    });
+  }, []);
+
   const handleSend = useCallback(async () => {
     if (!session) {
       window.location.href = '/login?returnTo=/playground';
@@ -133,19 +219,26 @@ export default function PlaygroundPage() {
     }
 
     const userMessage: Message = { role: 'user', content: input.trim() };
-    setMessages((prev) => [...prev, userMessage]);
+    if (activeConversationId) {
+      setConversations((previous) => previous.map((conversation) => conversation.id === activeConversationId && conversation.messages.length === 0
+        ? { ...conversation, title: conversationTitle(userMessage.content), updatedAt: Date.now() }
+        : conversation));
+    }
+    const initialActivity: ActivityEvent = {
+      heading: describeIntent(userMessage.content),
+      kind: 'intent',
+      status: 'active',
+    };
+    setMessages((prev) => {
+      streamingIdxRef.current = prev.length + 1;
+      return [...prev, userMessage, { role: 'assistant', content: '', activity: [initialActivity], startedAt: Date.now() }];
+    });
     setInput('');
     setStatus('submitted');
-    setProgressSteps([{ label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' }]);
+    const queuedProgress: ProgressStep = { label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' };
+    setProgressSteps([queuedProgress]);
+    addActivity(streamingIdxRef.current, queuedProgress);
     abortControllerRef.current = new AbortController();
-
-    // Increment usage counter (fire and forget)
-    const identifier = getIdentifier();
-    fetch('/api/usage/check', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, inputTokens: 1000, outputTokens: 1000 }),
-    }).then(() => checkUsage()).catch(() => {});
 
     try {
       const token = await getAccessToken();
@@ -160,7 +253,7 @@ export default function PlaygroundPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ messages: [...messages, userMessage], profile: modelProfile }),
         signal: abortControllerRef.current?.signal,
       });
 
@@ -173,14 +266,6 @@ export default function PlaygroundPage() {
       let assistantContent = '';
       let orchestrationData: OrchestrationData | undefined;
       let streamBuffer = '';
-
-      // Insert placeholder assistant bubble once
-      streamingIdxRef.current = -1;
-      setMessages((prev) => {
-        const placeholderMsg: Message = { role: 'assistant', content: '' };
-        streamingIdxRef.current = prev.length;
-        return [...prev, placeholderMsg];
-      });
 
       if (reader) {
         while (true) {
@@ -202,7 +287,7 @@ export default function PlaygroundPage() {
                   setMessages((prev) => {
                     if (idx < 0 || idx >= prev.length) return prev;
                     const updated = [...prev];
-                    updated[idx] = { role: 'assistant', content: assistantContent };
+                    updated[idx] = { ...updated[idx], role: 'assistant', content: assistantContent };
                     return updated;
                   });
                 }
@@ -210,11 +295,13 @@ export default function PlaygroundPage() {
                   orchestrationData = data.orchestration;
                 }
                 if (data.progress) {
-                  addProgress({
+                  const progress = {
                     label: data.progress.label || 'Working',
                     detail: data.progress.detail,
                     status: data.progress.status || 'active',
-                  });
+                  } as ProgressStep;
+                  addProgress(progress);
+                  addActivity(streamingIdxRef.current, progress);
                 }
               } catch {}
             }
@@ -233,9 +320,15 @@ export default function PlaygroundPage() {
         });
       }
 
+      const completedIndex = streamingIdxRef.current;
       streamingIdxRef.current = -1;
       abortControllerRef.current = null;
       setProgressSteps((prev) => prev.map((item) => item.status === 'active' ? { ...item, status: 'done' } : item));
+      setMessages((prev) => prev.map((message, index) => ({
+        ...message,
+        activity: message.activity?.map((item) => item.status === 'active' ? { ...item, status: 'done' } : item),
+        completedAt: index === completedIndex ? Date.now() : message.completedAt,
+      })));
       setStatus('ready');
     } catch (err) {
       abortControllerRef.current = null;
@@ -244,15 +337,76 @@ export default function PlaygroundPage() {
       } else {
         setStatus('error');
         setProgressSteps((prev) => [...prev, { label: 'Generation failed', detail: 'Please retry or simplify the request.', status: 'error' }]);
-        setMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
+        const index = streamingIdxRef.current;
+        setMessages((prev) => {
+          if (index < 0 || index >= prev.length) return [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }];
+          const updated = [...prev];
+          updated[index] = {
+            ...updated[index],
+            content: 'Something went wrong. Please try again.',
+            completedAt: Date.now(),
+            activity: [...(updated[index].activity || []), {
+              heading: 'The workflow could not complete',
+              detail: 'Please retry or simplify the request.',
+              kind: 'error',
+              status: 'error',
+            }],
+          };
+          return updated;
+        });
+        streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, getIdentifier, checkUsage, session, addProgress]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
     setStatus('ready');
   };
+
+  const handleNewConversation = () => {
+    if (status === 'submitted' || status === 'streaming') return;
+    const conversation = createConversation();
+    setConversations((previous) => [conversation, ...previous]);
+    setActiveConversationId(conversation.id);
+    setMessages([]);
+    setModelProfile('pro');
+    setShowOrchestration(null);
+  };
+
+  const handleSelectConversation = (conversation: Conversation) => {
+    if (status === 'submitted' || status === 'streaming') return;
+    setActiveConversationId(conversation.id);
+    setMessages(conversation.messages || []);
+    setModelProfile(conversation.profile === 'lite' ? 'lite' : 'pro');
+    setShowOrchestration(null);
+  };
+
+  const handleDeleteConversation = (conversationId: string) => {
+    if (status === 'submitted' || status === 'streaming') return;
+    const remaining = conversations.filter((conversation) => conversation.id !== conversationId);
+    const nextConversation = remaining[0] || createConversation();
+    const next = remaining.length > 0 ? remaining : [nextConversation];
+    setConversations(next);
+    if (session?.id) window.localStorage.setItem(conversationStorageKey(session.id), JSON.stringify(next));
+    if (activeConversationId === conversationId) {
+      setActiveConversationId(nextConversation.id);
+      setMessages(nextConversation.messages || []);
+      setShowOrchestration(null);
+    }
+  };
+
+  const handleTogglePin = (conversationId: string) => {
+    setConversations((previous) => {
+      const next = sortConversations(previous.map((conversation) => conversation.id === conversationId
+        ? { ...conversation, pinned: !conversation.pinned }
+        : conversation));
+      if (session?.id) window.localStorage.setItem(conversationStorageKey(session.id), JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const visibleConversations = sortConversations(conversations);
 
   if (sessionChecked && !session) {
     return (
@@ -278,6 +432,48 @@ export default function PlaygroundPage() {
       <Navbar />
       <div className="flex h-screen pt-16 bg-bg-primary">
         <h1 className="sr-only">TemuClaude Playground</h1>
+
+        <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border-subtle bg-bg-secondary/50 p-3" aria-label="Chat history">
+          <button onClick={handleNewConversation} disabled={status === 'submitted' || status === 'streaming'} className="btn-secondary w-full justify-start !px-3 !py-2 disabled:opacity-50">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            New chat
+          </button>
+          <div className="mt-5 px-2 text-[10px] font-mono uppercase tracking-wider text-text-muted">Recent chats</div>
+          <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
+            {visibleConversations.map((conversation) => (
+              <div key={conversation.id} className={`group flex items-center gap-1 rounded-sm ${activeConversationId === conversation.id ? 'bg-bg-tertiary' : 'hover:bg-bg-tertiary/60'}`}>
+                <button
+                  onClick={() => handleSelectConversation(conversation)}
+                  className={`min-w-0 flex-1 truncate px-3 py-2.5 text-left text-sm ${activeConversationId === conversation.id ? 'text-text-primary font-medium' : 'text-text-secondary'}`}
+                  title={conversation.title}
+                >
+                  {conversation.title}
+                </button>
+                <div className="mr-1 hidden items-center gap-0.5 group-hover:flex group-focus-within:flex">
+                  <button
+                    onClick={() => handleTogglePin(conversation.id)}
+                    aria-label={`${conversation.pinned ? 'Unpin' : 'Pin'} ${conversation.title}`}
+                    title={conversation.pinned ? 'Unpin chat' : 'Pin chat'}
+                    className="group/pin relative rounded-sm p-1.5 text-text-muted hover:bg-white hover:text-accent-primary"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={conversation.pinned ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 17v5M8 3h8l-1 7 3 3H6l3-3-1-7Z" /></svg>
+                    <span role="tooltip" className="pointer-events-none absolute right-0 top-full z-10 mt-1 hidden whitespace-nowrap rounded-sm bg-bg-dark px-2 py-1 text-[10px] text-white shadow-sm group-hover/pin:block">{conversation.pinned ? 'Unpin chat' : 'Pin chat'}</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteConversation(conversation.id)}
+                    aria-label={`Delete ${conversation.title}`}
+                    title="Delete chat"
+                    className="group/delete relative rounded-sm p-1.5 text-text-muted hover:bg-white hover:text-accent-fig"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m-7 0 1 14h4l1-14" /></svg>
+                    <span role="tooltip" className="pointer-events-none absolute right-0 top-full z-10 mt-1 hidden whitespace-nowrap rounded-sm bg-bg-dark px-2 py-1 text-[10px] text-white shadow-sm group-hover/delete:block">Delete chat</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="px-2 pt-3 text-[10px] leading-relaxed text-text-muted">Chats are saved in this browser for your signed-in account.</p>
+        </aside>
 
         <main className="flex-1 flex flex-col h-[calc(100vh-4rem)] bg-bg-primary" aria-label="TemuClaude Playground" id="main-content">
           {/* Free tier limit banner */}
@@ -321,25 +517,25 @@ export default function PlaygroundPage() {
                 </div>
               )}
 
-              {/* Messages */}
+              {/* Agent transcript */}
               {messages.map((message, i) => (
-                <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[85%] ${
-                      message.role === 'user'
-                        ? 'bg-bg-dark text-text-inverse rounded-md rounded-tr-sm'
-                        : 'bg-white border border-border-subtle rounded-md rounded-tl-sm'
-                    } p-4`}
-                  >
+                <div key={i} className={message.role === 'user' ? 'flex justify-end' : 'max-w-full'}>
+                  <div className={message.role === 'user' ? 'max-w-[85%] bg-bg-dark text-text-inverse rounded-sm px-4 py-3' : 'border-l border-border-default pl-4 md:pl-5'}>
+                    {message.role === 'assistant' && message.activity && message.activity.length > 0 && (
+                      <AgentActivity
+                        events={message.activity}
+                        durationMs={message.completedAt && message.startedAt ? message.completedAt - message.startedAt : null}
+                        expanded={(i === messages.length - 1 && (status === 'submitted' || status === 'streaming')) || expandedActivity === String(i)}
+                        onToggle={() => setExpandedActivity((current) => current === String(i) ? null : String(i))}
+                      />
+                    )}
                     <div
-                      className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                        message.role === 'user' ? 'text-text-inverse' : 'text-text-primary'
-                      }`}
+                      className={`whitespace-pre-wrap text-sm leading-relaxed ${message.role === 'user' ? 'text-text-inverse' : 'text-text-primary'} ${message.role === 'assistant' && message.activity?.length ? 'mt-4' : ''}`}
                       role={message.role === 'assistant' ? 'status' : undefined}
                       aria-live={message.role === 'assistant' ? 'polite' : undefined}
                       aria-atomic="false"
                     >
-                      {message.content}
+                      {message.content || (message.role === 'assistant' && status === 'submitted' ? 'Working…' : '')}
                       {status === 'streaming' && i === messages.length - 1 && message.role === 'assistant' && (
                         <span className="inline-block w-2 h-4 bg-accent-primary ml-0.5 animate-blink" />
                       )}
@@ -367,19 +563,6 @@ export default function PlaygroundPage() {
                 </div>
               ))}
 
-              {/* Typing indicator */}
-              {status === 'submitted' && (
-                <div className="flex justify-start">
-                  <div className="bg-white border border-border-subtle rounded-md rounded-tl-sm p-4">
-                    <div className="flex gap-1">
-                      <span className="typing-dot" />
-                      <span className="typing-dot" />
-                      <span className="typing-dot" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div ref={messagesEndRef} />
             </div>
           </div>
@@ -395,37 +578,33 @@ export default function PlaygroundPage() {
           {/* Input Bar */}
           <div className="border-t border-border-subtle bg-bg-primary p-4">
             <div className="max-w-3xl mx-auto">
-              {progressSteps.length > 0 && (status === 'submitted' || status === 'streaming') && (
-                <div className="mb-3 border border-border-subtle rounded-sm bg-bg-secondary/70 overflow-hidden">
-                  <div className="px-3 py-2 border-b border-border-subtle text-xs font-semibold text-text-primary">
-                    Live working progress
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-0">
-                    {progressSteps.map((step, i) => (
-                      <div key={`${step.label}-${i}`} className="flex items-start gap-2 px-3 py-2 text-xs">
-                        <span className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${
-                          step.status === 'error' ? 'bg-accent-fig' : step.status === 'done' ? 'bg-accent-olive' : 'bg-accent-primary animate-pulse'
-                        }`} />
-                        <span>
-                          <span className="font-medium text-text-primary">{step.label}</span>
-                          {step.detail && <span className="block text-text-muted">{step.detail}</span>}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {(status === 'submitted' || status === 'streaming') && progressSteps.length > 0 && (
+                <p className="mb-2 text-xs text-text-muted" aria-live="polite">TemuClaude is working…</p>
               )}
-              {/* Free tier counter */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-text-muted">
-                    {freeQueriesUsed < 20 ? `${20 - freeQueriesUsed} free queries left today` : 'Free queries used up for today'}
-                  </span>
-                  {freeQueriesUsed >= 12 && freeQueriesUsed < 20 && (
-                    <a href="/pricing" className="text-xs text-accent-primary hover:underline">Upgrade for more →</a>
-                  )}
-                </div>
-              </div>
+              <fieldset className="mb-3 flex items-center gap-2" aria-label="TemuClaude model profile">
+                <legend className="sr-only">TemuClaude model profile</legend>
+                <span className="mr-1 text-xs text-text-muted">Mode</span>
+                {([
+                  ['pro', 'TemuClaude Pro', 'Maximum orchestration and premium escalation'],
+                  ['lite', 'TemuClaude Lite', 'Cost-bounded intelligent routing'],
+                ] as const).map(([value, label, description]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setModelProfile(value)}
+                    disabled={status === 'submitted' || status === 'streaming'}
+                    className={`rounded-sm border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50 ${
+                      modelProfile === value
+                        ? 'border-accent-primary bg-accent-primary/10 text-text-primary'
+                        : 'border-border-subtle text-text-secondary hover:border-border-default hover:text-text-primary'
+                    }`}
+                    aria-pressed={modelProfile === value}
+                    title={description}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </fieldset>
               <div className="flex gap-2 items-end">
                 <textarea
                   value={input}
@@ -437,8 +616,8 @@ export default function PlaygroundPage() {
                     }
                   }}
                   placeholder="Ask TemuClaude anything..."
-                  rows={1}
-                  className="input flex-1 resize-none min-h-[44px] max-h-32"
+                  rows={5}
+                  className="input flex-1 h-[122px] resize-none overflow-x-hidden overflow-y-auto"
                   aria-label="Enter your question"
                   disabled={status === 'submitted' || status === 'streaming'}
                 />
@@ -468,6 +647,108 @@ export default function PlaygroundPage() {
         </main>
       </div>
     </>
+  );
+}
+
+function conversationStorageKey(userId: string) {
+  return `temuclaude:playground:${userId}:conversations`;
+}
+
+function legacyConversationStorageKey(email: string) {
+  return `temuclaude:playground:${email.toLowerCase()}:conversations`;
+}
+
+function createConversation(): Conversation {
+  return {
+    id: `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    title: 'New chat',
+    messages: [],
+    updatedAt: Date.now(),
+  };
+}
+
+function conversationTitle(content: string) {
+  const compact = content.replace(/\s+/g, ' ').trim();
+  return compact.length > 40 ? `${compact.slice(0, 40)}…` : compact || 'New chat';
+}
+
+function sortConversations(conversations: Conversation[]) {
+  return [...conversations].sort((left, right) => Number(Boolean(right.pinned)) - Number(Boolean(left.pinned)) || right.updatedAt - left.updatedAt);
+}
+
+function describeIntent(prompt: string) {
+  const normalized = prompt.toLowerCase();
+  if (/compare|cost|price|cheaper|pricing/.test(normalized)) {
+    return 'I’ll compare the options against the relevant trade-offs and calculate the difference.';
+  }
+  if (/code|function|bug|error|typescript|python|javascript|implement/.test(normalized)) {
+    return 'I’ll inspect the problem, work through an implementation, and check the result.';
+  }
+  if (/research|latest|news|current|search|source/.test(normalized)) {
+    return 'I’ll research the current evidence, verify the important details, and synthesize an answer.';
+  }
+  return 'I’ll analyze the request, select the right reasoning path, and check the answer before responding.';
+}
+
+function toActivityEvent(step: ProgressStep): ActivityEvent {
+  const label = step.label.toLowerCase();
+  if (label.includes('queued')) return { heading: 'Prepared a work plan', detail: step.detail, kind: 'routing', status: step.status };
+  if (label.includes('classifying')) return { heading: 'Understood the request', detail: step.detail, kind: 'routing', status: step.status };
+  if (label.includes('routing')) return { heading: 'Selected a response plan', detail: step.detail, kind: 'routing', status: step.status };
+  if (label.includes('search')) return { heading: label.includes('complete') ? 'Finished web research' : 'Searched the web', detail: step.detail, kind: 'research', status: step.status };
+  if (label.includes('draft') || label.includes('calling')) return { heading: 'Consulted the selected model', detail: step.detail, kind: 'model', status: step.status };
+  if (label.includes('review')) return { heading: 'Cross-checked candidate answers', detail: step.detail, kind: 'verification', status: step.status };
+  if (label.includes('aggregat')) return { heading: 'Synthesized the strongest answer', detail: step.detail, kind: 'model', status: step.status };
+  if (label.includes('consistency') || label.includes('verif') || label.includes('quality')) return { heading: 'Verified the result', detail: step.detail, kind: 'verification', status: step.status };
+  if (label.includes('stream')) return { heading: 'Prepared the final response', detail: step.detail, kind: 'result', status: step.status };
+  if (step.status === 'error') return { heading: 'Recovered from a workflow issue', detail: step.detail, kind: 'error', status: step.status };
+  return { heading: step.label, detail: step.detail, kind: 'model', status: step.status };
+}
+
+function AgentActivity({
+  events,
+  durationMs,
+  expanded,
+  onToggle,
+}: {
+  events: ActivityEvent[];
+  durationMs: number | null;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const duration = durationMs === null ? 'Working' : `Worked for ${(durationMs / 1000).toFixed(durationMs < 10_000 ? 1 : 0)}s`;
+
+  if (!expanded) {
+    return (
+      <button onClick={onToggle} className="flex items-center gap-2 text-xs text-text-secondary hover:text-text-primary transition-colors" aria-expanded="false">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent-olive" aria-hidden="true" />
+        <span>{duration} · {events.length} {events.length === 1 ? 'step' : 'steps'}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+      </button>
+    );
+  }
+
+  return (
+    <div className="space-y-1.5 text-[13px] leading-5" aria-label="TemuClaude work log">
+      {durationMs !== null && (
+        <button onClick={onToggle} className="mb-1 flex items-center gap-2 text-xs text-text-muted hover:text-text-primary transition-colors" aria-expanded="true">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent-olive" aria-hidden="true" />
+          <span>{duration} · {events.length} {events.length === 1 ? 'step' : 'steps'}</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 15 12 9 18 15" /></svg>
+        </button>
+      )}
+      {events.map((event, index) => (
+        <div key={`${event.heading}-${index}`} className={`flex items-start gap-2 ${event.kind === 'intent' ? 'pb-2 text-text-primary' : 'text-text-secondary'}`}>
+          <span className={`mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full ${
+            event.status === 'error' ? 'bg-accent-fig' : event.status === 'active' ? 'bg-accent-primary animate-pulse' : event.kind === 'intent' ? 'bg-accent-primary' : 'bg-text-muted/70'
+          }`} aria-hidden="true" />
+          <div>
+            <p className={event.kind === 'intent' ? 'text-text-primary' : 'font-mono text-xs text-text-primary'}>{event.heading}</p>
+            {event.detail && <p className="text-xs text-text-muted">{event.detail}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { execSync } from 'child_process';
+import { hasInternalAdminAccess } from '@/lib/internal-admin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -8,6 +9,7 @@ const TEMUCLAUDE_DIR = process.env.TEMUCLAUDE_DIR || '/Users/saiful/temuclaude';
 const STATE_DIR = '/tmp/temuclaude_daemons';
 
 export async function POST(req: NextRequest) {
+  if (!hasInternalAdminAccess(req)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   try {
     const { action } = await req.json();
 
@@ -111,7 +113,8 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!hasInternalAdminAccess(req)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   try {
     let alive = 0;
     let total = 0;
