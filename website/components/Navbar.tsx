@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { getStoredSession, isSupabaseConfigured, onAuthSessionChange, signOut, type LocalSession } from '@/lib/auth';
 
-const navItems = [
+// Keep every desktop and mobile product link in this one list. Account actions
+// deliberately use the same text-link treatment, so a second CTA cannot drift
+// into the header during future releases.
+const primaryNavItems = [
   { label: 'Models', href: '/models' },
   { label: 'Playground', href: '/playground' },
   { label: 'Compare', href: '/compare' },
@@ -107,7 +110,7 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
+            {primaryNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -123,39 +126,35 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop account navigation */}
+          <div className="hidden md:flex items-center gap-8">
             {session ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 flex items-center gap-1.5 text-xs font-semibold"
+                  className={`nav-link ${pathname?.startsWith('/dashboard') ? 'nav-link-active' : ''}`}
+                  aria-current={pathname?.startsWith('/dashboard') ? 'page' : undefined}
                 >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="9" rx="1" />
-                    <rect x="14" y="3" width="7" height="5" rx="1" />
-                    <rect x="14" y="12" width="7" height="9" rx="1" />
-                    <rect x="3" y="16" width="7" height="5" rx="1" />
-                  </svg>
                   Dashboard
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 text-xs font-semibold cursor-pointer"
+                  className="nav-link cursor-pointer border-0 bg-transparent p-0"
                 >
                   Sign Out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="btn-secondary !rounded-md !bg-bg-primary/70 !py-2 !px-4 text-xs font-semibold">
+                <Link
+                  href="/login"
+                  className={`nav-link ${pathname?.startsWith('/login') ? 'nav-link-active' : ''}`}
+                  aria-current={pathname?.startsWith('/login') ? 'page' : undefined}
+                >
                   Sign In
                 </Link>
               </>
             )}
-            <Link href="/playground" className="btn-primary">
-              Playground
-            </Link>
           </div>
 
           {/* Mobile hamburger */}
@@ -196,7 +195,7 @@ export function Navbar() {
             aria-label="Mobile navigation"
           >
             <div className="p-6 flex flex-col gap-1 mt-16">
-              {navItems.map((item) => (
+              {primaryNavItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -215,13 +214,13 @@ export function Navbar() {
                   <Link
                     href="/dashboard"
                     onClick={() => setMobileOpen(false)}
-                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-4 w-full text-center py-2.5 text-sm font-semibold"
+                    className="btn-secondary mt-4 w-full text-center py-2.5 text-sm font-semibold"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-2 w-full py-2.5 text-sm font-semibold cursor-pointer"
+                    className="btn-secondary mt-2 w-full py-2.5 text-sm font-semibold cursor-pointer"
                   >
                     Sign Out
                   </button>
@@ -231,19 +230,12 @@ export function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setMobileOpen(false)}
-                    className="btn-secondary !rounded-md !bg-bg-primary/70 mt-4 w-full text-center py-2.5 text-sm font-semibold"
+                    className="btn-secondary mt-4 w-full text-center py-2.5 text-sm font-semibold"
                   >
                     Sign In
                   </Link>
                 </>
               )}
-              <Link
-                href="/playground"
-                onClick={() => setMobileOpen(false)}
-                className="btn-primary mt-2 w-full"
-              >
-                Playground
-              </Link>
             </div>
           </nav>
         </div>

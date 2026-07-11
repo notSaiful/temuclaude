@@ -73,6 +73,14 @@ assertIncludes('website/lib/openrouter-lite.ts', [
   'nvidia/nemotron-3-ultra-550b-a55b',
 ]);
 
+const navbarSource = read('website/components/Navbar.tsx');
+assert(navbarSource.includes('const primaryNavItems'), 'Navbar must use one shared primary navigation list.');
+assert((navbarSource.match(/label: 'Playground'/g) || []).length === 1, 'Navbar must render exactly one Playground link.');
+assert(!navbarSource.includes('className="btn-primary"'), 'Navbar must not render a duplicate black Playground CTA.');
+assert(navbarSource.includes("className={`nav-link ${pathname?.startsWith('/dashboard')"), 'Dashboard must use the shared header-link treatment.');
+assert(navbarSource.includes('className="nav-link cursor-pointer border-0 bg-transparent p-0"'), 'Sign Out must use the shared header-link treatment.');
+assert(fs.existsSync(path.join(website, 'app', 'login', 'page.tsx')), 'website/app/login/page.tsx is required to prevent header Sign In 404s.');
+
 assertIncludes('website/lib/db.ts', [
   'assertPersistentDbAvailable',
   'ALLOW_EPHEMERAL_DB',
