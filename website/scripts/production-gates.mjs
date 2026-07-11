@@ -59,6 +59,18 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
   'TemuClaude could not produce a non-empty completion',
   'Modal backend returned an empty completion',
   'finalContent',
+  'temuclaude/temuclaude-lite',
+]);
+
+assertIncludes('website/app/api/chat/route.ts', [
+  "profile must be either \"pro\" or \"lite\"",
+  'runLiteStack',
+  'recordPlaygroundUsage',
+]);
+
+assertIncludes('website/lib/openrouter-lite.ts', [
+  'LITE_MODEL_ALLOWLIST',
+  'nvidia/nemotron-3-ultra-550b-a55b',
 ]);
 
 assertIncludes('website/lib/db.ts', [

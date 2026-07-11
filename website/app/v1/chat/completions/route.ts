@@ -27,9 +27,11 @@
  * Timeout: 45s race → single GLM fallback
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'crypto';
 import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync, getRollingWindowUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS } from '@/lib/plans';
 import { callOpenRouter } from '@/lib/openrouter';
+import { callOpenRouterLite, type LiteModelId } from '@/lib/openrouter-lite';
 import { callModalChatCompletions, isModalConfigured, isModalRequired } from '@/lib/modal';
 
 // Global in-memory circuit breaker state (retained during warm serverless container instances)
@@ -49,6 +51,10 @@ const M_LUNA = 'openai/gpt-5.6-luna';
 const M_GROK = 'x-ai/grok-4.5';
 const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b';
 const M_TERRA = 'openai/gpt-5.6-terra'; // emergency rescue only
+const LITE_DEFAULT: LiteModelId = 'deepseek/deepseek-v4-flash';
+const LITE_REASONING: LiteModelId = 'qwen/qwen3-235b-a22b-thinking-2507';
+const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
+const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
@@ -170,6 +176,24 @@ function isCreative(text: string): boolean {
 
 function isMultimodal(text: string): boolean {
   return /\b(image|picture|photo|video|visual|diagram|chart|screenshot|see|look at|describe.*image)\b/i.test(text);
+}
+
+function isLiteModel(model: unknown): boolean {
+  return typeof model === 'string' && ['temuclaude-lite', 'temuclaude/temuclaude-lite', 'temuclaude/lite'].includes(model.toLowerCase());
+}
+
+function selectLiteApiModel(text: string, tier: string): LiteModelId {
+  if (tier === 'hard' && (isMath(text) || /\b(reason|prove|deduce|infer|logic)\b/i.test(text))) return LITE_REASONING;
+  if (isMultimodal(text) || /\b(agent|tool|workflow|ui|screen|browser|code)\b/i.test(text)) return LITE_AGENT;
+  return LITE_DEFAULT;
+}
+
+function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
+  const text = query.toLowerCase();
+  if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
+  if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
+  const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
+  return sample < 0.02;
 }
 
 /**
@@ -515,6 +539,74 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Lite is a separately bounded public API profile. It must bypass Modal
+    // and the Pro fusion pipeline so its allowlist and cost contract remain
+    // enforceable even when callers supply an arbitrary `model` field.
+    if (isLiteModel(model)) {
+      const latestUserText = [...messages].reverse().find((message: Msg) => message.role === 'user')?.content || '';
+      const tier = classify(latestUserText);
+      const liteModel = selectLiteApiModel(latestUserText, tier);
+      let lite = await callOpenRouterLite(liteModel, messages, {
+        temperature: temperature ?? 0.45,
+        maxTokens: Math.min(max_tokens ?? 2048, 4096),
+        timeoutMs: 60_000,
+        sessionId: `v1-lite-${Date.now()}`,
+      });
+      if (!lite.success || !hasUsableContent(lite.content)) {
+        return upstreamFailure(lite.error || 'TemuClaude Lite is temporarily unavailable.', 503);
+      }
+      let promptTokens = lite.promptTokens || promptTokenEstimate(messages);
+      let completionTokens = lite.completionTokens || completionTokenEstimate(lite.content);
+
+      // Keep the API profile aligned with Playground Lite: an independent
+      // critic runs only for high-risk, explicit-check, or audit-sampled work.
+      // A correction makes at most three Lite model calls in total.
+      if (shouldVerifyLite(latestUserText, tier, lite.content)) {
+        const verdict = await callOpenRouterLite(LITE_VERIFIER, [
+          { role: 'system', content: 'Check the draft for factual, logical, or safety-critical errors. Reply with PASS, or FAIL followed by a concise correction request.' },
+          { role: 'user', content: `Question:\n${latestUserText}\n\nDraft:\n${lite.content}` },
+        ], {
+          maxTokens: 350,
+          timeoutMs: 30_000,
+          sessionId: `v1-lite-verify-${Date.now()}`,
+        });
+        completionTokens += verdict.completionTokens;
+        promptTokens += verdict.promptTokens;
+        if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
+          const corrected = await callOpenRouterLite(liteModel, [
+            ...messages,
+            { role: 'assistant', content: lite.content },
+            { role: 'user', content: `Verifier feedback:\n${verdict.content}\n\nReturn a corrected, self-contained answer.` },
+          ], {
+            temperature: temperature ?? 0.35,
+            maxTokens: Math.min(max_tokens ?? 2048, 4096),
+            timeoutMs: 60_000,
+            sessionId: `v1-lite-correct-${Date.now()}`,
+          });
+          if (corrected.success && hasUsableContent(corrected.content)) {
+            lite = corrected;
+            promptTokens += corrected.promptTokens;
+            completionTokens += corrected.completionTokens;
+          }
+        }
+      }
+      if (!isEvalMode && userId) {
+        try { await incrementUsageAsync(userId, promptTokens, completionTokens, lite.model); } catch {}
+      }
+      return NextResponse.json({
+        id: `chatcmpl-${Date.now()}`,
+        object: 'chat.completion',
+        created: Math.floor(Date.now() / 1000),
+        model: 'temuclaude/temuclaude-lite',
+        choices: [{ index: 0, message: { role: 'assistant', content: lite.content.trim() }, finish_reason: 'stop' }],
+        usage: {
+          prompt_tokens: promptTokens,
+          completion_tokens: completionTokens,
+          total_tokens: promptTokens + completionTokens,
+        },
+      });
+    }
+
     let useFallbackRoute = false;
     if (Date.now() < circuitTrippedUntil) {
       console.warn('Circuit breaker is TRIPPED. Routing to fallback pool directly.');
@@ -644,6 +736,7 @@ export async function GET() {
       { name: 'GPT-5.6 Luna', role: 'QA-failure escalation', iq: null },
       { name: 'Grok 4.5', role: 'Code-repair escalation', iq: null },
       { name: 'Nemotron 3 Ultra', role: 'Independent QA', iq: null },
+      { name: 'TemuClaude Lite', role: 'Cost-bounded OpenRouter cascade', model: 'temuclaude/temuclaude-lite' },
     ],
     pipeline: ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback'],
   });

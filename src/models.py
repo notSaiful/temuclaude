@@ -245,6 +245,8 @@ OPENROUTER_MODELS = {
     "grok-4.5": "x-ai/grok-4.5",
     "gpt-5.6-terra": "openai/gpt-5.6-terra",
     "qwen3-235b-moe": "qwen/qwen3-235b-a22b-2507",      # $0.09/$0.10/M — MoE reasoning
+    "qwen3-235b-thinking": "qwen/qwen3-235b-a22b-thinking-2507",
+    "qwen3.7-plus": "qwen/qwen3.7-plus",
     "qwen3-next-80b-moe": "qwen/qwen3-next-80b-a3b-instruct",  # $0.09/$0.78/M — MoE general
     "gemma-4-26b-moe": "google/gemma-4-26b-a4b-it",     # $0.06/$0.30/M — MoE knowledge
 }
@@ -261,6 +263,8 @@ OPENROUTER_FREE_MODELS = {
 # these are only attempted when a preferred provider/model fails at runtime.
 OPENROUTER_MODEL_FALLBACKS = {
     "deepseek-v4-flash": ["deepseek-v4-pro", "glm-5.2"],
+    "qwen3-235b-thinking": ["deepseek-v4-flash"],
+    "qwen3.7-plus": ["deepseek-v4-flash"],
     "gemini-3.5-flash": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
     "gpt-5.6-luna": ["glm-5.2", "deepseek-v4-pro"],
     "grok-4.5": ["gpt-5.6-luna", "glm-5.2", "deepseek-v4-pro"],

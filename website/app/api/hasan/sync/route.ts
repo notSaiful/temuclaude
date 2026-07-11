@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { hasInternalAdminAccess } from '@/lib/internal-admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,6 +9,11 @@ let liveState: any = null;
 let lastSyncTime: number = 0;
 
 export async function POST(req: NextRequest) {
+  // A public caller must never be able to forge operational health or queue state.
+  if (!hasInternalAdminAccess(req)) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const data = await req.json();
     

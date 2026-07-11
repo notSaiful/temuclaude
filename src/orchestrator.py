@@ -45,6 +45,15 @@ if __package__:
     from .cache import get_cache
     from .models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
     from .reasoning_tree import MCTSReasoningSearch
+    from .model_profiles import (
+        LITE_PROFILE,
+        clamp_profile_output_tokens,
+        get_model_profile,
+        get_profile_fallbacks,
+        normalize_model_profile,
+        requires_lite_verification,
+        select_profile_model,
+    )
 else:
     # When run directly as: python src/orchestrator.py
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -79,6 +88,15 @@ else:
     from src.cache import get_cache
     from src.models import FREE_MODEL_CHAIN, ULTRA_CHEAP_MODELS
     from src.reasoning_tree import MCTSReasoningSearch
+    from src.model_profiles import (
+        LITE_PROFILE,
+        clamp_profile_output_tokens,
+        get_model_profile,
+        get_profile_fallbacks,
+        normalize_model_profile,
+        requires_lite_verification,
+        select_profile_model,
+    )
 
 
 import re as _re
@@ -770,6 +788,120 @@ class Temuclaude:
 
         return answer  # All failed, return last error
 
+    async def call_lite_model(
+        self,
+        model: str,
+        messages: list,
+        *,
+        max_tokens: int,
+        temperature: float = 0.2,
+        timeout: int = 120,
+    ) -> str:
+        """Call one Lite allowlisted OpenRouter model without cross-profile fallbacks.
+
+        This intentionally bypasses the generic fallback helper: that helper
+        may recover through the Pro pool, which would break Lite's price and
+        routing contract.
+        """
+        policy = get_model_profile(LITE_PROFILE)
+        if model not in policy.models:
+            return f"[ERROR: {model} is not permitted for TemuClaude Lite]"
+        if not _USE_OPENROUTER or not os.environ.get("OPENROUTER_API_KEY"):
+            return "[ERROR: TemuClaude Lite requires an OpenRouter API key]"
+
+        if __package__:
+            from .models import OPENROUTER_MODELS
+        else:
+            from src.models import OPENROUTER_MODELS
+
+        model_id = OPENROUTER_MODELS.get(model)
+        if not model_id:
+            return f"[ERROR: no OpenRouter mapping for Lite model {model}]"
+
+        try:
+            response = await asyncio.wait_for(
+                self.client.chat.completions.create(
+                    model=model_id,
+                    messages=messages,
+                    temperature=temperature,
+                    max_tokens=clamp_profile_output_tokens(LITE_PROFILE, "hard", max_tokens),
+                    extra_body={"provider": {"allow_fallbacks": True}},
+                ),
+                timeout=timeout,
+            )
+            content = self._extract_model_content(response.choices[0].message)
+            return self._compiler_guided_autocomplete(content) if content.strip() else "[ERROR: Lite model returned empty content]"
+        except asyncio.TimeoutError:
+            return f"[ERROR: {model} timed out after {timeout}s]"
+        except Exception as exc:
+            return f"[ERROR: {model} failed: {exc}]"
+
+    async def complete_lite(
+        self,
+        query: str,
+        system_prompt: Optional[str],
+        task_type: str,
+        tier: str,
+        start_time: float,
+    ) -> str:
+        """Bounded Lite route: primary, availability fallback, optional verifier."""
+        policy = get_model_profile(LITE_PROFILE)
+        if len(query) > policy.max_input_tokens * 4:
+            return f"[ERROR: TemuClaude Lite supports up to {policy.max_input_tokens:,} input tokens]"
+
+        model = select_profile_model(LITE_PROFILE, task_type, tier)
+        token_budget = clamp_profile_output_tokens(LITE_PROFILE, tier)
+        prompt = build_enhanced_system_prompt(task_type, system_prompt, tier=tier, query=query)
+        messages = [
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": query},
+        ]
+        track_skill_usage(task_type)
+        answer = await self.call_lite_model(model, messages, max_tokens=token_budget)
+        models_used = [model]
+        strategy = "lite_primary"
+
+        if answer.startswith("[ERROR"):
+            for fallback in get_profile_fallbacks(LITE_PROFILE, model):
+                answer = await self.call_lite_model(fallback, messages, max_tokens=token_budget)
+                models_used.append(fallback)
+                strategy = "lite_availability_fallback"
+                if not answer.startswith("[ERROR"):
+                    break
+
+        if not answer.startswith("[ERROR") and requires_lite_verification(query, tier, answer):
+            verifier = policy.verifier_model
+            if verifier and verifier not in models_used and len(models_used) < policy.max_model_calls:
+                verification_messages = [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Verify the candidate answer against the user request. "
+                            "Reply exactly PASS if it is correct and safe. Otherwise return only a corrected final answer."
+                        ),
+                    },
+                    {"role": "user", "content": f"Request:\n{query}\n\nCandidate answer:\n{answer}"},
+                ]
+                verification = await self.call_lite_model(verifier, verification_messages, max_tokens=token_budget)
+                models_used.append(verifier)
+                if not verification.startswith("[ERROR") and verification.strip().upper() != "PASS":
+                    answer = verification
+                    strategy += "+ultra_verifier_corrected"
+                else:
+                    strategy += "+ultra_verifier_passed"
+
+        self.logger.log(
+            user_query=query,
+            task_type=task_type,
+            routing_tier=f"lite_{tier}",
+            models_used=models_used,
+            strategy=strategy,
+            final_answer=answer,
+            latency_ms=int((time.time() - start_time) * 1000),
+            success=not answer.startswith("[ERROR"),
+        )
+        return answer
+
     async def project_multimodal_inputs(self, query: str) -> str:
         """Project visual elements in the query into structured text descriptions (Multimodal Projection)."""
         visual_keywords = ["image", "picture", "screenshot", "diagram", "chart", "graph", "plot"]
@@ -840,7 +972,13 @@ class Temuclaude:
         ]
         return await self.call_model("deepseek-v4-pro", messages, max_tokens=1024)
 
-    async def complete(self, query: str, system_prompt: str = None, budget_profile: str = "balanced") -> str:
+    async def complete(
+        self,
+        query: str,
+        system_prompt: str = None,
+        budget_profile: str = "balanced",
+        model_profile: str = "pro",
+    ) -> str:
         """
         Main entry point. User sends a query, gets one response.
         All orchestration is internal.
@@ -858,11 +996,15 @@ class Temuclaude:
         - Unified routing + cascading (arXiv:2410.10347)
         """
         start_time = time.time()
+        model_profile = normalize_model_profile(model_profile)
 
         # Step 0: Semantic cache check — zero cost, zero quality loss
         try:
             cache = get_cache()
-            cache_key_messages = [{"role": "user", "content": query}]
+            cache_key_messages = [
+                {"role": "system", "content": f"temuclaude-profile:{model_profile}"},
+                {"role": "user", "content": query},
+            ]
             cached = cache.get("cache", cache_key_messages)
             if cached is not None:
                 latency_ms = int((time.time() - start_time) * 1000)
@@ -906,6 +1048,9 @@ class Temuclaude:
         # Step 1: Classify the task
         task_type = await self.classify_task(query)
         tier = self.determine_tier(query, task_type)
+
+        if model_profile == LITE_PROFILE:
+            return await self.complete_lite(query, system_prompt, task_type, tier, start_time)
 
         # UI/UX generation: route through Loop Engine
         if task_type == "ui_ux":

@@ -11,20 +11,18 @@ import {
   verifyAndRenewWeeklyCreditsAsync
 } from '@/lib/db';
 import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
+import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { identifier } = body;
-
-    if (!identifier) {
-      return NextResponse.json({ error: 'Identifier required' }, { status: 400 });
-    }
-
-    const initialUser = await getOrCreateUserByEmailAsync(identifier);
+    const auth = await getAuthenticatedSupabaseUser(req);
+    if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    const email = auth.user.email?.trim().toLowerCase();
+    if (!email) return NextResponse.json({ error: 'Authenticated user has no email address' }, { status: 400 });
+    const initialUser = await getOrCreateUserByEmailAsync(email);
 
     // Dynamic weekly reset check
     const user = (await verifyAndRenewWeeklyCreditsAsync(initialUser.id)) || initialUser;
@@ -76,19 +74,24 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { identifier, inputTokens, outputTokens, modelName } = body;
+    const { inputTokens, outputTokens, modelName } = body;
+    const auth = await getAuthenticatedSupabaseUser(req);
+    if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    const email = auth.user.email?.trim().toLowerCase();
+    if (!email) return NextResponse.json({ error: 'Authenticated user has no email address' }, { status: 400 });
+    const initialUser = await getOrCreateUserByEmailAsync(email);
+    const user = (await verifyAndRenewWeeklyCreditsAsync(initialUser.id)) || initialUser;
 
-    if (!identifier) {
-      return NextResponse.json({ error: 'Identifier required' }, { status: 400 });
+    const limits = PLAN_LIMITS[user.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
+    const rollingBefore = await getRollingWindowUsageAsync(user.id, ROLLING_WINDOW_HOURS);
+    if (user.credit_balance <= 0 || (limits.rollingQueries !== Infinity && rollingBefore.query_count >= limits.rollingQueries)) {
+      return NextResponse.json({ error: 'Usage limit reached', allowed: false }, { status: 429 });
     }
-
-    const user = await getOrCreateUserByEmailAsync(identifier);
 
     // Deduct credits and log timestamped event with model metadata
     await incrementUsageAsync(user.id, inputTokens || 1000, outputTokens || 1000, modelName);
 
     const rollingUsage = await getRollingWindowUsageAsync(user.id, ROLLING_WINDOW_HOURS);
-    const limits = PLAN_LIMITS[user.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
 
     return NextResponse.json({
       success: true,

@@ -45,15 +45,39 @@ The active budget controller now runs in shadow mode. It records recommended act
 
 ## Pricing
 
-| Plan | Price | Queries | API |
-|------|-------|---------|-----|
-| Free | $0 | 20/day | Playground |
-| Developer | $15/mo | 50,000/mo | Yes |
-| Pro | $49/mo | 500,000/mo | Yes |
-| Pay-as-you-go | $0.50/$2.00 per 1M tokens | — | Yes |
-| Enterprise | $499/mo | Unlimited | Yes (SSO, SLA) |
+| Plan | Price | Monthly Credits | API |
+|------|-------|-----------------|-----|
+| Free | $0 | 50K credits (20 queries/day) | Playground |
+| Developer | $19/mo | 5M credits | Yes |
+| Pro | $49/mo | 25M credits | Yes |
+| Max | $149/mo | 100M credits | Yes |
+| Enterprise | From $499/mo | 300M credits + contract overages | Yes (SSO, SLA) |
 
-## vs Frontier Models
+Credits are route-weighted for margin safety: trivial 1x, standard 1.5x, hard multi-model orchestration 4x, frontier fallback 15x, and deep research / long agentic work up to 20x.
+
+## TemuClaude Lite
+
+The Playground exposes two server-validated product profiles. **TemuClaude Pro**
+keeps the full step-aware, premium-capable orchestration policy. **TemuClaude
+Lite** uses the same task classification, answer trace, safety gates, and
+authenticated usage controls with a stricter cost boundary:
+
+| Lite role | Model | Route policy |
+|---|---|---|
+| Default worker | DeepSeek V4 Flash | Routine queries and first-pass drafting |
+| Hard reasoning | Qwen3 235B Thinking | Math and structured reasoning only |
+| Multimodal / agent specialist | Qwen 3.7 Plus | Long-context, UI, vision, coding, and agent tasks |
+| Independent critic | Nemotron 3 Ultra | High-risk, explicit-verification, or 2% hard-task audit sample only |
+
+Lite is a cost-bounded cascade, not a four-model ensemble. It makes one
+primary call, permits one same-profile availability fallback, and allows a
+single verifier/corrective pass only when the risk gate fires. The target mix
+projects about **$0.113/M input** and **$0.371/M output** before provider
+discounts, caching, and prompt-token variation. It must not be marketed as a
+universal replacement for frontier systems; its quality/cost claim is subject
+to the same benchmark-promotion gate as Pro.
+
+## Cost and Frontier Evaluation
 
 | Model | Input $/1M | Output $/1M | vs TemuClaude |
 |-------|-----------|------------|-------------|
@@ -61,8 +85,8 @@ The active budget controller now runs in shadow mode. It records recommended act
 | GPT-5.6 Luna | $1.00 | $6.00 | General escalation candidate |
 | Grok 4.5 | $2.00 | $6.00 | Coding-agent escalation candidate |
 | Gemini 3.5 Flash | $1.50 | $9.00 | Premium multimodal candidate |
-| GLM-5.2 | $1.40 | $4.40 | Open planning/synthesis route |
-| DeepSeek V4 Flash | $0.14 | $0.28 | High-volume worker route |
+| GLM-5.2 | $0.54 | $1.76 | Open planning/synthesis route |
+| DeepSeek V4 Flash | $0.09 | $0.18 | High-volume worker route |
 
 Public API prices are not a blended TemuClaude cost. Production promotion is
 blocked until shadow telemetry shows quality, cost, latency, and reliability
@@ -106,9 +130,9 @@ Final Answer + Budget/Progress/Failure/Controller Telemetry
 
 - **Frontend**: Next.js 15, React 19, Tailwind CSS
 - **Backend**: Next.js API Routes (Node.js runtime)
-- **AI Models**: OpenRouter (8-model pool)
-- **Email**: Resend (automated transactional + marketing)
-- **Payments**: Razorpay (subscriptions, pay-as-you-go)
+- **AI Models**: Open-model core plus credential-gated direct specialist routes
+- **Email**: Hostinger/Titan SMTP or Resend fallback, plus app OTP and inbound email webhook support
+- **Payments**: Manual paid-plan activation now; hosted checkout integration is feature-flagged for later rollout
 - **Hosting**: Vercel (Mumbai region)
 - **Autonomous System**: Hasan (23-daemon research swarm)
 
@@ -161,7 +185,7 @@ temuclaude/
 - **Website**: Live at temuclaude.com
 - **Models**: eight active routing roles; premium routes are shadow/promotion-gated
 - **Legal**: Terms, Privacy, Refunds all live
-- **Email**: 8 automated email types via Resend
+- **Email**: OTP, support, welcome, billing, security, marketing, and inbound webhook mail via configurable provider
 - **Build**: Passing
 - **Tests**: 472+ passing
 
