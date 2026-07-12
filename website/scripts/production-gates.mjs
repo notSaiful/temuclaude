@@ -60,6 +60,9 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
   'Modal backend returned an empty completion',
   'finalContent',
   'temuclaude/temuclaude-lite',
+  "TEMUCLAUDE_USE_MODAL_BACKEND === 'true'",
+  'direct-code-generation',
+  'if (isCodeGen(text)) return LITE_DEFAULT',
 ]);
 
 assertIncludes('website/app/api/chat/route.ts', [
