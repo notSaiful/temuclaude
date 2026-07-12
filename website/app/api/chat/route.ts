@@ -27,7 +27,7 @@ const POOL = {
 // allowlist and never substitutes a Pro or free-route model.
 const LITE_POOL = {
   default: 'deepseek/deepseek-v4-flash',
-  reasoning: 'qwen/qwen3-235b-a22b-thinking-2507',
+  reasoning: 'qwen/qwen3.7-plus',
   agent: 'qwen/qwen3.7-plus',
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
 } satisfies Record<string, LiteModelId>;

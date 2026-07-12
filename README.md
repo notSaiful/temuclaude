@@ -65,7 +65,7 @@ authenticated usage controls with a stricter cost boundary:
 | Lite role | Model | Route policy |
 |---|---|---|
 | Default worker | DeepSeek V4 Flash | Routine queries and first-pass drafting |
-| Hard reasoning | Qwen3 235B Thinking | Math and structured reasoning only |
+| Hard reasoning | Qwen 3.7 Plus | Math, structured reasoning, and agentic work |
 | Multimodal / agent specialist | Qwen 3.7 Plus | Long-context, UI, vision, coding, and agent tasks |
 | Independent critic | Nemotron 3 Ultra | High-risk, explicit-verification, or 2% hard-task audit sample only |
 

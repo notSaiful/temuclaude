@@ -1,10 +1,9 @@
-import type { ChatMessage } from '@/lib/openrouter';
+import { isApprovedOpenRouterModel, type ChatMessage } from '@/lib/openrouter';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export const LITE_MODEL_IDS = [
   'deepseek/deepseek-v4-flash',
-  'qwen/qwen3-235b-a22b-thinking-2507',
   'qwen/qwen3.7-plus',
   'nvidia/nemotron-3-ultra-550b-a55b',
 ] as const;
@@ -111,7 +110,7 @@ export async function callOpenRouterLite(
         model,
         messages,
         temperature: options.temperature ?? 0.45,
-        max_completion_tokens: Math.max(16, Math.min(options.maxTokens ?? 2000, 4096)),
+        max_tokens: Math.max(16, Math.min(options.maxTokens ?? 2000, 4096)),
         provider: {
           allow_fallbacks: true,
           require_parameters: true,
@@ -127,7 +126,7 @@ export async function callOpenRouterLite(
     const usage = data?.usage || {};
     const actualModel = typeof data?.model === 'string' ? data.model : model;
 
-    if (!response.ok || !content || actualModel !== model) {
+    if (!response.ok || !content || !isApprovedOpenRouterModel(model, actualModel)) {
       return {
         success: false,
         content: '',
@@ -136,7 +135,7 @@ export async function callOpenRouterLite(
         completionTokens: Number(usage.completion_tokens) || 0,
         cost: Number(usage.cost) || 0,
         status: response.status,
-        error: actualModel !== model
+        error: !isApprovedOpenRouterModel(model, actualModel)
           ? `OpenRouter returned unapproved model ${actualModel} for TemuClaude Lite`
           : data?.error?.message || data?.message || (content ? response.statusText : 'OpenRouter returned an empty message'),
       };

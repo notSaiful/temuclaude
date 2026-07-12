@@ -25,7 +25,7 @@ export default function ModelsPage() {
 
           <div className="mb-8 border border-border-subtle rounded-sm bg-bg-secondary/60 p-5 max-w-3xl">
             <h2 className="text-lg font-semibold text-text-primary mb-2">TemuClaude Lite profile</h2>
-            <p className="text-sm text-text-secondary">The Playground Lite option is a separate cost-bounded cascade: DeepSeek V4 Flash by default, Qwen3 235B Thinking for hard reasoning, Qwen 3.7 Plus for multimodal and agentic work, and Nemotron 3 Ultra only for conditional independent verification.</p>
+            <p className="text-sm text-text-secondary">The Playground Lite option is a separate cost-bounded cascade: DeepSeek V4 Flash by default, Qwen 3.7 Plus for hard reasoning and agentic work, and Nemotron 3 Ultra only for conditional independent verification.</p>
           </div>
 
           <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

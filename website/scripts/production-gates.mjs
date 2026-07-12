@@ -78,13 +78,14 @@ assertIncludes('website/app/api/chat/route.ts', [
 assertIncludes('website/lib/openrouter-lite.ts', [
   'LITE_MODEL_ALLOWLIST',
   'nvidia/nemotron-3-ultra-550b-a55b',
-  'actualModel !== model',
+  'isApprovedOpenRouterModel(model, actualModel)',
   'OpenRouter returned unapproved model',
 ]);
 
 assertIncludes('website/lib/openrouter.ts', [
   'return uniqueModels(explicitFallbacks || [])',
   'allowExternalFallbacks?: boolean',
+  'isApprovedOpenRouterModel',
   'OpenRouter returned unapproved model',
 ]);
 

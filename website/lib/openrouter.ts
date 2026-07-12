@@ -167,6 +167,24 @@ function extractText(message: any): string {
   return '';
 }
 
+/**
+ * OpenRouter can return a dated revision of a requested canonical model ID,
+ * e.g. `deepseek/deepseek-v4-flash-20260423`. Treat only that exact dated
+ * revision as equivalent; never accept a different family such as a free
+ * router fallback.
+ */
+export function isApprovedOpenRouterModel(requested: string, actual: string): boolean {
+  if (requested === actual) return true;
+  const requestedParts = requested.split(':');
+  const actualParts = actual.split(':');
+  const requestedVariant = requestedParts.length > 1 ? requestedParts.slice(1).join(':') : '';
+  const actualVariant = actualParts.length > 1 ? actualParts.slice(1).join(':') : '';
+  if (requestedVariant !== actualVariant) return false;
+  const requestedBase = requestedParts[0];
+  const actualBase = actualParts[0];
+  return actualBase.startsWith(`${requestedBase}-`) && /-\d{8}$/.test(actualBase);
+}
+
 async function postOpenRouter(
   model: string,
   messages: ChatMessage[],
@@ -209,7 +227,9 @@ async function postOpenRouter(
         ...(models.length ? { models } : {}),
         messages,
         temperature,
-        max_completion_tokens: Math.max(16, maxTokens),
+        // `max_completion_tokens` is not supported by every OpenRouter
+        // endpoint. Requiring it made valid approved models look unavailable.
+        max_tokens: Math.max(16, maxTokens),
         provider: {
           allow_fallbacks: true,
           require_parameters: true,
@@ -238,7 +258,7 @@ async function postOpenRouter(
     const content = extractText(data?.choices?.[0]?.message);
     const actualModel = typeof data?.model === 'string' ? data.model : resolvedModel;
     const cost = Number(data?.usage?.cost) || 0;
-    if (actualModel !== resolvedModel && !models.includes(actualModel)) {
+    if (!isApprovedOpenRouterModel(resolvedModel, actualModel) && !models.some((allowed) => isApprovedOpenRouterModel(allowed, actualModel))) {
       return {
         success: false,
         content: '',
