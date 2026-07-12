@@ -55,12 +55,22 @@ for (const target of targets) {
       ],
       temperature: 0.35,
       max_tokens: target.maxTokens,
-      provider: { allow_fallbacks: true, require_parameters: true },
+      // The production code-delivery route disables optional thinking on V4
+      // Pro so it cannot spend the entire deliverable budget on a trace.
+      reasoning: { enabled: false, exclude: true },
+      // This test verifies the named model route itself. Runtime fallbacks are
+      // tested separately and must always be explicit approved models.
+      provider: { allow_fallbacks: false, require_parameters: true },
       stream: false,
     }),
     signal: AbortSignal.timeout(60_000),
   });
-  const body = await response.json().catch(() => ({}));
+  // Some upstream responses have leading whitespace. Parsing the text after
+  // trim makes this test robust while preserving an empty object on failure.
+  const raw = await response.text();
+  const body = (() => {
+    try { return JSON.parse(raw.trim()); } catch { return {}; }
+  })();
   const content = typeof body?.choices?.[0]?.message?.content === 'string'
     ? body.choices[0].message.content.trim()
     : '';
@@ -76,7 +86,7 @@ for (const target of targets) {
     reportedCostUsd: Number(body?.usage?.cost) || 0,
     returnedHtmlDocument: /^<!doctype html|^<html/i.test(html),
     hasCanvas: /<canvas\b/i.test(html),
-    hasKeyboardControl: /keydown|addeventlistener\(['"]key/i.test(html),
+    hasKeyboardControl: /keydown|onkey(?:down|up)|addeventlistener\(['"]key/i.test(html),
     hasRestart: /restart|reset/i.test(html),
     responseCharacters: content.length,
     error: body?.error?.message || body?.message || null,
