@@ -144,7 +144,7 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">Lite keeps the same authenticated Playground, task classification, answer trace, and safety policy as Pro, with a bounded model cascade designed for lower cost.</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li><strong className="text-text-primary">DeepSeek V4 Flash</strong> is the default worker.</li>
-                <li><strong className="text-text-primary">Qwen3 235B Thinking</strong> handles hard structured reasoning.</li>
+                <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> handles hard structured reasoning and agentic work.</li>
                 <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> handles vision, UI, long-context, and agentic work.</li>
                 <li><strong className="text-text-primary">Nemotron 3 Ultra</strong> is a conditional independent verifier for high-risk, explicit-check, and small audit-sample requests.</li>
               </ul>

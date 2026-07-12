@@ -52,7 +52,7 @@ const M_GROK = 'x-ai/grok-4.5';
 const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b';
 const M_TERRA = 'openai/gpt-5.6-terra'; // emergency rescue only
 const LITE_DEFAULT: LiteModelId = 'deepseek/deepseek-v4-flash';
-const LITE_REASONING: LiteModelId = 'qwen/qwen3-235b-a22b-thinking-2507';
+const LITE_REASONING: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
 
