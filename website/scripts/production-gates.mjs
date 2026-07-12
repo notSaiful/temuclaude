@@ -65,12 +65,30 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
 assertIncludes('website/app/api/chat/route.ts', [
   "profile must be either \"pro\" or \"lite\"",
   'runLiteStack',
+  'runCodeGeneration',
+  'direct-code-generation',
+  'reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals',
+  'formatProviderCost',
   'recordPlaygroundUsage',
 ]);
 
 assertIncludes('website/lib/openrouter-lite.ts', [
   'LITE_MODEL_ALLOWLIST',
   'nvidia/nemotron-3-ultra-550b-a55b',
+  'actualModel !== model',
+  'OpenRouter returned unapproved model',
+]);
+
+assertIncludes('website/lib/openrouter.ts', [
+  'return uniqueModels(explicitFallbacks || [])',
+  'allowExternalFallbacks?: boolean',
+  'OpenRouter returned unapproved model',
+]);
+
+assertIncludes('website/app/playground/page.tsx', [
+  'id="model-profile"',
+  'HTML deliverable',
+  "anchor.download = 'temuclaude-game.html'",
 ]);
 
 const navbarSource = read('website/components/Navbar.tsx');

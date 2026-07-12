@@ -17,6 +17,8 @@ export type LiteOpenRouterResult = {
   model: string;
   promptTokens: number;
   completionTokens: number;
+  /** Provider-reported successful request cost, when available. */
+  cost?: number;
   status?: number;
   error?: string;
 };
@@ -112,7 +114,7 @@ export async function callOpenRouterLite(
         max_completion_tokens: Math.max(16, Math.min(options.maxTokens ?? 2000, 4096)),
         provider: {
           allow_fallbacks: true,
-          sort: 'price',
+          require_parameters: true,
         },
         stream: false,
         ...(options.sessionId ? { session_id: options.sessionId.slice(0, 256) } : {}),
@@ -123,25 +125,30 @@ export async function callOpenRouterLite(
     const data = await response.json().catch(() => ({}));
     const content = extractText(data?.choices?.[0]?.message);
     const usage = data?.usage || {};
+    const actualModel = typeof data?.model === 'string' ? data.model : model;
 
-    if (!response.ok || !content) {
+    if (!response.ok || !content || actualModel !== model) {
       return {
         success: false,
         content: '',
-        model: typeof data?.model === 'string' ? data.model : model,
+        model: actualModel,
         promptTokens: Number(usage.prompt_tokens) || 0,
         completionTokens: Number(usage.completion_tokens) || 0,
+        cost: Number(usage.cost) || 0,
         status: response.status,
-        error: data?.error?.message || data?.message || (content ? response.statusText : 'OpenRouter returned an empty message'),
+        error: actualModel !== model
+          ? `OpenRouter returned unapproved model ${actualModel} for TemuClaude Lite`
+          : data?.error?.message || data?.message || (content ? response.statusText : 'OpenRouter returned an empty message'),
       };
     }
 
     return {
       success: true,
       content,
-      model: typeof data?.model === 'string' ? data.model : model,
+      model: actualModel,
       promptTokens: Number(usage.prompt_tokens) || 0,
       completionTokens: Number(usage.completion_tokens) || 0,
+      cost: Number(usage.cost) || 0,
     };
   } catch (error) {
     return {
