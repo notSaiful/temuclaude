@@ -541,6 +541,8 @@ export default function PlaygroundPage() {
                       )}
                     </div>
 
+                    {message.role === 'assistant' && <CodeArtifact content={message.content} />}
+
                     {/* Orchestration summary bar */}
                     {message.orchestration && message.role === 'assistant' && (
                       <div className="mt-3 pt-3 border-t border-border-subtle">
@@ -581,31 +583,7 @@ export default function PlaygroundPage() {
               {(status === 'submitted' || status === 'streaming') && progressSteps.length > 0 && (
                 <p className="mb-2 text-xs text-text-muted" aria-live="polite">TemuClaude is working…</p>
               )}
-              <fieldset className="mb-3 flex items-center gap-2" aria-label="TemuClaude model profile">
-                <legend className="sr-only">TemuClaude model profile</legend>
-                <span className="mr-1 text-xs text-text-muted">Mode</span>
-                {([
-                  ['pro', 'TemuClaude Pro', 'Maximum orchestration and premium escalation'],
-                  ['lite', 'TemuClaude Lite', 'Cost-bounded intelligent routing'],
-                ] as const).map(([value, label, description]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setModelProfile(value)}
-                    disabled={status === 'submitted' || status === 'streaming'}
-                    className={`rounded-sm border px-2.5 py-1.5 text-xs transition-colors disabled:opacity-50 ${
-                      modelProfile === value
-                        ? 'border-accent-primary bg-accent-primary/10 text-text-primary'
-                        : 'border-border-subtle text-text-secondary hover:border-border-default hover:text-text-primary'
-                    }`}
-                    aria-pressed={modelProfile === value}
-                    title={description}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </fieldset>
-              <div className="flex gap-2 items-end">
+              <div className="rounded-md border border-border-default bg-bg-primary shadow-[0_1px_6px_rgba(26,24,22,0.04)] focus-within:border-accent-primary">
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -616,31 +594,48 @@ export default function PlaygroundPage() {
                     }
                   }}
                   placeholder="Ask TemuClaude anything..."
-                  rows={5}
-                  className="input flex-1 h-[122px] resize-none overflow-x-hidden overflow-y-auto"
+                  rows={4}
+                  className="block h-[118px] w-full resize-none overflow-x-hidden overflow-y-auto border-0 bg-transparent px-4 py-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-0 focus:ring-0"
                   aria-label="Enter your question"
                   disabled={status === 'submitted' || status === 'streaming'}
                 />
-                {status === 'submitted' || status === 'streaming' ? (
-                  <button
-                    onClick={handleStop}
-                    className="btn-secondary !px-3"
-                    aria-label="Stop generating"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSend}
-                    disabled={!input.trim()}
-                    className="btn-accent !px-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label="Send message"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                    </svg>
-                  </button>
-                )}
+                <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-3 py-2">
+                  <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
+                  <div className="flex items-center gap-2">
+                    <label className="sr-only" htmlFor="model-profile">Model profile</label>
+                    <select
+                      id="model-profile"
+                      value={modelProfile}
+                      onChange={(event) => setModelProfile(event.target.value as ModelProfile)}
+                      disabled={status === 'submitted' || status === 'streaming'}
+                      className="max-w-[11.5rem] appearance-none bg-transparent py-1 pr-5 text-xs font-medium text-text-secondary outline-none disabled:opacity-50"
+                      title={modelProfile === 'pro' ? 'TemuClaude Pro: full orchestration' : 'TemuClaude Lite: cost-bounded routing'}
+                    >
+                      <option value="pro">TemuClaude Pro</option>
+                      <option value="lite">TemuClaude Lite</option>
+                    </select>
+                    {status === 'submitted' || status === 'streaming' ? (
+                      <button
+                        onClick={handleStop}
+                        className="flex h-8 w-8 items-center justify-center rounded-sm border border-border-default text-text-primary hover:border-accent-primary"
+                        aria-label="Stop generating"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSend}
+                        disabled={!input.trim()}
+                        className="flex h-8 w-8 items-center justify-center rounded-sm bg-accent-primary text-white disabled:cursor-not-allowed disabled:opacity-40"
+                        aria-label="Send message"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -748,6 +743,34 @@ function AgentActivity({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function CodeArtifact({ content }: { content: string }) {
+  const match = content.match(/```(html|htm)\n([\s\S]*?)```/i);
+  if (!match) return null;
+  const html = match[2].trim();
+  if (!html) return null;
+
+  const copy = async () => {
+    await navigator.clipboard?.writeText(html);
+  };
+  const download = () => {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const href = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    anchor.download = 'temuclaude-game.html';
+    anchor.click();
+    URL.revokeObjectURL(href);
+  };
+
+  return (
+    <div className="mt-3 flex items-center gap-2 border-t border-border-subtle pt-3 text-xs">
+      <span className="font-mono text-text-muted">HTML deliverable</span>
+      <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
+      <button onClick={download} className="text-accent-primary hover:underline">Download .html</button>
     </div>
   );
 }

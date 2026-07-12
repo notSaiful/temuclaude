@@ -45,6 +45,7 @@ type ModelResult = {
   modelId?: string;
   promptTokens?: number;
   completionTokens?: number;
+  cost?: number;
 };
 type OrchestrationData = {
   taskType: string; tier: string;
@@ -136,12 +137,15 @@ export async function POST(req: NextRequest) {
         const taskType = classifyTask(query);
         const difficulty = estimateDifficulty(query, taskType);
         const tier = determineTier(difficulty);
+        const isCodeGeneration = isCodeGenerationRequest(query);
         const techniques: string[] = [];
         sendProgress(controller, encoder, 'Routing selected', `TemuClaude ${profile === 'lite' ? 'Lite' : 'Pro'} · ${taskType} task · ${tier} tier`, 'done');
 
         let completed: CompletedResponse;
         if (profile === 'lite') {
-          completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques);
+          completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques, isCodeGeneration);
+        } else if (isCodeGeneration) {
+          completed = await runCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else if (tier === 'trivial') {
           // Layer 1: cheapest approved Pro route for straightforward requests.
           techniques.push('direct-routing');
@@ -149,7 +153,7 @@ export async function POST(req: NextRequest) {
           const result = await callModel(POOL.fastRoute, messages);
           sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
           streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'deepseek-v4-flash', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.0005', techniques);
+          sendOrch(controller, encoder, taskType, tier, [{ name: 'deepseek-v4-flash', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
           completed = { content: result.content, model: result.name };
         } else if (tier === 'medium') {
           // Layer 2: Specialist routing
@@ -159,7 +163,7 @@ export async function POST(req: NextRequest) {
           const result = await callModel(specialist, messages);
           sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
           streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: specialist.split('/').pop()||'', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, '$0.002', techniques);
+          sendOrch(controller, encoder, taskType, tier, [{ name: specialist.split('/').pop()||'', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
           completed = { content: result.content, model: result.name };
         } else {
           // HARD: Full 6-layer stack
@@ -195,8 +199,14 @@ async function runLiteStack(
   difficulty: number,
   t0: number,
   techniques: string[],
+  isCodeGeneration: boolean,
 ): Promise<CompletedResponse> {
-  const model = ['math', 'coding', 'reasoning'].includes(taskType)
+  // A straightforward code-generation request stays on the Flash worker in
+  // Lite. Qwen is reserved for visual/agentic or explicit reasoning work, so
+  // Lite cannot become more expensive than Pro merely because it wrote code.
+  const model = isCodeGeneration
+    ? LITE_POOL.default
+    : ['math', 'reasoning'].includes(taskType)
     ? LITE_POOL.reasoning
     : difficulty >= 7
       ? LITE_POOL.agent
@@ -205,17 +215,23 @@ async function runLiteStack(
   sendProgress(controller, encoder, 'Calling Lite model', `${model.split('/').pop()} is drafting`);
 
   const result = await callOpenRouterLite(model, [
-    { role: 'system', content: ENGLISH_SYSTEM.content },
+    {
+      role: 'system',
+      content: isCodeGeneration
+        ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.`
+        : ENGLISH_SYSTEM.content,
+    },
     ...messages,
   ], {
-    maxTokens: 2_000,
-    timeoutMs: 12_000,
+    maxTokens: isCodeGeneration ? 3_072 : 2_000,
+    timeoutMs: isCodeGeneration ? 30_000 : 12_000,
     sessionId: `playground-lite-${query.slice(0, 80)}`,
   });
   let content = result.success
     ? result.content
     : 'TemuClaude Lite could not complete this request right now. Please try again.';
   let completionTokens = result.completionTokens;
+  let providerCost = result.cost || 0;
 
   if (result.success && shouldVerifyLite(query, tier, content)) {
     techniques.push('lite-risk-verification');
@@ -225,6 +241,7 @@ async function runLiteStack(
       { role: 'user', content: `Question:\n${query}\n\nDraft:\n${content}` },
     ], { maxTokens: 350, timeoutMs: 12_000, sessionId: `playground-lite-verify-${query.slice(0, 72)}` });
     completionTokens += verdict.completionTokens;
+    providerCost += verdict.cost || 0;
     if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
       techniques.push('lite-corrective-retry');
       sendProgress(controller, encoder, 'Correcting Lite response', 'Applying the independent verification feedback');
@@ -233,10 +250,11 @@ async function runLiteStack(
         ...messages,
         { role: 'assistant', content },
         { role: 'user', content: `Verifier feedback:\n${verdict.content}` },
-      ], { maxTokens: 2_000, timeoutMs: 12_000, sessionId: `playground-lite-correct-${query.slice(0, 72)}` });
+      ], { maxTokens: isCodeGeneration ? 3_072 : 2_000, timeoutMs: isCodeGeneration ? 30_000 : 12_000, sessionId: `playground-lite-correct-${query.slice(0, 72)}` });
       if (corrected.success) {
         content = corrected.content;
         completionTokens += corrected.completionTokens;
+        providerCost += corrected.cost || 0;
       }
     }
   }
@@ -248,7 +266,7 @@ async function runLiteStack(
     response: content.substring(0, 200),
     latency: (Date.now() - t0) / 1000,
     correct: result.success,
-  }], result.model.split('/').pop() || result.model, result.success ? 1 : 0, 0, false, t0, '$0.001', techniques);
+  }], result.model.split('/').pop() || result.model, result.success ? 1 : 0, 0, false, t0, formatProviderCost(providerCost), techniques);
   return {
     content,
     model: result.model,
@@ -260,9 +278,63 @@ async function runLiteStack(
 function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
   const text = query.toLowerCase();
   if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
+  if (isCodeGenerationRequest(query)) return false;
   if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
   const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
   return sample < 0.02;
+}
+
+async function runCodeGeneration(
+  query: string,
+  messages: ChatMessage[],
+  controller: ReadableStreamDefaultController,
+  encoder: TextEncoder,
+  taskType: string,
+  tier: string,
+  t0: number,
+  techniques: string[],
+): Promise<CompletedResponse> {
+  // Code generation is a deliverable, not a debate topic. A single capable
+  // coding model with a real output budget produces materially better files
+  // than asking a fusion aggregator to discuss other model responses.
+  techniques.push('direct-code-generation');
+  sendProgress(controller, encoder, 'Generating the requested code', 'DeepSeek V4 Pro is building a complete deliverable');
+  const codeSystem = {
+    role: 'system' as const,
+    content: [
+      'You are TemuClaude Code. Execute the user request now; do not ask follow-up questions when reasonable defaults are possible.',
+      'For a game, website, or interactive app request, return a complete runnable deliverable.',
+      'When a single-file HTML game is requested or suitable, output one complete HTML fenced file with all CSS and JavaScript included.',
+      'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
+    ].join(' '),
+  };
+  let result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
+    maxTokens: 8_192,
+    timeoutMs: 45_000,
+    temperature: 0.35,
+  });
+  if (!result.ok) {
+    techniques.push('code-repair-fallback');
+    sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is producing the fallback deliverable');
+    result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
+      maxTokens: 8_192,
+      timeoutMs: 45_000,
+      temperature: 0.35,
+    });
+  }
+
+  const content = result.ok
+    ? result.content
+    : 'The code-generation model was temporarily unavailable. Please retry; no partial or substituted model response was returned.';
+  sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
+  streamText(controller, encoder, content);
+  sendOrch(controller, encoder, taskType, tier, [{
+    name: result.name,
+    response: content.substring(0, 200),
+    latency: result.latency,
+    correct: result.ok,
+  }], result.name, result.ok ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
+  return { content, model: result.name };
 }
 
 // === FULL STACK (hard queries) ===
@@ -328,7 +400,14 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // Layer 3: GLM-5.2 aggregates with structured analysis
   techniques.push('structured-aggregation');
   sendProgress(controller, encoder, 'Aggregating answer', 'Synthesizing consensus, contradictions, and final response');
-  const fusionPrompt = buildFusionPrompt(query, crossReviewResults.filter(r => r.ok));
+  // A timed-out peer review must never erase the usable proposals. The former
+  // empty-review prompt caused the aggregator to ask customers for model
+  // outputs instead of answering their request.
+  const reviewOrProposalInputs = crossReviewResults.filter((result) => result.ok);
+  const fusionPrompt = buildFusionPrompt(
+    query,
+    reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals,
+  );
   const aggResult = await callModel(POOL.orchestrator, [
     { role: 'system', content: 'You are TemuClaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
     { role: 'user', content: fusionPrompt },
@@ -523,7 +602,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     workingProposals.length,
     Math.round(qaScore * 10),
     codeVerified,
-    t0, '$0.015', techniques
+    t0, 'Provider-priced', techniques
   );
   return { content: finalAnswer, model: POOL.orchestrator };
 }
@@ -532,6 +611,11 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
 function estimateTokens(text: string): number {
   return Math.max(1, Math.ceil(text.length / 4));
+}
+
+function formatProviderCost(cost?: number): string {
+  if (!Number.isFinite(cost) || !cost || cost < 0) return 'Provider-priced';
+  return '$' + cost.toFixed(cost < 0.01 ? 5 : 3);
 }
 
 async function recordPlaygroundUsage(userId: string, messages: ChatMessage[], response: CompletedResponse) {
@@ -567,13 +651,18 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ orchestration: data })}\n\n`));
 }
 
-async function callModel(model: string, messages: any[]): Promise<ModelResult> {
+async function callModel(
+  model: string,
+  messages: any[],
+  options: { maxTokens?: number; timeoutMs?: number; temperature?: number } = {},
+): Promise<ModelResult> {
   const start = Date.now();
   const messagesWithSystem = [ENGLISH_SYSTEM, ...messages]
     .map(m => ({ role: m.role, content: m.content }));
   const result = await callOpenRouter(model, messagesWithSystem, {
-    maxTokens: 2000,
-    timeoutMs: 10000,
+    maxTokens: options.maxTokens ?? 2_000,
+    timeoutMs: options.timeoutMs ?? 10_000,
+    temperature: options.temperature ?? 0.45,
     sessionId: `playground-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
   });
   return {
@@ -581,6 +670,7 @@ async function callModel(model: string, messages: any[]): Promise<ModelResult> {
     content: result.success ? result.content : `[OpenRouter error: ${result.error || result.status || 'failed'}]`,
     latency: (Date.now() - start) / 1000,
     ok: result.success,
+    cost: result.cost,
   };
 }
 
@@ -634,7 +724,7 @@ async function verifyCode(answer: string): Promise<boolean> {
 function classifyTask(query: string): string {
   const q = query.toLowerCase();
   if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation|math|sum|product|factor|theorem|prove/)) return 'math';
-  if (q.match(/code|function|python|javascript|debug|error|bug|program|script|algorithm|sort|merge|binary|array/)) return 'coding';
+  if (isCodeGenerationRequest(q) || q.match(/code|function|python|javascript|debug|error|bug|program|script|algorithm|sort|merge|binary|array/)) return 'coding';
   if (q.match(/write|poem|story|essay|compose|create|generate|design|draft|blog|article/)) return 'creative';
   // Legal queries → Gemini specialist routing.
   if (q.match(/legal|law|lawsuit|contract|clause|liability|statute|regulation|compliance|gdpr|copyright|patent|trademark/)) return 'legal';
@@ -643,6 +733,11 @@ function classifyTask(query: string): string {
   if (q.match(/explain|what is|how does|why|define|describe|who|when|where|which/)) return 'knowledge';
   if (q.match(/compare|analyze|reason|logic|deduce|infer|evaluate|assess|argue|prove|step by step/)) return 'reasoning';
   return 'knowledge';
+}
+
+function isCodeGenerationRequest(query: string): boolean {
+  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
+    || /\b(single[- ]file|html game|browser game|playable game|canvas game|three\.js)\b/i.test(query);
 }
 
 function estimateDifficulty(query: string, taskType: string): number {

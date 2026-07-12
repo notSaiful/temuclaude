@@ -12,6 +12,8 @@ export type OpenRouterResult = {
   model: string;
   provider: 'openrouter' | 'aiml' | 'groq' | 'deepinfra';
   attemptedModels: string[];
+  /** Provider-reported successful request cost, when OpenRouter returns it. */
+  cost?: number;
   status?: number;
   error?: string;
 };
@@ -210,10 +212,7 @@ async function postOpenRouter(
         max_completion_tokens: Math.max(16, maxTokens),
         provider: {
           allow_fallbacks: true,
-          sort: {
-            by: 'price',
-            partition: 'model',
-          },
+          require_parameters: true,
         },
         stream: false,
         ...(sessionId ? { session_id: sessionId.slice(0, 256) } : {}),
@@ -237,11 +236,26 @@ async function postOpenRouter(
     }
 
     const content = extractText(data?.choices?.[0]?.message);
+    const actualModel = typeof data?.model === 'string' ? data.model : resolvedModel;
+    const cost = Number(data?.usage?.cost) || 0;
+    if (actualModel !== resolvedModel && !models.includes(actualModel)) {
+      return {
+        success: false,
+        content: '',
+        tokens: data?.usage?.total_tokens || 0,
+        cost,
+        model: actualModel,
+        provider: 'openrouter',
+        attemptedModels: [resolvedModel],
+        error: `OpenRouter returned unapproved model ${actualModel} for requested model ${resolvedModel}`,
+      };
+    }
     return {
       success: !!content,
       content,
       tokens: data?.usage?.total_tokens || 0,
-      model: data?.model || resolvedModel,
+      cost,
+      model: actualModel,
       provider: 'openrouter',
       attemptedModels: [resolvedModel],
       error: content ? undefined : 'OpenRouter returned an empty message',
@@ -422,15 +436,10 @@ function uniqueModels(models: string[]): string[] {
 }
 
 function getOpenRouterFallbacks(model: string, explicitFallbacks?: string[]): string[] {
-  return uniqueModels([
-    ...(explicitFallbacks || []),
-    ...(OPENROUTER_ROLE_FALLBACKS[model] || []),
-    'z-ai/glm-5.2',
-    'deepseek/deepseek-v4-pro',
-    'openai/gpt-oss-120b:free',
-    'openai/gpt-oss-120b',
-    'openrouter/free',
-  ]).filter((fallback) => fallback !== model);
+  // Model fallbacks are a product policy, not a transport concern. The old
+  // implicit list silently let a failed call become an unrelated free model,
+  // which made the OpenRouter logs and customer cost contract untrustworthy.
+  return uniqueModels(explicitFallbacks || []).filter((fallback) => fallback !== model);
 }
 
 function getAimlFallbacks(openRouterModels: string[]): string[] {
@@ -450,6 +459,11 @@ export async function callOpenRouter(
     timeoutMs?: number;
     fallbacks?: string[];
     sessionId?: string;
+    /**
+     * Cross-provider/model transports are intentionally opt-in. Production
+     * Pro/Lite routes use only explicit, profile-approved model fallbacks.
+     */
+    allowExternalFallbacks?: boolean;
   } = {},
 ): Promise<OpenRouterResult> {
   const temperature = options.temperature ?? 0.6;
@@ -480,7 +494,7 @@ export async function callOpenRouter(
     last = result;
   }
 
-  if (deepinfraFallbackEnabled()) {
+  if (options.allowExternalFallbacks && deepinfraFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, DEEPINFRA_MODEL_MAP)) {
       attemptedModels.push(`deepinfra:${candidate}`);
       const result = await postCompatibleProvider(
@@ -500,7 +514,7 @@ export async function callOpenRouter(
     }
   }
 
-  if (groqFallbackEnabled()) {
+  if (options.allowExternalFallbacks && groqFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, GROQ_MODEL_MAP)) {
       attemptedModels.push(`groq:${candidate}`);
       const result = await postCompatibleProvider(
@@ -520,7 +534,7 @@ export async function callOpenRouter(
     }
   }
 
-  if (aimlFallbackEnabled()) {
+  if (options.allowExternalFallbacks && aimlFallbackEnabled()) {
     for (const candidate of getAimlFallbacks(openRouterModels)) {
       attemptedModels.push(`aiml:${candidate}`);
       const result = await postAiml(candidate, messages, temperature, maxTokens, timeoutMs);
