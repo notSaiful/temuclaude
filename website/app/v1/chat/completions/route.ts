@@ -183,14 +183,19 @@ function isLiteModel(model: unknown): boolean {
 }
 
 function selectLiteApiModel(text: string, tier: string): LiteModelId {
+  // A runnable code deliverable is both latency- and budget-sensitive. Keep
+  // Lite on the low-cost Flash route rather than treating every code prompt
+  // as an expensive agentic request.
+  if (isCodeGen(text)) return LITE_DEFAULT;
   if (tier === 'hard' && (isMath(text) || /\b(reason|prove|deduce|infer|logic)\b/i.test(text))) return LITE_REASONING;
-  if (isMultimodal(text) || /\b(agent|tool|workflow|ui|screen|browser|code)\b/i.test(text)) return LITE_AGENT;
+  if (isMultimodal(text) || /\b(agent|tool|workflow|ui|screen|browser)\b/i.test(text)) return LITE_AGENT;
   return LITE_DEFAULT;
 }
 
 function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
   const text = query.toLowerCase();
   if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
+  if (isCodeGen(query)) return false;
   if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
   const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
   return sample < 0.02;
@@ -303,6 +308,16 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   const math = isMath(q);
   const creative = isCreative(q);
   const multimodal = isMultimodal(q);
+
+  // A code or game request needs a complete file, not a fusion discussion.
+  // This is deliberately the same direct delivery contract used by Playground.
+  if (isCodeGen(q)) {
+    const r = await call(M_DEEPSEEK, [
+      { role: 'system', content: 'You are TemuClaude Code. Execute the request now; do not ask follow-up questions when reasonable defaults are possible. Return a complete, runnable deliverable. For a single-file web game, output one complete HTML fenced file with all CSS and JavaScript included. Do not describe phases or defer implementation.' },
+      ...messages,
+    ], 0.35, Math.min(Math.max(maxTok, 4096), 8192));
+    return { content: r.content, tokens: r.tokens, tier: 'direct-code-generation', time: Date.now() - start };
+  }
 
   // ── TRIVIAL: DeepSeek V4 Flash ──
   if (diff === 'trivial') {
@@ -546,9 +561,13 @@ export async function POST(request: NextRequest) {
       const latestUserText = [...messages].reverse().find((message: Msg) => message.role === 'user')?.content || '';
       const tier = classify(latestUserText);
       const liteModel = selectLiteApiModel(latestUserText, tier);
-      let lite = await callOpenRouterLite(liteModel, messages, {
+      const liteCodeRequest = isCodeGen(latestUserText);
+      const liteMessages: Msg[] = liteCodeRequest
+        ? [{ role: 'system', content: 'You are TemuClaude Code. Execute the requested coding task now; do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable. When suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.' }, ...messages]
+        : messages;
+      let lite = await callOpenRouterLite(liteModel, liteMessages, {
         temperature: temperature ?? 0.45,
-        maxTokens: Math.min(max_tokens ?? 2048, 4096),
+        maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 3072 : 2048), 4096),
         timeoutMs: 60_000,
         sessionId: `v1-lite-${Date.now()}`,
       });
@@ -616,7 +635,11 @@ export async function POST(request: NextRequest) {
     let modalSuccess = false;
     let modal;
 
-    if (!useFallbackRoute && isModalConfigured()) {
+    // The legacy Modal service has a separate model registry. It must never
+    // become an implicit production route, otherwise API users can receive a
+    // different stack than Playground users. Re-enable it only intentionally.
+    const useModalBackend = process.env.TEMUCLAUDE_USE_MODAL_BACKEND === 'true';
+    if (!useFallbackRoute && useModalBackend && isModalConfigured()) {
       try {
         modal = await callModalChatCompletions({
           model: model || 'temuclaude',
