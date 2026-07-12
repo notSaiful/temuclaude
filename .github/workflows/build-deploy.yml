@@ -22,6 +22,9 @@ jobs:
       
       - name: Install dependencies
         run: cd website && npm ci
+
+      - name: Verify Supabase migration packet
+        run: node website/scripts/verify-supabase-migrations.mjs
       
       - name: TypeScript check
         run: cd website && npx tsc --noEmit
