@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signal Lost: Fluorescent Maze</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: grid; place-items: center; overflow: hidden; background: #080a08; color: #e8e5cf; }
+    #shell { position: relative; width: min(100vw, 1040px); aspect-ratio: 16 / 9; background: #11130f; box-shadow: 0 0 80px #000; }
+    canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
+    #hud { position: absolute; inset: 0; pointer-events: none; padding: 22px; display: flex; justify-content: space-between; text-shadow: 0 2px 5px #000; font-size: clamp(10px, 1.4vw, 15px); letter-spacing: .08em; }
+    #hud b { color: #d9ff8a; font-weight: 600; }
+    #card { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: min(82%, 530px); padding: 28px; border: 1px solid #767b55; background: #12150ee8; box-shadow: 0 18px 70px #000; text-align: center; }
+    #card h1 { margin: 0 0 10px; font-size: clamp(22px, 4vw, 42px); letter-spacing: .12em; color: #f0efce; }
+    #card p { line-height: 1.65; color: #cac8b6; }
+    button { pointer-events: auto; margin-top: 8px; padding: 11px 17px; border: 1px solid #d9ff8a; background: transparent; color: #d9ff8a; font: inherit; letter-spacing: .08em; cursor: pointer; }
+    button:hover { background: #d9ff8a; color: #11130f; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main id="shell">
+    <canvas id="game" width="1280" height="720" aria-label="Signal Lost game canvas"></canvas>
+    <div id="hud"><span>CHANNEL <b id="channel">01</b> / 04</span><span id="status">RECOVER THE SIGNAL</span></div>
+    <section id="card"><h1>SIGNAL LOST</h1><p>Fluorescent lights fail somewhere ahead. Recover four lost signal nodes, then find the marked exit.<br><br>Move with <b>WASD</b> or <b>arrow keys</b>.</p><button id="start">ENTER MAZE</button></section>
+  </main>
+  <script>
+  (() => {
+    const c = document.querySelector('#game'), x = c.getContext('2d');
+    const card = document.querySelector('#card'), start = document.querySelector('#start');
+    const status = document.querySelector('#status'), channel = document.querySelector('#channel');
+    const W = 1280, H = 720, S = 40, keys = new Set();
+    const walls = [
+      [0,0,32,1],[0,17,32,1],[0,0,1,18],[31,0,1,18],
+      [3,1,1,11],[3,12,7,1],[6,4,1,9],[9,1,1,8],[9,9,8,1],[12,3,1,6],[12,12,1,5],
+      [15,1,1,11],[15,12,6,1],[18,4,1,8],[21,1,1,8],[21,9,7,1],[24,3,1,7],[24,11,1,6],
+      [27,1,1,11],[27,12,4,1],[5,15,14,1],[17,14,1,3],[20,14,1,3]
+    ];
+    const nodes = [{x:6.5,y:2.5},{x:28.5,y:4.5},{x:10.5,y:14.5},{x:22.5,y:15.5}];
+    const exit = {x:29.5,y:15.5};
+    let p, running = false, won = false, recovered = 0, last = 0, flicker = 0;
+    function reset(){ p={x:1.8,y:2.1}; recovered=0; won=false; nodes.forEach(n=>n.on=false); status.textContent='RECOVER THE SIGNAL'; channel.textContent='01'; }
+    function blocked(nx,ny){ return walls.some(([a,b,w,h]) => nx>.18+a && nx<w+a-.18 && ny>.18+b && ny<h+b-.18); }
+    function update(dt){
+      if(!running || won) return;
+      let dx=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);
+      let dy=(keys.has('s')||keys.has('arrowdown')?1:0)-(keys.has('w')||keys.has('arrowup')?1:0);
+      const l=Math.hypot(dx,dy)||1, speed=dt*.0032; dx=dx/l*speed;dy=dy/l*speed;
+      if(!blocked(p.x+dx,p.y))p.x+=dx;if(!blocked(p.x,p.y+dy))p.y+=dy;
+      nodes.forEach(n=>{if(!n.on&&Math.hypot(p.x-n.x,p.y-n.y)<.58){n.on=true;recovered++;channel.textContent=String(recovered+1).padStart(2,'0');status.textContent=recovered===4?'EXIT SIGNAL DETECTED':'SIGNAL NODE RECOVERED';}});
+      if(recovered===4&&Math.hypot(p.x-exit.x,p.y-exit.y)<.7){won=true;status.textContent='TRANSMISSION RESTORED'; card.querySelector('h1').textContent='YOU FOUND THE WAY OUT';card.querySelector('p').innerHTML='The corridor goes quiet. Your recovered signal is ready to take with you.';start.textContent='PLAY AGAIN';card.classList.remove('hidden');}
+    }
+    function rect(a,b,w,h,col){x.fillStyle=col;x.fillRect(a*S,b*S,w*S,h*S)}
+    function draw(t){
+      const pulse=.78+Math.sin(t*.002)*.12, flick=Math.random()<.028?.45:1;
+      x.clearRect(0,0,W,H);x.fillStyle='#202219';x.fillRect(0,0,W,H);
+      for(let yy=0;yy<18;yy++)for(let xx=0;xx<32;xx++){const v=(xx*19+yy*7)%16;rect(xx,yy,1,1,`rgb(${35+v},${37+v},${28+v})`)}
+      for(let yy=0;yy<18;yy+=2)for(let xx=0;xx<32;xx+=4){x.fillStyle=`rgba(221,235,161,${.07*pulse*flick})`;x.fillRect(xx*S+6,yy*S+8,126,4)}
+      walls.forEach(w=>{rect(...w,'#535443');x.strokeStyle='#8b8c68';x.lineWidth=1;x.strokeRect(w[0]*S+.5,w[1]*S+.5,w[2]*S-1,w[3]*S-1)});
+      x.save();x.translate(exit.x*S,exit.y*S);x.fillStyle=recovered===4?'#d9ff8a':'#46503d';x.fillRect(-12,-18,24,36);x.fillStyle='#111';x.fillRect(-6,-10,12,20);x.restore();
+      nodes.forEach((n,i)=>{const a=n.on?1:.18, r=9+Math.sin(t*.005+i)*3;x.beginPath();x.arc(n.x*S,n.y*S,r,0,7);x.fillStyle=`rgba(209,255,107,${a})`;x.fill();x.beginPath();x.arc(n.x*S,n.y*S,3,0,7);x.fillStyle='#f4ffe1';x.fill()});
+      const gx=p.x*S,gy=p.y*S; x.save();x.globalCompositeOperation='multiply';const g=x.createRadialGradient(gx,gy,20,gx,gy,210);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.55,'rgba(0,0,0,.18)');g.addColorStop(1,'rgba(0,0,0,.9)');x.fillStyle=g;x.fillRect(0,0,W,H);x.restore();
+      x.beginPath();x.arc(gx,gy,10,0,7);x.fillStyle='#f6f2d7';x.fill();x.beginPath();x.arc(gx,gy,4,0,7);x.fillStyle='#baff70';x.fill();
+      requestAnimationFrame(draw);
+    }
+    addEventListener('keydown',e=>{keys.add(e.key.toLowerCase());if(['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase()))e.preventDefault()});addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+    function loop(t){const dt=Math.min(40,t-last||16);last=t;update(dt);requestAnimationFrame(loop)}
+    start.onclick=()=>{reset();running=true;card.classList.add('hidden');};reset();requestAnimationFrame(draw);requestAnimationFrame(loop);
+  })();
+  </script>
+</body>
+</html>
