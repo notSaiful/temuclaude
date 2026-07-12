@@ -15,10 +15,10 @@
 | --- | --- | --- |
 | Chat, pins, delete, compact work log | Implemented; history is browser-local | Available |
 | Pro/Lite composer selection | Implemented | Available |
-| HTML artifact download | Implemented for fenced HTML | Available |
+| HTML artifact download | Implemented for complete fenced or raw HTML documents | Available |
 | Same-page HTML preview | Implemented with an opaque-origin iframe and restrictive CSP | Available |
 | Isolated static HTML preview | Implemented with a short-lived E2B sandbox, no sandbox internet, no product secrets | Available when E2B is configured |
-| Durable project/file API | Implemented and Supabase tables exist | API foundation available; not yet fully connected to Playground UI |
+| Durable project/file API | Implemented, ownership-checked, and connected to the Playground project sidebar and “Save to project” action | Available for HTML files |
 | Durable chat, revisions, ZIP export | Not implemented | Do not claim |
 | React/Node/full-stack sandbox build | Not implemented | Do not claim |
 | GitHub/Vercel deployment from Playground | Not implemented | Do not claim |
@@ -47,11 +47,11 @@ Every capability must satisfy all of the following before it is advertised:
 
 ## Implementation plan
 
-### Phase 1 — durable artifact workflow (build now)
+### Phase 1 — durable artifact workflow (complete)
 
 - Link the Playground to the existing authenticated projects/files API.
 - Allow generated HTML to be saved as a project file as well as downloaded.
-- Record artifact hashes, file paths, and save events; reject traversal and files above the existing 1 MB limit.
+- Record file hashes, file paths, and save events; reject traversal and files above the existing 1 MB limit.
 - Keep browser-local chat history as a compatibility fallback until durable message migration is tested.
 
 ### Phase 2 — project revisions and exports
