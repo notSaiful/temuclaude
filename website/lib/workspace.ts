@@ -216,3 +216,22 @@ export async function recordWorkspaceEvent(input: {
   });
   if (error) throw error;
 }
+
+export async function countWorkspaceEventsSince(input: {
+  userId: string;
+  projectId: string;
+  eventType: string;
+  sinceUnix: number;
+}): Promise<number> {
+  const project = await getWorkspaceProject(input.userId, input.projectId);
+  if (!project) return 0;
+  const { count, error } = await getSupabaseAdminClient()
+    .from('temuclaude_project_events')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', input.userId)
+    .eq('project_id', input.projectId)
+    .eq('event_type', input.eventType)
+    .gte('created_at', input.sinceUnix);
+  if (error) throw error;
+  return count || 0;
+}

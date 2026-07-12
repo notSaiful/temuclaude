@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateUserByEmailAsync } from '@/lib/db';
 import { createIsolatedProjectPreview, isE2BProjectPreviewConfigured } from '@/lib/e2b-project-preview';
 import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
-import { getWorkspaceProject, listWorkspaceFiles, recordWorkspaceEvent } from '@/lib/workspace';
+import { countWorkspaceEventsSince, getWorkspaceProject, listWorkspaceFiles, recordWorkspaceEvent } from '@/lib/workspace';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
+const MAX_PREVIEWS_PER_PROJECT_PER_HOUR = 12;
 
 export async function POST(req: NextRequest) {
   if (!isE2BProjectPreviewConfigured()) return NextResponse.json({ error: 'Project previews are not configured yet.' }, { status: 503 });
@@ -22,6 +23,15 @@ export async function POST(req: NextRequest) {
     const account = await getOrCreateUserByEmailAsync(email, String(metadata.full_name || metadata.name || metadata.user_name || ''));
     const project = await getWorkspaceProject(account.id, body.projectId);
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    const startedThisHour = await countWorkspaceEventsSince({
+      userId: account.id,
+      projectId: project.id,
+      eventType: 'project.preview.started',
+      sinceUnix: Math.floor(Date.now() / 1000) - 60 * 60,
+    });
+    if (startedThisHour >= MAX_PREVIEWS_PER_PROJECT_PER_HOUR) {
+      return NextResponse.json({ error: 'This project has reached its isolated preview limit. Try again in an hour.' }, { status: 429 });
+    }
     const files = await listWorkspaceFiles(account.id, project.id);
     const preview = await createIsolatedProjectPreview(files, { userId: account.id, projectId: project.id });
     await recordWorkspaceEvent({
