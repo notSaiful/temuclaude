@@ -50,6 +50,13 @@ type Conversation = {
 
 type ModelProfile = 'pro' | 'lite';
 
+type WorkspaceProject = {
+  id: string;
+  title: string;
+  profile: ModelProfile;
+  updated_at: number;
+};
+
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -64,6 +71,9 @@ export default function PlaygroundPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
+  const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
+  const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
+  const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -140,6 +150,30 @@ export default function PlaygroundPage() {
       return next;
     });
   }, [activeConversationId, messages, modelProfile, session?.id]);
+
+  const loadWorkspaceProjects = useCallback(async () => {
+    if (!session?.id) return;
+    setWorkspaceState('loading');
+    try {
+      const token = await getAccessToken();
+      if (!token) return;
+      const response = await fetch('/api/projects', { headers: { Authorization: `Bearer ${token}` } });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !Array.isArray(data.projects)) throw new Error(data.error || 'Workspace storage is unavailable.');
+      const projects = data.projects as WorkspaceProject[];
+      setWorkspaceProjects(projects);
+      setActiveWorkspaceProjectId((current) => current && projects.some((project) => project.id === current) ? current : projects[0]?.id || null);
+      setWorkspaceState('idle');
+    } catch {
+      // The user can still chat and download files when project storage is
+      // temporarily unavailable. Never render an operational error as no data.
+      setWorkspaceState('error');
+    }
+  }, [session?.id]);
+
+  useEffect(() => {
+    void loadWorkspaceProjects();
+  }, [loadWorkspaceProjects]);
 
   // Check usage on mount and after each query
   const checkUsage = useCallback(async () => {
@@ -374,6 +408,41 @@ export default function PlaygroundPage() {
     setShowOrchestration(null);
   };
 
+  const createWorkspaceProject = useCallback(async () => {
+    if (!session?.id) throw new Error('Sign in to create a project.');
+    const token = await getAccessToken();
+    if (!token) throw new Error('Sign in to create a project.');
+    const response = await fetch('/api/projects', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: `Untitled project ${workspaceProjects.length + 1}`, profile: modelProfile }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.project) throw new Error(data.error || 'Could not create a project.');
+    const project = data.project as WorkspaceProject;
+    setWorkspaceProjects((previous) => [project, ...previous]);
+    setActiveWorkspaceProjectId(project.id);
+    setWorkspaceState('idle');
+    return project;
+  }, [modelProfile, session?.id, workspaceProjects.length]);
+
+  const saveHtmlToWorkspace = useCallback(async (html: string) => {
+    let projectId = activeWorkspaceProjectId;
+    if (!projectId) projectId = (await createWorkspaceProject()).id;
+    const token = await getAccessToken();
+    if (!token) throw new Error('Sign in to save a project file.');
+    const response = await fetch(`/api/projects/${encodeURIComponent(projectId)}/files`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filePath: 'index.html', language: 'html', content: html }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.file) throw new Error(data.error || 'Could not save index.html.');
+    setActiveWorkspaceProjectId(projectId);
+    await loadWorkspaceProjects();
+    return data.file as { file_path: string };
+  }, [activeWorkspaceProjectId, createWorkspaceProject, loadWorkspaceProjects]);
+
   const handleSelectConversation = (conversation: Conversation) => {
     if (status === 'submitted' || status === 'streaming') return;
     setActiveConversationId(conversation.id);
@@ -438,6 +507,30 @@ export default function PlaygroundPage() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             New chat
           </button>
+          <div className="mt-5 flex items-center justify-between px-2">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">Projects</span>
+            <button
+              onClick={() => void createWorkspaceProject().catch(() => setWorkspaceState('error'))}
+              className="rounded-sm px-1 text-sm text-text-muted hover:text-accent-primary"
+              title="Create project"
+              aria-label="Create project"
+            >+</button>
+          </div>
+          <div className="mt-2 space-y-1">
+            {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
+            {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">Project storage is unavailable. Chats and downloads still work.</p>}
+            {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
+            {workspaceProjects.slice(0, 6).map((project) => (
+              <button
+                key={project.id}
+                onClick={() => setActiveWorkspaceProjectId(project.id)}
+                title={project.title}
+                className={`block w-full truncate rounded-sm px-2 py-1.5 text-left text-xs ${activeWorkspaceProjectId === project.id ? 'bg-bg-tertiary text-text-primary' : 'text-text-secondary hover:bg-bg-tertiary/60'}`}
+              >
+                {project.title}
+              </button>
+            ))}
+          </div>
           <div className="mt-5 px-2 text-[10px] font-mono uppercase tracking-wider text-text-muted">Recent chats</div>
           <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
             {visibleConversations.map((conversation) => (
@@ -472,7 +565,7 @@ export default function PlaygroundPage() {
               </div>
             ))}
           </div>
-          <p className="px-2 pt-3 text-[10px] leading-relaxed text-text-muted">Chats are saved in this browser for your signed-in account.</p>
+          <p className="px-2 pt-3 text-[10px] leading-relaxed text-text-muted">Chats stay in this browser. Project files are saved to your account.</p>
         </aside>
 
         <main className="flex-1 flex flex-col h-[calc(100vh-4rem)] bg-bg-primary" aria-label="TemuClaude Playground" id="main-content">
@@ -541,7 +634,7 @@ export default function PlaygroundPage() {
                       )}
                     </div>
 
-                    {message.role === 'assistant' && <CodeArtifact content={message.content} />}
+                    {message.role === 'assistant' && <CodeArtifact content={message.content} onSaveToWorkspace={saveHtmlToWorkspace} />}
 
                     {/* Orchestration summary bar */}
                     {message.orchestration && message.role === 'assistant' && (
@@ -747,13 +840,12 @@ function AgentActivity({
   );
 }
 
-function CodeArtifact({ content }: { content: string }) {
+function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveToWorkspace: (html: string) => Promise<{ file_path: string }> }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
-  const match = content.match(/```(html|htm)\n([\s\S]*?)```/i);
-  if (!match) return null;
-  const html = match[2].trim();
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const html = extractHtmlArtifact(content);
   if (!html) return null;
 
   const copy = async () => {
@@ -793,6 +885,15 @@ function CodeArtifact({ content }: { content: string }) {
       setIsolatedPreviewState('error');
     }
   };
+  const saveToWorkspace = async () => {
+    setSaveState('saving');
+    try {
+      await onSaveToWorkspace(html);
+      setSaveState('saved');
+    } catch {
+      setSaveState('error');
+    }
+  };
 
   return (
     <div className="mt-3 border-t border-border-subtle pt-3 text-xs">
@@ -806,9 +907,15 @@ function CodeArtifact({ content }: { content: string }) {
         </button>
         <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
         <button onClick={download} className="text-text-secondary hover:text-text-primary">Download .html</button>
+        <button onClick={saveToWorkspace} disabled={saveState === 'saving' || saveState === 'saved'} className="text-text-secondary hover:text-text-primary disabled:opacity-50">
+          {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved to project' : 'Save to project'}
+        </button>
       </div>
       {isolatedPreviewState === 'error' && (
         <p className="mt-2 text-xs text-accent-fig">The isolated preview could not start. The downloadable HTML is still available.</p>
+      )}
+      {saveState === 'error' && (
+        <p className="mt-2 text-xs text-accent-fig">This file could not be saved to the selected project. Your download is still available.</p>
       )}
       {previewOpen && (
         <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-white">
@@ -837,6 +944,17 @@ function CodeArtifact({ content }: { content: string }) {
       )}
     </div>
   );
+}
+
+function extractHtmlArtifact(content: string): string | null {
+  const fenced = content.match(/```(?:html|htm)\s*\n([\s\S]*?)```/i);
+  if (fenced?.[1]?.trim()) return fenced[1].trim();
+  const start = content.search(/<!doctype\s+html\b|<html\b/i);
+  if (start < 0) return null;
+  const candidate = content.slice(start).trim();
+  // Avoid presenting a prose fragment as a runnable file. A complete HTML
+  // answer can be fenced or raw, but it must still close its document.
+  return /<\/html>\s*$/i.test(candidate) ? candidate : null;
 }
 
 function sandboxPreviewDocument(html: string): string {

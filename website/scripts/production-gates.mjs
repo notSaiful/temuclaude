@@ -73,6 +73,8 @@ assertIncludes('website/app/api/chat/route.ts', [
   'reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals',
   'formatProviderCost',
   'recordPlaygroundUsage',
+  'disableReasoning: true',
+  'lite-approved-rescue',
 ]);
 
 assertIncludes('website/lib/openrouter-lite.ts', [
@@ -87,6 +89,8 @@ assertIncludes('website/lib/openrouter.ts', [
   'allowExternalFallbacks?: boolean',
   'isApprovedOpenRouterModel',
   'OpenRouter returned unapproved model',
+  'Reasoning traces are not user deliverables',
+  'disableReasoning',
 ]);
 
 assertIncludes('website/app/playground/page.tsx', [
@@ -98,6 +102,8 @@ assertIncludes('website/app/playground/page.tsx', [
   'sandboxPreviewDocument',
   "connect-src 'none'",
   'Run isolated preview',
+  'Save to project',
+  'extractHtmlArtifact',
 ]);
 
 assertIncludes('website/lib/e2b-preview.ts', [

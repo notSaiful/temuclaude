@@ -214,12 +214,13 @@ async function runLiteStack(
   techniques.push('lite-single-model-routing');
   sendProgress(controller, encoder, 'Calling Lite model', `${model.split('/').pop()} is drafting`);
 
-  const result = await callOpenRouterLite(model, [
+  const codeInstruction = isCodeGeneration
+    ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.`
+    : ENGLISH_SYSTEM.content;
+  let result = await callOpenRouterLite(model, [
     {
       role: 'system',
-      content: isCodeGeneration
-        ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.`
-        : ENGLISH_SYSTEM.content,
+      content: codeInstruction,
     },
     ...messages,
   ], {
@@ -227,6 +228,21 @@ async function runLiteStack(
     timeoutMs: isCodeGeneration ? 30_000 : 12_000,
     sessionId: `playground-lite-${query.slice(0, 80)}`,
   });
+  // Keep Lite reliable without hiding a substituted model: the only rescue
+  // route is the explicitly approved Qwen worker and it is used only after
+  // the selected primary model fails. The final telemetry names the model.
+  if (!result.success && model !== LITE_POOL.agent) {
+    techniques.push('lite-approved-rescue');
+    sendProgress(controller, encoder, 'Recovering Lite response', 'Qwen 3.7 Plus is producing the approved fallback');
+    result = await callOpenRouterLite(LITE_POOL.agent, [
+      { role: 'system', content: codeInstruction },
+      ...messages,
+    ], {
+      maxTokens: isCodeGeneration ? 3_072 : 2_000,
+      timeoutMs: isCodeGeneration ? 30_000 : 12_000,
+      sessionId: `playground-lite-rescue-${query.slice(0, 72)}`,
+    });
+  }
   let content = result.success
     ? result.content
     : 'TemuClaude Lite could not complete this request right now. Please try again.';
@@ -312,6 +328,7 @@ async function runCodeGeneration(
     maxTokens: 8_192,
     timeoutMs: 45_000,
     temperature: 0.35,
+    disableReasoning: true,
   });
   if (!result.ok) {
     techniques.push('code-repair-fallback');
@@ -320,6 +337,7 @@ async function runCodeGeneration(
       maxTokens: 8_192,
       timeoutMs: 45_000,
       temperature: 0.35,
+      disableReasoning: true,
     });
   }
 
@@ -654,7 +672,7 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
 async function callModel(
   model: string,
   messages: any[],
-  options: { maxTokens?: number; timeoutMs?: number; temperature?: number } = {},
+  options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean } = {},
 ): Promise<ModelResult> {
   const start = Date.now();
   const messagesWithSystem = [ENGLISH_SYSTEM, ...messages]
@@ -663,6 +681,7 @@ async function callModel(
     maxTokens: options.maxTokens ?? 2_000,
     timeoutMs: options.timeoutMs ?? 10_000,
     temperature: options.temperature ?? 0.45,
+    disableReasoning: options.disableReasoning,
     sessionId: `playground-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
   });
   return {

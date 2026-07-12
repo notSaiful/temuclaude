@@ -151,19 +151,8 @@ function extractText(message: any): string {
       .join('');
     if (text.trim()) return text.trim();
   }
-
-  if (typeof message?.reasoning === 'string' && message.reasoning.trim()) {
-    return message.reasoning.trim();
-  }
-
-  const details = message?.reasoning_details;
-  if (Array.isArray(details)) {
-    const text = details
-      .map((part) => part?.text || part?.summary || part?.content || '')
-      .join('');
-    if (text.trim()) return text.trim();
-  }
-
+  // Reasoning traces are not user deliverables. Treating one as an answer
+  // leaked incomplete thought and made a max-token exhaustion look successful.
   return '';
 }
 
@@ -193,6 +182,7 @@ async function postOpenRouter(
   timeoutMs: number,
   sessionId?: string,
   modelFallbacks: string[] = [],
+  disableReasoning = false,
 ): Promise<OpenRouterResult> {
   const key = process.env.OPENROUTER_API_KEY || '';
   const resolvedModel = resolveOpenRouterModel(model);
@@ -234,6 +224,7 @@ async function postOpenRouter(
           allow_fallbacks: true,
           require_parameters: true,
         },
+        ...(disableReasoning ? { reasoning: { enabled: false, exclude: true } } : {}),
         stream: false,
         ...(sessionId ? { session_id: sessionId.slice(0, 256) } : {}),
       }),
@@ -484,6 +475,8 @@ export async function callOpenRouter(
      * Pro/Lite routes use only explicit, profile-approved model fallbacks.
      */
     allowExternalFallbacks?: boolean;
+    /** Code deliverables need output tokens, not an exposed thinking trace. */
+    disableReasoning?: boolean;
   } = {},
 ): Promise<OpenRouterResult> {
   const temperature = options.temperature ?? 0.6;
@@ -507,6 +500,7 @@ export async function callOpenRouter(
       timeoutMs,
       options.sessionId,
       openRouterModels.slice(i + 1),
+      options.disableReasoning,
     );
     if (result.success) {
       return { ...result, attemptedModels };
