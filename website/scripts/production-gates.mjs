@@ -136,6 +136,26 @@ assertIncludes('website/lib/db.ts', [
 
 assertIncludes('website/.env.example', ['ALLOW_EPHEMERAL_DB=false']);
 assertIncludes('.env.example', ['ALLOW_EPHEMERAL_DB=false']);
+assertIncludes('website/.env.example', [
+  'STAGING_SUPABASE_URL',
+  'VERCEL_STAGING_PROJECT_ID',
+  'GITHUB_APP_ID',
+  'GITHUB_APP_PRIVATE_KEY',
+  'VERCEL_OAUTH_CLIENT_ID',
+  'VERCEL_INTEGRATION_SLUG',
+]);
+assertIncludes('website/lib/project-actions.ts', [
+  'requestProjectAction',
+  'decideProjectAction',
+  'executeApprovedProjectAction',
+  'deploy.production',
+]);
+assertIncludes('website/app/playground/page.tsx', [
+  'Approvals',
+  'requestProjectAction',
+  'decideProjectAction',
+  'deploy.production',
+]);
 
 assert(fs.existsSync(path.join(website, 'next.config.js')), 'website/next.config.js is missing');
 
