@@ -57,6 +57,12 @@ type WorkspaceProject = {
   updated_at: number;
 };
 
+type ProjectPreview = {
+  previewUrl: string;
+  expiresAt: string;
+  entrypoint: 'static' | 'server';
+};
+
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -75,6 +81,8 @@ export default function PlaygroundPage() {
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
   const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
+  const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
+  const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -470,6 +478,27 @@ export default function PlaygroundPage() {
     }
   }, [activeWorkspaceProjectId]);
 
+  const runWorkspaceProject = useCallback(async () => {
+    if (!activeWorkspaceProjectId) return;
+    setProjectPreviewState('starting');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to preview this project.');
+      const response = await fetch('/api/sandbox/project-preview', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId: activeWorkspaceProjectId }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data?.preview?.previewUrl) throw new Error(data?.error || 'Project preview failed.');
+      setProjectPreview(data.preview as ProjectPreview);
+      setProjectPreviewState('idle');
+    } catch {
+      setProjectPreview(null);
+      setProjectPreviewState('error');
+    }
+  }, [activeWorkspaceProjectId]);
+
   const handleSelectConversation = (conversation: Conversation) => {
     if (status === 'submitted' || status === 'streaming') return;
     setActiveConversationId(conversation.id);
@@ -539,6 +568,16 @@ export default function PlaygroundPage() {
             <div className="flex items-center gap-2">
               {activeWorkspaceProjectId && (
                 <button
+                  onClick={() => void runWorkspaceProject()}
+                  disabled={projectPreviewState === 'starting'}
+                  className="text-[10px] text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+                  title="Run the selected project in an isolated preview"
+                >
+                  {projectPreviewState === 'starting' ? 'Starting…' : 'Run'}
+                </button>
+              )}
+              {activeWorkspaceProjectId && (
+                <button
                   onClick={() => void exportWorkspaceProject()}
                   disabled={workspaceExportState === 'exporting'}
                   className="text-[10px] text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
@@ -559,6 +598,7 @@ export default function PlaygroundPage() {
             {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
             {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">Project storage is unavailable. Chats and downloads still work.</p>}
             {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project could not be exported.</p>}
+            {projectPreviewState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project needs index.html or server.mjs and could not be previewed.</p>}
             {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
             {workspaceProjects.slice(0, 6).map((project) => (
               <button
@@ -774,6 +814,20 @@ export default function PlaygroundPage() {
           </div>
         </main>
       </div>
+      {projectPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-dark/50 p-4" role="dialog" aria-modal="true" aria-label="Project preview">
+          <div className="flex h-[min(48rem,88vh)] w-[min(72rem,96vw)] flex-col overflow-hidden rounded-sm border border-border-default bg-bg-primary shadow-xl">
+            <div className="flex items-center justify-between gap-4 border-b border-border-subtle px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-text-primary">Isolated project preview</p>
+                <p className="text-[11px] text-text-muted">{projectPreview.entrypoint === 'server' ? 'Node service' : 'Static project'} · expires {new Date(projectPreview.expiresAt).toLocaleTimeString()}</p>
+              </div>
+              <button onClick={() => setProjectPreview(null)} className="text-xs text-text-secondary hover:text-text-primary" aria-label="Close project preview">Close</button>
+            </div>
+            <iframe title="Isolated project preview" src={projectPreview.previewUrl} sandbox="allow-scripts" referrerPolicy="no-referrer" className="min-h-0 flex-1 bg-white" />
+          </div>
+        </div>
+      )}
     </>
   );
 }
