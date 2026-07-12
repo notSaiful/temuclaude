@@ -74,6 +74,7 @@ export default function PlaygroundPage() {
   const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
   const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -446,6 +447,29 @@ export default function PlaygroundPage() {
     return data.file as { file_path: string };
   }, [activeWorkspaceProjectId, createWorkspaceProject, loadWorkspaceProjects]);
 
+  const exportWorkspaceProject = useCallback(async () => {
+    if (!activeWorkspaceProjectId) return;
+    setWorkspaceExportState('exporting');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to export this project.');
+      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) throw new Error('Project export failed.');
+      const blob = await response.blob();
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = href;
+      anchor.download = 'temuclaude-project.zip';
+      anchor.click();
+      URL.revokeObjectURL(href);
+      setWorkspaceExportState('idle');
+    } catch {
+      setWorkspaceExportState('error');
+    }
+  }, [activeWorkspaceProjectId]);
+
   const handleSelectConversation = (conversation: Conversation) => {
     if (status === 'submitted' || status === 'streaming') return;
     setActiveConversationId(conversation.id);
@@ -512,16 +536,29 @@ export default function PlaygroundPage() {
           </button>
           <div className="mt-5 flex items-center justify-between px-2">
             <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">Projects</span>
-            <button
-              onClick={() => void createWorkspaceProject().catch(() => setWorkspaceState('error'))}
-              className="rounded-sm px-1 text-sm text-text-muted hover:text-accent-primary"
-              title="Create project"
-              aria-label="Create project"
-            >+</button>
+            <div className="flex items-center gap-2">
+              {activeWorkspaceProjectId && (
+                <button
+                  onClick={() => void exportWorkspaceProject()}
+                  disabled={workspaceExportState === 'exporting'}
+                  className="text-[10px] text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+                  title="Download the selected project as a ZIP file"
+                >
+                  {workspaceExportState === 'exporting' ? 'Exporting…' : 'Export ZIP'}
+                </button>
+              )}
+              <button
+                onClick={() => void createWorkspaceProject().catch(() => setWorkspaceState('error'))}
+                className="rounded-sm px-1 text-sm text-text-muted hover:text-accent-primary"
+                title="Create project"
+                aria-label="Create project"
+              >+</button>
+            </div>
           </div>
           <div className="mt-2 space-y-1">
             {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
             {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">Project storage is unavailable. Chats and downloads still work.</p>}
+            {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project could not be exported.</p>}
             {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
             {workspaceProjects.slice(0, 6).map((project) => (
               <button
