@@ -97,6 +97,21 @@ assertIncludes('website/app/playground/page.tsx', [
   'sandbox="allow-scripts"',
   'sandboxPreviewDocument',
   "connect-src 'none'",
+  'Run isolated preview',
+]);
+
+assertIncludes('website/lib/e2b-preview.ts', [
+  "from 'e2b'",
+  'allowInternetAccess: false',
+  "connect-src 'none'",
+  'frame-ancestors https://temuclaude.com',
+  'sandbox.kill()',
+]);
+
+assertIncludes('website/app/api/sandbox/preview/route.ts', [
+  'getAuthenticatedSupabaseUser',
+  'createIsolatedHtmlPreview',
+  'HTML previews are limited to 1 MB',
 ]);
 
 const navbarSource = read('website/components/Navbar.tsx');

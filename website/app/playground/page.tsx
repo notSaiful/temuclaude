@@ -749,6 +749,8 @@ function AgentActivity({
 
 function CodeArtifact({ content }: { content: string }) {
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
+  const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const match = content.match(/```(html|htm)\n([\s\S]*?)```/i);
   if (!match) return null;
   const html = match[2].trim();
@@ -766,6 +768,31 @@ function CodeArtifact({ content }: { content: string }) {
     anchor.click();
     URL.revokeObjectURL(href);
   };
+  const runIsolatedPreview = async () => {
+    setIsolatedPreviewState('starting');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to run an isolated preview.');
+      const response = await fetch('/api/sandbox/preview', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ html }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data?.preview?.previewUrl || !data?.preview?.downloadUrl) {
+        throw new Error(data?.error || 'Could not start the isolated preview.');
+      }
+      setIsolatedPreview(data.preview);
+      setPreviewOpen(true);
+      setIsolatedPreviewState('idle');
+    } catch (error) {
+      setIsolatedPreview(null);
+      setIsolatedPreviewState('error');
+    }
+  };
 
   return (
     <div className="mt-3 border-t border-border-subtle pt-3 text-xs">
@@ -774,19 +801,38 @@ function CodeArtifact({ content }: { content: string }) {
         <button onClick={() => setPreviewOpen((open) => !open)} className="text-accent-primary hover:underline" aria-expanded={previewOpen}>
           {previewOpen ? 'Close preview' : 'Preview'}
         </button>
+        <button onClick={runIsolatedPreview} disabled={isolatedPreviewState === 'starting'} className="text-text-secondary hover:text-text-primary disabled:opacity-50">
+          {isolatedPreviewState === 'starting' ? 'Starting isolated preview…' : 'Run isolated preview'}
+        </button>
         <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
         <button onClick={download} className="text-text-secondary hover:text-text-primary">Download .html</button>
       </div>
+      {isolatedPreviewState === 'error' && (
+        <p className="mt-2 text-xs text-accent-fig">The isolated preview could not start. The downloadable HTML is still available.</p>
+      )}
       {previewOpen && (
         <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-white">
-          <div className="border-b border-border-subtle bg-bg-secondary px-3 py-2 font-mono text-[11px] text-text-muted">Preview · sandboxed</div>
-          <iframe
-            title="Generated HTML preview"
-            srcDoc={sandboxPreviewDocument(html)}
-            sandbox="allow-scripts"
-            referrerPolicy="no-referrer"
-            className="h-[32rem] w-full bg-white"
-          />
+          <div className="flex items-center justify-between gap-3 border-b border-border-subtle bg-bg-secondary px-3 py-2 font-mono text-[11px] text-text-muted">
+            <span>{isolatedPreview ? 'Preview · isolated workspace' : 'Preview · sandboxed'}</span>
+            {isolatedPreview && <a href={isolatedPreview.downloadUrl} target="_blank" rel="noopener noreferrer" className="text-accent-primary hover:underline">Download isolated artifact</a>}
+          </div>
+          {isolatedPreview ? (
+            <iframe
+              title="Isolated generated HTML preview"
+              src={isolatedPreview.previewUrl}
+              sandbox="allow-scripts"
+              referrerPolicy="no-referrer"
+              className="h-[32rem] w-full bg-white"
+            />
+          ) : (
+            <iframe
+              title="Generated HTML preview"
+              srcDoc={sandboxPreviewDocument(html)}
+              sandbox="allow-scripts"
+              referrerPolicy="no-referrer"
+              className="h-[32rem] w-full bg-white"
+            />
+          )}
         </div>
       )}
     </div>
