@@ -63,6 +63,15 @@ type ProjectPreview = {
   entrypoint: 'static' | 'server';
 };
 
+type ProjectAction = {
+  id: string;
+  action_type: 'agent.run' | 'package.install' | 'network.enable' | 'github.connect' | 'deploy.preview' | 'deploy.production';
+  status: 'requested' | 'approved' | 'rejected' | 'executing' | 'completed' | 'failed' | 'cancelled';
+  requested_payload: Record<string, unknown>;
+  expires_at: number;
+  created_at: number;
+};
+
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -83,6 +92,8 @@ export default function PlaygroundPage() {
   const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
   const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
   const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
+  const [projectActions, setProjectActions] = useState<ProjectAction[]>([]);
+  const [projectActionState, setProjectActionState] = useState<'idle' | 'loading' | 'saving' | 'error'>('idle');
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -455,6 +466,70 @@ export default function PlaygroundPage() {
     return data.file as { file_path: string };
   }, [activeWorkspaceProjectId, createWorkspaceProject, loadWorkspaceProjects]);
 
+
+  const loadProjectActions = useCallback(async (projectId = activeWorkspaceProjectId) => {
+    if (!projectId) {
+      setProjectActions([]);
+      return;
+    }
+    setProjectActionState('loading');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to view approvals.');
+      const response = await fetch(`/api/projects/${encodeURIComponent(projectId)}/actions`, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !Array.isArray(data.actions)) throw new Error(data.error || 'Could not load approvals.');
+      setProjectActions(data.actions as ProjectAction[]);
+      setProjectActionState('idle');
+    } catch {
+      setProjectActionState('error');
+    }
+  }, [activeWorkspaceProjectId]);
+
+  useEffect(() => {
+    void loadProjectActions(activeWorkspaceProjectId);
+  }, [activeWorkspaceProjectId, loadProjectActions]);
+
+  const requestProjectAction = useCallback(async (actionType: ProjectAction['action_type']) => {
+    if (!activeWorkspaceProjectId) return;
+    setProjectActionState('saving');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to request approval.');
+      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/actions`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionType, payload: { source: 'playground', requestedFrom: window.location.pathname } }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.action) throw new Error(data.error || 'Could not request approval.');
+      setProjectActions((previous) => [data.action as ProjectAction, ...previous]);
+      setProjectActionState('idle');
+    } catch {
+      setProjectActionState('error');
+    }
+  }, [activeWorkspaceProjectId]);
+
+  const decideProjectAction = useCallback(async (actionId: string, decision: 'approved' | 'rejected') => {
+    if (!activeWorkspaceProjectId) return;
+    setProjectActionState('saving');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to approve actions.');
+      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/actions/${encodeURIComponent(actionId)}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, payload: { decidedFrom: 'playground' } }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.action) throw new Error(data.error || 'Could not update approval.');
+      setProjectActions((previous) => previous.map((action) => action.id === actionId ? data.action as ProjectAction : action));
+      setProjectActionState('idle');
+    } catch {
+      setProjectActionState('error');
+    }
+  }, [activeWorkspaceProjectId]);
+
   const exportWorkspaceProject = useCallback(async () => {
     if (!activeWorkspaceProjectId) return;
     setWorkspaceExportState('exporting');
@@ -611,6 +686,44 @@ export default function PlaygroundPage() {
               </button>
             ))}
           </div>
+          {activeWorkspaceProjectId && (
+            <div className="mt-5 rounded-md border border-border-subtle bg-bg-primary/60 p-2">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">Approvals</span>
+                <button onClick={() => void loadProjectActions()} className="text-[10px] text-text-muted hover:text-text-primary">Refresh</button>
+              </div>
+              <div className="grid grid-cols-2 gap-1">
+                {(['agent.run', 'package.install', 'deploy.preview', 'deploy.production'] as ProjectAction['action_type'][]).map((actionType) => (
+                  <button
+                    key={actionType}
+                    onClick={() => void requestProjectAction(actionType)}
+                    disabled={projectActionState === 'saving'}
+                    className="rounded-sm border border-border-subtle px-1.5 py-1 text-[10px] text-text-secondary hover:border-accent-primary hover:text-text-primary disabled:opacity-50"
+                  >
+                    {actionType.replace('.', ' ')}
+                  </button>
+                ))}
+              </div>
+              {projectActionState === 'error' && <p className="mt-2 text-[11px] text-accent-fig">Approval service is unavailable.</p>}
+              <div className="mt-2 space-y-1">
+                {projectActions.slice(0, 4).map((action) => (
+                  <div key={action.id} className="rounded-sm bg-bg-tertiary/60 p-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="truncate text-[11px] text-text-secondary">{action.action_type}</span>
+                      <span className="text-[10px] uppercase text-text-muted">{action.status}</span>
+                    </div>
+                    {action.status === 'requested' && (
+                      <div className="mt-2 flex gap-1">
+                        <button onClick={() => void decideProjectAction(action.id, 'approved')} className="flex-1 rounded-sm bg-accent-primary px-2 py-1 text-[10px] font-medium text-white">Approve</button>
+                        <button onClick={() => void decideProjectAction(action.id, 'rejected')} className="flex-1 rounded-sm border border-border-subtle px-2 py-1 text-[10px] text-text-secondary">Reject</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {projectActions.length === 0 && <p className="text-[11px] text-text-muted">No action approvals yet.</p>}
+              </div>
+            </div>
+          )}
           <div className="mt-5 px-2 text-[10px] font-mono uppercase tracking-wider text-text-muted">Recent chats</div>
           <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
             {visibleConversations.map((conversation) => (
