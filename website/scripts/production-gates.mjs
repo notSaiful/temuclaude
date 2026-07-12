@@ -93,6 +93,10 @@ assertIncludes('website/app/playground/page.tsx', [
   'id="model-profile"',
   'HTML deliverable',
   "anchor.download = 'temuclaude-game.html'",
+  'Preview · sandboxed',
+  'sandbox="allow-scripts"',
+  'sandboxPreviewDocument',
+  "connect-src 'none'",
 ]);
 
 const navbarSource = read('website/components/Navbar.tsx');

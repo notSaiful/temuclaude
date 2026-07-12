@@ -748,6 +748,7 @@ function AgentActivity({
 }
 
 function CodeArtifact({ content }: { content: string }) {
+  const [previewOpen, setPreviewOpen] = useState(false);
   const match = content.match(/```(html|htm)\n([\s\S]*?)```/i);
   if (!match) return null;
   const html = match[2].trim();
@@ -767,12 +768,39 @@ function CodeArtifact({ content }: { content: string }) {
   };
 
   return (
-    <div className="mt-3 flex items-center gap-2 border-t border-border-subtle pt-3 text-xs">
-      <span className="font-mono text-text-muted">HTML deliverable</span>
-      <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
-      <button onClick={download} className="text-accent-primary hover:underline">Download .html</button>
+    <div className="mt-3 border-t border-border-subtle pt-3 text-xs">
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-text-muted">HTML deliverable</span>
+        <button onClick={() => setPreviewOpen((open) => !open)} className="text-accent-primary hover:underline" aria-expanded={previewOpen}>
+          {previewOpen ? 'Close preview' : 'Preview'}
+        </button>
+        <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
+        <button onClick={download} className="text-text-secondary hover:text-text-primary">Download .html</button>
+      </div>
+      {previewOpen && (
+        <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-white">
+          <div className="border-b border-border-subtle bg-bg-secondary px-3 py-2 font-mono text-[11px] text-text-muted">Preview · sandboxed</div>
+          <iframe
+            title="Generated HTML preview"
+            srcDoc={sandboxPreviewDocument(html)}
+            sandbox="allow-scripts"
+            referrerPolicy="no-referrer"
+            className="h-[32rem] w-full bg-white"
+          />
+        </div>
+      )}
     </div>
   );
+}
+
+function sandboxPreviewDocument(html: string): string {
+  // Generated code is untrusted. The preview has an opaque origin and a CSP
+  // that permits only its inline code; it cannot access TemuClaude data,
+  // navigate the parent page, submit forms, or call out to another service.
+  const policy = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'\">";
+  return /<head[^>]*>/i.test(html)
+    ? html.replace(/<head([^>]*)>/i, `<head$1>${policy}`)
+    : `${policy}${html}`;
 }
 
 function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClose: () => void }) {
