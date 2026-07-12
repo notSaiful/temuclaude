@@ -19,8 +19,10 @@
 | Same-page HTML preview | Implemented with an opaque-origin iframe and restrictive CSP | Available |
 | Isolated static HTML preview | Implemented with a short-lived E2B sandbox, no sandbox internet, no product secrets | Available when E2B is configured |
 | Durable project/file API | Implemented, ownership-checked, and connected to the Playground project sidebar and “Save to project” action | Available for HTML files |
-| Durable chat, revisions, ZIP export | Not implemented | Do not claim |
-| React/Node/full-stack sandbox build | Not implemented | Do not claim |
+| Project ZIP export | Implemented with a 100-file / 5 MB bound and traversal rejection | Available |
+| Isolated saved-project preview | Implemented with a pinned E2B Node 24 template, no sandbox internet, 5-minute expiry, and a sandboxed iframe | Available for static projects and a saved `server.mjs`/`server.js` |
+| Durable chat and revisions | Not implemented | Do not claim |
+| React/package-install build | Not implemented | Do not claim |
 | GitHub/Vercel deployment from Playground | Not implemented | Do not claim |
 | Agent task graph and approvals | Not implemented | Do not claim |
 | Image/video/music Playground jobs | Existing backend research only; no verified Playground job flow | Do not claim |
@@ -30,8 +32,9 @@
 
 - Static isolated HTML preview: sandbox creation, public preview health check, downloadable artifact URL, and teardown passed.
 - Isolated Node-service preview: an HTML route and a local JSON API route both returned HTTP 200 from a short-lived, internet-disabled, credential-free sandbox.
+- Pinned project-preview template: the E2B Node 24 template was built with one CPU and 1 GB memory; a saved project returned HTTP 200 from the isolated public preview URL and was destroyed after the test.
 
-This establishes the runtime primitive for a future runnable-project feature. It is **not** a deployed user-facing full-stack builder yet; that still requires the pinned template, file upload/restore path, per-project lifecycle, cost limits, permissions, and end-to-end UI tests described below.
+This provides a user-facing runnable-project path for saved static files and small Node services. It is **not** a general React/package-install builder: dependency installation, external network access, arbitrary build commands, and persistent sandbox sessions remain intentionally unavailable until their controls and cost limits are tested.
 
 ## Product decision
 
