@@ -351,7 +351,12 @@ export async function sendOtp(email: string, returnTo?: string) {
   if (error) throw error;
 }
 
-export async function verifyOtp(email: string, token: string, type: 'email' | 'signup' = 'email') {
+export async function verifyOtp(
+  email: string,
+  token: string,
+  type: 'email' | 'signup' = 'email',
+  _params?: { password?: string; name?: string },
+) {
   if (!isSupabaseConfigured()) {
     if (token !== '123456') {
       throw new Error('Invalid verification code. Use "123456" for mock sign in.');
