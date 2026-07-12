@@ -156,7 +156,10 @@ export default function PlaygroundPage() {
     setWorkspaceState('loading');
     try {
       const token = await getAccessToken();
-      if (!token) return;
+      if (!token) {
+        setWorkspaceState('idle');
+        return;
+      }
       const response = await fetch('/api/projects', { headers: { Authorization: `Bearer ${token}` } });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !Array.isArray(data.projects)) throw new Error(data.error || 'Workspace storage is unavailable.');
