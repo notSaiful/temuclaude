@@ -26,6 +26,13 @@
 | Image/video/music Playground jobs | Existing backend research only; no verified Playground job flow | Do not claim |
 | Obsidian connector | Not implemented | Do not claim |
 
+### Live infrastructure checks completed
+
+- Static isolated HTML preview: sandbox creation, public preview health check, downloadable artifact URL, and teardown passed.
+- Isolated Node-service preview: an HTML route and a local JSON API route both returned HTTP 200 from a short-lived, internet-disabled, credential-free sandbox.
+
+This establishes the runtime primitive for a future runnable-project feature. It is **not** a deployed user-facing full-stack builder yet; that still requires the pinned template, file upload/restore path, per-project lifecycle, cost limits, permissions, and end-to-end UI tests described below.
+
 ## Product decision
 
 The goal is not an unverifiable claim that TemuClaude is “better than Codex, Claude Code, and Hermes combined.” The measurable goal is a secure, inspectable creative-agent workspace with a smaller, clearer capability set that can be proven through end-to-end tests.
