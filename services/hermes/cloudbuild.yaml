@@ -1,0 +1,14 @@
+# Builds the Cloud Run-specific Hermes image from the repository root so the
+# Dockerfile can copy its production configuration. No secret is present in
+# the build context or image.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --file
+      - services/hermes/Dockerfile
+      - --tag
+      - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v2
+      - .
+images:
+  - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v2
