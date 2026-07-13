@@ -13,11 +13,13 @@ export type LocalSession = {
   providers: AuthProvider[];
   avatarInitials: string;
   signedInAt: number;
+  accessToken?: string;
 };
 
 export const AUTH_EVENT = 'temuclaude-auth-change';
 const LOCAL_SESSION_KEY = 'temuclaude_local_auth_session';
 const LOCAL_ACCOUNTS_KEY = 'temuclaude_local_auth_accounts';
+const OTP_CHALLENGE_PREFIX = 'temuclaude_otp_challenge';
 
 let browserClient: SupabaseClient | null = null;
 
@@ -153,6 +155,22 @@ function getLocalSession(): LocalSession | null {
   }
 }
 
+function getOtpChallengeKey(email: string, purpose: 'email' | 'signup') {
+  return `${OTP_CHALLENGE_PREFIX}:${purpose}:${email.trim().toLowerCase()}`;
+}
+
+function saveOtpChallenge(email: string, purpose: 'email' | 'signup', challenge: string) {
+  window.sessionStorage.setItem(getOtpChallengeKey(email, purpose), challenge);
+}
+
+function getOtpChallenge(email: string, purpose: 'email' | 'signup') {
+  return window.sessionStorage.getItem(getOtpChallengeKey(email, purpose));
+}
+
+function clearOtpChallenge(email: string, purpose: 'email' | 'signup') {
+  window.sessionStorage.removeItem(getOtpChallengeKey(email, purpose));
+}
+
 function createLocalSession(params: { email: string; name?: string; provider: AuthProvider }): LocalSession {
   const email = params.email.trim().toLowerCase();
   const name = params.name?.trim() || email.split('@')[0].replace(/[._-]+/g, ' ');
@@ -169,7 +187,11 @@ function createLocalSession(params: { email: string; name?: string; provider: Au
 }
 
 function safeReturnTo(returnTo = '/dashboard') {
-  return returnTo.startsWith('/') ? returnTo : '/dashboard';
+  // Only accept an internal, absolute path. `//host` is protocol-relative and
+  // would otherwise turn a post-auth redirect into an open redirect.
+  return returnTo.startsWith('/') && !returnTo.startsWith('//') && !returnTo.includes('\\')
+    ? returnTo
+    : '/dashboard';
 }
 
 function authRedirectUrl(returnTo?: string) {
@@ -183,7 +205,9 @@ export function sanitizeReturnTo(returnTo?: string | null) {
 }
 
 export async function getStoredSession(): Promise<LocalSession | null> {
-  if (!isSupabaseConfigured()) return getLocalSession();
+  const localSession = getLocalSession();
+  if (localSession?.accessToken?.startsWith('app:')) return localSession;
+  if (!isSupabaseConfigured()) return localSession;
 
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase.auth.getSession();
@@ -192,9 +216,11 @@ export async function getStoredSession(): Promise<LocalSession | null> {
 }
 
 export async function getAccessToken(): Promise<string | null> {
+  const localSession = getLocalSession();
+  if (localSession?.accessToken?.startsWith('app:')) return localSession.accessToken;
+
   if (!isSupabaseConfigured()) {
-    const session = getLocalSession();
-    return session ? `local:${btoa(JSON.stringify({ id: session.id, email: session.email, name: session.name }))}` : null;
+    return localSession ? `local:${btoa(JSON.stringify({ id: localSession.id, email: localSession.email, name: localSession.name }))}` : null;
   }
 
   const supabase = getSupabaseBrowserClient();
@@ -213,7 +239,8 @@ export async function exchangeCodeForSession(code: string) {
 }
 
 export function onAuthSessionChange(callback: (session: LocalSession | null) => void) {
-  if (!isSupabaseConfigured()) {
+  const existingLocalSession = getLocalSession();
+  if (existingLocalSession?.accessToken?.startsWith('app:') || !isSupabaseConfigured()) {
     const syncLocalSession = () => callback(getLocalSession());
     window.addEventListener(AUTH_EVENT, syncLocalSession);
     return () => window.removeEventListener(AUTH_EVENT, syncLocalSession);
@@ -250,34 +277,22 @@ export async function signInWithEmail(params: { email: string; password: string 
 }
 
 export async function signUpWithEmail(params: { email: string; password: string; name?: string; returnTo?: string }) {
-  if (!isSupabaseConfigured()) {
-    const email = params.email.trim().toLowerCase();
-    if (!params.password || params.password.length < 6) {
-      throw new Error('Password must be at least 6 characters.');
-    }
-
-    const accounts = getLocalAccounts();
-    const name = params.name?.trim() || email.split('@')[0].replace(/[._-]+/g, ' ');
-    accounts[email] = { email, password: params.password, name };
-    saveLocalAccounts(accounts);
-    saveLocalSession(createLocalSession({ email, name, provider: 'email' }));
-    return;
+  const email = params.email.trim().toLowerCase();
+  if (!params.password || params.password.length < 6) {
+    throw new Error('Password must be at least 6 characters.');
   }
 
-  const supabase = getSupabaseBrowserClient();
-  const { error } = await supabase.auth.signUp({
-    email: params.email.trim().toLowerCase(),
-    password: params.password,
-    options: {
-      data: {
-        full_name: params.name?.trim() || undefined,
-        name: params.name?.trim() || undefined,
-      },
-      emailRedirectTo: authRedirectUrl(params.returnTo),
-    },
+  const res = await fetch('/api/auth/signup/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      name: params.name?.trim() || undefined,
+    }),
   });
-  if (error) throw error;
-  emitAuthEvent();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Could not send verification code.');
+  saveOtpChallenge(email, 'signup', data.challenge);
 }
 
 export async function signInWithOAuth(provider: OAuthProvider, returnTo?: string) {
@@ -303,8 +318,9 @@ export async function signInWithOAuth(provider: OAuthProvider, returnTo?: string
 }
 
 export async function signOut() {
+  window.localStorage.removeItem(LOCAL_SESSION_KEY);
+
   if (!isSupabaseConfigured()) {
-    window.localStorage.removeItem(LOCAL_SESSION_KEY);
     emitAuthEvent();
     return;
   }
@@ -335,39 +351,57 @@ export async function syncAuthenticatedUser() {
 }
 
 export async function sendOtp(email: string, returnTo?: string) {
-  if (!isSupabaseConfigured()) {
-    console.log(`Mock OTP sent to: ${email}`);
-    return;
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const { error } = await supabase.auth.signInWithOtp({
-    email: email.trim().toLowerCase(),
-    options: {
-      emailRedirectTo: authRedirectUrl(returnTo),
-      shouldCreateUser: true,
-    },
+  const normalizedEmail = email.trim().toLowerCase();
+  const res = await fetch('/api/auth/signin/start', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: normalizedEmail,
+    }),
   });
-  if (error) throw error;
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Could not send verification code.');
+  saveOtpChallenge(normalizedEmail, 'email', data.challenge);
 }
 
 export async function verifyOtp(
   email: string,
   token: string,
   type: 'email' | 'signup' = 'email',
-  _params?: { password?: string; name?: string },
+  params: { password?: string; name?: string } = {},
 ) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const challenge = getOtpChallenge(normalizedEmail, type);
+  if (challenge) {
+    const res = await fetch(type === 'signup' ? '/api/auth/signup/verify' : '/api/auth/signin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: normalizedEmail,
+        code: token,
+        challenge,
+        password: params.password,
+        name: params.name,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Invalid verification code.');
+    clearOtpChallenge(normalizedEmail, type);
+    saveLocalSession(data.session);
+    return;
+  }
+
   if (!isSupabaseConfigured()) {
     if (token !== '123456') {
       throw new Error('Invalid verification code. Use "123456" for mock sign in.');
     }
-    saveLocalSession(createLocalSession({ email, name: email.split('@')[0], provider: 'email' }));
+    saveLocalSession(createLocalSession({ email: normalizedEmail, name: normalizedEmail.split('@')[0], provider: 'email' }));
     return;
   }
 
   const supabase = getSupabaseBrowserClient();
   const { error } = await supabase.auth.verifyOtp({
-    email: email.trim().toLowerCase(),
+    email: normalizedEmail,
     token: token.trim(),
     type,
   });

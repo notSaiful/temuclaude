@@ -1,5 +1,7 @@
+import nodemailer from 'nodemailer';
+
 /**
- * TemuClaude Email System — Resend Integration
+ * TemuClaude Email System
  * 
  * Handles all automated email communication:
  * - Customer support
@@ -14,19 +16,27 @@
  * Managed by Hasan autonomous system.
  */
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+function getEmailProvider() {
+  const configuredProvider = (process.env.EMAIL_PROVIDER || '').toLowerCase();
+  if (configuredProvider) return configuredProvider;
+  if (process.env.HOSTINGER_EMAIL_PASSWORD || process.env.SMTP_PASSWORD) return 'hostinger';
+  return 'resend';
+}
+
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
 // Email addresses for TemuClaude
+// Note: temuclaude.com is the verified sending domain in Resend.
+// Hostinger DNS must have SPF TXT on root domain pointing to amazonses.com.
 export const EMAIL_ADDRESSES = {
-  hello: 'hello@temuclaude.com',
-  support: 'support@temuclaude.com',
-  legal: 'legal@temuclaude.com',
-  security: 'security@temuclaude.com',
-  api: 'api@temuclaude.com',
-  billing: 'billing@temuclaude.com',
-  marketing: 'marketing@temuclaude.com',
-  saiful: 'saiful@temuclaude.com',
+  hello: 'TemuClaude <hello@temuclaude.com>',
+  support: 'TemuClaude Support <support@temuclaude.com>',
+  legal: 'TemuClaude Legal <legal@temuclaude.com>',
+  security: 'TemuClaude Security <security@temuclaude.com>',
+  api: 'TemuClaude API <api@temuclaude.com>',
+  billing: 'TemuClaude Billing <billing@temuclaude.com>',
+  marketing: 'TemuClaude <marketing@temuclaude.com>',
+  saiful: 'TemuClaude <saiful@temuclaude.com>',
 } as const;
 
 export type EmailType =
@@ -56,41 +66,161 @@ interface EmailResult {
   error?: string;
 }
 
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case '\'': return '&#39;';
+      default: return char;
+    }
+  });
+}
+
+function emailText(value: string) {
+  let text = '';
+  let inTag = false;
+  let previousWasSpace = false;
+  for (const character of value) {
+    if (character === '<') { inTag = true; continue; }
+    if (character === '>') { inTag = false; continue; }
+    if (inTag) continue;
+    const isSpace = character === ' ' || character === '\n' || character === '\r' || character === '\t';
+    if (isSpace && previousWasSpace) continue;
+    text += isSpace ? ' ' : character;
+    previousWasSpace = isSpace;
+  }
+  return text.trim();
+}
+
+function getResendApiKey() {
+  return process.env.RESEND_API_KEY || '';
+}
+
+function getDefaultFromAddress() {
+  return process.env.EMAIL_FROM || process.env.RESEND_FROM_EMAIL || EMAIL_ADDRESSES.hello;
+}
+
+function extractEmailAddress(value: string) {
+  const match = value.match(/<([^>]+)>/);
+  return (match?.[1] || value).trim();
+}
+
+function getSmtpConfig() {
+  const user = process.env.SMTP_USER || process.env.HOSTINGER_EMAIL_USER || 'hello@temuclaude.com';
+
+  return {
+    host: process.env.SMTP_HOST || process.env.HOSTINGER_SMTP_HOST || 'smtp.hostinger.com',
+    port: Number(process.env.SMTP_PORT || process.env.HOSTINGER_SMTP_PORT || 465),
+    secure: (process.env.SMTP_SECURE || process.env.HOSTINGER_SMTP_SECURE || 'true') !== 'false',
+    user: extractEmailAddress(user),
+    pass: process.env.SMTP_PASSWORD || process.env.HOSTINGER_EMAIL_PASSWORD || '',
+  };
+}
+
+function isSmtpProvider() {
+  const provider = getEmailProvider();
+  return provider === 'smtp' || provider === 'hostinger';
+}
+
+export function getEmailDeliveryStatus() {
+  const provider = getEmailProvider();
+  const smtp = getSmtpConfig();
+  const resendConfigured = Boolean(getResendApiKey());
+  const smtpConfigured = Boolean(smtp.user && smtp.pass);
+
+  return {
+    provider,
+    from: getDefaultFromAddress(),
+    resendConfigured,
+    smtpConfigured,
+    ready: isSmtpProvider() ? smtpConfigured : provider === 'resend' && resendConfigured,
+  };
+}
+
+async function sendEmailViaSmtp(params: {
+  to: string[];
+  from: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+}): Promise<EmailResult> {
+  const smtp = getSmtpConfig();
+  if (!smtp.pass) {
+    console.error('[EMAIL] SMTP password not configured');
+    return { success: false, error: 'SMTP password not configured' };
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: smtp.host,
+    port: smtp.port,
+    secure: smtp.secure,
+    auth: {
+      user: smtp.user,
+      pass: smtp.pass,
+    },
+  });
+
+  const result = await transporter.sendMail({
+    from: params.from,
+    to: params.to.join(', '),
+    subject: params.subject,
+    // SMTP is the compatibility fallback. Plain text prevents a caller from
+    // turning user-provided content into executable email markup.
+    text: emailText(params.html),
+    replyTo: params.replyTo,
+  });
+
+  return { success: true, id: result.messageId };
+}
+
 /**
- * Send an email via Resend API
+ * Send an email via the configured production provider.
  */
 export async function sendEmail({
   to,
-  from = EMAIL_ADDRESSES.hello,
+  from,
   subject,
   html,
   replyTo,
   type = 'notification',
   tags = [],
 }: SendEmailParams): Promise<EmailResult> {
-  if (!RESEND_API_KEY) {
-    console.error('[EMAIL] RESEND_API_KEY not set');
-    return { success: false, error: 'RESEND_API_KEY not configured' };
-  }
-
   const recipients = Array.isArray(to) ? to : [to];
+  const sender = from || getDefaultFromAddress();
 
-  // Validate from address
-  if (!from.includes('@temuclaude.com') && !from.includes('@resend.dev')) {
+  // Validate from address — accept root domain and any subdomain (e.g. send.temuclaude.com)
+  const fromEmail = extractEmailAddress(sender);
+  if (!fromEmail.endsWith('@temuclaude.com') && !fromEmail.endsWith('.temuclaude.com') && !sender.includes('@resend.dev')) {
     console.error('[EMAIL] From address must use temuclaude.com domain');
     return { success: false, error: 'Invalid from address' };
   }
 
   try {
+    if (isSmtpProvider()) {
+      const result = await sendEmailViaSmtp({ to: recipients, from: sender, subject, html, replyTo });
+      console.info('[EMAIL] SMTP delivery accepted');
+      return result;
+    }
+
+    const resendApiKey = getResendApiKey();
+    if (!resendApiKey) {
+      console.error('[EMAIL] RESEND_API_KEY not set');
+      return { success: false, error: 'RESEND_API_KEY not configured' };
+    }
+
+    const uniqueTags = Array.from(new Set(tags));
     const body: Record<string, unknown> = {
-      from,
+      from: sender,
       to: recipients,
       subject,
       html,
       tags: [
         { name: 'type', value: type },
         { name: 'source', value: 'hasan' },
-        ...tags.map(t => ({ name: 'tag', value: t })),
+        ...uniqueTags.map((t, idx) => ({ name: `tag_${idx + 1}`, value: t })),
       ],
     };
 
@@ -101,20 +231,21 @@ export async function sendEmail({
     const response = await fetch(RESEND_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Authorization': `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15_000),
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({})) as { id?: string; message?: string; name?: string };
 
     if (!response.ok) {
-      console.error('[EMAIL] Send failed:', data);
-      return { success: false, error: data.message || 'Unknown error' };
+      console.error('[EMAIL] Resend request failed:', response.status);
+      return { success: false, error: data.message || data.name || `Resend request failed (${response.status})` };
     }
 
-    console.log(`[EMAIL] Sent (${type}): ${subject} → ${recipients.join(', ')} [${data.id}]`);
+    console.info('[EMAIL] Resend delivery accepted');
     return { success: true, id: data.id };
   } catch (error) {
     console.error('[EMAIL] Error:', error);
@@ -336,13 +467,14 @@ export async function sendWelcomeEmail(
         </div>
         <p style="color: #475569; line-height: 1.6; font-size: 14px;">
           <strong>What you get (free):</strong><br>
-          · 20 queries/day — no signup required<br>
+          · 20 queries/day after sign-in<br>
+          · 50K monthly credits<br>
           · Full 10-layer orchestration<br>
           · All 8 models<br>
           · Visible orchestration panel
         </p>
         <p style="color: #475569; line-height: 1.6; font-size: 14px;">
-          <strong>Need more?</strong> Developer plan starts at $15/mo for 50,000 queries + API access.
+          <strong>Need more?</strong> Developer starts at $19/mo for 5M monthly credits + API access.
         </p>
         <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
           <p style="color: #64748b; font-size: 13px; margin: 0;">
@@ -365,6 +497,44 @@ export async function sendWelcomeEmail(
     html,
     type: 'welcome',
     tags: ['onboarding'],
+  });
+}
+
+/**
+ * Send one-time password for sign in and account creation.
+ */
+export async function sendOtpEmail(
+  userEmail: string,
+  code: string,
+  purpose: 'signin' | 'signup' = 'signin',
+): Promise<EmailResult> {
+  const purposeLabel = purpose === 'signup' ? 'create your TemuClaude account' : 'sign in to TemuClaude';
+  const safeCode = escapeHtml(code);
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+      <div style="background: #111827; padding: 28px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 24px;">TemuClaude verification code</h1>
+        <p style="color: #cbd5e1; margin: 8px 0 0 0;">Use this code to ${purposeLabel}.</p>
+      </div>
+      <div style="background: #f8fafc; padding: 28px; border: 1px solid #e2e8f0; border-radius: 0 0 12px 12px;">
+        <p style="color: #334155; margin: 0 0 18px 0;">Your 6-digit code is:</p>
+        <div style="font-size: 32px; letter-spacing: 8px; font-weight: 700; color: #0f172a; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; text-align: center;">
+          ${safeCode}
+        </div>
+        <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 18px 0 0 0;">
+          This code expires in 10 minutes. If you did not request it, you can safely ignore this email.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: userEmail,
+    from: EMAIL_ADDRESSES.hello,
+    subject: `${safeCode} is your TemuClaude verification code`,
+    html,
+    type: 'security',
+    tags: ['otp', purpose],
   });
 }
 
