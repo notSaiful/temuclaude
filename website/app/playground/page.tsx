@@ -9,8 +9,20 @@ type Message = {
   content: string;
   orchestration?: OrchestrationData;
   activity?: ActivityEvent[];
+  media?: MediaJob;
   startedAt?: number;
   completedAt?: number;
+};
+
+type MediaKind = 'text' | 'image' | 'video' | 'speech' | 'music';
+type MediaJob = {
+  id: string;
+  kind: Exclude<MediaKind, 'text'>;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
+  model: string;
+  output_url: string | null;
+  output_mime_type: string | null;
+  error_code: string | null;
 };
 
 type OrchestrationData = {
@@ -82,6 +94,7 @@ export default function PlaygroundPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
+  const [mediaKind, setMediaKind] = useState<MediaKind>('text');
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
@@ -261,12 +274,87 @@ export default function PlaygroundPage() {
     });
   }, []);
 
+  const pollMediaJob = useCallback(async (jobId: string, messageIndex: number, token: string) => {
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, 5_000));
+      try {
+        const response = await fetch(`/api/media/jobs/${encodeURIComponent(jobId)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.job) throw new Error(data.error || 'Media status is unavailable.');
+        const job = data.job as MediaJob;
+        setMessages((previous) => previous.map((message, index) => index === messageIndex
+          ? { ...message, media: job, content: mediaStatusMessage(job), completedAt: job.status === 'completed' || job.status === 'failed' ? Date.now() : message.completedAt }
+          : message));
+        if (job.status === 'completed' || job.status === 'failed') {
+          setStatus(job.status === 'completed' ? 'ready' : 'error');
+          return;
+        }
+      } catch {
+        setMessages((previous) => previous.map((message, index) => index === messageIndex
+          ? { ...message, content: 'The media job is still running, but its status could not be refreshed. Try again shortly.' }
+          : message));
+        setStatus('error');
+        return;
+      }
+    }
+    setMessages((previous) => previous.map((message, index) => index === messageIndex
+      ? { ...message, content: 'This media job is still processing. Keep this chat open and refresh shortly to check again.' }
+      : message));
+    setStatus('ready');
+  }, []);
+
+  const handleMediaSend = useCallback(async () => {
+    if (!session || mediaKind === 'text' || !input.trim() || status === 'submitted' || status === 'streaming') return;
+    const token = await getAccessToken();
+    if (!token) {
+      window.location.href = '/login?returnTo=/playground';
+      return;
+    }
+    const userMessage: Message = { role: 'user', content: input.trim() };
+    const assistantIndex = messages.length + 1;
+    streamingIdxRef.current = assistantIndex;
+    setMessages((previous) => [...previous, userMessage, {
+      role: 'assistant', content: `Creating your ${mediaKind}…`, startedAt: Date.now(),
+      activity: [{ heading: `Preparing ${mediaKind} job`, kind: 'routing', status: 'active' }],
+    }]);
+    setInput('');
+    setStatus('submitted');
+    try {
+      const response = await fetch('/api/media/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ kind: mediaKind, prompt: userMessage.content }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.job) throw new Error(data.error || 'Unable to create media job.');
+      const job = data.job as MediaJob;
+      setMessages((previous) => previous.map((message, index) => index === assistantIndex
+        ? { ...message, media: job, content: mediaStatusMessage(job), completedAt: job.status === 'completed' ? Date.now() : undefined,
+          activity: [{ heading: `${mediaKind} job created`, kind: 'result', status: job.status === 'failed' ? 'error' : 'done' }] }
+        : message));
+      if (job.status === 'queued' || job.status === 'processing') void pollMediaJob(job.id, assistantIndex, token);
+      else setStatus(job.status === 'completed' ? 'ready' : 'error');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to create media job.';
+      setMessages((previous) => previous.map((message, index) => index === assistantIndex
+        ? { ...message, content: errorMessage, completedAt: Date.now(), activity: [{ heading: 'Media job failed', detail: errorMessage, kind: 'error', status: 'error' }] }
+        : message));
+      setStatus('error');
+    }
+  }, [input, mediaKind, messages.length, pollMediaJob, session, status]);
+
   const handleSend = useCallback(async () => {
     if (!session) {
       window.location.href = '/login?returnTo=/playground';
       return;
     }
     if (!input.trim() || status === 'submitted' || status === 'streaming') return;
+    if (mediaKind !== 'text') {
+      await handleMediaSend();
+      return;
+    }
 
     // Check if user has reached free tier limit
     if (limitMessage) {
@@ -416,7 +504,7 @@ export default function PlaygroundPage() {
         streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace, mediaKind, handleMediaSend]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
@@ -762,6 +850,7 @@ export default function PlaygroundPage() {
                     </div>
 
                     {message.role === 'assistant' && <CodeArtifact content={message.content} onSaveToWorkspace={saveHtmlToWorkspace} />}
+                    {message.role === 'assistant' && message.media && <MediaOutput job={message.media} />}
 
                     {/* Orchestration summary bar */}
                     {message.orchestration && message.role === 'assistant' && (
@@ -824,6 +913,21 @@ export default function PlaygroundPage() {
                   <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
                   <div className="flex items-center gap-2">
                     {activeWorkspaceProjectId && workspaceAnalysisState === 'analyzing' && <span className="text-[10px] text-text-muted">Analysing workspace…</span>}
+                    <div className="relative">
+                      <select
+                        value={mediaKind}
+                        onChange={(event) => setMediaKind(event.target.value as MediaKind)}
+                        disabled={status === 'submitted' || status === 'streaming'}
+                        aria-label="Choose output type"
+                        className="appearance-none rounded-sm bg-transparent px-2 py-1 text-xs font-medium text-text-secondary outline-none hover:bg-bg-tertiary disabled:opacity-50"
+                      >
+                        <option value="text">Text</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="speech">Speech</option>
+                        <option value="music">Music</option>
+                      </select>
+                    </div>
                     <div className="relative">
                       <button
                         type="button"
@@ -892,6 +996,40 @@ export default function PlaygroundPage() {
         </div>
       )}
     </>
+  );
+}
+
+function mediaStatusMessage(job: MediaJob): string {
+  if (job.status === 'completed') return `${job.kind[0].toUpperCase()}${job.kind.slice(1)} ready.`;
+  if (job.status === 'failed') return `This ${job.kind} could not be generated. Please try a different prompt.`;
+  return `${job.kind[0].toUpperCase()}${job.kind.slice(1)} generation is in progress…`;
+}
+
+function MediaOutput({ job }: { job: MediaJob }) {
+  if (job.status === 'failed') {
+    return <p className="mt-3 rounded-sm border border-accent-fig/30 bg-accent-fig/5 p-3 text-xs text-accent-fig">Generation failed. No credits are charged by this job endpoint on failure.</p>;
+  }
+  if (!job.output_url) {
+    return <p className="mt-3 rounded-sm border border-border-subtle bg-bg-secondary p-3 text-xs text-text-muted">{job.kind === 'video' || job.kind === 'music' ? 'The provider is rendering this output. It may take a few minutes.' : 'The provider is preparing this output.'}</p>;
+  }
+  const title = `${job.kind[0].toUpperCase()}${job.kind.slice(1)} output`;
+  return (
+    <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-bg-secondary p-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="text-xs font-medium text-text-primary">{title}</p>
+        <a href={job.output_url} target="_blank" rel="noreferrer" className="text-[11px] text-accent-primary hover:underline">Open output</a>
+      </div>
+      {job.kind === 'image' ? (
+        // External provider URLs are only accepted after HTTPS validation on the server.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={job.output_url} alt="Generated artwork" className="max-h-[32rem] w-full rounded-sm object-contain" />
+      ) : job.kind === 'video' ? (
+        <video controls preload="metadata" className="w-full rounded-sm" src={job.output_url}>Your browser cannot play this video.</video>
+      ) : (
+        <audio controls preload="metadata" className="w-full" src={job.output_url}>Your browser cannot play this audio.</audio>
+      )}
+      <p className="mt-2 truncate text-[10px] text-text-muted" title={job.model}>Generated with {job.model}</p>
+    </div>
   );
 }
 
