@@ -2,7 +2,12 @@ import { callOpenRouter } from '@/lib/openrouter';
 import { GoogleAuth } from 'google-auth-library';
 
 export type HermesRuntime = 'openrouter' | 'hermes-gateway';
-export type HermesPlan = { content: string; model?: string; runtime: HermesRuntime };
+export type HermesActionProposal = {
+  actionType: 'file.write' | 'command.run' | 'package.install';
+  title: string;
+  payload: Record<string, unknown>;
+};
+export type HermesPlan = { content: string; model?: string; runtime: HermesRuntime; proposals: HermesActionProposal[] };
 type ProjectFile = { file_path: string; byte_size: number; content?: string };
 
 const MAX_CONTEXT_BYTES = 120_000;
@@ -43,13 +48,32 @@ function messages(input: { prompt: string; projectTitle: string; files: ProjectF
   return [
     {
       role: 'system' as const,
-      content: `You are TemuClaude's built-in workspace assistant, powered by OpenRouter. Analyze the supplied workspace and give an implementation-ready plan. You may inspect the supplied project context, reason about files, propose edits, package installs, network work, GitHub operations, and preview/production deployments. Never claim an action has run. Clearly label any proposed write, command, network, GitHub, or deployment action as requiring user approval. Be concise but concrete: files, changes, verification, and risks.`,
+      content: `You are TemuClaude's built-in workspace assistant. Analyze the supplied workspace and propose only safe, implementation-ready work. Return JSON only, with this exact shape: {"summary":"plain-language plan","actions":[{"actionType":"file.write"|"command.run"|"package.install","title":"short label","payload":{...}}]}. For file.write, payload is {"files":[{"filePath":"relative/path","content":"full file content","language":"optional"}]}. For command.run, payload is {"command":"npm test"} or another single safe npm script/node/python command. For package.install, payload is {"packages":["package-name"]}. Include no more than five actions. Never claim an action has run: every action is shown to the user and needs explicit approval. If a task requires browser, network, GitHub, or deployment work, explain that in summary but do not fabricate an action.`,
     },
     {
       role: 'user' as const,
       content: `Project: ${input.projectTitle}\n\nWorkspace context:\n${projectContext(input.files) || 'No files yet.'}\n\nTask:\n${input.prompt}`,
     },
   ];
+}
+
+function normalizeProposals(value: unknown): HermesActionProposal[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 5).flatMap((item): HermesActionProposal[] => {
+    if (!item || typeof item !== 'object') return [];
+    const record = item as Record<string, unknown>;
+    if ((record.actionType !== 'file.write' && record.actionType !== 'command.run' && record.actionType !== 'package.install') || typeof record.title !== 'string' || !record.title.trim() || !record.payload || typeof record.payload !== 'object' || Array.isArray(record.payload)) return [];
+    return [{ actionType: record.actionType, title: record.title.slice(0, 140), payload: record.payload as Record<string, unknown> }];
+  });
+}
+
+function parsePlan(content: string, runtime: HermesRuntime, model?: string): HermesPlan {
+  const trimmed = content.trim().replace(/^```json\s*/i, '').replace(/\s*```$/, '');
+  try {
+    const parsed = JSON.parse(trimmed) as Record<string, unknown>;
+    if (typeof parsed.summary === 'string' && parsed.summary.trim()) return { content: parsed.summary.trim(), proposals: normalizeProposals(parsed.actions), model, runtime };
+  } catch { /* A provider may return a plain-language plan; retain it safely. */ }
+  return { content: content.trim(), proposals: [], model, runtime };
 }
 
 async function requestGatewayPlan(
@@ -83,7 +107,7 @@ async function requestGatewayPlan(
     !content.trim() ||
     /^API call failed(?:\s|:)/i.test(content.trim())
   ) throw new Error('Hermes gateway could not produce a plan.');
-  return { content: content.trim(), model: typeof payload.model === 'string' ? payload.model : undefined, runtime: 'hermes-gateway' };
+  return parsePlan(content, 'hermes-gateway', typeof payload.model === 'string' ? payload.model : undefined);
 }
 
 /**
@@ -104,5 +128,5 @@ export async function requestHermesPlan(input: { prompt: string; projectTitle: s
     { maxTokens: 2_400, temperature: 0.25, timeoutMs: 60_000, sessionId: `hermes-plan-${Date.now()}` },
   );
   if (!result.success || !result.content.trim()) throw new Error(result.error || 'OpenRouter workspace analysis could not complete.');
-  return { content: result.content.trim(), model: result.model, runtime: 'openrouter' };
+  return parsePlan(result.content, 'openrouter', result.model);
 }
