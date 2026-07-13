@@ -101,8 +101,10 @@ export default function PlaygroundPage() {
   const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
+  const [workspaceExportMessage, setWorkspaceExportMessage] = useState<string | null>(null);
   const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
   const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
+  const [projectPreviewMessage, setProjectPreviewMessage] = useState<string | null>(null);
   const [workspaceAnalysis, setWorkspaceAnalysis] = useState<string | null>(null);
   const [workspaceAnalysisState, setWorkspaceAnalysisState] = useState<'idle' | 'analyzing' | 'error'>('idle');
   const [workspaceApprovals, setWorkspaceApprovals] = useState<WorkspaceApproval[]>([]);
@@ -571,7 +573,10 @@ export default function PlaygroundPage() {
       const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/export`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!response.ok) throw new Error('Project export failed.');
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Project export failed.');
+      }
       const blob = await response.blob();
       const href = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -579,8 +584,13 @@ export default function PlaygroundPage() {
       anchor.download = 'temuclaude-project.zip';
       anchor.click();
       URL.revokeObjectURL(href);
+      setWorkspaceExportMessage(null);
       setWorkspaceExportState('idle');
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Project export failed.';
+      setWorkspaceExportMessage(/no files to export/i.test(message)
+        ? 'This project is empty. Ask TemuClaude to create a website or game, then click “Save to project” on its HTML deliverable before exporting.'
+        : message);
       setWorkspaceExportState('error');
     }
   }, [activeWorkspaceProjectId]);
@@ -599,9 +609,14 @@ export default function PlaygroundPage() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data?.preview?.previewUrl) throw new Error(data?.error || 'Project preview failed.');
       setProjectPreview(data.preview as ProjectPreview);
+      setProjectPreviewMessage(null);
       setProjectPreviewState('idle');
-    } catch {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Project preview failed.';
       setProjectPreview(null);
+      setProjectPreviewMessage(/index\.html|server\.mjs/i.test(message)
+        ? 'This project has no runnable file yet. Ask TemuClaude to create a website or game, then click “Save to project” on its HTML deliverable before running it.'
+        : message);
       setProjectPreviewState('error');
     }
   }, [activeWorkspaceProjectId]);
@@ -741,8 +756,8 @@ export default function PlaygroundPage() {
           <div className="mt-2 space-y-1">
             {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
             {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{workspaceError || 'Project storage is unavailable. Chats and downloads still work.'}</p>}
-            {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project could not be exported.</p>}
-            {projectPreviewState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project needs index.html or server.mjs and could not be previewed.</p>}
+            {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{workspaceExportMessage || 'This project could not be exported.'}</p>}
+            {projectPreviewState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{projectPreviewMessage || 'This project could not be previewed.'}</p>}
             {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
             {workspaceProjects.slice(0, 6).map((project) => (
               <button
