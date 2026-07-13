@@ -80,11 +80,19 @@ function escapeHtml(value: string) {
 }
 
 function emailText(value: string) {
-  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function logField(value: unknown) {
-  return String(value ?? '').replace(/[\r\n]/g, ' ').slice(0, 500);
+  let text = '';
+  let inTag = false;
+  let previousWasSpace = false;
+  for (const character of value) {
+    if (character === '<') { inTag = true; continue; }
+    if (character === '>') { inTag = false; continue; }
+    if (inTag) continue;
+    const isSpace = character === ' ' || character === '\n' || character === '\r' || character === '\t';
+    if (isSpace && previousWasSpace) continue;
+    text += isSpace ? ' ' : character;
+    previousWasSpace = isSpace;
+  }
+  return text.trim();
 }
 
 function getResendApiKey() {
@@ -193,7 +201,7 @@ export async function sendEmail({
   try {
     if (isSmtpProvider()) {
       const result = await sendEmailViaSmtp({ to: recipients, from: sender, subject, html, replyTo });
-      console.log(`[EMAIL] Sent via SMTP (${logField(type)}): ${logField(subject)} -> ${recipients.map(logField).join(', ')}`);
+      console.info('[EMAIL] SMTP delivery accepted');
       return result;
     }
 
@@ -233,11 +241,11 @@ export async function sendEmail({
     const data = await response.json().catch(() => ({})) as { id?: string; message?: string; name?: string };
 
     if (!response.ok) {
-      console.error('[EMAIL] Resend request failed:', response.status, logField(data.name || data.message || 'Unknown error'));
+      console.error('[EMAIL] Resend request failed:', response.status);
       return { success: false, error: data.message || data.name || `Resend request failed (${response.status})` };
     }
 
-    console.log(`[EMAIL] Sent (${logField(type)}): ${logField(subject)} → ${recipients.map(logField).join(', ')} [${logField(data.id)}]`);
+    console.info('[EMAIL] Resend delivery accepted');
     return { success: true, id: data.id };
   } catch (error) {
     console.error('[EMAIL] Error:', error);
