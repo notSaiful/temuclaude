@@ -5,8 +5,8 @@ kind: Service
 metadata:
   name: temuclaude-hermes
   labels:
-    app.kubernetes.io/name: temuclaude-hermes
-    app.kubernetes.io/component: private-agent-runtime
+    app: temuclaude-hermes
+    component: private-agent-runtime
 spec:
   template:
     metadata:
