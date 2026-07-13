@@ -41,8 +41,6 @@ spec:
                   key: latest
             - name: OPENAI_BASE_URL
               value: https://temuclaude.com/v1
-            - name: HERMES_MODEL
-              value: temuclaude/temuclaude-pro
           resources:
             limits:
               cpu: "1"
