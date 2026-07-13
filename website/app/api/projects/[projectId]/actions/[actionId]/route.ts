@@ -1,0 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getOrCreateUserByEmailAsync } from '@/lib/db';
+import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
+import { decideWorkspaceAction } from '@/lib/workspace';
+export const runtime = 'nodejs'; export const dynamic = 'force-dynamic';
+type Context = { params: Promise<{ projectId: string; actionId: string }> };
+export async function PATCH(req: NextRequest, context: Context) { try { const auth = await getAuthenticatedSupabaseUser(req); if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status }); const email = auth.user.email?.trim().toLowerCase(); if (!email) return NextResponse.json({ error: 'Authenticated user has no email address' }, { status: 400 }); const body = await req.json().catch(() => null) as { approve?: unknown; reason?: unknown } | null; if (typeof body?.approve !== 'boolean' || (body.reason !== undefined && typeof body.reason !== 'string')) return NextResponse.json({ error: 'approve must be a boolean.' }, { status: 400 }); const { projectId, actionId } = await context.params; const appUser = await getOrCreateUserByEmailAsync(email, String(auth.user.user_metadata?.full_name || email.split('@')[0])); const action = await decideWorkspaceAction({ userId: appUser.id, projectId, actionId, approve: body.approve, reason: body.reason }); return NextResponse.json({ action }); } catch (error) { return NextResponse.json({ error: error instanceof Error ? error.message : 'Could not decide approval.' }, { status: 409 }); } }
