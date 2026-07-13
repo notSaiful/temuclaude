@@ -1,0 +1,26 @@
+# Deliberately kept separate from the root deployment config: this is an
+# opt-in blueprint for the persistent Hermes dashboard, not the Next.js site.
+services:
+  - type: web
+    name: temuclaude-hermes
+    runtime: docker
+    dockerfilePath: ./services/hermes/Dockerfile
+    dockerContext: .
+    plan: starter
+    region: singapore
+    healthCheckPath: /
+    disk:
+      name: hermes-state
+      mountPath: /opt/data
+      sizeGB: 1
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: HERMES_DASHBOARD_BASIC_AUTH_USERNAME
+        sync: false
+      - key: HERMES_DASHBOARD_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: HERMES_DASHBOARD_BASIC_AUTH_SECRET
+        generateValue: true
+      - key: HERMES_DASHBOARD_PUBLIC_URL
+        sync: false
