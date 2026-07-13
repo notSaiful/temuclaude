@@ -99,6 +99,7 @@ export default function PlaygroundPage() {
   const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
   const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
   const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
   const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
   const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
@@ -198,10 +199,13 @@ export default function PlaygroundPage() {
       const projects = data.projects as WorkspaceProject[];
       setWorkspaceProjects(projects);
       setActiveWorkspaceProjectId((current) => current && projects.some((project) => project.id === current) ? current : projects[0]?.id || null);
+      setWorkspaceError(null);
       setWorkspaceState('idle');
-    } catch {
-      // The user can still chat and download files when project storage is
-      // temporarily unavailable. Never render an operational error as no data.
+    } catch (error) {
+      // Preserve the server's safe, actionable error instead of making a
+      // signed-in user guess whether storage, authentication, or a migration
+      // is at fault.
+      setWorkspaceError(error instanceof Error ? error.message : 'Project storage is unavailable.');
       setWorkspaceState('error');
     }
   }, [session?.id]);
@@ -536,6 +540,7 @@ export default function PlaygroundPage() {
     const project = data.project as WorkspaceProject;
     setWorkspaceProjects((previous) => [project, ...previous]);
     setActiveWorkspaceProjectId(project.id);
+    setWorkspaceError(null);
     setWorkspaceState('idle');
     return project;
   }, [modelProfile, session?.id, workspaceProjects.length]);
@@ -723,7 +728,10 @@ export default function PlaygroundPage() {
                 </button>
               )}
               <button
-                onClick={() => void createWorkspaceProject().catch(() => setWorkspaceState('error'))}
+                onClick={() => void createWorkspaceProject().catch((error) => {
+                  setWorkspaceError(error instanceof Error ? error.message : 'Could not create a project.');
+                  setWorkspaceState('error');
+                })}
                 className="rounded-sm px-1 text-sm text-text-muted hover:text-accent-primary"
                 title="Create project"
                 aria-label="Create project"
@@ -732,7 +740,7 @@ export default function PlaygroundPage() {
           </div>
           <div className="mt-2 space-y-1">
             {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
-            {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">Project storage is unavailable. Chats and downloads still work.</p>}
+            {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{workspaceError || 'Project storage is unavailable. Chats and downloads still work.'}</p>}
             {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project could not be exported.</p>}
             {projectPreviewState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">This project needs index.html or server.mjs and could not be previewed.</p>}
             {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
@@ -1126,6 +1134,7 @@ function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveT
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
   const html = extractHtmlArtifact(content);
   if (!html) return null;
 
@@ -1170,8 +1179,10 @@ function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveT
     setSaveState('saving');
     try {
       await onSaveToWorkspace(html);
+      setSaveError(null);
       setSaveState('saved');
-    } catch {
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'This file could not be saved to the selected project.');
       setSaveState('error');
     }
   };
@@ -1196,7 +1207,7 @@ function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveT
         <p className="mt-2 text-xs text-accent-fig">The isolated preview could not start. The downloadable HTML is still available.</p>
       )}
       {saveState === 'error' && (
-        <p className="mt-2 text-xs text-accent-fig">This file could not be saved to the selected project. Your download is still available.</p>
+        <p className="mt-2 text-xs text-accent-fig">{saveError || 'This file could not be saved to the selected project.'} Your download is still available.</p>
       )}
       {previewOpen && (
         <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-white">
