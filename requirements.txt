@@ -1,5 +1,5 @@
-litellm>=1.40.0
-litellm[proxy]>=1.40.0
+litellm>=1.83.7
+litellm[proxy]>=1.83.7
 openai>=1.0.0
 pyyaml>=6.0
 aiohttp>=3.9
