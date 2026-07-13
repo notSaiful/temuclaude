@@ -63,6 +63,11 @@ type ProjectPreview = {
   entrypoint: 'static' | 'server';
 };
 
+type WorkspaceApproval = {
+  title: string;
+  action: { id: string; action_type: string; status: string };
+};
+
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -77,12 +82,17 @@ export default function PlaygroundPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
   const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
   const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
   const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
+  const [workspaceAnalysis, setWorkspaceAnalysis] = useState<string | null>(null);
+  const [workspaceAnalysisState, setWorkspaceAnalysisState] = useState<'idle' | 'analyzing' | 'error'>('idle');
+  const [workspaceApprovals, setWorkspaceApprovals] = useState<WorkspaceApproval[]>([]);
+  const [workspaceActionState, setWorkspaceActionState] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -281,6 +291,9 @@ export default function PlaygroundPage() {
     });
     setInput('');
     setStatus('submitted');
+    // Workspace awareness is part of the normal Playground request flow. It
+    // runs alongside chat only when the user selected a project to inspect.
+    if (activeWorkspaceProjectId) void analyzeWorkspace(userMessage.content);
     const queuedProgress: ProgressStep = { label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' };
     setProgressSteps([queuedProgress]);
     addActivity(streamingIdxRef.current, queuedProgress);
@@ -403,7 +416,7 @@ export default function PlaygroundPage() {
         streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
@@ -497,6 +510,40 @@ export default function PlaygroundPage() {
       setProjectPreview(null);
       setProjectPreviewState('error');
     }
+  }, [activeWorkspaceProjectId]);
+
+  async function analyzeWorkspace(prompt: string) {
+    if (!prompt.trim() || !activeWorkspaceProjectId) return;
+    setWorkspaceAnalysisState('analyzing');
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to analyse the workspace.');
+      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/agent`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data?.plan?.content !== 'string') throw new Error(data?.error || 'Workspace analysis is unavailable.');
+      setWorkspaceAnalysis(data.plan.content); setWorkspaceApprovals(Array.isArray(data.actions) ? data.actions : []); setWorkspaceAnalysisState('idle');
+    } catch { setWorkspaceAnalysis('Workspace analysis could not complete. Your chat response is still available; try again after checking the OpenRouter service configuration.'); setWorkspaceAnalysisState('error'); }
+  }
+
+  const approveAndExecuteWorkspaceAction = useCallback(async (approval: WorkspaceApproval) => {
+    if (!activeWorkspaceProjectId) return;
+    setWorkspaceActionState(approval.action.id);
+    try {
+      const token = await getAccessToken();
+      if (!token) throw new Error('Sign in to approve this action.');
+      const base = `/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/actions/${encodeURIComponent(approval.action.id)}`;
+      const approvalResponse = await fetch(base, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ approve: true }) });
+      if (!approvalResponse.ok) throw new Error('Approval failed.');
+      const executionResponse = await fetch(`${base}/execute`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      const data = await executionResponse.json().catch(() => ({}));
+      if (!executionResponse.ok) throw new Error(data?.error || 'Execution failed.');
+      setWorkspaceApprovals((previous) => previous.filter((item) => item.action.id !== approval.action.id));
+      setWorkspaceAnalysis((previous) => `${previous || 'Workspace analysis'}\n\n✓ Completed: ${approval.title}`);
+    } catch {
+      setWorkspaceAnalysis((previous) => `${previous || 'Workspace analysis'}\n\n⚠ Could not complete: ${approval.title}`);
+    } finally { setWorkspaceActionState(null); }
   }, [activeWorkspaceProjectId]);
 
   const handleSelectConversation = (conversation: Conversation) => {
@@ -757,6 +804,7 @@ export default function PlaygroundPage() {
                 <p className="mb-2 text-xs text-text-muted" aria-live="polite">TemuClaude is working…</p>
               )}
               <div className="rounded-md border border-border-default bg-bg-primary shadow-[0_1px_6px_rgba(26,24,22,0.04)] focus-within:border-accent-primary">
+                {workspaceAnalysis && <div className="m-3 rounded-sm border border-accent-primary/30 bg-accent-primary/5 p-3 text-xs text-text-secondary"><strong className="text-text-primary">Hermes workspace plan</strong><pre className="mt-2 whitespace-pre-wrap font-sans">{workspaceAnalysis}</pre>{workspaceApprovals.length > 0 && <div className="mt-3 space-y-2"><p className="text-[11px] font-medium text-text-primary">Ready for your approval</p>{workspaceApprovals.map((approval) => <div key={approval.action.id} className="flex items-center justify-between gap-3 rounded-sm border border-border-subtle bg-bg-primary p-2"><span className="text-[11px] text-text-secondary">{approval.title}</span><button type="button" onClick={() => void approveAndExecuteWorkspaceAction(approval)} disabled={workspaceActionState !== null} className="btn-secondary !px-2 !py-1 text-[10px] disabled:opacity-50">{workspaceActionState === approval.action.id ? 'Running…' : 'Approve & run'}</button></div>)}</div>}<p className="mt-2 text-[11px] text-text-muted">Approved changes and commands run in an isolated workspace. Network, GitHub, browser, and production deployment access stay separately approval-gated.</p></div>}
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -775,18 +823,33 @@ export default function PlaygroundPage() {
                 <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-3 py-2">
                   <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
                   <div className="flex items-center gap-2">
-                    <label className="sr-only" htmlFor="model-profile">Model profile</label>
-                    <select
-                      id="model-profile"
-                      value={modelProfile}
-                      onChange={(event) => setModelProfile(event.target.value as ModelProfile)}
-                      disabled={status === 'submitted' || status === 'streaming'}
-                      className="max-w-[11.5rem] appearance-none bg-transparent py-1 pr-5 text-xs font-medium text-text-secondary outline-none disabled:opacity-50"
-                      title={modelProfile === 'pro' ? 'TemuClaude Pro: full orchestration' : 'TemuClaude Lite: cost-bounded routing'}
-                    >
-                      <option value="pro">TemuClaude Pro</option>
-                      <option value="lite">TemuClaude Lite</option>
-                    </select>
+                    {activeWorkspaceProjectId && workspaceAnalysisState === 'analyzing' && <span className="text-[10px] text-text-muted">Analysing workspace…</span>}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowModelPicker((open) => !open)}
+                        disabled={status === 'submitted' || status === 'streaming'}
+                        aria-haspopup="listbox"
+                        aria-expanded={showModelPicker}
+                        className="flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-tertiary hover:text-text-primary disabled:opacity-50"
+                        title="Choose TemuClaude model profile"
+                      >
+                        <span>{modelProfile === 'pro' ? 'TemuClaude Pro' : 'TemuClaude Lite'}</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+                      </button>
+                      {showModelPicker && (
+                        <div role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
+                          <button role="option" aria-selected={modelProfile === 'pro'} onClick={() => { setModelProfile('pro'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'pro' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
+                            <span className="block text-xs font-semibold text-text-primary">TemuClaude Pro</span>
+                            <span className="mt-0.5 block text-[11px] text-text-muted">Full routed orchestration for demanding tasks</span>
+                          </button>
+                          <button role="option" aria-selected={modelProfile === 'lite'} onClick={() => { setModelProfile('lite'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'lite' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
+                            <span className="block text-xs font-semibold text-text-primary">TemuClaude Lite</span>
+                            <span className="mt-0.5 block text-[11px] text-text-muted">Cost-bounded routing for everyday work</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     {status === 'submitted' || status === 'streaming' ? (
                       <button
                         onClick={handleStop}
