@@ -39,6 +39,9 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     const nextReturnTo = params.get('returnTo') || '/dashboard';
     setReturnTo(nextReturnTo);
+    if (params.get('mode') === 'signup') {
+      setMode('signup');
+    }
 
     let mounted = true;
 
