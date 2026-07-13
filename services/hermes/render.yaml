@@ -4,7 +4,7 @@ services:
   - type: web
     name: temuclaude-hermes
     runtime: docker
-    dockerfilePath: ./services/hermes/Dockerfile
+    dockerfilePath: ./services/hermes/Dockerfile.render
     dockerContext: .
     plan: starter
     region: singapore

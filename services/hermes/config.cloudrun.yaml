@@ -1,0 +1,14 @@
+# Harden the network-facing Hermes API surface. An explicit list prevents the
+# platform's default interactive toolsets from being inherited. `no_mcp` also
+# prevents any globally configured MCP server from being injected implicitly.
+platform_toolsets:
+  api_server:
+    - no_mcp
+
+# Stop an accidental or malformed tool loop deterministically if a future,
+# explicitly reviewed tool bridge is enabled.
+tool_loop_guardrails:
+  hard_stop_enabled: true
+  hard_stop_after:
+    exact_failure: 5
+    idempotent_no_progress: 5
