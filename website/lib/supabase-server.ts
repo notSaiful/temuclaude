@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient, type User as SupabaseUser } from '@supabase/supabase-js';
 import type { NextRequest } from 'next/server';
+import { verifyAppAuthToken } from '@/lib/app-auth';
 
 type AuthenticatedUserResult =
   | { user: SupabaseUser; token: string; error?: never; status?: never }
@@ -54,6 +55,27 @@ export async function getAuthenticatedSupabaseUser(req: NextRequest): Promise<Au
 
   if (!token) {
     return { error: 'Missing Supabase access token', status: 401 };
+  }
+
+  if (token.startsWith('app:')) {
+    const payload = verifyAppAuthToken(token);
+    if (!payload) {
+      return { error: 'Invalid app auth token', status: 401 };
+    }
+
+    return {
+      token,
+      user: {
+        id: payload.id,
+        aud: 'authenticated',
+        role: 'authenticated',
+        email: payload.email,
+        app_metadata: { provider: 'email', providers: ['email'] },
+        user_metadata: { name: payload.name, full_name: payload.name },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      } as SupabaseUser,
+    };
   }
 
   if (token.startsWith('local:')) {
