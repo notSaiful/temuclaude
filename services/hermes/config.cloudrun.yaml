@@ -1,0 +1,28 @@
+# Harden the network-facing Hermes API surface. An explicit list prevents the
+# platform's default interactive toolsets from being inherited. `no_mcp` also
+# prevents any globally configured MCP server from being injected implicitly.
+platform_toolsets:
+  api_server:
+    - no_mcp
+
+# Hermes resolves its provider from config.yaml, not just environment variables.
+# The API key is injected by Cloud Run from Secret Manager as OPENAI_API_KEY;
+# this file contains only its variable name and no credential value.
+model:
+  provider: custom:temuclaude
+  default: temuclaude/temuclaude-pro
+  api_mode: chat_completions
+providers:
+  temuclaude:
+    base_url: https://temuclaude.com/v1
+    key_env: OPENAI_API_KEY
+    default_model: temuclaude/temuclaude-pro
+    transport: chat_completions
+
+# Stop an accidental or malformed tool loop deterministically if a future,
+# explicitly reviewed tool bridge is enabled.
+tool_loop_guardrails:
+  hard_stop_enabled: true
+  hard_stop_after:
+    exact_failure: 5
+    idempotent_no_progress: 5
