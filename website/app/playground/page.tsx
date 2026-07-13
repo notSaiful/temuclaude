@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { getAccessToken, getStoredSession, type LocalSession } from '@/lib/auth';
+import { inferMediaKind } from '@/lib/media-intent';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -14,10 +15,10 @@ type Message = {
   completedAt?: number;
 };
 
-type MediaKind = 'text' | 'image' | 'video' | 'speech' | 'music';
+type MediaKind = 'image' | 'video' | 'speech' | 'music';
 type MediaJob = {
   id: string;
-  kind: Exclude<MediaKind, 'text'>;
+  kind: MediaKind;
   status: 'queued' | 'processing' | 'completed' | 'failed';
   model: string;
   output_url: string | null;
@@ -94,7 +95,6 @@ export default function PlaygroundPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
-  const [mediaKind, setMediaKind] = useState<MediaKind>('text');
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
   const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
@@ -305,8 +305,8 @@ export default function PlaygroundPage() {
     setStatus('ready');
   }, []);
 
-  const handleMediaSend = useCallback(async () => {
-    if (!session || mediaKind === 'text' || !input.trim() || status === 'submitted' || status === 'streaming') return;
+  const handleMediaSend = useCallback(async (mediaKind: MediaKind) => {
+    if (!session || !input.trim() || status === 'submitted' || status === 'streaming') return;
     const token = await getAccessToken();
     if (!token) {
       window.location.href = '/login?returnTo=/playground';
@@ -325,7 +325,7 @@ export default function PlaygroundPage() {
       const response = await fetch('/api/media/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ kind: mediaKind, prompt: userMessage.content }),
+        body: JSON.stringify({ prompt: userMessage.content }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.job) throw new Error(data.error || 'Unable to create media job.');
@@ -343,7 +343,7 @@ export default function PlaygroundPage() {
         : message));
       setStatus('error');
     }
-  }, [input, mediaKind, messages.length, pollMediaJob, session, status]);
+  }, [input, messages.length, pollMediaJob, session, status]);
 
   const handleSend = useCallback(async () => {
     if (!session) {
@@ -351,8 +351,9 @@ export default function PlaygroundPage() {
       return;
     }
     if (!input.trim() || status === 'submitted' || status === 'streaming') return;
-    if (mediaKind !== 'text') {
-      await handleMediaSend();
+    const mediaKind = inferMediaKind(input);
+    if (mediaKind) {
+      await handleMediaSend(mediaKind);
       return;
     }
 
@@ -504,7 +505,7 @@ export default function PlaygroundPage() {
         streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace, mediaKind, handleMediaSend]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace, handleMediaSend]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
@@ -913,21 +914,6 @@ export default function PlaygroundPage() {
                   <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
                   <div className="flex items-center gap-2">
                     {activeWorkspaceProjectId && workspaceAnalysisState === 'analyzing' && <span className="text-[10px] text-text-muted">Analysing workspace…</span>}
-                    <div className="relative">
-                      <select
-                        value={mediaKind}
-                        onChange={(event) => setMediaKind(event.target.value as MediaKind)}
-                        disabled={status === 'submitted' || status === 'streaming'}
-                        aria-label="Choose output type"
-                        className="appearance-none rounded-sm bg-transparent px-2 py-1 text-xs font-medium text-text-secondary outline-none hover:bg-bg-tertiary disabled:opacity-50"
-                      >
-                        <option value="text">Text</option>
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                        <option value="speech">Speech</option>
-                        <option value="music">Music</option>
-                      </select>
-                    </div>
                     <div className="relative">
                       <button
                         type="button"
