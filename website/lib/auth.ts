@@ -282,12 +282,10 @@ export async function signUpWithEmail(params: { email: string; password: string;
     throw new Error('Password must be at least 6 characters.');
   }
 
-  const res = await fetch('/api/auth/otp', {
+  const res = await fetch('/api/auth/signup/start', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'start',
-      purpose: 'signup',
       email,
       name: params.name?.trim() || undefined,
     }),
@@ -354,12 +352,10 @@ export async function syncAuthenticatedUser() {
 
 export async function sendOtp(email: string, returnTo?: string) {
   const normalizedEmail = email.trim().toLowerCase();
-  const res = await fetch('/api/auth/otp', {
+  const res = await fetch('/api/auth/signin/start', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'start',
-      purpose: 'signin',
       email: normalizedEmail,
     }),
   });
@@ -377,12 +373,10 @@ export async function verifyOtp(
   const normalizedEmail = email.trim().toLowerCase();
   const challenge = getOtpChallenge(normalizedEmail, type);
   if (challenge) {
-    const res = await fetch('/api/auth/otp', {
+    const res = await fetch(type === 'signup' ? '/api/auth/signup/verify' : '/api/auth/signin/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'verify',
-        purpose: type === 'signup' ? 'signup' : 'signin',
         email: normalizedEmail,
         code: token,
         challenge,

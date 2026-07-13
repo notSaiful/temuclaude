@@ -10,8 +10,10 @@ def test_public_auth_entry_routes_exist():
         "website/app/signup/page.tsx",
         "website/app/register/page.tsx",
         "website/app/auth/callback/page.tsx",
-        "website/app/api/auth/otp/route.ts",
-        "website/app/api/auth/register/route.ts",
+        "website/app/api/auth/signup/start/route.ts",
+        "website/app/api/auth/signup/verify/route.ts",
+        "website/app/api/auth/signin/start/route.ts",
+        "website/app/api/auth/signin/verify/route.ts",
         "website/app/api/auth/sync/route.ts",
     ):
         assert (ROOT / route).is_file(), route

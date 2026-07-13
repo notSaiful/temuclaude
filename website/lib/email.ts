@@ -79,6 +79,14 @@ function escapeHtml(value: string) {
   });
 }
 
+function emailText(value: string) {
+  return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function logField(value: unknown) {
+  return String(value ?? '').replace(/[\r\n]/g, ' ').slice(0, 500);
+}
+
 function getResendApiKey() {
   return process.env.RESEND_API_KEY || '';
 }
@@ -151,7 +159,9 @@ async function sendEmailViaSmtp(params: {
     from: params.from,
     to: params.to.join(', '),
     subject: params.subject,
-    html: params.html,
+    // SMTP is the compatibility fallback. Plain text prevents a caller from
+    // turning user-provided content into executable email markup.
+    text: emailText(params.html),
     replyTo: params.replyTo,
   });
 
@@ -183,7 +193,7 @@ export async function sendEmail({
   try {
     if (isSmtpProvider()) {
       const result = await sendEmailViaSmtp({ to: recipients, from: sender, subject, html, replyTo });
-      console.log(`[EMAIL] Sent via SMTP (${type}): ${subject} -> ${recipients.join(', ')}`);
+      console.log(`[EMAIL] Sent via SMTP (${logField(type)}): ${logField(subject)} -> ${recipients.map(logField).join(', ')}`);
       return result;
     }
 
@@ -223,11 +233,11 @@ export async function sendEmail({
     const data = await response.json().catch(() => ({})) as { id?: string; message?: string; name?: string };
 
     if (!response.ok) {
-      console.error('[EMAIL] Resend request failed:', response.status, data.name || data.message || 'Unknown error');
+      console.error('[EMAIL] Resend request failed:', response.status, logField(data.name || data.message || 'Unknown error'));
       return { success: false, error: data.message || data.name || `Resend request failed (${response.status})` };
     }
 
-    console.log(`[EMAIL] Sent (${type}): ${subject} → ${recipients.join(', ')} [${data.id}]`);
+    console.log(`[EMAIL] Sent (${logField(type)}): ${logField(subject)} → ${recipients.map(logField).join(', ')} [${logField(data.id)}]`);
     return { success: true, id: data.id };
   } catch (error) {
     console.error('[EMAIL] Error:', error);
