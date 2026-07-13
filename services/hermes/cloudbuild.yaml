@@ -8,7 +8,7 @@ steps:
       - --file
       - services/hermes/Dockerfile
       - --tag
-      - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v3
+      - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v4
       - .
 images:
-  - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v3
+  - asia-south1-docker.pkg.dev/temuclaude-502009/temuclaude/hermes:cloudrun-v4

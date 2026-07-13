@@ -77,7 +77,12 @@ async function requestGatewayPlan(
   });
   const payload = await response.json().catch(() => ({}));
   const content = payload?.choices?.[0]?.message?.content;
-  if (!response.ok || typeof content !== 'string' || !content.trim()) throw new Error('Hermes gateway could not produce a plan.');
+  if (
+    !response.ok ||
+    typeof content !== 'string' ||
+    !content.trim() ||
+    /^API call failed(?:\s|:)/i.test(content.trim())
+  ) throw new Error('Hermes gateway could not produce a plan.');
   return { content: content.trim(), model: typeof payload.model === 'string' ? payload.model : undefined, runtime: 'hermes-gateway' };
 }
 

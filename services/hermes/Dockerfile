@@ -15,14 +15,19 @@ ENV PORT=8080 \
     API_SERVER_ENABLED=true \
     API_SERVER_HOST=0.0.0.0 \
     API_SERVER_MODEL_NAME=temuclaude-hermes \
+    HERMES_API_SERVER_FORCE_NON_STREAMING=true \
     HERMES_HOME=/opt/data \
-    HERMES_WRITE_SAFE_ROOT=/opt/data
+    HERMES_WRITE_SAFE_ROOT=/opt/data \
+    PYTHONPATH=/opt/data
 
 # The API server must not inherit Hermes' broad interactive CLI toolset.
 # Production capability is added later through individually reviewed tool
 # bridges that retain TemuClaude approval records. Until then, API callers
 # get model + run/approval APIs only: no shell, filesystem, browser, or MCP.
 COPY services/hermes/config.cloudrun.yaml /opt/data/config.yaml
+# Python imports sitecustomize automatically. This small, version-pinned
+# compatibility hook limits completed-response mode to this API server only.
+COPY services/hermes/sitecustomize.py /opt/data/sitecustomize.py
 
 EXPOSE 8080
 
