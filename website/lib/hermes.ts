@@ -7,6 +7,8 @@ type ProjectFile = { file_path: string; byte_size: number; content?: string };
 
 const MAX_CONTEXT_BYTES = 120_000;
 const MAX_FILE_BYTES = 24_000;
+const GATEWAY_TIMEOUT_MS = 120_000;
+const GATEWAY_MAX_TOKENS = 1_200;
 
 function configuredGateway() {
   const baseUrl = process.env.HERMES_GATEWAY_URL?.replace(/\/+$/, '');
@@ -61,13 +63,17 @@ async function requestGatewayPlan(
   const idTokenClient = await auth.getIdTokenClient(gateway.baseUrl);
   const idToken = await idTokenClient.idTokenProvider.fetchIdToken(gateway.baseUrl);
   const response = await fetch(`${gateway.baseUrl}/v1/chat/completions`, {
-    method: 'POST', cache: 'no-store', signal: AbortSignal.timeout(60_000),
+    method: 'POST', cache: 'no-store', signal: AbortSignal.timeout(GATEWAY_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${gateway.apiKey}`,
       'X-Serverless-Authorization': `Bearer ${idToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ model: process.env.HERMES_GATEWAY_MODEL || 'hermes', messages: messages(input) }),
+    body: JSON.stringify({
+      model: process.env.HERMES_GATEWAY_MODEL || 'hermes',
+      messages: messages(input),
+      max_tokens: GATEWAY_MAX_TOKENS,
+    }),
   });
   const payload = await response.json().catch(() => ({}));
   const content = payload?.choices?.[0]?.message?.content;
