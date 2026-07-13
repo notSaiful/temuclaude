@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import { getSupabaseAdminClient } from './supabase-server';
+import { MEDIA_KINDS, type MediaKind, inferMediaKind } from './media-intent';
 
-export const MEDIA_KINDS = ['image', 'video', 'speech', 'music'] as const;
-export type MediaKind = typeof MEDIA_KINDS[number];
+export { MEDIA_KINDS, inferMediaKind, type MediaKind } from './media-intent';
 export type MediaJobStatus = 'queued' | 'processing' | 'completed' | 'failed';
 
 export type MediaJob = {
@@ -48,6 +48,7 @@ const MEDIA_CREDIT_COSTS: Record<MediaKind, number> = {
   music: 75_000,
   video: 125_000,
 };
+
 
 export class MediaJobError extends Error {
   constructor(message: string, readonly status = 400, readonly code = 'media_request_invalid') {

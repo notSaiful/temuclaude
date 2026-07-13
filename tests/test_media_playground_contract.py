@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_media_jobs_are_persistent_owner_scoped_and_credit_settled():
-    migration = (ROOT / "supabase/migrations/202607130003_media_jobs.sql").read_text()
+    migration = (ROOT / "supabase/migrations/202607130004_media_jobs.sql").read_text()
 
     for required in (
         "temuclaude_media_jobs",
@@ -34,6 +34,10 @@ def test_media_route_requires_authentication_and_never_exposes_provider_key():
 
 def test_playground_has_explicit_output_selection_and_native_players():
     page = (ROOT / "website/app/playground/page.tsx").read_text()
+    media_intent = (ROOT / "website/lib/media-intent.ts").read_text()
 
-    for required in ('<option value="image">', '<option value="video">', '<option value="speech">', '<option value="music">', '<video controls', '<audio controls'):
+    for required in ('inferMediaKind(input)', '<video controls', '<audio controls'):
         assert required in page
+    assert 'aria-label="Choose output type"' not in page
+    for required in ('return \'video\'', 'return \'music\'', 'return \'speech\'', 'return \'image\''):
+        assert required in media_intent
