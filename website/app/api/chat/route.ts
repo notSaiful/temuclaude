@@ -7,7 +7,10 @@ import { getOrCreateUserByEmailAsync, getRollingWindowUsageAsync, incrementUsage
 import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// Hard Pro requests deliberately run several high-value model and verifier
+// stages. Give that quality-first pipeline room to finish instead of allowing
+// the platform to kill it at 60 seconds with no answer.
+export const maxDuration = 120;
 
 // TemuClaude Pro — the current eight-model, role-bounded registry.
 // Each model has a distinct job; premium escalation remains conditional.
@@ -324,11 +327,11 @@ async function runCodeGeneration(
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
-  const deadlineAt = Date.now() + 55_000;
+  const deadlineAt = t0 + 100_000;
   const remainingMs = () => Math.max(0, deadlineAt - Date.now());
   let result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
     maxTokens: 8_192,
-    timeoutMs: Math.min(38_000, remainingMs()),
+    timeoutMs: Math.min(65_000, remainingMs()),
     temperature: 0.35,
     disableReasoning: true,
     // OpenRouter can move between these parameter-compatible code models
@@ -340,7 +343,7 @@ async function runCodeGeneration(
     sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is repairing the deliverable');
     result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
       maxTokens: 6_144,
-      timeoutMs: Math.min(16_000, remainingMs()),
+      timeoutMs: Math.min(30_000, remainingMs()),
       temperature: 0.35,
       // Grok 4.5 requires reasoning to remain enabled. Omitting the
       // disable flag prevents the provider-side 400 that broke this route.
@@ -363,8 +366,16 @@ async function runCodeGeneration(
 
 // === FULL STACK (hard queries) ===
 async function runFullStack(query: string, messages: any[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]): Promise<CompletedResponse> {
-  // Fusion panel: GLM synthesis, DeepSeek reasoning, and MiniMax generation.
-  const fusionModels = [POOL.orchestrator, POOL.reasoning, POOL.specialist];
+  // Quality-first Pro panel: keep the planner and reasoning anchor, then add
+  // the strongest specialist for this task instead of using the cheapest
+  // fixed panel for every domain.
+  const taskSpecialist = taskType === 'creative'
+    ? POOL.specialist
+    : ['knowledge', 'legal', 'health'].includes(taskType)
+      ? POOL.multimodal
+      : POOL.verifier;
+  const fusionModels = [POOL.orchestrator, POOL.reasoning, taskSpecialist];
+  techniques.push('quality-first-pro-panel');
 
   // LAYER 0: WEB SEARCH (for knowledge/reasoning questions)
   let searchContext = '';
@@ -410,7 +421,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Cross-reviewing drafts', 'Models are checking each other for gaps');
   const crossReviewResults: ModelResult[] = [];
   for (let i = 0; i < Math.min(workingProposals.length, 1); i++) {
-    if (Date.now() - t0 > 28000) break;
+    if (Date.now() - t0 > 45_000) break;
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
@@ -440,7 +451,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Aggregation complete', aggResult.ok ? 'Primary synthesis ready' : 'Using strongest available draft', 'done');
 
   // LAYER 4: SELF-CONSISTENCY (for math/reasoning — adaptive N samples)
-  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 25000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 45_000) {
     techniques.push('self-consistency');
     sendProgress(controller, encoder, 'Checking consistency', 'Sampling alternate reasoning paths');
     const N = 2;
@@ -455,18 +466,18 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     }
     // PRM-weighted: score each sample with Nemotron, pick highest
     techniques.push('prm-weighted-voting');
+    const scores = await Promise.all(samples.map((sample) => scoreAnswer(query, sample)));
     let bestScore = -1;
     let bestAnswer = finalAnswer;
-    for (const sample of samples) {
-      const score = await scoreAnswer(query, sample);
-      if (score > bestScore) { bestScore = score; bestAnswer = sample; }
-    }
+    samples.forEach((sample, index) => {
+      if (scores[index] > bestScore) { bestScore = scores[index]; bestAnswer = sample; }
+    });
     finalAnswer = bestAnswer;
   }
 
   // LAYER 5: CODE VERIFICATION (for math/coding)
   let codeVerified = false;
-  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 60_000) {
     techniques.push('code-verification');
     sendProgress(controller, encoder, 'Verifying code or math', 'Running a lightweight verifier pass');
     codeVerified = await verifyCode(finalAnswer);
@@ -488,7 +499,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       }
       // Grok 4.5 is reserved for a bounded code-repair escalation, never a
       // first-pass model, so it improves failed code without inflating normal cost.
-      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 35000) {
+      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 70_000) {
         techniques.push('code-repair-escalation');
         const repair = await callModel(POOL.codeRepair, [
           { role: 'system', content: 'Repair the submitted solution. Return a complete, correct, self-contained answer with working code where relevant.' },
@@ -505,10 +516,10 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // LAYER 6: SELF-QA GATE — USVA 4-rubric verification
   techniques.push('usva-5-rubric-qa');
   sendProgress(controller, encoder, 'Quality scoring', 'Running final answer quality gate');
-  let qaScore = Date.now() - t0 < 42000 ? await runUSVA(query, finalAnswer) : 0.7;
+  let qaScore = Date.now() - t0 < 90_000 ? await runUSVA(query, finalAnswer) : 0.7;
 
   // If QA fails, retry with Reflexion
-  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 35000) {
+  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 70_000) {
     techniques.push('reflexion');
     const reflection = await callModel(POOL.verifier, [
       { role: 'system', content: 'You are a quality verifier. The answer scored low on quality. Explain what is wrong.' },
@@ -529,7 +540,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 12: s1 BUDGET FORCING (arXiv:2501.19393)
   // If the answer is suspiciously short for a hard question, force longer reasoning
-  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 80_000) {
     techniques.push('s1-budget-forcing');
     const forcedResult = await callModel(POOL.reasoning, [
       ...messages,
@@ -543,7 +554,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 13: STEP-LEVEL CODE VERIFICATION (rStar-Math pattern)
   // For math/coding: verify each reasoning step, not just the final answer
-  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 80_000) {
     techniques.push('step-level-verification');
     const stepVerified = await stepLevelVerify(query, finalAnswer);
     if (stepVerified) {
@@ -566,7 +577,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 14: Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
   // Extract logical claims and check for contradictions
-  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 35000) {
+  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 85_000) {
     techniques.push('z3-logical-verification');
     const logicalCheck = await logicalVerify(finalAnswer);
     if (logicalCheck === 'contradiction') {
@@ -600,7 +611,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 17: frontier escalation (GPT-5.6 Luna) only after QA failure.
   // For the hardest queries where QA score is still low after all retries
-  if (qaScore < 0.75 && needsFrontier(query, taskType) && Date.now() - t0 < 35000) {
+  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 85_000) {
     techniques.push('frontier-fallback');
     const frontierResult = await callModel(POOL.frontier, [
       { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
@@ -819,24 +830,23 @@ async function stepLevelVerify(query: string, answer: string): Promise<boolean> 
   const steps = answer.match(stepRegex) || [];
   if (steps.length === 0) return false;
 
-  // For each step, ask Nemotron to verify if the logic is correct
-  let allStepsCorrect = true;
-  for (let i = 0; i < Math.min(steps.length, 5); i++) {
-    const step = steps[i].substring(0, 300);
+  // Independent checks are parallel: verification quality stays intact while
+  // five steps consume one bounded latency window instead of five in series.
+  const verdicts = await Promise.all(steps.slice(0, 5).map(async (rawStep) => {
+    const step = rawStep.substring(0, 300);
     try {
       const result = await callOpenRouter(POOL.verifier, [
         { role: 'system', content: 'You are a step-level code verifier. For the given reasoning step, determine if it is logically correct. Reply with ONLY "CORRECT" or "INCORRECT".' },
         { role: 'user', content: `Question: ${query.substring(0, 200)}\n\nStep to verify:\n${step}\n\nIs this step logically correct? Reply ONLY "CORRECT" or "INCORRECT".` },
       ], { temperature: 0, maxTokens: 10, timeoutMs: 8000 });
-      if (!result.success) { allStepsCorrect = false; break; }
+      if (!result.success) return false;
       const verdict = result.content.toUpperCase();
-      if (!verdict.includes('CORRECT') || verdict.includes('INCORRECT')) {
-        allStepsCorrect = false;
-        break;
-      }
-    } catch { allStepsCorrect = false; break; }
-  }
-  return allStepsCorrect;
+      return verdict.includes('CORRECT') && !verdict.includes('INCORRECT');
+    } catch {
+      return false;
+    }
+  }));
+  return verdicts.every(Boolean);
 }
 
 // === Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern) ===

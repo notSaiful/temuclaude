@@ -482,6 +482,12 @@ export async function callOpenRouter(
   const temperature = options.temperature ?? 0.6;
   const maxTokens = options.maxTokens ?? 4096;
   const timeoutMs = options.timeoutMs ?? 60000;
+  // `timeoutMs` is the budget for the complete routed call, not for every
+  // fallback independently. Reusing the full timeout for each candidate made
+  // a three-model route take up to 3x its advertised limit and allowed Vercel
+  // to terminate the Playground before it could return a response.
+  const deadlineAt = Date.now() + Math.max(1, timeoutMs);
+  const remainingTimeoutMs = () => Math.max(0, deadlineAt - Date.now());
   const openRouterModels = uniqueModels([
     resolveOpenRouterModel(model),
     ...getOpenRouterFallbacks(resolveOpenRouterModel(model), options.fallbacks).map(resolveOpenRouterModel),
@@ -490,6 +496,8 @@ export async function callOpenRouter(
 
   let last: OpenRouterResult | null = null;
   for (let i = 0; i < openRouterModels.length; i++) {
+    const attemptTimeoutMs = remainingTimeoutMs();
+    if (attemptTimeoutMs < 250) break;
     const candidate = openRouterModels[i];
     attemptedModels.push(`openrouter:${candidate}`);
     const result = await postOpenRouter(
@@ -497,7 +505,7 @@ export async function callOpenRouter(
       messages,
       temperature,
       maxTokens,
-      timeoutMs,
+      attemptTimeoutMs,
       options.sessionId,
       openRouterModels.slice(i + 1),
       options.disableReasoning,
@@ -510,6 +518,8 @@ export async function callOpenRouter(
 
   if (options.allowExternalFallbacks && deepinfraFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, DEEPINFRA_MODEL_MAP)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`deepinfra:${candidate}`);
       const result = await postCompatibleProvider(
         'deepinfra',
@@ -519,7 +529,7 @@ export async function callOpenRouter(
         messages,
         temperature,
         maxTokens,
-        timeoutMs,
+        attemptTimeoutMs,
       );
       if (result.success) {
         return { ...result, attemptedModels };
@@ -530,6 +540,8 @@ export async function callOpenRouter(
 
   if (options.allowExternalFallbacks && groqFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, GROQ_MODEL_MAP)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`groq:${candidate}`);
       const result = await postCompatibleProvider(
         'groq',
@@ -539,7 +551,7 @@ export async function callOpenRouter(
         messages,
         temperature,
         maxTokens,
-        timeoutMs,
+        attemptTimeoutMs,
       );
       if (result.success) {
         return { ...result, attemptedModels };
@@ -550,8 +562,10 @@ export async function callOpenRouter(
 
   if (options.allowExternalFallbacks && aimlFallbackEnabled()) {
     for (const candidate of getAimlFallbacks(openRouterModels)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`aiml:${candidate}`);
-      const result = await postAiml(candidate, messages, temperature, maxTokens, timeoutMs);
+      const result = await postAiml(candidate, messages, temperature, maxTokens, attemptTimeoutMs);
       if (result.success) {
         return { ...result, attemptedModels };
       }
@@ -566,7 +580,7 @@ export async function callOpenRouter(
       tokens: 0,
       model: resolveOpenRouterModel(model),
       provider: 'openrouter' as const,
-      error: 'No providers were attempted',
+      error: attemptedModels.length > 0 ? 'Model routing deadline exhausted' : 'No providers were attempted',
     }),
     success: false,
     attemptedModels,
