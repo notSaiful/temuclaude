@@ -324,26 +324,32 @@ async function runCodeGeneration(
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
+  const deadlineAt = Date.now() + 55_000;
+  const remainingMs = () => Math.max(0, deadlineAt - Date.now());
   let result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
     maxTokens: 8_192,
-    timeoutMs: 45_000,
+    timeoutMs: Math.min(38_000, remainingMs()),
     temperature: 0.35,
     disableReasoning: true,
+    // OpenRouter can move between these parameter-compatible code models
+    // without making the user wait for a second full request timeout.
+    fallbacks: [POOL.fastRoute, POOL.orchestrator],
   });
-  if (!result.ok) {
+  if (!result.ok && remainingMs() >= 6_000) {
     techniques.push('code-repair-fallback');
-    sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is producing the fallback deliverable');
+    sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is repairing the deliverable');
     result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
-      maxTokens: 8_192,
-      timeoutMs: 45_000,
+      maxTokens: 6_144,
+      timeoutMs: Math.min(16_000, remainingMs()),
       temperature: 0.35,
-      disableReasoning: true,
+      // Grok 4.5 requires reasoning to remain enabled. Omitting the
+      // disable flag prevents the provider-side 400 that broke this route.
     });
   }
 
   const content = result.ok
     ? result.content
-    : 'The code-generation model was temporarily unavailable. Please retry; no partial or substituted model response was returned.';
+    : 'Code generation is temporarily unavailable after all approved routes were tried. Please retry shortly.';
   sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
   streamText(controller, encoder, content);
   sendOrch(controller, encoder, taskType, tier, [{
@@ -672,7 +678,7 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
 async function callModel(
   model: string,
   messages: any[],
-  options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean } = {},
+  options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean; fallbacks?: string[] } = {},
 ): Promise<ModelResult> {
   const start = Date.now();
   const messagesWithSystem = [ENGLISH_SYSTEM, ...messages]
@@ -682,6 +688,7 @@ async function callModel(
     timeoutMs: options.timeoutMs ?? 10_000,
     temperature: options.temperature ?? 0.45,
     disableReasoning: options.disableReasoning,
+    fallbacks: options.fallbacks,
     sessionId: `playground-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
   });
   return {
