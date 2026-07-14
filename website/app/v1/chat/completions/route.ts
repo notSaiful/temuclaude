@@ -43,7 +43,10 @@ let circuitTrippedUntil = 0;
 const modelActivityStore = new AsyncLocalStorage<string[]>();
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+// Raised from 120s to 300s on 2026-07-14: hard MoA queries can reach ~210s via
+// the 85s race -> empty GLM fallback -> finalRescue chain, which exceeded the
+// old 120s Vercel cap and 504'd. 300s is the Vercel plan ceiling.
+export const maxDuration = 300;
 
 // ── 8-MODEL POOL ──────────────────────────────────────────────
 const M_FLASH = 'deepseek/deepseek-v4-flash';
