@@ -50,6 +50,8 @@ type ModelResult = {
   promptTokens?: number;
   completionTokens?: number;
   cost?: number;
+  /** Underlying provider error/status when ok is false, for honest diagnostics. */
+  error?: string;
 };
 type OrchestrationData = {
   taskType: string; tier: string;
@@ -230,7 +232,7 @@ async function runLiteStack(
   ], {
     maxTokens: isCodeGeneration ? 3_072 : 2_000,
     timeoutMs: isCodeGeneration ? 30_000 : 12_000,
-    sessionId: `playground-lite-${query.slice(0, 80)}`,
+    sessionId: asciiSessionId('playground-lite', query),
   });
   // Keep Lite reliable without hiding a substituted model: the only rescue
   // route is the explicitly approved Qwen worker and it is used only after
@@ -244,7 +246,7 @@ async function runLiteStack(
     ], {
       maxTokens: isCodeGeneration ? 3_072 : 2_000,
       timeoutMs: isCodeGeneration ? 30_000 : 12_000,
-      sessionId: `playground-lite-rescue-${query.slice(0, 72)}`,
+      sessionId: asciiSessionId('playground-lite-rescue', query),
     });
   }
   let content = result.success
@@ -259,7 +261,7 @@ async function runLiteStack(
     const verdict = await callOpenRouterLite(LITE_POOL.verifier, [
       { role: 'system', content: 'Check the draft for factual, logical, or safety-critical errors. Reply with PASS, or FAIL followed by a concise correction request.' },
       { role: 'user', content: `Question:\n${query}\n\nDraft:\n${content}` },
-    ], { maxTokens: 350, timeoutMs: 12_000, sessionId: `playground-lite-verify-${query.slice(0, 72)}` });
+    ], { maxTokens: 350, timeoutMs: 12_000, sessionId: asciiSessionId('playground-lite-verify', query) });
     completionTokens += verdict.completionTokens;
     providerCost += verdict.cost || 0;
     if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
@@ -270,7 +272,7 @@ async function runLiteStack(
         ...messages,
         { role: 'assistant', content },
         { role: 'user', content: `Verifier feedback:\n${verdict.content}` },
-      ], { maxTokens: isCodeGeneration ? 3_072 : 2_000, timeoutMs: isCodeGeneration ? 30_000 : 12_000, sessionId: `playground-lite-correct-${query.slice(0, 72)}` });
+      ], { maxTokens: isCodeGeneration ? 3_072 : 2_000, timeoutMs: isCodeGeneration ? 30_000 : 12_000, sessionId: asciiSessionId('playground-lite-correct', query) });
       if (corrected.success) {
         content = corrected.content;
         completionTokens += corrected.completionTokens;
@@ -314,11 +316,13 @@ async function runCodeGeneration(
   t0: number,
   techniques: string[],
 ): Promise<CompletedResponse> {
-  // Code generation is a deliverable, not a debate topic. A single capable
-  // coding model with a real output budget produces materially better files
-  // than asking a fusion aggregator to discuss other model responses.
+  // Code generation is a deliverable, not a debate topic. MoA fusion merges
+  // three models' prose into incoherent code, so the intelligent + cost-
+  // effective design for a build is role-based, not debate-based:
+  //   planner (cheap fast model) -> coder (strong model) -> repairer (on fail).
+  // Each role has a distinct job, and the user sees the pipeline activate
+  // instead of a single opaque model call.
   techniques.push('direct-code-generation');
-  sendProgress(controller, encoder, 'Generating the requested code', 'DeepSeek V4 Pro is building a complete deliverable');
   const codeSystem = {
     role: 'system' as const,
     content: [
@@ -328,40 +332,82 @@ async function runCodeGeneration(
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
-  const deadlineAt = t0 + 100_000;
+  // A complete game or app can run to several thousand tokens. The previous
+  // 65s coder budget was shorter than a full generation, so the primary timed
+  // out mid-file, the shared deadline starved the fallbacks, and the user saw
+  // "temporarily unavailable". Give the build a real deadline and let the
+  // coder use most of it; the route maxDuration (300s) leaves headroom.
+  const deadlineAt = t0 + 200_000;
   const remainingMs = () => Math.max(0, deadlineAt - Date.now());
-  let result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
+  const orchestrationModels: { name: string; response: string; latency: number; correct: boolean }[] = [];
+  let totalCost = 0;
+
+  // ROLE 1 — PLANNER: for substantial builds, a cheap fast model sketches the
+  // structure first so the coder starts from a plan instead of a blank page.
+  // Trivial code asks (one-function snippets) skip planning to stay lean. A
+  // planner failure never blocks the coder — we just proceed without a plan.
+  const substantialBuild = /\b(game|web app|webapp|website|web page|webpage|application|app|landing page|dashboard|platform|tool|editor|clone|simulator)\b/i.test(query);
+  let plan = '';
+  if (substantialBuild && remainingMs() > 18_000) {
+    techniques.push('code-planning');
+    sendProgress(controller, encoder, 'Planning the build', 'A fast model is outlining the structure');
+    const planResult = await callModel(POOL.fastRoute, [
+      { role: 'system', content: 'You are a build planner. Given a build request, output a concise build plan: the file structure, the main components/modules, the tech approach, and any assets needed. Use at most 10 short bullet lines. Do not write the code itself.' },
+      ...messages,
+    ], { maxTokens: 700, timeoutMs: 14_000, temperature: 0.25, disableReasoning: true });
+    totalCost += planResult.cost || 0;
+    if (planResult.ok && planResult.content.trim()) {
+      plan = planResult.content.trim();
+      orchestrationModels.push({ name: planResult.name, response: plan.substring(0, 200), latency: planResult.latency, correct: planResult.ok });
+      sendProgress(controller, encoder, 'Plan ready', 'Generating the deliverable from the plan', 'done');
+    } else {
+      sendProgress(controller, encoder, 'Plan skipped', 'Generating the deliverable directly', 'done');
+    }
+  }
+
+  // ROLE 2 — CODER: the strong coding model produces the full runnable file,
+  // grounded in the plan when one was produced.
+  sendProgress(controller, encoder, 'Generating the requested code', 'DeepSeek V4 Pro is building a complete deliverable');
+  const coderMessages = plan
+    ? [{ role: 'system' as const, content: `${codeSystem.content}\n\nBuild plan to follow:\n${plan}` }, ...messages]
+    : [codeSystem, ...messages];
+  let result = await callModel(POOL.reasoning, coderMessages, {
     maxTokens: 8_192,
-    timeoutMs: Math.min(65_000, remainingMs()),
+    timeoutMs: Math.min(150_000, remainingMs()),
     temperature: 0.35,
     disableReasoning: true,
     // OpenRouter can move between these parameter-compatible code models
     // without making the user wait for a second full request timeout.
     fallbacks: [POOL.fastRoute, POOL.orchestrator],
   });
+  totalCost += result.cost || 0;
+  orchestrationModels.push({ name: result.name, response: result.content.substring(0, 200), latency: result.latency, correct: result.ok });
+
+  // ROLE 3 — REPAIRER: only if the coder failed. Grok 4.5 repairs the file.
   if (!result.ok && remainingMs() >= 6_000) {
     techniques.push('code-repair-fallback');
     sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is repairing the deliverable');
-    result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
+    const repair = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
       maxTokens: 6_144,
       timeoutMs: Math.min(30_000, remainingMs()),
       temperature: 0.35,
       // Grok 4.5 requires reasoning to remain enabled. Omitting the
       // disable flag prevents the provider-side 400 that broke this route.
     });
+    totalCost += repair.cost || 0;
+    orchestrationModels.push({ name: repair.name, response: repair.content.substring(0, 200), latency: repair.latency, correct: repair.ok });
+    result = repair;
   }
 
+  // Surface the real failure reason instead of a generic "unavailable" banner,
+  // so a timeout, a rate limit, or a parameter rejection is diagnosable.
+  const failureReason = (result.error || 'all approved code routes returned no usable output').slice(0, 180);
   const content = result.ok
     ? result.content
-    : 'Code generation is temporarily unavailable after all approved routes were tried. Please retry shortly.';
+    : `Code generation could not complete right now (${failureReason}). Please retry shortly.`;
   sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
   streamText(controller, encoder, content);
-  sendOrch(controller, encoder, taskType, tier, [{
-    name: result.name,
-    response: content.substring(0, 200),
-    latency: result.latency,
-    correct: result.ok,
-  }], result.name, result.ok ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
+  sendOrch(controller, encoder, taskType, tier, orchestrationModels, result.name, result.ok ? 1 : 0, 0, false, t0, formatProviderCost(totalCost), techniques);
   return { content, model: result.name };
 }
 
@@ -654,6 +700,16 @@ function formatProviderCost(cost?: number): string {
   return '$' + cost.toFixed(cost < 0.01 ? 5 : 3);
 }
 
+// x-session-id is an HTTP header (ByteString / Latin-1, chars 0-255 only).
+// Building it from raw user text crashes the request the moment the prompt
+// contains any non-Latin-1 character (em dash U+2014, emoji, non-English
+// script) with "Cannot convert argument to a ByteString". Base64url-encode
+// the user text so every id is ASCII-safe while still unique per prompt.
+// Mirrors the gateway route's pattern (Buffer.from(...).toString('base64url')).
+function asciiSessionId(prefix: string, text: string): string {
+  return `${prefix}-${Buffer.from(text || '').toString('base64url').slice(0, 64)}`;
+}
+
 async function recordPlaygroundUsage(userId: string, messages: ChatMessage[], response: CompletedResponse) {
   if (!response.content.trim()) return;
   const promptTokens = response.promptTokens ?? estimateTokens(messages.map((message) => message.content).join('\n'));
@@ -701,7 +757,7 @@ async function callModel(
     temperature: options.temperature ?? 0.45,
     disableReasoning: options.disableReasoning,
     fallbacks: options.fallbacks,
-    sessionId: `playground-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
+    sessionId: asciiSessionId('playground', messages[messages.length - 1]?.content || String(Date.now())),
   });
   return {
     name: result.model.split('/').pop() || result.model,
@@ -709,6 +765,7 @@ async function callModel(
     latency: (Date.now() - start) / 1000,
     ok: result.success,
     cost: result.cost,
+    error: result.success ? undefined : (result.error || (result.status ? `HTTP ${result.status}` : 'failed')),
   };
 }
 
@@ -784,6 +841,14 @@ function estimateDifficulty(query: string, taskType: string): number {
   if (['math', 'reasoning', 'coding'].includes(taskType)) d += 2;
   if (query.includes('explain') || query.includes('analyze')) d += 1;
   if (query.includes('compare') || query.includes('step by step')) d += 2;
+  // Building a deliverable is a substantial task regardless of how few words
+  // the prompt uses. "build a game" is short but still requires a full, runnable
+  // file, so it must never be labeled trivial. A named artifact (game / app /
+  // website / dashboard) is the hardest class of code-gen build.
+  if (isCodeGenerationRequest(query)) {
+    d += 3;
+    if (/\b(game|web app|webapp|website|web page|webpage|application|app|landing page|dashboard|platform|tool|editor|clone|simulator)\b/i.test(query)) d += 2;
+  }
   return Math.min(d, 10);
 }
 
