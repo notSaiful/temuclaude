@@ -447,9 +447,21 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   techniques.push('moa-3-layer');
   sendProgress(controller, encoder, 'Drafting proposals', 'Three models are working in parallel');
 
-  // Layer 1: 3 models propose independently (with search context)
+  // Layer 1: 3 models propose independently (with search context).
+  // Frontier reasoning models need real thinking time — at medium/high effort
+  // they routinely take 30-60s+ before the first answer token, and over 100s at
+  // max effort. Reasoning tokens count toward max_tokens, so a 2k cap starves
+  // the answer. The callModel defaults (10s, 2k tokens) were shorter than a hard
+  // math problem needs, so all three drafts timed out and the user saw "0/3
+  // models returned usable drafts". The three run in parallel, so wall-clock is
+  // bounded by the slowest single draft, not the sum. Reasoning stays ON (no
+  // disableReasoning) — that is the whole point for math/reasoning tasks.
   const proposeResults = await Promise.allSettled(
-    fusionModels.map(id => callModel(id, augmentedMessages))
+    fusionModels.map(id => callModel(id, augmentedMessages, {
+      maxTokens: 6_144,
+      timeoutMs: 45_000,
+      temperature: 0.6,
+    }))
   );
   const proposals: ModelResult[] = proposeResults.map((r, i) =>
     r.status === 'fulfilled' ? r.value : { name: fusionModels[i].split('/').pop()||'', content: '[failed]', latency: 0, ok: false }
@@ -458,8 +470,30 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Proposal pass complete', `${workingProposals.length}/${proposals.length} models returned usable drafts`, workingProposals.length > 0 ? 'done' : 'error');
 
   if (workingProposals.length === 0) {
-    streamText(controller, encoder, 'All models are currently unavailable. Please try again.');
-    sendOrch(controller, encoder, taskType, tier, proposals.map(p => ({ name: p.name, response: p.content.substring(0,200), latency: p.latency, correct: p.ok })), 'none', 0, 0, false, t0, '$0.000', techniques);
+    // All three drafts failed (usually all timed out, or an OpenRouter outage).
+    // Fall back to one strong reasoning model with a generous serial budget
+    // instead of leaving the user with a dead "unavailable" message. The rescue
+    // tries DeepSeek V4 Pro first, then GLM-5.2 and the flash route as fallbacks
+    // within the same deadline.
+    techniques.push('fullstack-single-rescue');
+    sendProgress(controller, encoder, 'Recovering response', 'One strong model is producing a direct answer');
+    const rescue = await callModel(POOL.reasoning, augmentedMessages, {
+      maxTokens: 8_192,
+      timeoutMs: 75_000,
+      temperature: 0.4,
+      fallbacks: [POOL.orchestrator, POOL.fastRoute],
+    });
+    if (rescue.ok && rescue.content.trim()) {
+      sendProgress(controller, encoder, 'Streaming answer', 'Recovered response is ready', 'done');
+      streamText(controller, encoder, rescue.content);
+      sendOrch(controller, encoder, taskType, tier,
+        [{ name: rescue.name, response: rescue.content.substring(0, 200), latency: rescue.latency, correct: true }],
+        rescue.name, 1, 0, false, t0, formatProviderCost(rescue.cost), techniques);
+      return { content: rescue.content, model: rescue.name };
+    }
+    const reason = (rescue.error || 'all models and the rescue route returned no usable output').slice(0, 180);
+    streamText(controller, encoder, `All models are currently unavailable (${reason}). Please try again.`);
+    sendOrch(controller, encoder, taskType, tier, proposals.map(p => ({ name: p.name, response: p.content.substring(0,200), latency: p.latency, correct: p.ok })), 'none', 0, 0, false, t0, formatProviderCost(rescue.cost), techniques);
     return { content: '', model: 'temuclaude-pro-fusion' };
   }
 
@@ -468,7 +502,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Cross-reviewing drafts', 'Models are checking each other for gaps');
   const crossReviewResults: ModelResult[] = [];
   for (let i = 0; i < Math.min(workingProposals.length, 1); i++) {
-    if (Date.now() - t0 > 45_000) break;
+    if (Date.now() - t0 > 90_000) break;
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
@@ -498,7 +532,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Aggregation complete', aggResult.ok ? 'Primary synthesis ready' : 'Using strongest available draft', 'done');
 
   // LAYER 4: SELF-CONSISTENCY (for math/reasoning — adaptive N samples)
-  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 45_000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 90_000) {
     techniques.push('self-consistency');
     sendProgress(controller, encoder, 'Checking consistency', 'Sampling alternate reasoning paths');
     const N = 2;
@@ -508,7 +542,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'Provide an alternative solution with different reasoning. Then give your final answer.' },
-      ]);
+      ], { maxTokens: 4_096, timeoutMs: 25_000, temperature: 0.6 });
       if (sampleResult.ok) samples.push(sampleResult.content);
     }
     // PRM-weighted: score each sample with Nemotron, pick highest
@@ -524,7 +558,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 5: CODE VERIFICATION (for math/coding)
   let codeVerified = false;
-  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 60_000) {
+  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 105_000) {
     techniques.push('code-verification');
     sendProgress(controller, encoder, 'Verifying code or math', 'Running a lightweight verifier pass');
     codeVerified = await verifyCode(finalAnswer);
@@ -546,7 +580,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       }
       // Grok 4.5 is reserved for a bounded code-repair escalation, never a
       // first-pass model, so it improves failed code without inflating normal cost.
-      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 70_000) {
+      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 115_000) {
         techniques.push('code-repair-escalation');
         const repair = await callModel(POOL.codeRepair, [
           { role: 'system', content: 'Repair the submitted solution. Return a complete, correct, self-contained answer with working code where relevant.' },
@@ -563,10 +597,10 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // LAYER 6: SELF-QA GATE — USVA 4-rubric verification
   techniques.push('usva-5-rubric-qa');
   sendProgress(controller, encoder, 'Quality scoring', 'Running final answer quality gate');
-  let qaScore = Date.now() - t0 < 90_000 ? await runUSVA(query, finalAnswer) : 0.7;
+  let qaScore = Date.now() - t0 < 135_000 ? await runUSVA(query, finalAnswer) : 0.7;
 
   // If QA fails, retry with Reflexion
-  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 70_000) {
+  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 115_000) {
     techniques.push('reflexion');
     const reflection = await callModel(POOL.verifier, [
       { role: 'system', content: 'You are a quality verifier. The answer scored low on quality. Explain what is wrong.' },
@@ -587,7 +621,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 12: s1 BUDGET FORCING (arXiv:2501.19393)
   // If the answer is suspiciously short for a hard question, force longer reasoning
-  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 80_000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 125_000) {
     techniques.push('s1-budget-forcing');
     const forcedResult = await callModel(POOL.reasoning, [
       ...messages,
@@ -601,7 +635,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 13: STEP-LEVEL CODE VERIFICATION (rStar-Math pattern)
   // For math/coding: verify each reasoning step, not just the final answer
-  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 80_000) {
+  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 125_000) {
     techniques.push('step-level-verification');
     const stepVerified = await stepLevelVerify(query, finalAnswer);
     if (stepVerified) {
@@ -624,7 +658,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 14: Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
   // Extract logical claims and check for contradictions
-  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 85_000) {
+  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 130_000) {
     techniques.push('z3-logical-verification');
     const logicalCheck = await logicalVerify(finalAnswer);
     if (logicalCheck === 'contradiction') {
@@ -658,7 +692,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 17: frontier escalation (GPT-5.6 Luna) only after QA failure.
   // For the hardest queries where QA score is still low after all retries
-  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 85_000) {
+  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 130_000) {
     techniques.push('frontier-fallback');
     const frontierResult = await callModel(POOL.frontier, [
       { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
