@@ -4,4 +4,4 @@ openai>=1.0.0
 pyyaml>=6.0
 aiohttp>=3.9
 python-json-logger>=2.0
-datasets>=2.0.0
+datasets>=5.0.0
