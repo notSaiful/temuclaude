@@ -48,6 +48,53 @@ STEP_CODE_GENERATION_PROMPT = (
 )
 
 
+import ast
+
+def local_ast_check(code_text: str, language: str = "python") -> dict:
+    """
+    Perform local AST/syntax verification.
+    Returns a dict with 'ok': bool, and 'error': str (if any).
+    """
+    if not code_text.strip():
+        return {"ok": False, "error": "Empty code block"}
+        
+    if language.lower() in ("python", "py"):
+        try:
+            ast.parse(code_text)
+            return {"ok": True, "error": None}
+        except SyntaxError as e:
+            return {
+                "ok": False,
+                "error": f"Python Syntax Error: {e.msg} on line {e.lineno} (col {e.offset})"
+            }
+        except Exception as e:
+            return {"ok": False, "error": f"Parsing Error: {str(e)}"}
+            
+    # For JS/TS/HTML/CSS, do a basic brackets balance check
+    elif language.lower() in ("javascript", "typescript", "js", "ts", "html", "css"):
+        brackets = {')': '(', ']': '[', '}': '{'}
+        stack = []
+        for i, char in enumerate(code_text):
+            if char in brackets.values():
+                stack.append((char, i))
+            elif char in brackets.keys():
+                if not stack or stack[-1][0] != brackets[char]:
+                    line_no = code_text[:i].count('\n') + 1
+                    return {
+                        "ok": False,
+                        "error": f"Mismatched bracket '{char}' detected on line {line_no}."
+                    }
+                stack.pop()
+        if stack:
+            line_no = code_text[:stack[-1][1]].count('\n') + 1
+            return {
+                "ok": False,
+                "error": f"Unclosed bracket '{stack[-1][0]}' detected on line {line_no}."
+            }
+            
+    return {"ok": True, "error": None}
+
+
 def extract_code(response: str) -> str:
     """Extract Python code from a model response.
     
@@ -124,6 +171,17 @@ async def verify_with_code(
             "code": "",
             "stdout": "",
             "stderr": "No code generated",
+        }
+    
+    # AST/Syntax check
+    ast_check = local_ast_check(code, "python")
+    if not ast_check["ok"]:
+        return {
+            "verified": False,
+            "answer": None,
+            "code": code,
+            "stdout": "",
+            "stderr": f"AST Check Failed: {ast_check['error']}",
         }
     
     # Execute in sandbox

@@ -1,6 +1,6 @@
-// Create subscription order for Pro or Enterprise plan
+// Create subscription order for Developer, Pro, Max, or Enterprise plan
 // POST /api/payments/create-subscription
-// Body: { planId: 'pro' | 'enterprise', email: string, name?: string }
+// Body: { planId: 'developer' | 'pro' | 'max' | 'enterprise', email: string, name?: string }
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PLANS } from '@/lib/plans';
@@ -12,6 +12,12 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    if (process.env.NEXT_PUBLIC_BILLING_CHECKOUT_ENABLED !== 'true') {
+      return NextResponse.json({
+        error: 'Hosted checkout is not live yet. Email hello@temuclaude.com to activate a paid plan.',
+      }, { status: 503 });
+    }
+
     const body = await req.json();
     const { planId, email, name } = body;
 
@@ -20,9 +26,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing planId or email' }, { status: 400 });
     }
 
-    const plan = PLANS[planId as 'developer' | 'pro' | 'enterprise'];
+    const plan = PLANS[planId as 'developer' | 'pro' | 'max' | 'enterprise'];
     if (!plan || plan.id === 'free') {
-      return NextResponse.json({ error: 'Invalid plan. Choose developer, pro, or enterprise.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid plan. Choose developer, pro, max, or enterprise.' }, { status: 400 });
     }
 
     // Get Razorpay plan ID from environment (server-side only)
@@ -30,11 +36,13 @@ export async function POST(req: NextRequest) {
       ? (process.env.RAZORPAY_PLAN_DEV_ID || process.env.RAZORPAY_PLAN_DEVELOPER_ID)
       : planId === 'pro'
       ? process.env.RAZORPAY_PLAN_PRO_ID
+      : planId === 'max'
+      ? process.env.RAZORPAY_PLAN_MAX_ID
       : process.env.RAZORPAY_PLAN_ENTERPRISE_ID;
 
     if (!razorpayPlanId) {
       return NextResponse.json({
-        error: `Razorpay plan ID not configured for ${planId}. Set RAZORPAY_PLAN_DEV_ID, RAZORPAY_PLAN_PRO_ID, or RAZORPAY_PLAN_ENTERPRISE_ID in environment.`,
+        error: `Razorpay plan ID not configured for ${planId}. Set RAZORPAY_PLAN_DEV_ID, RAZORPAY_PLAN_PRO_ID, RAZORPAY_PLAN_MAX_ID, or RAZORPAY_PLAN_ENTERPRISE_ID in environment.`,
       }, { status: 500 });
     }
 

@@ -1,4 +1,4 @@
-// Setup script: Create Razorpay plans for Developer, Pro, and Enterprise
+// Setup script: Create Razorpay plans for Developer, Pro, Max, and Enterprise
 // GET /api/setup-plans — creates plans in Razorpay, returns plan IDs to add to .env
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,6 +16,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (process.env.NEXT_PUBLIC_BILLING_CHECKOUT_ENABLED !== 'true') {
+      return NextResponse.json({
+        error: 'Hosted checkout is disabled. Razorpay plan setup is intentionally parked for this production launch.',
+      }, { status: 503 });
+    }
+
     const results: any = {};
 
     // Create Developer plan
@@ -24,7 +30,7 @@ export async function GET(req: NextRequest) {
       amountINR: PLANS.developer.priceINR,
       period: 'monthly',
       interval: 1,
-      description: '50,000 queries/month, API access, all models',
+      description: '5M monthly credits, API access, all models',
     });
     results.developer = { id: devPlan.id, amount: devPlan.item.amount };
     console.log('Developer plan created:', devPlan.id);
@@ -35,10 +41,21 @@ export async function GET(req: NextRequest) {
       amountINR: PLANS.pro.priceINR,
       period: 'monthly',
       interval: 1,
-      description: '500,000 queries/month, priority routing, API access',
+      description: '25M monthly credits, priority routing, API access',
     });
     results.pro = { id: proPlan.id, amount: proPlan.item.amount };
     console.log('Pro plan created:', proPlan.id);
+
+    // Create Max plan
+    const maxPlan = await createPlan({
+      name: 'TemuClaude Max',
+      amountINR: PLANS.max.priceINR,
+      period: 'monthly',
+      interval: 1,
+      description: '100M monthly credits, heavy coding and research usage',
+    });
+    results.max = { id: maxPlan.id, amount: maxPlan.item.amount };
+    console.log('Max plan created:', maxPlan.id);
 
     // Create Enterprise plan
     const entPlan = await createPlan({
@@ -46,7 +63,7 @@ export async function GET(req: NextRequest) {
       amountINR: PLANS.enterprise.priceINR,
       period: 'monthly',
       interval: 1,
-      description: 'Unlimited queries, SSO, SLA, dedicated support',
+      description: '300M monthly credits, SSO, SLA, dedicated support',
     });
     results.enterprise = { id: entPlan.id, amount: entPlan.item.amount };
     console.log('Enterprise plan created:', entPlan.id);
@@ -59,6 +76,7 @@ export async function GET(req: NextRequest) {
         RAZORPAY_PLAN_DEV_ID: results.developer.id,
         RAZORPAY_PLAN_DEVELOPER_ID: results.developer.id,
         RAZORPAY_PLAN_PRO_ID: results.pro.id,
+        RAZORPAY_PLAN_MAX_ID: results.max.id,
         RAZORPAY_PLAN_ENTERPRISE_ID: results.enterprise.id,
       },
     });

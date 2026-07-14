@@ -190,6 +190,33 @@ def remove_emojis(text: str) -> str:
     return emoji_pattern.sub("", text)
 
 
+def enforce_simplicity_rules(text: str) -> str:
+    """
+    Enforce high school readability target (sweet spot) and paragraph limits.
+    If the output contains no code blocks (```), limit prose to at most 3 paragraphs.
+    """
+    if "```" in text:
+        return text
+        
+    paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+    if len(paragraphs) > 3:
+        text = '\n\n'.join(paragraphs[:3])
+        
+    replacements = {
+        "utilize": "use",
+        "subsequently": "then",
+        "facilitate": "help",
+        "methodology": "method",
+        "aggregate": "combine",
+        "delineate": "show",
+        "concomitant": "linked",
+    }
+    for word, simple in replacements.items():
+        text = re.sub(rf"\b{word}\b", simple, text, flags=re.IGNORECASE)
+        
+    return text.strip()
+
+
 def format_response(text: str, style: str = "professional") -> str:
     """Apply tone and formatting rules to a response.
 
@@ -203,6 +230,7 @@ def format_response(text: str, style: str = "professional") -> str:
     # All styles: remove filler, simplify
     text = remove_filler(text)
     text = simplify_wordy(text)
+    text = enforce_simplicity_rules(text)
 
     if style == "professional":
         # Professional: concise, prose-first, no emojis

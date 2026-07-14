@@ -185,7 +185,7 @@ TTS_UNIQUE_POOLS = {
 # =============================================================================
 # Reuse the same 3 judges from the media module
 # They can score TTS based on text analysis + audio metadata
-# For premium tier, Gemini 3 Flash can actually listen to audio
+# For premium tier, Gemini 2.5 Flash can actually listen to audio
 
 TTS_JUDGE_POOL = [
     {

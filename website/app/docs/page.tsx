@@ -12,7 +12,7 @@ const sections: DocSection[] = [
   { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Evaluation & Trust', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
-  { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
+  { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Use with Hermes Agent', 'Rate Limits', 'Error Codes'] },
   { title: 'Enterprise', items: ['Self-Hosting & Private VPC'] },
   {
     title: 'Legal & Info',
@@ -101,12 +101,13 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
               <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — sign in, ask anything, and get a superior answer. 20 free queries/day.</p>
-              <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
+              <p className="text-sm text-text-secondary mb-2">Option 2 — OpenAI-compatible API access:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
+  -H "Authorization: Bearer tmc_your_api_key" \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
+  -d '{"model":"temuclaude","messages":[{"role":"user","content":"What is 9.9 vs 9.11?"}]}'
 
-# Response: SSE stream with answer + orchestration metadata`} />
+ # Response: OpenAI-compatible chat completion JSON`} />
               <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
             </section>
 
@@ -343,25 +344,19 @@ export default function DocsPage() {
 
             <section id="rest-api" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">REST API</h2>
-              <p className="text-text-secondary mb-4">TemuClaude exposes a single endpoint:</p>
-              <CodeBlock lang="bash" code={`POST /api/chat
+              <p className="text-text-secondary mb-4">Use the OpenAI-compatible endpoint for assistants and developer tools:</p>
+              <CodeBlock lang="bash" code={`POST https://temuclaude.com/v1/chat/completions
 
 Request:
 {
-  "profile": "lite",
+  "model": "temuclaude",
   "messages": [
     {"role": "user", "content": "What is 9.9 vs 9.11?"}
   ]
 }
 
-Response: SSE stream
-  data: {"chunk": "9.9"}
-  data: {"chunk": " is"}
-  data: {"chunk": " larger"}
-  ...
-  data: {"orchestration": {...}}
-  data: [DONE]`} />
-              <p className="text-sm text-text-secondary">Set <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">profile</code> to <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"pro"</code> (default) or <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"lite"</code>. The server validates the profile and keeps model selection internal.</p>
+Response: OpenAI-compatible chat completion JSON`} />
+              <p className="text-sm text-text-secondary">Use model <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">temuclaude</code>. The server keeps model selection and orchestration internal.</p>
             </section>
 
             <section id="streaming" className="mb-12">
@@ -403,11 +398,30 @@ Response: SSE stream
 
             <section id="authentication" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
-              <p className="text-text-secondary mb-4">Free trial: no authentication needed. Paid developer wallets use the live API key generated from the dashboard:</p>
+              <p className="text-text-secondary mb-4">API requests require a TemuClaude API key generated in the developer dashboard. Keys begin with <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">tmc_</code>; keep them server-side and revoke unused keys immediately.</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "Authorization: Bearer tc_live_f893d2b10a2c88ef092e10f" \\
+  -H "Authorization: Bearer tmc_your_api_key" \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
+  -d '{"model":"temuclaude","messages":[{"role":"user","content":"Hello"}]}'`} />
+            </section>
+
+            <section id="use-with-hermes-agent" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Use with Hermes Agent</h2>
+              <p className="text-text-secondary mb-4">Recommended for agent workflows: Hermes can use TemuClaude as its reasoning backend while Hermes provides its own tools, workspace access, skills, and approvals.</p>
+              <CodeBlock lang="bash" code={`hermes model
+
+# Choose: Custom endpoint (self-hosted / VLLM / etc.)
+# Base URL: https://temuclaude.com/v1
+# API key:  tmc_your_api_key
+# Model:    temuclaude`} />
+              <CodeBlock lang="yaml" code={`# ~/.hermes/config.yaml
+model:
+  provider: custom
+  base_url: https://temuclaude.com/v1
+  api_key: tmc_your_api_key
+  default: temuclaude`} />
+              <Callout type="tip">Use this setup when you want Hermes tools and workflows with TemuClaude routing. Start with ordinary chat tasks. Streaming, tool-call, and structured-output compatibility should be validated for your Hermes version before production automation.</Callout>
+              <Callout type="warning">Do not paste an API key into a shared shell history, repository, or client-side application. Use a local secret manager or environment variable instead.</Callout>
             </section>
 
             <section id="rate-limits" className="mb-12">

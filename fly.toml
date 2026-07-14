@@ -8,7 +8,7 @@ primary_region = "bom"  # Mumbai — closest to Nagpur, India
   dockerfile = "Dockerfile"
 
 [http_service]
-  internal_port = 4000
+  internal_port = 8080
   force_https = true
   auto_stop_machines = false
   auto_start_machines = true
@@ -32,4 +32,4 @@ primary_region = "bom"  # Mumbai — closest to Nagpur, India
   memory_mb = 512
 
 [env]
-  TEMUCLAUDE_MASTER_KEY = "change-me-in-fly-secrets"
+  PORT = "8080"

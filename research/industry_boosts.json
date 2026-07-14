@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "topic": "litellm_config",
+    "boost": 20,
+    "reason": "Industry signal: litellm v1.93.0-dev.1",
+    "source": "litellm_releases"
+  }
+]

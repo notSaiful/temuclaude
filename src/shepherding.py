@@ -51,7 +51,7 @@ MAX_HINT_TOKENS = 500  # Maximum hint size (don't over-pay for hints)
 
 # Models that are good "shepherds" (provide good hints)
 # These are the expensive, high-quality models
-SHEPHERD_MODELS = ["glm-5.2", "deepseek-v4-pro", "claude-sonnet-5"]
+SHEPHERD_MODELS = ["glm-5.2", "deepseek-v4-pro", "claude-sonnet-4.6"]
 
 # Models that are good "workers" (complete from hints)
 # These are the cheap, fast models

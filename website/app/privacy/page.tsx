@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       <Navbar />
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Privacy Policy">
         <div className="container-max max-w-2xl mx-auto">
-          <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Privacy Policy</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Privacy Policy</h1>
           <p className="text-sm text-text-muted mb-12">Last updated: July 4, 2026</p>
 
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
@@ -26,8 +26,8 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. What We Collect</h2>
               <p>To provide the Service, we collect:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li><strong>Email address</strong> — when you subscribe to a paid plan (for billing and account management)</li>
-                <li><strong>Payment information</strong> — processed by Razorpay (we never see or store your card details)</li>
+                <li><strong>Email address</strong> — when you create an account or request a paid plan (for billing and account management)</li>
+                <li><strong>Payment information</strong> — processed by the active payment provider when paid billing is enabled (we never see or store your card details)</li>
                 <li><strong>Usage counts</strong> — number of queries per day/month (to enforce plan limits). We store the count, NOT the query content.</li>
                 <li><strong>API keys</strong> — hashed and stored securely for authentication</li>
               </ul>
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Email: to send billing receipts, subscription notifications, and important service updates</li>
                 <li>Usage counts: to enforce plan limits and prevent abuse</li>
-                <li>Payment data: processed by Razorpay for subscription billing</li>
+                <li>Payment data: processed by the active payment provider for subscription billing when paid billing is enabled</li>
               </ul>
               <p className="mt-2">We do NOT use your data to train AI models. We do NOT use your data for advertising. We do NOT share your data with third parties.</p>
             </section>
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">5. Data Processors</h2>
               <p>We use the following third-party services to operate the Service:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li><strong>Razorpay</strong> — payment processing (PCI-DSS compliant, we never see card details)</li>
+                <li><strong>Payment provider</strong> — payment processing when hosted checkout is enabled (we never see card details)</li>
                 <li><strong>OpenRouter</strong> — AI model hosting (queries are forwarded to their models; their privacy policy applies to query data in transit)</li>
                 <li><strong>Vercel</strong> — website hosting and API infrastructure</li>
               </ul>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">6. Data Security</h2>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>API keys are hashed with SHA-256 before storage</li>
-                <li>Payment processing is handled by Razorpay (PCI-DSS Level 1 compliant)</li>
+                <li>Payment processing is handled by the active payment provider when paid billing is enabled</li>
                 <li>All API communication uses HTTPS/TLS encryption</li>
                 <li>Database access is restricted and audited</li>
                 <li>No plaintext payment data is ever stored on our servers</li>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
                 <li>Export your data — receive your data in JSON format</li>
                 <li>Object to processing — request that we stop processing your data</li>
               </ul>
-              <p className="mt-2">To exercise these rights, email us at ggs@temuclaude.com. We respond within 30 days.</p>
+              <p className="mt-2">To exercise these rights, email us at <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a>. We respond within 30 days.</p>
             </section>
 
             <section>
@@ -103,7 +103,7 @@ export default function PrivacyPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">9. Cookies</h2>
               <p>We use only essential cookies:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Anonymous identifier (localStorage) — to track free tier usage across sessions</li>
+                <li>Supabase authentication session — to keep signed-in users securely authenticated</li>
                 <li>Cookie consent — to remember your consent choice</li>
               </ul>
               <p className="mt-2">We do NOT use analytics cookies, advertising cookies, or social media tracking cookies.</p>
@@ -126,7 +126,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">13. Contact</h2>
-              <p>For privacy questions or data requests, contact: ggs@temuclaude.com</p>
+              <p>For privacy questions or data requests, contact: <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> or call <a href="tel:+17252686198" className="text-accent-primary hover:underline">+1 (725) 268-6198</a>.</p>
             </section>
           </div>
         </div>

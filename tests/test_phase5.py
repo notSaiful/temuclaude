@@ -65,8 +65,7 @@ def test_start_script():
     assert os.path.isfile(start_path), "start.sh missing"
     with open(start_path) as f:
         content = f.read()
-    # Accept both TIMUCLAUDE and TEMUCLAUDE (project name evolved from Timuclaude)
-    for item in ["OPENROUTER_API_KEY", "11434", "litellm", "config/litellm.yaml", "4000"]:
+    for item in ["TEMUCLAUDE_API_KEY", "uvicorn", "api_server:app", "PORT"]:
         assert item in content, f"start.sh missing '{item}'"
     assert os.access(start_path, os.X_OK), "start.sh not executable"
 
@@ -76,8 +75,8 @@ def test_dockerfile():
     assert os.path.isfile(dockerfile_path), "Dockerfile missing"
     with open(dockerfile_path) as f:
         content = f.read()
-    for item in ["FROM python", "WORKDIR", "requirements.txt", "COPY src",
-                 "COPY config", "EXPOSE 4000", "litellm", "HEALTHCHECK"]:
+    for item in ["FROM python", "WORKDIR", "requirements.txt", "src ./src",
+                 "config ./config", "EXPOSE 8080", "HEALTHCHECK", "USER app"]:
         assert item in content, f"Dockerfile missing '{item}'"
 
 
@@ -88,7 +87,7 @@ def test_fly_config():
         content = f.read()
     # Accept both timuclaude and temuclaude (project name evolved)
     assert "timuclaude" in content.lower() or "temuclaude" in content.lower(), "fly.toml missing app name"
-    for item in ["primary_region", "Dockerfile", "4000", "/health"]:
+    for item in ["primary_region", "Dockerfile", "8080", "/health"]:
         assert item in content, f"fly.toml missing '{item}'"
 
 

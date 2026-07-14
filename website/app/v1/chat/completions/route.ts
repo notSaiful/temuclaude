@@ -28,6 +28,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync, getRollingWindowUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS } from '@/lib/plans';
 import { callOpenRouter } from '@/lib/openrouter';
@@ -37,9 +38,12 @@ import { callModalChatCompletions, isModalConfigured, isModalRequired } from '@/
 // Global in-memory circuit breaker state (retained during warm serverless container instances)
 let consecutiveFailures = 0;
 let circuitTrippedUntil = 0;
+// One request can invoke several models in parallel. AsyncLocalStorage keeps
+// that invocation list isolated per request, including across Promise.all.
+const modelActivityStore = new AsyncLocalStorage<string[]>();
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 // ── 8-MODEL POOL ──────────────────────────────────────────────
 const M_FLASH = 'deepseek/deepseek-v4-flash';
@@ -55,9 +59,11 @@ const LITE_DEFAULT: LiteModelId = 'deepseek/deepseek-v4-flash';
 const LITE_REASONING: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
+const TEMUCLAUDE_PRO_MODEL = 'temuclaude/temuclaude-pro';
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
+type ModelCallOptions = { fallbacks?: string[]; timeoutMs?: number; disableReasoning?: boolean };
 interface OrchestrationResult { content: string; tokens: number; tier: string; time: number }
 
 function hasUsableContent(content: unknown): content is string {
@@ -83,11 +89,74 @@ function extractAssistantContent(data: any): string {
   return data?.choices?.[0]?.message?.content || '';
 }
 
+function recordModelActivity(model: string | null | undefined) {
+  if (!model || /^temuclaude(?:\/|$)/i.test(model)) return;
+  modelActivityStore.getStore()?.push(model);
+}
+
+type CompletionPayload = {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: Array<Record<string, unknown>>;
+  usage?: Record<string, number>;
+};
+
+/**
+ * Return either the established JSON completion contract or a small,
+ * standards-compliant OpenAI SSE sequence.  The pipeline deliberately
+ * completes before emitting: orchestration depends on several model calls,
+ * but clients that request `stream: true` (including AI SDK consumers such as
+ * Obsidian LLM Wiki) still receive the protocol they expect.
+ */
+function completionResponse(payload: CompletionPayload, stream: boolean): NextResponse {
+  if (!stream) return NextResponse.json(payload);
+
+  const content = String((payload.choices[0]?.message as { content?: string } | undefined)?.content || '');
+  const chunkBase = {
+    id: payload.id,
+    object: 'chat.completion.chunk',
+    created: payload.created,
+    model: payload.model,
+  };
+  const encoder = new TextEncoder();
+  const sse = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+        ...chunkBase,
+        choices: [{ index: 0, delta: { role: 'assistant' }, finish_reason: null }],
+      })}\n\n`));
+      if (content) {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+          ...chunkBase,
+          choices: [{ index: 0, delta: { content }, finish_reason: null }],
+        })}\n\n`));
+      }
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+        ...chunkBase,
+        choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
+      })}\n\n`));
+      controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+      controller.close();
+    },
+  });
+  return new NextResponse(sse, {
+    headers: {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    },
+  });
+}
+
 /**
  * Call a model via OpenRouter with reasoning field fallback.
  * Prepends English enforcement system prompt to ensure consistent English output.
  */
-async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): Promise<Result> {
+async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096, options: ModelCallOptions = {}): Promise<Result> {
+  recordModelActivity(model);
   let msgs = messages;
   const effectiveMaxTokens = Math.max(64, maxTok);
   if (!messages.some(m => m.role === 'system')) {
@@ -97,31 +166,27 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096): 
   const result = await callOpenRouter(model, msgs, {
     temperature: temp,
     maxTokens: effectiveMaxTokens,
-    timeoutMs: 60000,
+    timeoutMs: options.timeoutMs ?? 60_000,
+    fallbacks: options.fallbacks,
+    disableReasoning: options.disableReasoning,
     sessionId: `v1-${Buffer.from(messages[messages.length - 1]?.content || '').toString('base64url').slice(0, 64)}`,
   });
+  recordModelActivity(result.model);
   return { success: result.success, content: result.content, tokens: result.tokens };
 }
 
 async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
   const start = Date.now();
-  const fallbacks = [M_FLASH, M_GLM, M_DEEPSEEK, M_TERRA];
-  let tokens = 0;
-
-  for (const model of fallbacks) {
-    const result = await call(model, messages, temp, maxTok);
-    tokens += result.tokens;
-    if (result.success && hasUsableContent(result.content)) {
-      return {
-        content: result.content.trim(),
-        tokens,
-        tier: 'rescue-fallback',
-        time: Date.now() - start,
-      };
-    }
-  }
-
-  return { content: '', tokens, tier: 'failed-empty', time: Date.now() - start };
+  const result = await call(M_FLASH, messages, temp, maxTok, {
+    fallbacks: [M_GLM, M_DEEPSEEK, M_TERRA],
+    timeoutMs: 100_000,
+  });
+  return {
+    content: result.success ? result.content.trim() : '',
+    tokens: result.tokens,
+    tier: result.success ? 'rescue-fallback' : 'failed-empty',
+    time: Date.now() - start,
+  };
 }
 
 /**
@@ -180,6 +245,16 @@ function isMultimodal(text: string): boolean {
 
 function isLiteModel(model: unknown): boolean {
   return typeof model === 'string' && ['temuclaude-lite', 'temuclaude/temuclaude-lite', 'temuclaude/lite'].includes(model.toLowerCase());
+}
+
+function isProModel(model: unknown): boolean {
+  return model === undefined || model === null || (typeof model === 'string' && [
+    'temuclaude',
+    'temuclaude-pro',
+    'temuclaude/temuclaude',
+    TEMUCLAUDE_PRO_MODEL,
+    'temuclaude/pro',
+  ].includes(model.toLowerCase()));
 }
 
 function selectLiteApiModel(text: string, tier: string): LiteModelId {
@@ -315,7 +390,10 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     const r = await call(M_DEEPSEEK, [
       { role: 'system', content: 'You are TemuClaude Code. Execute the request now; do not ask follow-up questions when reasonable defaults are possible. Return a complete, runnable deliverable. For a single-file web game, output one complete HTML fenced file with all CSS and JavaScript included. Do not describe phases or defer implementation.' },
       ...messages,
-    ], 0.35, Math.min(Math.max(maxTok, 4096), 8192));
+    ], 0.35, Math.min(Math.max(maxTok, 4096), 8192), {
+      fallbacks: [M_GLM, M_GROK],
+      timeoutMs: 100_000,
+    });
     return { content: r.content, tokens: r.tokens, tier: 'direct-code-generation', time: Date.now() - start };
   }
 
@@ -477,9 +555,11 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
 }
 
 export async function POST(request: NextRequest) {
+  return modelActivityStore.run([], async () => {
   try {
     const body = await request.json();
     const { model, messages, temperature, max_tokens } = body;
+    const wantsStream = body.stream === true;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -554,6 +634,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (!isLiteModel(model) && !isProModel(model)) {
+      return NextResponse.json(
+        { error: { message: 'Unsupported model. Use temuclaude/temuclaude-pro or temuclaude/temuclaude-lite.', type: 'invalid_request_error' } },
+        { status: 400 },
+      );
+    }
+
     // Lite is a separately bounded public API profile. It must bypass Modal
     // and the Pro fusion pipeline so its allowlist and cost contract remain
     // enforceable even when callers supply an arbitrary `model` field.
@@ -565,6 +652,7 @@ export async function POST(request: NextRequest) {
       const liteMessages: Msg[] = liteCodeRequest
         ? [{ role: 'system', content: 'You are TemuClaude Code. Execute the requested coding task now; do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable. When suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.' }, ...messages]
         : messages;
+      recordModelActivity(liteModel);
       let lite = await callOpenRouterLite(liteModel, liteMessages, {
         temperature: temperature ?? 0.45,
         maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 3072 : 2048), 4096),
@@ -581,6 +669,7 @@ export async function POST(request: NextRequest) {
       // critic runs only for high-risk, explicit-check, or audit-sampled work.
       // A correction makes at most three Lite model calls in total.
       if (shouldVerifyLite(latestUserText, tier, lite.content)) {
+        recordModelActivity(LITE_VERIFIER);
         const verdict = await callOpenRouterLite(LITE_VERIFIER, [
           { role: 'system', content: 'Check the draft for factual, logical, or safety-critical errors. Reply with PASS, or FAIL followed by a concise correction request.' },
           { role: 'user', content: `Question:\n${latestUserText}\n\nDraft:\n${lite.content}` },
@@ -592,6 +681,7 @@ export async function POST(request: NextRequest) {
         completionTokens += verdict.completionTokens;
         promptTokens += verdict.promptTokens;
         if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
+          recordModelActivity(liteModel);
           const corrected = await callOpenRouterLite(liteModel, [
             ...messages,
             { role: 'assistant', content: lite.content },
@@ -610,9 +700,9 @@ export async function POST(request: NextRequest) {
         }
       }
       if (!isEvalMode && userId) {
-        try { await incrementUsageAsync(userId, promptTokens, completionTokens, lite.model); } catch {}
+        try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
       }
-      return NextResponse.json({
+      return completionResponse({
         id: `chatcmpl-${Date.now()}`,
         object: 'chat.completion',
         created: Math.floor(Date.now() / 1000),
@@ -623,7 +713,7 @@ export async function POST(request: NextRequest) {
           completion_tokens: completionTokens,
           total_tokens: promptTokens + completionTokens,
         },
-      });
+      }, wantsStream);
     }
 
     let useFallbackRoute = false;
@@ -659,11 +749,22 @@ export async function POST(request: NextRequest) {
             }
             console.warn('Modal backend returned an empty completion, falling back to in-process pipeline.');
           } else {
+            recordModelActivity(typeof modal.data?.model === 'string' ? modal.data.model : null);
             if (!isEvalMode && userId) {
               const usage = modal.data?.usage || {};
               const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
               const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
-              try { await incrementUsageAsync(userId, promptTokens, completionTokens, 'glm-5.2'); } catch {}
+              try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+            }
+            if (wantsStream) {
+              return completionResponse({
+                id: String(modal.data?.id || `chatcmpl-${Date.now()}`),
+                object: 'chat.completion',
+                created: Number(modal.data?.created || Math.floor(Date.now() / 1000)),
+                model: String(modal.data?.model || model || 'temuclaude'),
+                choices: [{ index: 0, message: { role: 'assistant', content: modalContent }, finish_reason: 'stop' }],
+                usage: modal.data?.usage,
+              }, true);
             }
             return NextResponse.json(modal.data, { status: modal.status });
           }
@@ -693,13 +794,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Timeout safeguard: 90s -> single GLM fallback (within Vercel's 120s limit)
+    // Timeout safeguard: reserve enough time for one strong GLM response
+    // before Vercel's 300-second function deadline. (Raised from 120s on
+    // 2026-07-14: hard MoA queries can reach ~210s via race → GLM fallback
+    // → finalRescue, which exceeded the old 120s cap and 504'd on Vercel.)
     const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
     const timeout = new Promise<OrchestrationResult>(resolve => {
       setTimeout(async () => {
-        const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096);
-        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 90000 });
-      }, 90000);
+        const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096, { timeoutMs: 25_000 });
+        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 85_000 });
+      }, 85_000);
     });
 
     let result = await Promise.race([pipeline, timeout]);
@@ -717,15 +821,14 @@ export async function POST(request: NextRequest) {
     if (!isEvalMode && userId) {
       const promptTokens = promptTokenEstimate(messages);
       const completionTokens = completionTokenEstimate(finalContent);
-      const modelName = result.tier || 'temuclaude-standard';
-      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelName); } catch {}
+      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
     }
 
-    return NextResponse.json({
+    return completionResponse({
       id: `chatcmpl-${Date.now()}`,
       object: 'chat.completion',
       created: Math.floor(Date.now() / 1000),
-      model: model || 'temuclaude',
+      model: TEMUCLAUDE_PRO_MODEL,
       choices: [{
         index: 0,
         message: { role: 'assistant', content: finalContent },
@@ -736,13 +839,14 @@ export async function POST(request: NextRequest) {
         completion_tokens: completionTokenEstimate(finalContent),
         total_tokens: result.tokens || promptTokenEstimate(messages) + completionTokenEstimate(finalContent),
       },
-    });
+    }, wantsStream);
   } catch {
     return NextResponse.json(
       { error: { message: 'Internal server error', type: 'server_error' } },
       { status: 500 }
     );
   }
+  });
 }
 
 export async function GET() {

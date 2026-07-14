@@ -162,10 +162,12 @@ def test_model_pool():
         else:
             passed += 1
 
-    # Check fusion panel has 5 models
-    if len(FUSION_PANEL) != 5:
+    # The updated stack caps ordinary fusion at three diverse models. More
+    # models are not automatically better once cost, latency, and correlated
+    # errors are included; premium routes enter only through explicit gates.
+    if len(FUSION_PANEL) != 3:
         failed += 1
-        failures.append(f"Fusion panel should have 5 models, has {len(FUSION_PANEL)}")
+        failures.append(f"Fusion panel should have 3 models, has {len(FUSION_PANEL)}")
     else:
         passed += 1
 

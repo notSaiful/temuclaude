@@ -8,11 +8,13 @@ import json
 import re
 import time
 import asyncio
+import hashlib
+from datetime import date
 from typing import Optional
 
 import modal
 
-app = modal.App("temuclaude")
+app = modal.App("temuclaude-prod")
 
 image = (
     modal.Image.debian_slim(python_version="3.12")
@@ -21,6 +23,12 @@ image = (
 
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+PLAN_MONTHLY_LIMITS = {
+    "developer": 50000,
+    "pro": 500000,
+    "enterprise": -1,
+}
 
 # ── 8-MODEL POOL ──────────────────────────────────────────────
 M_GLM = "z-ai/glm-5.2"
@@ -39,6 +47,120 @@ class Result:
         self.success = success
         self.content = content
         self.tokens = tokens
+
+
+def _supabase_headers() -> Optional[dict]:
+    key = (
+        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        or os.environ.get("SUPABASE_SECRET_KEY")
+        or os.environ.get("SUPABASE_SERVICE_KEY")
+    )
+    if not key:
+        return None
+    return {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+    }
+
+
+def _supabase_url() -> str:
+    return (os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL") or "").rstrip("/")
+
+
+async def validate_customer_api_key(client, raw_key: str) -> Optional[dict]:
+    """Validate a customer tmc_ key against Supabase and return the app user."""
+    if not raw_key.startswith("tmc_"):
+        return None
+
+    base = _supabase_url()
+    headers = _supabase_headers()
+    if not base or not headers:
+        return None
+
+    key_hash = hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
+    key_resp = await client.get(
+        f"{base}/rest/v1/temuclaude_api_keys",
+        headers=headers,
+        params={"key_hash": f"eq.{key_hash}", "select": "id,user_id", "limit": "1"},
+    )
+    if key_resp.status_code != 200:
+        return None
+    rows = key_resp.json()
+    if not rows:
+        return None
+
+    key_record = rows[0]
+    await client.patch(
+        f"{base}/rest/v1/temuclaude_api_keys",
+        headers={**headers, "Prefer": "return=minimal"},
+        params={"id": f"eq.{key_record['id']}"},
+        json={"last_used": int(time.time())},
+    )
+
+    user_resp = await client.get(
+        f"{base}/rest/v1/temuclaude_users",
+        headers=headers,
+        params={"id": f"eq.{key_record['user_id']}", "select": "id,email,plan", "limit": "1"},
+    )
+    if user_resp.status_code != 200:
+        return None
+    users = user_resp.json()
+    return users[0] if users else None
+
+
+async def get_monthly_usage(client, user_id: str) -> int:
+    base = _supabase_url()
+    headers = _supabase_headers()
+    if not base or not headers:
+        return 0
+
+    month_start = date.today().replace(day=1).isoformat()
+    resp = await client.get(
+        f"{base}/rest/v1/temuclaude_usage",
+        headers=headers,
+        params={
+            "user_id": f"eq.{user_id}",
+            "query_date": f"gte.{month_start}",
+            "select": "query_count",
+        },
+    )
+    if resp.status_code != 200:
+        return 0
+    return sum(int(row.get("query_count") or 0) for row in resp.json())
+
+
+async def increment_customer_usage(client, user_id: str, prompt_tokens: int, completion_tokens: int) -> None:
+    base = _supabase_url()
+    headers = _supabase_headers()
+    if not base or not headers:
+        return
+
+    today = date.today().isoformat()
+    usage_resp = await client.get(
+        f"{base}/rest/v1/temuclaude_usage",
+        headers=headers,
+        params={
+            "user_id": f"eq.{user_id}",
+            "query_date": f"eq.{today}",
+            "select": "query_count,input_tokens,output_tokens",
+            "limit": "1",
+        },
+    )
+    current = usage_resp.json()[0] if usage_resp.status_code == 200 and usage_resp.json() else {}
+    payload = {
+        "user_id": user_id,
+        "query_date": today,
+        "query_count": int(current.get("query_count") or 0) + 1,
+        "input_tokens": int(current.get("input_tokens") or 0) + prompt_tokens,
+        "output_tokens": int(current.get("output_tokens") or 0) + completion_tokens,
+    }
+    await client.post(
+        f"{base}/rest/v1/temuclaude_usage",
+        headers={**headers, "Prefer": "resolution=merge-duplicates,return=minimal"},
+        params={"on_conflict": "user_id,query_date"},
+        json=payload,
+    )
 
 
 async def call_model(client, model: str, messages: list, temp: float = 0.6, max_tok: int = 4096) -> Result:
@@ -378,7 +500,7 @@ async def orchestrate(client, messages: list, temp: float, max_tok: int) -> dict
 
 @app.function(
     image=image,
-    secrets=[modal.Secret.from_name("openrouter-key")],
+    secrets=[modal.Secret.from_name("temuclaude-prod")],
     scaledown_window=300,
     timeout=120,
 )
@@ -396,9 +518,45 @@ def serve():
     async def root():
         return {"status": "ok", "model": "temuclaude"}
 
+    @api.get("/models")
     @api.get("/v1/models")
     async def list_models():
-        return {"object": "list", "data": [{"id": "temuclaude", "object": "model", "owned_by": "temuclaude"}]}
+        return {
+            "data": [
+                {
+                    "id": "temuclaude/temuclaude",
+                    "name": "TemuClaude",
+                    "created": 1778398147,
+                    "input_modalities": ["text"],
+                    "output_modalities": ["text"],
+                    "quantization": "fp16",
+                    "context_length": 8192,
+                    "max_output_length": 4096,
+                    "pricing": {
+                        "prompt": "0.000002",        # Cost per prompt token in USD ($2.00 / 1M)
+                        "completion": "0.000008",    # Cost per completion token in USD ($8.00 / 1M)
+                        "image": "0",
+                        "request": "0",
+                        "input_cache_read": "0"
+                    },
+                    "supported_sampling_parameters": ["temperature", "max_tokens"],
+                    "supported_features": ["reasoning"],
+                    "description": "TemuClaude — 8-Model Multi-Model AI Orchestration (OpenAI-compatible)",
+                    "is_ready": True,
+                    "is_free": False,
+                    "discount_to_user": 0,
+                    "capacity_tpm": 1000000,
+                    "openrouter": {
+                        "slug": "temuclaude/temuclaude"
+                    },
+                    "datacenters": [
+                        {
+                            "country_code": "US"
+                        }
+                    ]
+                }
+            ]
+        }
 
     @api.get("/health")
     async def health():
@@ -438,16 +596,42 @@ def serve():
                     status_code=400,
                 )
 
-            # Auth check (optional)
+            client = httpx.AsyncClient(timeout=60)
+
+            # Auth check: website gateway uses master key; direct users use tmc_ keys.
             auth_key = request.headers.get("authorization", "").replace("Bearer ", "")
             master_key = os.environ.get("TEMUCLAUDE_MASTER_KEY", "")
-            if master_key and auth_key != master_key:
+            direct_user = None
+            if master_key and auth_key == master_key:
+                pass
+            elif auth_key.startswith("tmc_"):
+                direct_user = await validate_customer_api_key(client, auth_key)
+                if not direct_user:
+                    await client.aclose()
+                    return JSONResponse(
+                        {"error": {"message": "Invalid API key", "type": "authentication_error"}},
+                        status_code=401,
+                    )
+                plan = direct_user.get("plan") or "free"
+                if plan not in PLAN_MONTHLY_LIMITS:
+                    await client.aclose()
+                    return JSONResponse(
+                        {"error": {"message": "API access requires a Developer, Pro, or Enterprise plan.", "type": "permission_error"}},
+                        status_code=403,
+                    )
+                monthly_limit = PLAN_MONTHLY_LIMITS[plan]
+                if monthly_limit >= 0 and await get_monthly_usage(client, direct_user["id"]) >= monthly_limit:
+                    await client.aclose()
+                    return JSONResponse(
+                        {"error": {"message": "Monthly API quota exceeded.", "type": "rate_limit_error"}},
+                        status_code=429,
+                    )
+            elif master_key:
+                await client.aclose()
                 return JSONResponse(
                     {"error": {"message": "Invalid API key", "type": "authentication_error"}},
                     status_code=401,
                 )
-
-            client = httpx.AsyncClient(timeout=60)
 
             # Timeout safeguard: 45s → single GLM fallback
             pipeline_task = asyncio.ensure_future(orchestrate(client, messages, temp, max_tok))
@@ -466,6 +650,10 @@ def serve():
             for t in pending:
                 t.cancel()
             result = done.pop().result()
+            prompt_tokens = sum(len(m.get("content", "").split()) for m in messages)
+            completion_tokens = len(result["content"].split()) if result["content"] else 0
+            if direct_user:
+                await increment_customer_usage(client, direct_user["id"], prompt_tokens, completion_tokens)
             await client.aclose()
 
             return JSONResponse({
@@ -479,8 +667,8 @@ def serve():
                     "finish_reason": "stop",
                 }],
                 "usage": {
-                    "prompt_tokens": sum(len(m.get("content", "").split()) for m in messages),
-                    "completion_tokens": len(result["content"].split()) if result["content"] else 0,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
                     "total_tokens": result["tokens"],
                 },
             })

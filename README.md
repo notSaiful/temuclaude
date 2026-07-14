@@ -17,6 +17,22 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-sp
 - **Benchmarks**: https://temuclaude.com/benchmarks
 - **Models**: https://temuclaude.com/models
 
+## Use with Hermes Agent
+
+TemuClaude exposes an authenticated OpenAI-compatible Chat Completions endpoint:
+
+```text
+Base URL: https://temuclaude.com/v1
+Model: temuclaude
+```
+
+Generate a `tmc_...` API key from the TemuClaude dashboard, then configure
+Hermes with `hermes model` → **Custom endpoint** using that base URL, key, and
+model name. Hermes supplies the agent tools and workspace; TemuClaude supplies
+the routed model response. Keep API keys in a local secret store and validate
+streaming/tool-call compatibility before using the endpoint for autonomous
+production actions.
+
 ## Updated Model Stack + Step Router
 
 TemuClaude uses eight active *roles*, not an always-on eight-model ensemble.

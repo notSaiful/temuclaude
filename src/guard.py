@@ -313,7 +313,7 @@ def guard_input(raw_input: str, embed_canaries: bool = True) -> GuardResult:
 
 
 def check_output_for_leaks(output: str) -> tuple[bool, list[str]]:
-    """Check model output for system prompt leakage via canary tokens.
+    """Check model output for system prompt leakage via canary tokens and honeypots.
     
     Args:
         output: Model output text
@@ -322,6 +322,16 @@ def check_output_for_leaks(output: str) -> tuple[bool, list[str]]:
         (leak_detected, list_of_leaked_token_names)
     """
     leaked = _canary_manager.check_output(output)
+    
+    honeypots = {
+        "MOCK_AWS_SECRET_KEY": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "MOCK_DB_PASSWORD": "temu_db_pass_secret_example_998",
+        "MOCK_API_KEY": "tc_live_f893d2b10a2c88ef092e10f"
+    }
+    for key, val in honeypots.items():
+        if val in output:
+            leaked.append(f"honeypot_{key}")
+            
     return len(leaked) > 0, leaked
 
 

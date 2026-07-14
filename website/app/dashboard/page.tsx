@@ -55,6 +55,13 @@ type DashboardData = {
       creditsSpent: number;
     };
   };
+  capacity: {
+    windowHours: number;
+    isUnlimited: boolean;
+    limit: number | null;
+    remaining: number | null;
+    nextRecoveryAt: number | null;
+  };
   apiKeys: ApiKeyRecord[];
   savings: number;
   modelMix: Record<string, number>;
@@ -64,6 +71,12 @@ type DashboardData = {
     nextInvoiceAt: number | null;
   };
 };
+
+function isDashboardData(value: unknown): value is DashboardData {
+  if (!value || typeof value !== 'object') return false;
+  const record = value as Record<string, unknown>;
+  return Boolean(record.user && record.plan && record.limits && record.usage && record.capacity);
+}
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat('en-US').format(value);
@@ -82,12 +95,49 @@ function formatDate(timestamp: number | null) {
   );
 }
 
+function formatDateTime(timestamp: number | null) {
+  if (!timestamp) return 'Not scheduled';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+  }).format(new Date(timestamp * 1000));
+}
+
 function formatLastUsed(timestamp: number | null) {
   return timestamp ? formatDate(timestamp) : 'Never';
 }
 
 function moneyOrUnavailable(value: number | null) {
   return value === null ? 'Not tracked' : `$${value.toFixed(2)}`;
+}
+
+function modelActivityLabel(modelId: string): string | null {
+  const normalized = modelId.trim().toLowerCase();
+  const exact: Record<string, string> = {
+    'glm-5.2': 'GLM-5.2',
+    'z-ai/glm-5.2': 'GLM-5.2',
+    'deepseek-pro': 'DeepSeek V4 Pro',
+    'deepseek/deepseek-v4-pro': 'DeepSeek V4 Pro',
+    'deepseek-v4-pro-20260423': 'DeepSeek V4 Pro',
+    'deepseek/deepseek-v4-flash': 'DeepSeek V4 Flash',
+    'deepseek-v4-flash-20260423': 'DeepSeek V4 Flash',
+    'qwen/qwen3.7-plus': 'Qwen 3.7 Plus',
+    'google/gemini-3.5-flash': 'Gemini 3.5 Flash',
+    'minimax/minimax-m3': 'MiniMax M3',
+    'nvidia/nemotron-3-ultra-550b-a55b': 'Nemotron 3 Ultra',
+    'openai/gpt-5.6-luna': 'GPT-5.6 Luna',
+    'x-ai/grok-4.5': 'Grok 4.5',
+  };
+  if (exact[normalized]) return exact[normalized];
+  // Historical routing tiers and unrecognised provider aliases are deliberately
+  // hidden: this panel is strictly model activity, never fallback/routing text.
+  return null;
+}
+
+function modelActivityEntries(modelMix: Record<string, number>) {
+  return Object.entries(modelMix)
+    .map(([modelId, calls]) => ({ modelId, calls, label: modelActivityLabel(modelId) }))
+    .filter((entry): entry is { modelId: string; calls: number; label: string } => entry.label !== null)
+    .sort((a, b) => b.calls - a.calls || a.label.localeCompare(b.label));
 }
 
 function authProviderLabel(session: LocalSession) {
@@ -121,8 +171,28 @@ export default function DashboardPage() {
       headers: { Authorization: `Bearer ${token}` },
       cache: 'no-store',
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Dashboard data unavailable.');
+    const contentType = res.headers.get('content-type') || '';
+    const rawBody = await res.text();
+    let data: unknown = null;
+
+    if (contentType.includes('application/json') && rawBody.trim()) {
+      try {
+        data = JSON.parse(rawBody) as unknown;
+      } catch {
+        throw new Error('Dashboard returned an invalid response. Please refresh and try again.');
+      }
+    }
+
+    if (!res.ok) {
+      const apiError = data && typeof data === 'object' && 'error' in data && typeof data.error === 'string'
+        ? data.error
+        : null;
+      throw new Error(apiError || 'Dashboard service is temporarily unavailable. Please refresh and try again.');
+    }
+    if (!isDashboardData(data)) {
+      throw new Error('Dashboard returned an incomplete response. Please refresh and try again.');
+    }
+
     setDashboardData(data);
     setDataError(null);
   }, []);
@@ -160,6 +230,19 @@ export default function DashboardPage() {
       mounted = false;
     };
   }, [loadDashboard, router]);
+
+  // Usage capacity changes with time even when the user is not making a new
+  // request. Refresh the live analytics rather than leaving a five-hour or
+  // weekly figure stale until a manual page reload.
+  useEffect(() => {
+    if (!session) return;
+    const refreshId = window.setInterval(() => {
+      void loadDashboard().catch((error) => {
+        setDataError(error instanceof Error ? error.message : 'Dashboard refresh failed.');
+      });
+    }, 60_000);
+    return () => window.clearInterval(refreshId);
+  }, [loadDashboard, session]);
 
   const handleGenerateKey = async () => {
     setKeyStatus('Creating API key...');
@@ -199,9 +282,44 @@ export default function DashboardPage() {
 
   const handleCopyKey = () => {
     if (newApiKey) {
-      navigator.clipboard.writeText(newApiKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(newApiKey)
+          .then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          })
+          .catch((err) => {
+            console.error('navigator.clipboard.writeText failed, trying fallback:', err);
+            fallbackCopyText(newApiKey);
+          });
+      } else {
+        fallbackCopyText(newApiKey);
+      }
+    }
+  };
+
+  const fallbackCopyText = (text: string) => {
+    try {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      if (successful) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        setKeyStatus('Copy failed. Please select the key and copy manually.');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      setKeyStatus('Copy failed. Please copy the key manually.');
     }
   };
 
@@ -253,12 +371,17 @@ export default function DashboardPage() {
   const weeklyPercent = weeklyAllocation === 0 ? 0 : Math.max(0, Math.min(100, Math.round((creditBalance / weeklyAllocation) * 100)));
 
   const rollingQueries = dashboardData?.usage.rolling?.queries ?? 0;
-  const rollingLimit = dashboardData?.limits.rollingQueries === null
-    ? Infinity
-    : (dashboardData?.limits.rollingQueries ?? 20);
-  const rollingPercent = rollingLimit === Infinity
-    ? 100
-    : (rollingLimit === 0 ? 0 : Math.max(0, Math.min(100, Math.round(((rollingLimit - rollingQueries) / rollingLimit) * 100))));
+  const rollingCreditsSpent = dashboardData?.usage.rolling?.creditsSpent ?? 0;
+  const capacity = dashboardData?.capacity;
+  const rollingPercent = capacity?.isUnlimited
+    ? null
+    : (capacity?.limit ? Math.max(0, Math.min(100, Math.round(((capacity.remaining ?? 0) / capacity.limit) * 100))) : 0);
+  const capacityLabel = capacity?.isUnlimited ? `${formatNumber(rollingQueries)} used` : `${rollingPercent ?? 0}%`;
+  const rateStatus = creditBalance <= 0
+    ? 'Exhausted'
+    : capacity && !capacity.isUnlimited && (capacity.remaining ?? 0) <= 0
+      ? 'Cooling down'
+      : 'Available';
 
   const displayName = dashboardData?.user.name || session?.name || 'TemuClaude User';
   const displayEmail = dashboardData?.user.email || session?.email || '';
@@ -410,18 +533,18 @@ export default function DashboardPage() {
                     <strong className="text-2xl text-text-primary">{weeklyPercent}%</strong>
                   </div>
                   <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
-                    <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">5h Capacity Remaining</span>
-                    <strong className="text-2xl text-text-primary">{rollingPercent}%</strong>
+                    <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">5h Request Usage</span>
+                    <strong className="text-2xl text-text-primary">{capacityLabel}</strong>
                   </div>
                   <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
                     <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">5h Queries Sent</span>
                     <strong className="text-2xl text-text-primary">
-                      {rollingQueries}
+                      {formatNumber(rollingQueries)}
                     </strong>
                   </div>
                   <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm">
                     <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Rate Status</span>
-                    <strong className="text-2xl text-accent-olive">Active</strong>
+                    <strong className={`text-2xl ${rateStatus === 'Available' ? 'text-accent-olive' : 'text-accent-fig'}`}>{rateStatus}</strong>
                   </div>
                 </div>
 
@@ -446,37 +569,28 @@ export default function DashboardPage() {
               </div>
 
               <div className="card">
-                <h2 className="text-lg font-serif text-text-primary mb-2">Activity By Model</h2>
+                <h2 className="text-lg font-serif text-text-primary mb-2">Model Activity</h2>
                 <p className="text-xs text-text-secondary mb-5 leading-relaxed">
-                  Distribution of queries routed across the hybrid model pool.
+                  Actual model calls made for your requests. Routing and fallback labels are excluded.
                 </p>
 
-                {dashboardData?.modelMix && Object.keys(dashboardData.modelMix).length > 0 ? (
+                {modelActivityEntries(dashboardData?.modelMix || {}).length > 0 ? (
                   <div className="space-y-4">
                     {(() => {
-                      const totalQueries = Object.values(dashboardData.modelMix).reduce((sum, val) => sum + val, 0);
+                      const activity = modelActivityEntries(dashboardData?.modelMix || {});
+                      const totalCalls = activity.reduce((sum, entry) => sum + entry.calls, 0);
 
-                      const modelMeta: Record<string, { label: string; colorClass: string }> = {
-                        'glm-5.2': { label: 'GLM-5.2 (Orchestrator)', colorClass: 'bg-accent-olive' },
-                        'deepseek-pro': { label: 'DeepSeek Pro (Reasoning)', colorClass: 'bg-accent-primary' },
-                        'llama-3.3': { label: 'Llama 3.3 (Specialist)', colorClass: 'bg-blue-600' },
-                        'gemini-2.5': { label: 'Gemini 2.5 Flash (Worker)', colorClass: 'bg-sky-500' },
-                        'mistral-large': { label: 'Mistral Large 3 (Logic)', colorClass: 'bg-amber-600' },
-                        'temuclaude-standard': { label: 'TemuClaude Standard', colorClass: 'bg-emerald-600' },
-                      };
-
-                      return Object.entries(dashboardData.modelMix).map(([modelId, count]) => {
-                        const meta = modelMeta[modelId] || { label: modelId, colorClass: 'bg-text-secondary' };
-                        const percent = Math.round((count / totalQueries) * 100);
+                      return activity.map(({ modelId, label, calls }) => {
+                        const percent = Math.round((calls / totalCalls) * 100);
                         return (
                           <div key={modelId} className="space-y-1.5">
                             <div className="flex justify-between text-xs font-mono">
-                              <span className="text-text-primary font-medium">{meta.label}</span>
-                              <span className="text-text-secondary">{count} queries ({percent}%)</span>
+                              <span className="text-text-primary font-medium">{label}</span>
+                              <span className="text-text-secondary">{calls} {calls === 1 ? 'call' : 'calls'} ({percent}%)</span>
                             </div>
                             <div className="w-full bg-border-default h-2 rounded-full overflow-hidden">
                               <div
-                                className={`${meta.colorClass} h-full transition-all duration-500`}
+                                className="bg-accent-primary h-full transition-all duration-500"
                                 style={{ width: `${percent}%` }}
                               />
                             </div>
@@ -487,7 +601,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="p-4 bg-bg-secondary border border-border-subtle rounded-sm text-sm text-text-secondary text-center">
-                    No active model queries recorded yet.
+                    No named model calls recorded yet. New requests will show each model used.
                   </div>
                 )}
               </div>
@@ -544,22 +658,19 @@ export default function DashboardPage() {
 
                   <div className="space-y-2 mb-6">
                     <div className="flex justify-between text-xs text-text-secondary font-medium">
-                      <span>5h Request Capacity</span>
+                      <span>5h Request Usage</span>
                       <span>
-                        {rollingPercent}% remaining
+                        {capacity?.isUnlimited ? `${formatNumber(rollingQueries)} requests used` : `${rollingPercent ?? 0}% remaining`}
                       </span>
                     </div>
-                    <div className="w-full bg-border-default h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-accent-primary h-full transition-all duration-500"
-                        style={{
-                          width: `${rollingPercent}%`
-                        }}
-                      />
-                    </div>
+                    {!capacity?.isUnlimited && (
+                      <div className="w-full bg-border-default h-2 rounded-full overflow-hidden">
+                        <div className="bg-accent-primary h-full transition-all duration-500" style={{ width: `${rollingPercent ?? 0}%` }} />
+                      </div>
+                    )}
                     <div className="text-[10px] text-text-muted flex justify-between">
-                      <span>Capacity recovers over time</span>
-                      <span>Next reset: {formatDate(dashboardData?.user.credits_reset_at ?? null)}</span>
+                      <span>{capacity?.isUnlimited ? `${formatTokens(rollingCreditsSpent)} credits consumed in the past 5 hours` : 'Capacity recovers as each request ages out'}</span>
+                      {!capacity?.isUnlimited && <span>Next recovery: {formatDateTime(capacity?.nextRecoveryAt ?? null)}</span>}
                     </div>
                   </div>
                 </div>
@@ -577,13 +688,13 @@ export default function DashboardPage() {
                     <strong className="text-text-primary font-mono">{weeklyPercent}%</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">5h Request Capacity</span>
-                    <strong className="text-text-primary font-mono">{rollingPercent}%</strong>
+                    <span className="text-text-secondary">5h Consumption</span>
+                    <strong className="text-text-primary font-mono">{formatNumber(rollingQueries)} requests · {formatTokens(rollingCreditsSpent)} credits</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Next Renewal Reset</span>
+                    <span className="text-text-secondary">Weekly Credit Renewal</span>
                     <strong className="text-text-primary">
-                      {formatDate(dashboardData?.user.credits_reset_at ?? null)}
+                      {formatDateTime(dashboardData?.user.credits_reset_at ?? null)}
                     </strong>
                   </div>
                 </div>
