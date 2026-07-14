@@ -9,12 +9,11 @@ const MOCK_TRACES = [
   {
     query: "Compare 9.9 vs 9.11",
     steps: [
-      { text: "Cache check: Miss (similarity = 0.81)", status: "info" },
-      { text: "AOPR classification: Hard Logic. Routing to deepseek-v4-pro.", status: "route" },
-      { text: "Step 1: Convert values to decimals (9.90 vs 9.11). 90 > 11.", status: "thought" },
-      { text: "Verification: Launching SymPy equations checks...", status: "info" },
-      { text: "SymPy: verified True (9.9 > 9.11). Exit code 0.", status: "verify" },
-      { text: "Z3 logic checks: SAT (No contradictions detected).", status: "verify" },
+      { text: "Classification: Hard logic. Routing to the full MoA panel.", status: "route" },
+      { text: "Mixture-of-Agents: drafting candidate answers in parallel...", status: "info" },
+      { text: "Self-consistency: 3 samples, majority vote.", status: "thought" },
+      { text: "QA gate: Nemotron 3 Ultra scores the draft (9/10).", status: "verify" },
+      { text: "Answer verified — no reflexion pass needed.", status: "verify" },
       { text: "Output: 9.9 is larger than 9.11.", status: "output" },
       { text: "Blended cost: $0.0006 (cost-aware routed execution)", status: "price" }
     ]
@@ -22,24 +21,23 @@ const MOCK_TRACES = [
   {
     query: "Build Tic Tac Toe in React",
     steps: [
-      { text: "Cache check: Miss (similarity = 0.74)", status: "info" },
-      { text: "AOPR classification: Code Gen. Routing to extreme models.", status: "route" },
-      { text: "Writing React hook state logic (board, turn, winner)...", status: "thought" },
-      { text: "Visual Sandbox: Launching headless Puppeteer renderer...", status: "info" },
-      { text: "Screenshot checks: SSIM = 0.98. Visual layout passes.", status: "verify" },
-      { text: "Adversarial Breaker: Simulating random clicks on cells...", status: "info" },
-      { text: "Breaker: 0 DOM crashes caught.", status: "verify" },
+      { text: "Classification: Code gen. Routing to a single strong model (medium tier).", status: "route" },
+      { text: "Drafting React hook state logic (board, turn, winner)...", status: "thought" },
+      { text: "QA gate: Nemotron 3 Ultra flags missing win-detection.", status: "verify" },
+      { text: "Reflexion: re-drafting with verifier feedback...", status: "info" },
+      { text: "QA gate: corrected draft scores 10/10.", status: "verify" },
       { text: "Output: Code compiled and verified successfully.", status: "output" },
       { text: "Blended cost: $0.0034 (cost-aware routed execution)", status: "price" }
     ]
   },
   {
-    query: "Sales report anomalies",
+    query: "Summarize this sales report",
     steps: [
-      { text: "Cache check: Hit! Paraphrase match (similarity = 0.96)", status: "info" },
-      { text: "Retrieving pre-compiled response from semantic cache...", status: "info" },
-      { text: "Output: Anomalies report loaded from Cache.", status: "output" },
-      { text: "Blended cost: $0.0000 (Saved 100%. Cache hits are free)", status: "price" }
+      { text: "Classification: Trivial. Routing to deepseek-v4-flash.", status: "route" },
+      { text: "Single-model draft (no MoA panel needed for trivial tasks)...", status: "thought" },
+      { text: "QA gate: Nemotron 3 Ultra scores the draft (9/10).", status: "verify" },
+      { text: "Output: Anomalies report ready.", status: "output" },
+      { text: "Blended cost: $0.0001 (cost-aware routed execution)", status: "price" }
     ]
   }
 ];
@@ -69,7 +67,7 @@ function InteractiveTraceTerminal() {
     <div className="card w-full max-w-md bg-white border border-border-default shadow-md overflow-hidden p-6 font-sans">
       <div className="flex items-center justify-between mb-4 border-b border-border-subtle pb-3">
         <span className="text-xs font-mono font-semibold uppercase tracking-wider text-text-secondary">
-          Live Execution Trace
+          Example Trace · Illustrative
         </span>
         <div className="flex gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-red-400 opacity-60" />
@@ -90,7 +88,7 @@ function InteractiveTraceTerminal() {
                 : 'border-border-default hover:border-text-secondary text-text-secondary'
             }`}
           >
-            {idx === 0 ? "Math Logic" : idx === 1 ? "Web App Gen" : "Cached Query"}
+            {idx === 0 ? "Math Logic" : idx === 1 ? "Web App Gen" : "Trivial Query"}
           </button>
         ))}
       </div>
@@ -173,9 +171,9 @@ export default function HomePage() {
                   className="text-lg text-text-secondary mb-8 max-w-lg leading-relaxed animate-fade-in-up"
                   style={{ animationDelay: '300ms' }}
                 >
-                  TemuClaude is the next-generation multi-agent orchestration engine.
-                  We run 8 models in parallel, verify logic code programmatically, and build full-stack web apps,
-                  voxel games, and algorithms without a single point of failure.
+                  TemuClaude is a multi-agent orchestration engine. It routes each question across
+                  an 8-model pool, runs the right specialists in parallel for hard questions, verifies
+                  code programmatically, and returns one answer — no model selection, no fallback juggling.
                 </p>
 
                 {/* Code snippet — shows devs exactly how to use it */}
@@ -204,7 +202,7 @@ export default function HomePage() {
                   style={{ animationDelay: '500ms' }}
                 >
                   <a href="/playground" className="btn-accent">
-                    Try Free — 20 queries/day
+                    Try Free — 20 free queries
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                   </a>
                   <a href="/pricing" className="btn-secondary">
@@ -218,7 +216,7 @@ export default function HomePage() {
                 >
                   <span><strong className="text-text-primary">Free Trial</strong> available</span>
                   <span className="text-border-default">·</span>
-                  <span>Plans from <strong className="text-text-primary">$15/mo</strong></span>
+                  <span>Plans from <strong className="text-text-primary">$19/mo</strong></span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">Cancel anytime</strong></span>
                 </div>
@@ -237,26 +235,23 @@ export default function HomePage() {
         {/* ━━ Trust & Telemetry Strip ━━ */}
         <section className="border-y border-border-default bg-bg-secondary py-8 px-6 relative z-10">
           <div className="container-max">
-            {/* Telemetry Dashboard */}
+            {/* Honest status strip — no fabricated live metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center items-center mb-8 border-b border-border-subtle pb-8">
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Network Uptime</span>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-accent-olive animate-pulse" />
-                  <strong className="text-xl text-text-primary font-mono">99.98%</strong>
-                </div>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">License</span>
+                <strong className="text-xl text-text-primary font-mono">MIT</strong>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Blended Rate</span>
-                <strong className="text-xl text-text-primary font-mono">~$0.94/M</strong>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Model pool</span>
+                <strong className="text-xl text-text-primary font-mono">8 roles</strong>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Cache hit rate</span>
-                <strong className="text-xl text-text-primary font-mono">34.8%</strong>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Source</span>
+                <strong className="text-xl text-text-primary font-mono">Open</strong>
               </div>
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Saved by Developers</span>
-                <strong className="text-xl text-accent-primary font-mono animate-pulse">$148,204.42</strong>
+                <span className="text-[10px] uppercase tracking-wider text-text-muted block mb-1">Your data</span>
+                <strong className="text-xl text-text-primary font-mono">Never trained on</strong>
               </div>
             </div>
 
@@ -333,7 +328,7 @@ export default function HomePage() {
                     analyzes consensus and contradictions, then synthesizes one superior answer.
                   </p>
                   <p className="text-sm text-text-muted leading-relaxed">
-                    The result: measurably smarter than any single model in the pool.
+                    The goal: synthesize a stronger answer than any single model in the pool.
                     You don't choose models. TemuClaude does it for you, automatically.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-4">
@@ -357,8 +352,8 @@ export default function HomePage() {
                   <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Math that's verified</h3>
                   <p className="text-sm text-text-secondary leading-relaxed">
                     For math questions, 3 DeepSeek samples run at high temperature and vote on the
-                    answer. If 2 out of 3 agree, you get the consensus. Research shows this catches
-                    18% more errors than a single attempt.
+                    answer. If 2 out of 3 agree, you get the consensus. Research on self-consistency
+                    voting shows it catches more errors than a single attempt.
                   </p>
                 </div>
               </StaggerItem>
@@ -375,8 +370,8 @@ export default function HomePage() {
                   </div>
                   <h3 className="text-base font-serif text-text-primary mb-2" style={{ fontWeight: 400 }}>Self-checking</h3>
                   <p className="text-sm text-text-secondary leading-relaxed">
-                    Every answer is scored on 5 quality rubrics. If it scores below 8/10,
-                    TemuClaude retries with feedback. You always get the best version.
+                    Every hard answer is quality-checked. If it scores low, TemuClaude retries with
+                    feedback — so you get a re-checked, improved answer.
                   </p>
                 </div>
               </StaggerItem>
@@ -394,7 +389,7 @@ export default function HomePage() {
                       <div className="flex flex-wrap gap-4 text-sm">
                         <div>
                         <span className="text-2xl font-serif text-accent-primary" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>~$1.35</span>
-                          <span className="text-text-muted ml-1">/M blended</span>
+                          <span className="text-text-muted ml-1">/M blended (modeled)</span>
                         </div>
                         <div>
                         <span className="text-2xl font-serif text-accent-olive" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>31x</span>
@@ -679,10 +674,10 @@ export default function HomePage() {
         <section className="py-28 px-6 bg-bg-secondary">
           <div className="container-max text-center">
             <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-4" style={{ fontWeight: 300, letterSpacing: '-0.02em' }}>
-              Developer plans from $15/month.<br />Cancel anytime.
+              Developer plans from $19/month.<br />Cancel anytime.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              20 free queries/day in the playground. Upgrade when you need API access and higher limits.
+              20 free queries in the playground to start. Upgrade when you need API access and higher limits.
             </p>
             <div className="flex items-center justify-center gap-4">
               <a href="/playground" className="btn-accent">
@@ -705,7 +700,7 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary">Playground</a></li>
                   <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary">Models</a></li>
-                  <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
+                  <li><a href="/docs#projected-scores" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
                   <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
@@ -720,8 +715,8 @@ export default function HomePage() {
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
                 <ul className="space-y-2">
-                  <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                   <li><a href="/contact" className="text-sm text-text-secondary hover:text-accent-primary">Contact Us</a></li>
+                  <li><a href="mailto:hello@temuclaude.com" className="text-sm text-text-secondary hover:text-accent-primary">Email Support</a></li>
                 </ul>
               </div>
               <div>
@@ -735,17 +730,19 @@ export default function HomePage() {
               </div>
             </div>
             <div className="pt-8 border-t border-border-subtle flex flex-col items-center gap-3">
-              <svg width="32" height="32" viewBox="0 0 200 200" aria-hidden="true">
-                <line x1="25" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="55" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="100" y1="20" x2="100" y2="85" stroke="#C97B50" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="145" y1="30" x2="100" y2="85" stroke="#D4A574" strokeWidth="7" strokeLinecap="round"/>
-                <line x1="175" y1="55" x2="100" y2="85" stroke="#E8D5C4" strokeWidth="7" strokeLinecap="round"/>
-                <rect x="90" y="85" width="20" height="95" rx="5" fill="#D97757"/>
-                <circle cx="100" cy="85" r="6" fill="#D97757"/>
+              <svg width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="11" fill="#E25822"/>
+                <line x1="50" y1="50" x2="50" y2="10" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="79" y2="21" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="90" y2="50" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="79" y2="79" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="50" y2="90" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="21" y2="79" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="10" y2="50" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
+                <line x1="50" y1="50" x2="21" y2="21" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
               </svg>
               <p className="text-sm text-text-muted">
-                Built by Mohammad Saiful Haque · MIT Licensed
+                © 2026 TemuClaude. All rights reserved.
               </p>
             </div>
           </div>
