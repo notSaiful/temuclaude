@@ -951,7 +951,7 @@ export default function PlaygroundPage() {
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
                       </button>
                       {showModelPicker && (
-                        <div role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
+                        <div id="model-profile" role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
                           <button role="option" aria-selected={modelProfile === 'pro'} onClick={() => { setModelProfile('pro'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'pro' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
                             <span className="block text-xs font-semibold text-text-primary">TemuClaude Pro</span>
                             <span className="mt-0.5 block text-[11px] text-text-muted">Full routed orchestration for demanding tasks</span>
