@@ -41,8 +41,9 @@ class FirewallResult:
 
 # ─── Secret patterns ───────────────────────────────────────────
 SECRET_PATTERNS = [
-    # API keys (various formats)
-    (r"sk-[a-zA-Z0-9]{20,}", "api_key"),
+    # API keys (various formats) — allow underscores/hyphens so sk-proj-... and
+    # sk-test_key_... style keys are matched, not just base62 sk-<48> keys.
+    (r"sk-[A-Za-z0-9_-]{20,}", "api_key"),
     (r"AKIA[0-9A-Z]{16}", "aws_access_key"),
     (r"ghp_[a-zA-Z0-9]{36}", "github_pat"),
     (r"gho_[a-zA-Z0-9]{36}", "github_oauth"),
