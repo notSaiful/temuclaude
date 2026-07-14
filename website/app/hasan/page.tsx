@@ -126,6 +126,8 @@ export default function HasanPage() {
   const [deployData, setDeployData] = useState<any>(null);
   const [powerState, setPowerState] = useState<'active' | 'deactivated'>('deactivated');
   const [powerLoading, setPowerLoading] = useState(false);
+  const [opKey, setOpKey] = useState<string>(() => (typeof window !== 'undefined' ? sessionStorage.getItem('hasan_op_key') || '' : ''));
+  const [opKeyInput, setOpKeyInput] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -205,9 +207,13 @@ export default function HasanPage() {
     try {
       const res = await fetch('/api/hasan/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(opKey ? { 'x-temuclaude-internal-key': opKey } : {}) },
         body: JSON.stringify({ message: userMsg.content }),
       });
+      if (res.status === 401) {
+        setChatMessages(prev => [...prev, { role: 'hasan', content: 'Hasan chat is restricted to the operator. Enter the operator key below to continue.', timestamp: new Date().toISOString() }]);
+        return;
+      }
       const json = await res.json();
       const hasanMsg: ChatMessage = { role: 'hasan', content: json.response || 'No response', timestamp: new Date().toISOString() };
       setChatMessages(prev => [...prev, hasanMsg]);
@@ -479,6 +485,23 @@ export default function HasanPage() {
                 <p style={s.chatStatus}>{online ? 'Online · Ready to talk' : 'Offline · System deactivated'}</p>
               </div>
             </div>
+            {!opKey && (
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                <input
+                  value={opKeyInput}
+                  onChange={e => setOpKeyInput(e.target.value)}
+                  placeholder="Operator key"
+                  type="password"
+                  style={{ ...s.chatInput, flex: 1 }}
+                />
+                <button
+                  onClick={() => { const k = opKeyInput.trim(); if (k) { sessionStorage.setItem('hasan_op_key', k); setOpKey(k); setOpKeyInput(''); } }}
+                  style={{ ...s.sendBtn, padding: '0 16px' }}
+                >
+                  Unlock
+                </button>
+              </div>
+            )}
             <div style={s.chatMessages}>
               {chatMessages.length === 0 && (
                 <div style={s.chatWelcome}>

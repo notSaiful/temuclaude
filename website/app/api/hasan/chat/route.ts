@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { callOpenRouter as callOpenRouterRequest } from '@/lib/openrouter';
+import { hasInternalAdminAccess } from '@/lib/internal-admin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -409,6 +410,9 @@ async function callOpenRouter(
 }
 
 export async function POST(req: NextRequest) {
+  if (!hasInternalAdminAccess(req)) {
+    return NextResponse.json({ error: 'Unauthorized: operator key required' }, { status: 401 });
+  }
   try {
     const { message } = await req.json();
 

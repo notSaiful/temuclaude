@@ -89,6 +89,13 @@ export async function fetchSubscription(subscriptionId: string) {
   return razorpayRequest('GET', `/subscriptions/${subscriptionId}`);
 }
 
+// Fetch order details (one-time / top-up purchases). Notes carry the paid plan
+// and user_id, which /api/payments/verify uses as the source of truth for what
+// was actually purchased — instead of trusting client-supplied values.
+export async function fetchOrder(orderId: string) {
+  return razorpayRequest('GET', `/orders/${orderId}`);
+}
+
 // Cancel a subscription
 export async function cancelSubscription(subscriptionId: string, cancelAtCycleEnd = true) {
   return razorpayRequest('POST', `/subscriptions/${subscriptionId}/cancel`, {
