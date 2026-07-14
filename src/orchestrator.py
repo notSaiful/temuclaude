@@ -10,8 +10,14 @@ import time
 import asyncio
 import os
 import sys
+import logging
 from typing import Optional
 from openai import AsyncOpenAI
+
+# Module-level logger for orchestration warnings (e.g. fallback paths).
+# QueryLogger (self.logger) records structured per-query JSONL entries; it is
+# not the right tool for ad-hoc warnings, so we use a stdlib logger here.
+logger = logging.getLogger(__name__)
 
 # Handle both package import (from src.orchestrator) and direct script execution
 if __package__:
@@ -1203,7 +1209,7 @@ class Temuclaude:
                         models_used.extend(["nemotron-3-ultra", repair_model])
                         self_play_ran = True
                 except Exception as ex:
-                    logger.warning(f"MCTS/Self-Play pipeline failed: {ex}. Falling back to standard MoA.")
+                    logger.warning(f"MCTS/Self-Play pipeline failed: {ex}. Falling back to standard MoA.", exc_info=True)
 
             if not mcts_ran:
                 # A third MoA review layer is reserved for the explicit
