@@ -9,8 +9,9 @@ import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
 export const runtime = 'nodejs';
 // Hard Pro requests deliberately run several high-value model and verifier
 // stages. Give that quality-first pipeline room to finish instead of allowing
-// the platform to kill it at 60 seconds with no answer.
-export const maxDuration = 120;
+// the platform to kill it mid-pipeline with no answer. Raised from 120s to
+// 300s on 2026-07-14 (Vercel plan ceiling): hard runs can reach ~210s.
+export const maxDuration = 300;
 
 // TemuClaude Pro — the current eight-model, role-bounded registry.
 // Each model has a distinct job; premium escalation remains conditional.
