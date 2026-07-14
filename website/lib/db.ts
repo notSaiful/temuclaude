@@ -6,6 +6,12 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { PLAN_LIMITS, type PlanId } from './plans';
+import { nextWeeklyResetAt, rollingWindowCutoff, WEEKLY_WINDOW_SECONDS } from './usage-windows';
+
+function weeklyCreditsForPlan(plan: string): number {
+  return PLAN_LIMITS[plan as PlanId]?.weeklyCredits ?? PLAN_LIMITS.free.weeklyCredits;
+}
 
 interface DBSchema {
   users: Record<string, User>;
@@ -158,9 +164,9 @@ export function createUser(email: string, name?: string): User {
     name: name || null,
     plan: 'free',
     razorpay_customer_id: null,
-    credit_balance: 50000,
+    credit_balance: PLAN_LIMITS.free.weeklyCredits,
     credits_reset_at: now + 7 * 24 * 3600,
-    weekly_credit_allocation: 50000,
+    weekly_credit_allocation: PLAN_LIMITS.free.weeklyCredits,
     created_at: now,
     updated_at: now,
   };
@@ -185,7 +191,7 @@ export function getUserByEmail(email: string): User | null {
 export function updateUserPlan(userId: string, plan: string): void {
   const db = loadDB();
   if (db.users[userId]) {
-    const weeklyAllocation = plan === 'developer' ? 5000000 : plan === 'pro' ? 25000000 : plan === 'max' ? 100000000 : plan === 'enterprise' ? 300000000 : 50000;
+    const weeklyAllocation = weeklyCreditsForPlan(plan);
     db.users[userId].plan = plan;
     db.users[userId].weekly_credit_allocation = weeklyAllocation;
     db.users[userId].credit_balance = weeklyAllocation;
@@ -333,7 +339,17 @@ export function getMonthUsage(userId: string): { totalQueries: number; totalInpu
   return { totalQueries, totalInputTokens, totalOutputTokens };
 }
 
-export function incrementUsage(userId: string, inputTokens: number, outputTokens: number, modelName?: string): void {
+type ModelActivity = string | string[] | undefined;
+
+function modelActivityEntries(modelActivity: ModelActivity): string[] {
+  const values = Array.isArray(modelActivity) ? modelActivity : [modelActivity];
+  const models = values.filter((model): model is string => typeof model === 'string' && model.trim().length > 0);
+  // Retain historical rows when no model attribution exists, but never invent a
+  // customer-facing routing tier such as "hard" or "fallback".
+  return models.length > 0 ? models : ['unattributed-legacy'];
+}
+
+export function incrementUsage(userId: string, inputTokens: number, outputTokens: number, modelActivity?: ModelActivity): void {
   const db = loadDB();
   const today = new Date().toISOString().split('T')[0];
   const key = `${userId}_${today}`;
@@ -355,19 +371,22 @@ export function incrementUsage(userId: string, inputTokens: number, outputTokens
   }
 
   // 2. Add high-res rolling window event
-  const eventId = generateId();
   const creditsSpent = inputTokens + outputTokens;
   const savedUsd = creditsSpent * 0.00004906;
   if (!db.events) db.events = {};
-  db.events[eventId] = {
-    id: eventId,
-    user_id: userId,
-    created_at: now,
-    credits_spent: creditsSpent,
-    query_count: 1,
-    model_name: modelName || 'temuclaude-standard',
-    saved_usd: savedUsd,
-  };
+  modelActivityEntries(modelActivity).forEach((modelName, index) => {
+    const eventId = generateId();
+    db.events[eventId] = {
+      id: eventId,
+      user_id: userId,
+      created_at: now,
+      // A request is billed once. Extra per-model events are telemetry only.
+      credits_spent: index === 0 ? creditsSpent : 0,
+      query_count: index === 0 ? 1 : 0,
+      model_name: modelName,
+      saved_usd: index === 0 ? savedUsd : 0,
+    };
+  });
 
   // 3. Deduct from credit balance
   if (db.users[userId]) {
@@ -433,15 +452,17 @@ function normalizeEmail(email: string): string {
 }
 
 function mapUser(row: any): User {
+  const plan = row.plan || 'free';
+  const allocation = Number(row.weekly_credit_allocation ?? weeklyCreditsForPlan(plan));
   return {
     id: row.id,
     email: row.email,
     name: row.name ?? null,
-    plan: row.plan || 'free',
+    plan,
     razorpay_customer_id: row.razorpay_customer_id ?? null,
-    credit_balance: Number(row.credit_balance ?? 50000),
-    credits_reset_at: Number(row.credits_reset_at ?? (nowUnix() + 7 * 24 * 3600)),
-    weekly_credit_allocation: Number(row.weekly_credit_allocation ?? 50000),
+    credit_balance: Number(row.credit_balance ?? allocation),
+    credits_reset_at: Number(row.credits_reset_at ?? (nowUnix() + WEEKLY_WINDOW_SECONDS)),
+    weekly_credit_allocation: allocation,
     created_at: Number(row.created_at || nowUnix()),
     updated_at: Number(row.updated_at || nowUnix()),
   };
@@ -500,9 +521,9 @@ export async function createUserAsync(email: string, name?: string): Promise<Use
     name: name || null,
     plan: 'free',
     razorpay_customer_id: null,
-    credit_balance: 50000,
+    credit_balance: PLAN_LIMITS.free.weeklyCredits,
     credits_reset_at: now + 7 * 24 * 3600,
-    weekly_credit_allocation: 50000,
+    weekly_credit_allocation: PLAN_LIMITS.free.weeklyCredits,
     created_at: now,
     updated_at: now,
   };
@@ -533,7 +554,7 @@ export async function updateUserPlanAsync(userId: string, plan: string): Promise
     return;
   }
 
-  const weeklyAllocation = plan === 'developer' ? 5000000 : plan === 'pro' ? 25000000 : plan === 'max' ? 100000000 : plan === 'enterprise' ? 300000000 : 50000;
+  const weeklyAllocation = weeklyCreditsForPlan(plan);
   const { error } = await client
     .from('temuclaude_users')
     .update({
@@ -745,45 +766,35 @@ export async function getMonthUsageAsync(userId: string): Promise<{ totalQueries
   );
 }
 
-export async function incrementUsageAsync(userId: string, inputTokens: number, outputTokens: number, modelName?: string): Promise<void> {
+export async function incrementUsageAsync(userId: string, inputTokens: number, outputTokens: number, modelActivity?: ModelActivity): Promise<void> {
   const client = getSupabaseAdminClient();
   if (!client) {
-    incrementUsage(userId, inputTokens, outputTokens, modelName);
+    incrementUsage(userId, inputTokens, outputTokens, modelActivity);
     return;
   }
 
   const now = nowUnix();
   const creditsSpent = inputTokens + outputTokens;
   const savedUsd = creditsSpent * 0.00004906;
-  const resolvedModel = modelName || 'temuclaude-standard';
+  const models = modelActivityEntries(modelActivity);
 
-  // 1. Log high-res rolling window event
+  // 1. Log one event per actual model invocation. Only the first entry carries
+  // billing and request-count values, so model transparency cannot inflate
+  // quotas, credit deductions, or savings totals.
   const { error: eventErr } = await client
     .from('temuclaude_usage_events')
-    .insert({
+    .insert(models.map((modelName, index) => ({
       id: generateId(),
       user_id: userId,
       created_at: now,
-      credits_spent: creditsSpent,
-      query_count: 1,
-      model_name: resolvedModel,
-      saved_usd: savedUsd,
-    });
+      credits_spent: index === 0 ? creditsSpent : 0,
+      query_count: index === 0 ? 1 : 0,
+      model_name: modelName,
+      saved_usd: index === 0 ? savedUsd : 0,
+    })));
 
   if (eventErr) {
-    console.warn('Logging usage event with model metadata failed, falling back to core schema...', eventErr.message);
-    const { error: fallbackErr } = await client
-      .from('temuclaude_usage_events')
-      .insert({
-        id: generateId(),
-        user_id: userId,
-        created_at: now,
-        credits_spent: creditsSpent,
-        query_count: 1,
-      });
-    if (fallbackErr) {
-      console.error('Core usage event fallback insert failed:', fallbackErr.message);
-    }
+    throw new Error(`Usage event ledger write failed: ${eventErr.message}`);
   }
 
   // 2. Deduct credits from user profile
@@ -817,43 +828,51 @@ export async function incrementUsageAsync(userId: string, inputTokens: number, o
   if (error) throw error;
 }
 
-export async function getRollingWindowUsageAsync(userId: string, hours = 5): Promise<{ query_count: number; credits_spent: number }> {
+export async function getRollingWindowUsageAsync(userId: string, hours = 5): Promise<{ query_count: number; credits_spent: number; oldest_event_at: number | null }> {
   const client = getSupabaseAdminClient();
-  const cutoff = nowUnix() - hours * 3600;
+  const cutoff = rollingWindowCutoff(nowUnix(), hours);
 
   if (!client) {
     const db = loadDB();
     let query_count = 0;
     let credits_spent = 0;
+    let oldest_event_at: number | null = null;
 
     for (const event of Object.values(db.events || {})) {
       if (event.user_id === userId && event.created_at >= cutoff) {
         query_count += event.query_count;
         credits_spent += event.credits_spent;
+        oldest_event_at = oldest_event_at === null ? event.created_at : Math.min(oldest_event_at, event.created_at);
       }
     }
-    return { query_count, credits_spent };
+    return { query_count, credits_spent, oldest_event_at };
   }
 
   const { data, error } = await client
     .from('temuclaude_usage_events')
-    .select('query_count, credits_spent')
+    .select('created_at, query_count, credits_spent')
     .eq('user_id', userId)
-    .gte('created_at', cutoff);
+    .gte('created_at', cutoff)
+    .order('created_at', { ascending: true });
 
-  if (error) {
-    console.warn('Supabase usage events read failed (falling back to daily):', error.message);
-    const today = await getTodayUsageAsync(userId);
-    return { query_count: today.query_count, credits_spent: today.input_tokens + today.output_tokens };
-  }
+  // Daily summaries have no per-request timestamps and therefore cannot
+  // truthfully answer a rolling-window query. Failing closed prevents an
+  // incorrect dashboard value or accidental quota bypass when the event ledger
+  // has not been migrated.
+  if (error) throw new Error(`Usage event ledger is unavailable: ${error.message}`);
 
   let query_count = 0;
   let credits_spent = 0;
+  let oldest_event_at: number | null = null;
   for (const row of data || []) {
     query_count += Number(row.query_count || 0);
     credits_spent += Number(row.credits_spent || 0);
+    const timestamp = Number(row.created_at || 0);
+    if (Number(row.query_count || 0) > 0 && timestamp > 0) {
+      oldest_event_at = oldest_event_at === null ? timestamp : Math.min(oldest_event_at, timestamp);
+    }
   }
-  return { query_count, credits_spent };
+  return { query_count, credits_spent, oldest_event_at };
 }
 
 export async function verifyAndRenewWeeklyCreditsAsync(userId: string): Promise<User | null> {
@@ -866,8 +885,8 @@ export async function verifyAndRenewWeeklyCreditsAsync(userId: string): Promise<
     if (!user) return null;
 
     if (now >= (user.credits_reset_at || 0)) {
-      user.credit_balance = user.weekly_credit_allocation || 50000;
-      user.credits_reset_at = now + 7 * 24 * 3600;
+      user.credit_balance = user.weekly_credit_allocation || weeklyCreditsForPlan(user.plan);
+      user.credits_reset_at = nextWeeklyResetAt(user.credits_reset_at, now);
       user.updated_at = now;
       saveDB();
     }
@@ -883,14 +902,22 @@ export async function verifyAndRenewWeeklyCreditsAsync(userId: string): Promise<
   if (fetchErr || !userRow) return null;
   const user = mapUser(userRow);
 
-  if (now >= user.credits_reset_at) {
-    const newBalance = user.weekly_credit_allocation;
-    const newReset = now + 7 * 24 * 3600;
+  const weeklyAllocation = weeklyCreditsForPlan(user.plan);
+  const needsPolicySync = user.weekly_credit_allocation !== weeklyAllocation;
+
+  if (now >= user.credits_reset_at || needsPolicySync) {
+    const newBalance = now >= user.credits_reset_at
+      ? weeklyAllocation
+      : Math.min(user.credit_balance, weeklyAllocation);
+    const newReset = now >= user.credits_reset_at
+      ? nextWeeklyResetAt(user.credits_reset_at, now)
+      : user.credits_reset_at;
 
     const { data: updatedRow, error: updateErr } = await client
       .from('temuclaude_users')
       .update({
         credit_balance: newBalance,
+        weekly_credit_allocation: weeklyAllocation,
         credits_reset_at: newReset,
         updated_at: now
       })
@@ -1020,7 +1047,7 @@ export async function getSavingsAndModelMixAsync(userId: string): Promise<{
     const saved = event.saved_usd !== undefined ? Number(event.saved_usd) : Number(event.credits_spent || 0) * 0.00004906;
     totalSavedUSD += saved;
 
-    const model = event.model_name || 'temuclaude-standard';
+    const model = event.model_name || 'unattributed-legacy';
     modelMix[model] = (modelMix[model] || 0) + 1;
   }
 
