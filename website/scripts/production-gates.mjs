@@ -123,6 +123,8 @@ assertIncludes('website/lib/openrouter.ts', [
 
 assertIncludes('website/app/playground/page.tsx', [
   'resolveChatEndpoint(process.env.NEXT_PUBLIC_CHAT_API_URL)',
+  "response.status === 401",
+  "'/login?returnTo=/playground&reason=session-expired'",
   'title="Choose TemuClaude model profile"',
   'HTML deliverable',
   "anchor.download = 'temuclaude-game.html'",

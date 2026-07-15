@@ -4,7 +4,7 @@
 # (set at deploy time via `gcloud run deploy --timeout=3600`) so hard
 # orchestration runs that exceed Vercel's 300s function ceiling can finish.
 # The Vercel playground calls this service cross-origin with a bearer Supabase
-# access token; CORS is handled in the route itself. Only /api/chat is used
+# access token or shared signed app token; CORS is handled in the route itself. Only /api/chat is used
 # cross-origin — the rest of the app is bundled but dormant here.
 #
 # Build context: the website/ directory  (gcloud run deploy --source website).

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
-import { getAccessToken, getStoredSession, type LocalSession } from '@/lib/auth';
+import { getAccessToken, getStoredSession, signOut, type LocalSession } from '@/lib/auth';
 import { resolveChatEndpoint } from '@/lib/chat-endpoint';
 import { inferMediaKind } from '@/lib/media-intent';
 
@@ -356,7 +356,19 @@ export default function PlaygroundPage() {
         signal: abortControllerRef.current?.signal,
       });
 
-      if (!response.ok) throw new Error(`API returned ${response.status}`);
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Cloud Run and Vercel share the app-token signing secret. If that
+          // secret is rotated, an existing browser session cannot be repaired
+          // in place; clear it and obtain a fresh signed session instead of
+          // presenting an unrelated model-generation error.
+          await signOut();
+          window.location.href = '/login?returnTo=/playground&reason=session-expired';
+          return;
+        }
+        const errorBody = await response.json().catch(() => ({})) as { error?: string };
+        throw new Error(errorBody.error || `API returned ${response.status}`);
+      }
 
       setStatus('streaming');
 
