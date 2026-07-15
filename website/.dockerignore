@@ -1,0 +1,11 @@
+# Exclude the local (darwin) node_modules and build artifacts from the Docker
+# build context so the linux image gets a fresh `npm ci` install. Without this,
+# COPY ./ would ship platform-mismatched binaries into the container.
+node_modules
+.next
+.git
+.env
+.env.local
+.env.*.local
+Dockerfile
+.dockerignore

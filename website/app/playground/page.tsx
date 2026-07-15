@@ -341,7 +341,12 @@ export default function PlaygroundPage() {
         return;
       }
 
-      const response = await fetch('/api/chat', {
+      // When NEXT_PUBLIC_CHAT_API_URL is set (the Cloud Run chat service), the
+      // playground calls it cross-origin with the bearer Supabase access token
+      // (already attached below) so hard orchestration can exceed Vercel's 300s
+      // ceiling. Unset = same-origin Vercel route (current behavior).
+      const chatUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || '/api/chat';
+      const response = await fetch(chatUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

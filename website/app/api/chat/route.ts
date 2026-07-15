@@ -99,37 +99,61 @@ function validateMessages(value: unknown): { messages: ChatMessage[] } | { error
   return { messages };
 }
 
+function corsInit(req: NextRequest): Record<string, string> {
+  // The chat route runs on Cloud Run (long request timeout) and is called
+  // cross-origin from the Vercel playground using a bearer access token (no
+  // cookies cross-origin). Same-origin Vercel requests are not subject to
+  // CORS, so these headers are inert there. Allowlist is configurable.
+  const allow = (process.env.CHAT_CORS_ALLOW_ORIGIN || 'https://temuclaude.com')
+    .split(',').map((s) => s.trim()).filter(Boolean);
+  const origin = req.headers.get('origin');
+  const allowOrigin = origin && allow.includes(origin) ? origin : (allow[0] || 'https://temuclaude.com');
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  };
+}
+
+// Preflight for cross-origin (Cloud Run) chat calls. Same-origin Vercel calls
+// never trigger a preflight, so this is inert on Vercel.
+export async function OPTIONS(req: NextRequest) {
+  return new Response(null, { status: 204, headers: corsInit(req) });
+}
+
 export async function POST(req: NextRequest) {
   const auth = await getAuthenticatedSupabaseUser(req);
   if ('error' in auth) {
-    return Response.json({ error: auth.error }, { status: auth.status });
+    return Response.json({ error: auth.error }, { status: auth.status, headers: corsInit(req) });
   }
   const email = auth.user.email?.trim().toLowerCase();
-  if (!email) return Response.json({ error: 'Authenticated user has no email address' }, { status: 400 });
+  if (!email) return Response.json({ error: 'Authenticated user has no email address' }, { status: 400, headers: corsInit(req) });
   const initialUser = await getOrCreateUserByEmailAsync(email);
   const account = (await verifyAndRenewWeeklyCreditsAsync(initialUser.id)) || initialUser;
   const limits = PLAN_LIMITS[account.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
   const rollingUsage = await getRollingWindowUsageAsync(account.id, ROLLING_WINDOW_HOURS);
   if (account.credit_balance <= 0 || (limits.rollingQueries !== Infinity && rollingUsage.query_count >= limits.rollingQueries)) {
-    return Response.json({ error: 'Usage limit reached. Upgrade or wait for capacity to recover.' }, { status: 429 });
+    return Response.json({ error: 'Usage limit reached. Upgrade or wait for capacity to recover.' }, { status: 429, headers: corsInit(req) });
   }
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return Response.json({ error: 'Request body must be valid JSON' }, { status: 400 });
+    return Response.json({ error: 'Request body must be valid JSON' }, { status: 400, headers: corsInit(req) });
   }
 
   const payload = body && typeof body === 'object' ? body as Record<string, unknown> : {};
   const profile = payload.profile === undefined ? 'pro' : payload.profile;
   if (profile !== 'pro' && profile !== 'lite') {
-    return Response.json({ error: 'profile must be either "pro" or "lite"' }, { status: 400 });
+    return Response.json({ error: 'profile must be either "pro" or "lite"' }, { status: 400, headers: corsInit(req) });
   }
 
   const validated = validateMessages(payload.messages);
   if ('error' in validated) {
-    return Response.json({ error: validated.error }, { status: 400 });
+    return Response.json({ error: validated.error }, { status: 400, headers: corsInit(req) });
   }
   const messages = validated.messages;
   const encoder = new TextEncoder();
@@ -190,7 +214,7 @@ export async function POST(req: NextRequest) {
   });
 
   return new Response(stream, {
-    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+    headers: { ...corsInit(req), 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
   });
 }
 
