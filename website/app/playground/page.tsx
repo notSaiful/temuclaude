@@ -93,6 +93,10 @@ export default function PlaygroundPage() {
   // chunk pushed a new message and the response repeated N times).
   const streamingIdxRef = useRef<number>(-1);
   const historyReadyRef = useRef(false);
+  // Pending requestAnimationFrame id for coalescing streamed chunks (see
+  // scheduleFlush in handleSend). Kept on a ref so handleStop / conversation
+  // switches can cancel a pending frame and avoid a stale flush after reset.
+  const flushRafRef = useRef<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -356,6 +360,25 @@ export default function PlaygroundPage() {
       let assistantContent = '';
       let orchestrationData: OrchestrationData | undefined;
       let streamBuffer = '';
+      // Coalesce streamed chunks to one render per animation frame. Without
+      // this, every chunk fired setMessages and re-rendered the whole message
+      // list dozens of times per second, which pinned the main thread so the
+      // user could not type or switch tabs while a response was generating.
+      const flushContent = () => {
+        flushRafRef.current = null;
+        const idx = streamingIdxRef.current;
+        const snapshot = assistantContent;
+        setMessages((prev) => {
+          if (idx < 0 || idx >= prev.length) return prev;
+          const updated = [...prev];
+          updated[idx] = { ...updated[idx], role: 'assistant', content: snapshot };
+          return updated;
+        });
+      };
+      const scheduleFlush = () => {
+        if (flushRafRef.current != null) return;
+        flushRafRef.current = requestAnimationFrame(flushContent);
+      };
 
       if (reader) {
         while (true) {
@@ -373,13 +396,7 @@ export default function PlaygroundPage() {
                 const data = JSON.parse(trimmedLine.slice(6));
                 if (data.chunk) {
                   assistantContent += data.chunk;
-                  const idx = streamingIdxRef.current;
-                  setMessages((prev) => {
-                    if (idx < 0 || idx >= prev.length) return prev;
-                    const updated = [...prev];
-                    updated[idx] = { ...updated[idx], role: 'assistant', content: assistantContent };
-                    return updated;
-                  });
+                  scheduleFlush();
                 }
                 if (data.orchestration) {
                   orchestrationData = data.orchestration;
@@ -397,6 +414,21 @@ export default function PlaygroundPage() {
             }
           }
         }
+      }
+
+      // Flush any chunk(s) buffered but not yet rendered (a frame may have
+      // been pending when the stream ended), then cancel the rAF so no stale
+      // flush runs after we reset the streaming index below.
+      if (flushRafRef.current != null) { cancelAnimationFrame(flushRafRef.current); flushRafRef.current = null; }
+      {
+        const idx = streamingIdxRef.current;
+        const finalContent = assistantContent;
+        setMessages((prev) => {
+          if (idx < 0 || idx >= prev.length) return prev;
+          const updated = [...prev];
+          updated[idx] = { ...updated[idx], role: 'assistant', content: finalContent };
+          return updated;
+        });
       }
 
       // Attach orchestration metadata to the streamed assistant message.
@@ -421,6 +453,7 @@ export default function PlaygroundPage() {
       })));
       setStatus('ready');
     } catch (err) {
+      if (flushRafRef.current != null) { cancelAnimationFrame(flushRafRef.current); flushRafRef.current = null; }
       abortControllerRef.current = null;
       if (err instanceof Error && err.name === 'AbortError') {
         setStatus('ready');
@@ -449,13 +482,20 @@ export default function PlaygroundPage() {
     }
   }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity, handleMediaSend]);
 
-  const handleStop = () => {
-    abortControllerRef.current?.abort();
+  // Cancel any in-flight stream cleanly: drop the pending rAF flush, abort the
+  // fetch, and reset streaming bookkeeping. Used by Stop, New chat, and
+  // switching conversations mid-stream so the user is never locked out of the
+  // UI while a response is generating.
+  const abortInFlight = () => {
+    if (flushRafRef.current != null) { cancelAnimationFrame(flushRafRef.current); flushRafRef.current = null; }
+    if (abortControllerRef.current) { abortControllerRef.current.abort(); abortControllerRef.current = null; }
+    streamingIdxRef.current = -1;
     setStatus('ready');
   };
+  const handleStop = () => abortInFlight();
 
   const handleNewConversation = () => {
-    if (status === 'submitted' || status === 'streaming') return;
+    if (status === 'submitted' || status === 'streaming') abortInFlight();
     const conversation = createConversation();
     setConversations((previous) => [conversation, ...previous]);
     setActiveConversationId(conversation.id);
@@ -465,7 +505,7 @@ export default function PlaygroundPage() {
   };
 
   const handleSelectConversation = (conversation: Conversation) => {
-    if (status === 'submitted' || status === 'streaming') return;
+    if (status === 'submitted' || status === 'streaming') abortInFlight();
     setActiveConversationId(conversation.id);
     setMessages(conversation.messages || []);
     setModelProfile(conversation.profile === 'lite' ? 'lite' : 'pro');
@@ -524,7 +564,7 @@ export default function PlaygroundPage() {
         <h1 className="sr-only">TemuClaude Playground</h1>
 
         <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border-subtle bg-bg-secondary/50 p-3" aria-label="Chat history">
-          <button onClick={handleNewConversation} disabled={status === 'submitted' || status === 'streaming'} className="btn-secondary w-full justify-start !px-3 !py-2 disabled:opacity-50">
+          <button onClick={handleNewConversation} className="btn-secondary w-full justify-start !px-3 !py-2">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             New chat
           </button>
@@ -688,7 +728,6 @@ export default function PlaygroundPage() {
                   rows={4}
                   className="block h-[118px] w-full resize-none overflow-x-hidden overflow-y-auto border-0 bg-transparent px-4 py-3 text-sm text-text-primary outline-none placeholder:text-text-muted focus:border-0 focus:ring-0"
                   aria-label="Enter your question"
-                  disabled={status === 'submitted' || status === 'streaming'}
                 />
                 <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-3 py-2">
                   <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
@@ -697,7 +736,6 @@ export default function PlaygroundPage() {
                       <button
                         type="button"
                         onClick={() => setShowModelPicker((open) => !open)}
-                        disabled={status === 'submitted' || status === 'streaming'}
                         aria-haspopup="listbox"
                         aria-expanded={showModelPicker}
                         className="flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs font-medium text-text-secondary transition-colors hover:bg-bg-tertiary hover:text-text-primary disabled:opacity-50"

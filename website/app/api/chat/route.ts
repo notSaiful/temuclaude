@@ -154,23 +154,18 @@ export async function POST(req: NextRequest) {
           completed = await runCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else if (tier === 'trivial') {
           // Layer 1: cheapest approved Pro route for straightforward requests.
+          // Budget raised from callModel defaults (2k/10s) to 4k/25s so a
+          // reasoning-capable fast model has room to finish, with the
+          // orchestrator + DeepSeek V4 Pro as explicit fallbacks.
           techniques.push('direct-routing');
-          sendProgress(controller, encoder, 'Calling fast model', 'DeepSeek V4 Flash is drafting');
-          const result = await callModel(POOL.fastRoute, messages);
-          sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-          streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'deepseek-v4-flash', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
-          completed = { content: result.content, model: result.name };
+          completed = await routeSingleModel(controller, encoder, POOL.fastRoute, messages, { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.orchestrator, POOL.reasoning] }, taskType, tier, t0, techniques, 'Calling fast model', 'DeepSeek V4 Flash is drafting');
         } else if (tier === 'medium') {
-          // Layer 2: Specialist routing
+          // Layer 2: Specialist routing, with the same empty-content gate +
+          // fallback chain as the trivial tier so a single empty specialist
+          // response is never streamed as the final answer.
           techniques.push('specialist-routing');
           const specialist = pickSpecialist(taskType);
-          sendProgress(controller, encoder, 'Calling specialist', `${specialist.split('/').pop()} is drafting`);
-          const result = await callModel(specialist, messages);
-          sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-          streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: specialist.split('/').pop()||'', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
-          completed = { content: result.content, model: result.name };
+          completed = await routeSingleModel(controller, encoder, specialist, messages, { maxTokens: 4_096, timeoutMs: 30_000, fallbacks: [POOL.orchestrator, POOL.reasoning] }, taskType, tier, t0, techniques, 'Calling specialist', `${specialist.split('/').pop()} is drafting`);
         } else {
           // HARD: Full 6-layer stack
           completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
@@ -803,6 +798,45 @@ async function callModel(
     cost: result.cost,
     error: result.success ? undefined : (result.error || (result.status ? `HTTP ${result.status}` : 'failed')),
   };
+}
+
+// Single-model routing for the trivial + medium tiers. The old inline code
+// called callModel with no fallbacks and streamed result.content unconditionally,
+// so an empty/failed response surfaced to the user as the literal string
+// "[OpenRouter error: OpenRouter returned an empty message]" — the same
+// failure class PR #28 fixed on the MoA layer (a reasoning model can spend the
+// whole token budget on excluded reasoning and return empty content, or a
+// provider returns a transient empty). Here the callModel fallback chain
+// retries the orchestrator then DeepSeek V4 Pro on empty, and the content gate
+// below streams a clear, honest message instead of a raw error if every route
+// still comes back empty.
+async function routeSingleModel(
+  controller: ReadableStreamDefaultController,
+  encoder: TextEncoder,
+  primary: string,
+  messages: any[],
+  callOptions: { maxTokens: number; timeoutMs: number; fallbacks: string[] },
+  taskType: string,
+  tier: string,
+  t0: number,
+  techniques: string[],
+  progressLabel: string,
+  progressDetail: string,
+): Promise<CompletedResponse> {
+  sendProgress(controller, encoder, progressLabel, progressDetail);
+  const result = await callModel(primary, messages, callOptions);
+  const usable = result.ok && !!result.content.trim() && !result.content.startsWith('[OpenRouter error:');
+  if (usable) {
+    sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
+    streamText(controller, encoder, result.content);
+  } else {
+    techniques.push('single-route-empty');
+    const reason = (result.error || 'the model returned an empty response').slice(0, 160);
+    sendProgress(controller, encoder, 'Response unavailable', 'No model returned usable output', 'error');
+    streamText(controller, encoder, `I couldn't get a response from the model${reason ? ` (${reason})` : ''}. Please try again, or rephrase the request.`);
+  }
+  sendOrch(controller, encoder, taskType, tier, [{ name: result.name, response: result.content.substring(0, 200), latency: (Date.now() - t0) / 1000, correct: usable }], 'single', usable ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
+  return { content: result.content, model: result.name };
 }
 
 function buildCrossReviewPrompt(query: string, reviewer: ModelResult, others: ModelResult[]): string {
