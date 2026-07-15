@@ -183,6 +183,7 @@ async function postOpenRouter(
   sessionId?: string,
   modelFallbacks: string[] = [],
   disableReasoning = false,
+  responseFormat?: 'json_object',
 ): Promise<OpenRouterResult> {
   const key = process.env.OPENROUTER_API_KEY || '';
   const resolvedModel = resolveOpenRouterModel(model);
@@ -225,6 +226,7 @@ async function postOpenRouter(
           require_parameters: true,
         },
         ...(disableReasoning ? { reasoning: { enabled: false, exclude: true } } : {}),
+        ...(responseFormat ? { response_format: { type: responseFormat } } : {}),
         stream: false,
         ...(sessionId ? { session_id: sessionId.slice(0, 256) } : {}),
       }),
@@ -477,6 +479,12 @@ export async function callOpenRouter(
     allowExternalFallbacks?: boolean;
     /** Code deliverables need output tokens, not an exposed thinking trace. */
     disableReasoning?: boolean;
+    /**
+     * Opt-in JSON mode for structured calls (e.g. the request classifier).
+     * Best-effort: models that don't support it ignore it and return text,
+     * which the caller must parse with a fallback. No existing caller sets it.
+     */
+    responseFormat?: 'json_object';
   } = {},
 ): Promise<OpenRouterResult> {
   const temperature = options.temperature ?? 0.6;
@@ -509,6 +517,7 @@ export async function callOpenRouter(
       options.sessionId,
       openRouterModels.slice(i + 1),
       options.disableReasoning,
+      options.responseFormat,
     );
     if (result.success) {
       return { ...result, attemptedModels };

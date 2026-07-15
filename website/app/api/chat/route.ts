@@ -139,13 +139,11 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       try {
         const query = messages[messages.length - 1]?.content || '';
-        sendProgress(controller, encoder, 'Classifying prompt', 'Detecting task type and routing tier');
-        const taskType = classifyTask(query);
-        const difficulty = estimateDifficulty(query, taskType);
-        const tier = determineTier(difficulty);
-        const isCodeGeneration = isCodeGenerationRequest(query);
         const techniques: string[] = [];
-        sendProgress(controller, encoder, 'Routing selected', `TemuClaude ${profile === 'lite' ? 'Lite' : 'Pro'} · ${taskType} task · ${tier} tier`, 'done');
+        sendProgress(controller, encoder, 'Classifying prompt', 'Analyzing the request to pick the right pipeline');
+        const cls = await classifyWithDeliberation(query, profile, controller, encoder, techniques);
+        const { taskType, tier, isCodeGeneration, difficulty } = cls;
+        sendProgress(controller, encoder, 'Routing selected', `TemuClaude ${profile === 'lite' ? 'Lite' : 'Pro'} · ${taskType} task · ${tier} tier · ${cls.confidence} confidence — ${cls.reason.slice(0, 80)}`, 'done');
 
         let completed: CompletedResponse;
         if (profile === 'lite') {
@@ -170,6 +168,12 @@ export async function POST(req: NextRequest) {
           // HARD: Full 6-layer stack
           completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
         }
+
+        // Count the classification pre-pass tokens toward usage. callOpenRouter
+        // returns a single total-tokens figure; fold it into the completion
+        // count (the classifier is a small call, so the approximation is minor).
+        const baseCompletionTokens = completed.completionTokens ?? estimateTokens(completed.content);
+        completed.completionTokens = baseCompletionTokens + cls.classifierTokens;
 
         await recordPlaygroundUsage(account.id, messages, completed);
 
@@ -917,7 +921,7 @@ function classifyTask(query: string): string {
 }
 
 function isCodeGenerationRequest(query: string): boolean {
-  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
+  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|web page|webpage|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
     || /\b(single[- ]file|html game|browser game|playable game|canvas game|three\.js)\b/i.test(query);
 }
 
@@ -972,6 +976,164 @@ function needsFrontier(query: string, taskType: string): boolean {
   // Complex codebase questions
   if (q.includes('refactor') || q.includes('architecture') || q.includes('system design')) return true;
   return false;
+}
+
+// === LLM REQUEST CLASSIFIER (primary routing path) ===
+// The regex classifier above (classifyTask / estimateDifficulty / determineTier
+// / isCodeGenerationRequest) is retained as the fallback. The primary path asks
+// a fast model to classify the request into {taskType, tier, isCodeGeneration,
+// confidence, reason}; on borderline or low-confidence calls it takes a second
+// sample (deliberation) to verify the tier before routing. A build/deliverable
+// request is never sent to the trivial single-model route.
+
+type ClassResult = {
+  taskType: string;
+  tier: string;
+  isCodeGeneration: boolean;
+  confidence: 'high' | 'medium' | 'low';
+  reason: string;
+};
+
+type DeliberationResult = ClassResult & { difficulty: number; classifierTokens: number };
+
+const CLASS_TASK_TYPES = new Set(['math', 'coding', 'creative', 'legal', 'health', 'knowledge', 'reasoning']);
+const CLASS_TIERS = new Set(['trivial', 'medium', 'hard']);
+const TIER_RANK: Record<string, number> = { trivial: 0, medium: 1, hard: 2 };
+const TIER_DIFFICULTY: Record<string, number> = { trivial: 3, medium: 5, hard: 8 };
+
+const CLASSIFIER_SYSTEM = `You are TemuClaude's request router. Classify the user's LATEST message and respond with ONLY a JSON object — no prose, no markdown, no code fences.
+
+Schema:
+{"taskType": "math"|"coding"|"creative"|"legal"|"health"|"knowledge"|"reasoning", "tier": "trivial"|"medium"|"hard", "isCodeGeneration": boolean, "confidence": "high"|"medium"|"low", "reason": "short phrase"}
+
+Tier definitions:
+- trivial: a single factual lookup, greeting, or one-line answer.
+- medium: needs one specialist and moderate reasoning — an explanation, comparison, or a single short snippet.
+- hard: multi-step synthesis, a proof/derivation, deep analysis, OR producing a complete deliverable (webpage, website, app, game, dashboard, tool, landing page, full HTML file).
+
+Rules:
+- If the user asks to BUILD/MAKE/CREATE/GENERATE/DESIGN a deliverable (webpage, website, web page, app, game, dashboard, tool, landing page, HTML, component, script), set isCodeGeneration=true and tier="hard".
+- A short prompt that asks for a complete built artifact is still "hard" — the work is in the output, not the prompt length.
+- "reason" is a short phrase, e.g. "full webpage build", "factual lookup", "multi-step proof".`;
+
+function parseClassifierJson(content: string): ClassResult | null {
+  if (!content) return null;
+  let text = content.trim();
+  // Strip a markdown code fence if the model wrapped the JSON.
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) text = fence[1].trim();
+  // Skip any leading prose and grab the first {...} block.
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) return null;
+  let parsed: any;
+  try {
+    parsed = JSON.parse(text.slice(start, end + 1));
+  } catch {
+    return null;
+  }
+  if (!parsed || typeof parsed !== 'object') return null;
+  const taskType = typeof parsed.taskType === 'string' ? parsed.taskType.toLowerCase() : '';
+  const tier = typeof parsed.tier === 'string' ? parsed.tier.toLowerCase() : '';
+  if (!CLASS_TASK_TYPES.has(taskType) || !CLASS_TIERS.has(tier)) return null;
+  if (typeof parsed.isCodeGeneration !== 'boolean') return null;
+  const rawConf = typeof parsed.confidence === 'string' ? parsed.confidence.toLowerCase() : 'medium';
+  const confidence: ClassResult['confidence'] = rawConf === 'high' || rawConf === 'low' ? rawConf : 'medium';
+  const reason = typeof parsed.reason === 'string' ? parsed.reason.slice(0, 160) : '';
+  return { taskType, tier, isCodeGeneration: parsed.isCodeGeneration, confidence, reason };
+}
+
+async function classifyWithLLM(query: string, model: string): Promise<{ result: ClassResult | null; tokens: number }> {
+  try {
+    const res = await callOpenRouter(
+      model,
+      [
+        { role: 'system', content: CLASSIFIER_SYSTEM },
+        { role: 'user', content: `Classify this request:\n\n${query}` },
+      ],
+      {
+        temperature: 0,
+        maxTokens: 300,
+        timeoutMs: 8_000,
+        disableReasoning: true,
+        responseFormat: 'json_object',
+        sessionId: asciiSessionId('playground-classifier', query),
+      },
+    );
+    if (!res.success) return { result: null, tokens: 0 };
+    return { result: parseClassifierJson(res.content), tokens: res.tokens || 0 };
+  } catch {
+    return { result: null, tokens: 0 };
+  }
+}
+
+function regexFallbackClassification(query: string): ClassResult {
+  const taskType = classifyTask(query);
+  const tier = determineTier(estimateDifficulty(query, taskType));
+  return {
+    taskType,
+    tier,
+    isCodeGeneration: isCodeGenerationRequest(query),
+    confidence: 'low',
+    reason: 'regex fallback (classifier unavailable)',
+  };
+}
+
+function reconcileClassifier(a: ClassResult, b: ClassResult): ClassResult {
+  // Reconcile conservatively: any build flag wins; take the harder tier; keep
+  // the taskType that drove the harder tier; confidence is high if either was.
+  const isCodeGeneration = a.isCodeGeneration || b.isCodeGeneration;
+  const tier = TIER_RANK[b.tier] > TIER_RANK[a.tier] ? b.tier : a.tier;
+  const taskType = TIER_RANK[b.tier] >= TIER_RANK[a.tier] ? b.taskType : a.taskType;
+  const confidence: ClassResult['confidence'] = a.confidence === 'high' || b.confidence === 'high' ? 'high' : 'medium';
+  const reason = b.reason || a.reason;
+  return { taskType, tier, isCodeGeneration, confidence, reason };
+}
+
+async function classifyWithDeliberation(
+  query: string,
+  profile: ModelProfile,
+  controller: ReadableStreamDefaultController,
+  encoder: TextEncoder,
+  techniques: string[],
+): Promise<DeliberationResult> {
+  // Sample 1 — fast and cheap; runs on every request (Pro and Lite).
+  const s1 = await classifyWithLLM(query, POOL.fastRoute);
+  let classifierTokens = s1.tokens;
+  let result: ClassResult;
+
+  if (!s1.result) {
+    // Classifier call failed or returned unparseable JSON — use the regex path.
+    techniques.push('regex-classification-fallback');
+    result = regexFallbackClassification(query);
+  } else if (
+    profile !== 'lite' &&
+    (s1.result.confidence !== 'high' || (s1.result.isCodeGeneration && s1.result.tier === 'trivial'))
+  ) {
+    // Borderline or inconsistent — deliberate via a 2nd sample (Pro only; Lite
+    // stays cheap and trusts the fast classifier + the build safety net below).
+    sendProgress(controller, encoder, 'Deliberating', 'Re-verifying a borderline classification', 'active');
+    const s2 = await classifyWithLLM(query, POOL.orchestrator);
+    classifierTokens += s2.tokens;
+    techniques.push('llm-classification', 'deliberation');
+    result = s2.result
+      ? reconcileClassifier(s1.result, s2.result)
+      : { ...s1.result, tier: s1.result.isCodeGeneration && s1.result.tier === 'trivial' ? 'hard' : s1.result.tier };
+  } else {
+    techniques.push('llm-classification');
+    result = s1.result;
+  }
+
+  // Build safety net: a regex-recognized deliverable is never routed to the
+  // trivial single-model path, even if both classifier samples missed it.
+  if (isCodeGenerationRequest(query) && !result.isCodeGeneration) {
+    result = { ...result, isCodeGeneration: true, reason: result.reason || 'build request (regex safety net)' };
+  }
+  if (result.isCodeGeneration && result.tier === 'trivial') {
+    result = { ...result, tier: 'hard' };
+  }
+
+  return { ...result, difficulty: TIER_DIFFICULTY[result.tier] ?? 5, classifierTokens };
 }
 
 // === STEP-LEVEL CODE VERIFICATION (rStar-Math pattern) ===

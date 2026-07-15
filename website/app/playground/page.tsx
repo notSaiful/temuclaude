@@ -866,6 +866,7 @@ function toActivityEvent(step: ProgressStep): ActivityEvent {
   const label = step.label.toLowerCase();
   if (label.includes('queued')) return { heading: 'Prepared a work plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('classifying')) return { heading: 'Understood the request', detail: step.detail, kind: 'routing', status: step.status };
+  if (label.includes('deliberat')) return { heading: 'Re-verified a borderline classification', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('routing')) return { heading: 'Selected a response plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('search')) return { heading: label.includes('complete') ? 'Finished web research' : 'Searched the web', detail: step.detail, kind: 'research', status: step.status };
   if (label.includes('draft') || label.includes('calling')) return { heading: 'Consulted the selected model', detail: step.detail, kind: 'model', status: step.status };
@@ -1041,6 +1042,15 @@ function sandboxPreviewDocument(html: string): string {
     : `${policy}${html}`;
 }
 
+const TECHNIQUE_LABELS: Record<string, string> = {
+  'llm-classification': 'LLM classification',
+  'deliberation': 'Deliberation',
+  'regex-classification-fallback': 'Regex fallback',
+  'direct-routing': 'Direct routing',
+  'specialist-routing': 'Specialist routing',
+  'reflexion': 'Reflexion',
+};
+
 function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClose: () => void }) {
   return (
     <div className="border-t border-border-subtle bg-bg-secondary max-h-[40vh] overflow-y-auto">
@@ -1063,6 +1073,15 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             <div>
               <div className="text-sm font-medium text-text-primary">Understanding your question</div>
               <div className="text-xs text-text-muted">Classified as: {data.taskType} · Routed to: {data.tier} tier</div>
+              {data.techniques && data.techniques.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {data.techniques.map((technique, i) => (
+                    <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-sm bg-bg-tertiary text-text-muted border border-border-subtle">
+                      {TECHNIQUE_LABELS[technique] ?? technique}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
