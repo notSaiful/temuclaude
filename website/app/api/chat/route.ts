@@ -5,6 +5,8 @@ import { callOpenRouterLite, type LiteModelId } from '@/lib/openrouter-lite';
 import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
 import { getOrCreateUserByEmailAsync, getRollingWindowUsageAsync, incrementUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
+import { LITE_MODEL_POOL, MODEL_STRENGTHS, PRO_MODEL_POOL } from '@/lib/model-catalog';
+import { validateChatMessages } from '@/lib/chat-contract';
 
 export const runtime = 'nodejs';
 // Hard Pro requests deliberately run several high-value model and verifier
@@ -13,48 +15,21 @@ export const runtime = 'nodejs';
 // 300s on 2026-07-14 (Vercel plan ceiling): hard runs can reach ~210s.
 export const maxDuration = 300;
 
-// TemuClaude Pro — the current eight-model, role-bounded registry.
-// Each model has a distinct job; premium escalation remains conditional.
-const POOL = {
-  orchestrator: 'z-ai/glm-5.2',
-  reasoning: 'deepseek/deepseek-v4-pro',
-  fastRoute: 'deepseek/deepseek-v4-flash',
-  multimodal: 'google/gemini-3.5-flash',
-  specialist: 'minimax/minimax-m3',
-  vision: 'minimax/minimax-m3',
-  frontier: 'openai/gpt-5.6-luna',
-  codeRepair: 'x-ai/grok-4.5',
-  verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
-};
+// Pro models are selected by task. Expensive fallbacks are conditional.
+const POOL = PRO_MODEL_POOL;
 
 // Each pool model's best jobs. Drives drafter selection + role assignment so a
 // build uses the strongest model for each job instead of defaulting to one. The
 // labels mirror the short names shown in the orchestration panel.
-const MODEL_STRENGTHS: Record<string, { label: string; best: string[] }> = {
-  'z-ai/glm-5.2':               { label: 'GLM-5.2',           best: ['architecture', 'synthesis', 'judging', 'general-code', 'agentic'] },
-  'deepseek/deepseek-v4-pro':   { label: 'DeepSeek V4 Pro',   best: ['code', 'math', 'algorithms', 'logic-heavy'] },
-  'deepseek/deepseek-v4-flash': { label: 'DeepSeek V4 Flash', best: ['planning', 'fast-draft', 'cheap'] },
-  'google/gemini-3.5-flash':    { label: 'Gemini 3.5 Flash',  best: ['visual', 'layout', 'theme', 'ui-ux', 'multimodal'] },
-  'minimax/minimax-m3':         { label: 'MiniMax M3',        best: ['creative', 'long-context', 'generalist'] },
-  'openai/gpt-5.6-luna':        { label: 'GPT-5.6 Luna',      best: ['frontier', 'hardest-integration', 'complex-systems'] },
-  'x-ai/grok-4.5':              { label: 'Grok 4.5',          best: ['debugging', 'repair'] },
-  'nvidia/nemotron-3-ultra-550b-a55b': { label: 'Nemotron',    best: ['verification', 'judging', 'scoring'] },
-};
-
 // Lite is intentionally isolated from POOL. Its caller enforces this exact
 // allowlist and never substitutes a Pro or free-route model.
-const LITE_POOL = {
-  default: 'deepseek/deepseek-v4-flash',
-  reasoning: 'qwen/qwen3.7-plus',
-  agent: 'qwen/qwen3.7-plus',
-  verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
-} satisfies Record<string, LiteModelId>;
+const LITE_POOL = LITE_MODEL_POOL;
 
 // System prompt to force English responses
-const ENGLISH_SYSTEM = { role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' };
+const ENGLISH_SYSTEM = { role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' } as const;
 
 type ModelProfile = 'pro' | 'lite';
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 type ModelResult = {
   name: string;
   content: string;
@@ -81,69 +56,63 @@ type CompletedResponse = {
   completionTokens?: number;
 };
 
-function validateMessages(value: unknown): { messages: ChatMessage[] } | { error: string } {
-  if (!Array.isArray(value) || value.length === 0) {
-    return { error: 'messages must be a non-empty array' };
+function corsInit(req: NextRequest): Record<string, string> {
+  // The chat route runs on Cloud Run (long request timeout) and is called
+  // cross-origin from the Vercel playground using a bearer access token (no
+  // cookies cross-origin). Same-origin Vercel requests are not subject to
+  // CORS, so these headers are inert there. Allowlist is configurable.
+  const allow = (process.env.CHAT_CORS_ALLOW_ORIGIN || 'https://temuclaude.com')
+    .split(',').map((s) => s.trim()).filter(Boolean);
+  const origin = req.headers.get('origin');
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  };
+  if (origin && allow.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
   }
-  if (value.length > 50) {
-    return { error: 'messages cannot contain more than 50 entries' };
-  }
+  return headers;
+}
 
-  let totalCharacters = 0;
-  const messages: ChatMessage[] = [];
-  for (const message of value) {
-    if (!message || typeof message !== 'object') {
-      return { error: 'each message must be an object' };
-    }
-    const { role, content } = message as Record<string, unknown>;
-    if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string' || !content.trim()) {
-      return { error: 'each message requires a user or assistant role and non-empty content' };
-    }
-    if (content.length > 20_000) {
-      return { error: 'each message must be 20,000 characters or fewer' };
-    }
-
-    totalCharacters += content.length;
-    if (totalCharacters > 100_000) {
-      return { error: 'messages must be 100,000 characters or fewer in total' };
-    }
-    messages.push({ role, content });
-  }
-
-  return { messages };
+// Preflight for cross-origin (Cloud Run) chat calls. Same-origin Vercel calls
+// never trigger a preflight, so this is inert on Vercel.
+export async function OPTIONS(req: NextRequest) {
+  return new Response(null, { status: 204, headers: corsInit(req) });
 }
 
 export async function POST(req: NextRequest) {
   const auth = await getAuthenticatedSupabaseUser(req);
   if ('error' in auth) {
-    return Response.json({ error: auth.error }, { status: auth.status });
+    return Response.json({ error: auth.error }, { status: auth.status, headers: corsInit(req) });
   }
   const email = auth.user.email?.trim().toLowerCase();
-  if (!email) return Response.json({ error: 'Authenticated user has no email address' }, { status: 400 });
+  if (!email) return Response.json({ error: 'Authenticated user has no email address' }, { status: 400, headers: corsInit(req) });
   const initialUser = await getOrCreateUserByEmailAsync(email);
   const account = (await verifyAndRenewWeeklyCreditsAsync(initialUser.id)) || initialUser;
   const limits = PLAN_LIMITS[account.plan as keyof typeof PLAN_LIMITS] || PLAN_LIMITS.free;
   const rollingUsage = await getRollingWindowUsageAsync(account.id, ROLLING_WINDOW_HOURS);
   if (account.credit_balance <= 0 || (limits.rollingQueries !== Infinity && rollingUsage.query_count >= limits.rollingQueries)) {
-    return Response.json({ error: 'Usage limit reached. Upgrade or wait for capacity to recover.' }, { status: 429 });
+    return Response.json({ error: 'Usage limit reached. Upgrade or wait for capacity to recover.' }, { status: 429, headers: corsInit(req) });
   }
 
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return Response.json({ error: 'Request body must be valid JSON' }, { status: 400 });
+    return Response.json({ error: 'Request body must be valid JSON' }, { status: 400, headers: corsInit(req) });
   }
 
   const payload = body && typeof body === 'object' ? body as Record<string, unknown> : {};
   const profile = payload.profile === undefined ? 'pro' : payload.profile;
   if (profile !== 'pro' && profile !== 'lite') {
-    return Response.json({ error: 'profile must be either "pro" or "lite"' }, { status: 400 });
+    return Response.json({ error: 'profile must be either "pro" or "lite"' }, { status: 400, headers: corsInit(req) });
   }
 
-  const validated = validateMessages(payload.messages);
+  const validated = validateChatMessages(payload.messages, ['user', 'assistant'] as const);
   if ('error' in validated) {
-    return Response.json({ error: validated.error }, { status: 400 });
+    return Response.json({ error: validated.error }, { status: 400, headers: corsInit(req) });
   }
   const messages = validated.messages;
   const encoder = new TextEncoder();
@@ -204,7 +173,7 @@ export async function POST(req: NextRequest) {
   });
 
   return new Response(stream, {
-    headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
+    headers: { ...corsInit(req), 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' },
   });
 }
 
@@ -329,7 +298,7 @@ async function runCodeGeneration(
   t0: number,
   techniques: string[],
 ): Promise<CompletedResponse> {
-  // Code generation is a deliverable, not a debate topic. MoA fusion merges
+  // Code generation is a deliverable, not a debate topic. Merging complete
   // three models' prose into incoherent code, so the design for a build is
   // strength-based, not debate-based:
   //   planner (fast model) -> N drafters (strong models, in parallel, picked by
@@ -499,7 +468,7 @@ async function runCodeGeneration(
 }
 
 // === FULL STACK (hard queries) ===
-async function runFullStack(query: string, messages: any[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]): Promise<CompletedResponse> {
+async function runFullStack(query: string, messages: ChatMessage[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]): Promise<CompletedResponse> {
   // Quality-first Pro panel: keep the planner and reasoning anchor, then add
   // the strongest specialist for this task instead of using the cheapest
   // fixed panel for every domain.
@@ -526,11 +495,11 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   }
 
   // Augment messages with search context if available
-  const augmentedMessages = searchContext
-    ? [...messages.slice(0, -1), { role: 'user', content: messages[messages.length - 1]?.content + searchContext }]
+  const augmentedMessages: ChatMessage[] = searchContext
+    ? [...messages.slice(0, -1), { role: 'user' as const, content: messages[messages.length - 1]?.content + searchContext }]
     : messages;
 
-  // LAYER 3: MoA 3-LAYER — Propose → Cross-Review → Aggregate
+  // Draft independently, review, then synthesize.
   techniques.push('moa-3-layer');
   sendProgress(controller, encoder, 'Drafting proposals', 'Three models are working in parallel');
 
@@ -618,7 +587,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // three drafts — so it is the single most important call in the stack. The
   // callModel 2k/10s default (the same starved budget #28 fixed on the propose
   // layer) routinely left it empty, silently falling back to proposal[0] so the
-  // MoA "consensus/contradiction synthesis" never actually ran. Give it a real
+  // The consensus check never actually ran. Give it a real
   // budget and an explicit fallback chain.
   const aggResult = await callModel(POOL.orchestrator, [
     { role: 'system', content: 'You are TemuClaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
@@ -872,7 +841,7 @@ function sendProgress(controller: ReadableStreamDefaultController, encoder: Text
   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ progress: { label, detail, status } })}\n\n`));
 }
 
-function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, models: any[], aggregator: string, consensus: number, qaScore: number, codeVerified: boolean, t0: number, cost: string, techniques: string[]) {
+function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, models: OrchestrationData['models'], aggregator: string, consensus: number, qaScore: number, codeVerified: boolean, t0: number, cost: string, techniques: string[]) {
   const data: OrchestrationData = {
     taskType, tier, models, aggregator, consensus, qaScore, codeVerified,
     totalLatency: ((Date.now() - t0) / 1000).toFixed(1), cost, techniques,
@@ -882,7 +851,7 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
 
 async function callModel(
   model: string,
-  messages: any[],
+  messages: ChatMessage[],
   options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean; fallbacks?: string[] } = {},
 ): Promise<ModelResult> {
   const start = Date.now();
@@ -910,7 +879,7 @@ async function callModel(
 // called callModel with no fallbacks and streamed result.content unconditionally,
 // so an empty/failed response surfaced to the user as the literal string
 // "[OpenRouter error: OpenRouter returned an empty message]" — the same
-// failure class PR #28 fixed on the MoA layer (a reasoning model can spend the
+// failure class PR #28 fixed on the multi-draft route (a reasoning model can spend the
 // whole token budget on excluded reasoning and return empty content, or a
 // provider returns a transient empty). Here the callModel fallback chain
 // retries the orchestrator then DeepSeek V4 Pro on empty, and the content gate
@@ -920,7 +889,7 @@ async function routeSingleModel(
   controller: ReadableStreamDefaultController,
   encoder: TextEncoder,
   primary: string,
-  messages: any[],
+  messages: ChatMessage[],
   callOptions: { maxTokens: number; timeoutMs: number; fallbacks: string[] },
   taskType: string,
   tier: string,
@@ -1182,21 +1151,22 @@ function parseClassifierJson(content: string): ClassResult | null {
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
   if (start === -1 || end === -1 || end <= start) return null;
-  let parsed: any;
+  let parsed: unknown;
   try {
     parsed = JSON.parse(text.slice(start, end + 1));
   } catch {
     return null;
   }
   if (!parsed || typeof parsed !== 'object') return null;
-  const taskType = typeof parsed.taskType === 'string' ? parsed.taskType.toLowerCase() : '';
-  const tier = typeof parsed.tier === 'string' ? parsed.tier.toLowerCase() : '';
+  const record = parsed as Record<string, unknown>;
+  const taskType = typeof record.taskType === 'string' ? record.taskType.toLowerCase() : '';
+  const tier = typeof record.tier === 'string' ? record.tier.toLowerCase() : '';
   if (!CLASS_TASK_TYPES.has(taskType) || !CLASS_TIERS.has(tier)) return null;
-  if (typeof parsed.isCodeGeneration !== 'boolean') return null;
-  const rawConf = typeof parsed.confidence === 'string' ? parsed.confidence.toLowerCase() : 'medium';
+  if (typeof record.isCodeGeneration !== 'boolean') return null;
+  const rawConf = typeof record.confidence === 'string' ? record.confidence.toLowerCase() : 'medium';
   const confidence: ClassResult['confidence'] = rawConf === 'high' || rawConf === 'low' ? rawConf : 'medium';
-  const reason = typeof parsed.reason === 'string' ? parsed.reason.slice(0, 160) : '';
-  return { taskType, tier, isCodeGeneration: parsed.isCodeGeneration, confidence, reason };
+  const reason = typeof record.reason === 'string' ? record.reason.slice(0, 160) : '';
+  return { taskType, tier, isCodeGeneration: record.isCodeGeneration, confidence, reason };
 }
 
 async function classifyWithLLM(query: string, model: string): Promise<{ result: ClassResult | null; tokens: number }> {
@@ -1334,10 +1304,10 @@ async function logicalVerify(answer: string): Promise<'pass' | 'contradiction' |
   } catch { return 'error'; }
 }
 
-// === WEB SEARCH (DuckDuckGo — free, unlimited, no API key) ===
+// === WEB SEARCH (DuckDuckGo HTML endpoint; no API key) ===
 async function webSearch(query: string, numResults: number): Promise<string> {
   try {
-    // DuckDuckGo HTML endpoint — no API key needed, no rate limits
+    // DuckDuckGo HTML endpoint; no API key is needed.
     const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query.substring(0, 200))}`;
     const response = await fetch(searchUrl, {
       headers: {

@@ -251,12 +251,11 @@ OPENROUTER_MODELS = {
     "gemma-4-26b-moe": "google/gemma-4-26b-a4b-it",     # $0.06/$0.30/M — MoE knowledge
 }
 
-# Free models on OpenRouter (no cost, rate limited)
-# These are used for the trivial tier — 60% of queries at $0 cost
+# Legacy low-cost route names. The provider catalog no longer exposes the old
+# ``:free`` aliases, so these point to the current canonical model IDs.
 OPENROUTER_FREE_MODELS = {
-    "gpt-oss-120b": "openai/gpt-oss-120b:free",
-    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b:free",
-    "nemotron-3-super": "nvidia/nemotron-3-super-120b-a12b:free",
+    "gpt-oss-120b": "openai/gpt-oss-120b",
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
 }
 
 # Provider/runtime fallback order. Preferred model IDs above remain unchanged;
@@ -360,12 +359,11 @@ def get_runtime_model(model: str, environ=None, _seen=None) -> str:
             return resolved
     return "glm-5.2"
 
-# Free model fallback order for trivial tier
-# Try each in order until one succeeds (rate limits may block some)
+# Low-cost fallback order for the trivial tier. These IDs were checked against
+# the live OpenRouter catalog during the July 2026 audit.
 FREE_MODEL_CHAIN = [
-    "openai/gpt-oss-120b:free",
-    "nvidia/nemotron-3-ultra-550b-a55b:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
+    "openai/gpt-oss-120b",
+    "nvidia/nemotron-3-ultra-550b-a55b",
 ]
 
 # Ultra-cheap MoE models for medium tier (3-5x compute savings vs dense models)

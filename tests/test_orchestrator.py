@@ -162,10 +162,11 @@ def test_model_pool():
         else:
             passed += 1
 
-    # Check fusion panel has 5 models
-    if len(FUSION_PANEL) != 5:
+    # The hard route intentionally uses three complementary models. Premium
+    # specialists are conditional fallbacks, not always-on panel members.
+    if len(FUSION_PANEL) != 3:
         failed += 1
-        failures.append(f"Fusion panel should have 5 models, has {len(FUSION_PANEL)}")
+        failures.append(f"Fusion panel should have 3 models, has {len(FUSION_PANEL)}")
     else:
         passed += 1
 

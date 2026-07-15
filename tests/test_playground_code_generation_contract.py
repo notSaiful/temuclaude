@@ -11,13 +11,13 @@ def test_code_generation_has_parameter_compatible_fallbacks():
     generation = route[route.index("async function runCodeGeneration"):route.index("// === FULL STACK")]
 
     assert "fallbacks: [POOL.fastRoute, POOL.orchestrator]" in generation
-    assert "deadlineAt = t0 + 100_000" in generation
+    assert "deadlineAt = t0 + 200_000" in generation
     assert "remainingMs() >= 6_000" in generation
 
 
 def test_grok_repair_does_not_disable_mandatory_reasoning():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
-    repair = route[route.index("result = await callModel(POOL.codeRepair"):route.index("const content = result.ok")]
+    repair = route[route.index("const repair = await callModel(POOL.codeRepair"):route.index("const content = result.ok")]
 
     assert "disableReasoning: true" not in repair
     assert "timeoutMs: Math.min(30_000, remainingMs())" in repair
@@ -26,7 +26,7 @@ def test_grok_repair_does_not_disable_mandatory_reasoning():
 def test_playground_pro_pipeline_is_quality_first_and_has_runtime_headroom():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
 
-    assert "export const maxDuration = 120" in route
+    assert "export const maxDuration = 300" in route
     assert "quality-first-pro-panel" in route
     assert "taskType === 'creative'" in route
     assert "['knowledge', 'legal', 'health'].includes(taskType)" in route

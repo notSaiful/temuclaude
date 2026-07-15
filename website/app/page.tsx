@@ -204,7 +204,7 @@ export default function HomePage() {
                   style={{ animationDelay: '500ms' }}
                 >
                   <a href="/playground" className="btn-accent">
-                    Try Free — 20 queries/day
+                    Try Free — usage limits apply
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                   </a>
                   <a href="/pricing" className="btn-secondary">
@@ -218,7 +218,7 @@ export default function HomePage() {
                 >
                   <span><strong className="text-text-primary">Free Trial</strong> available</span>
                   <span className="text-border-default">·</span>
-                  <span>Plans from <strong className="text-text-primary">$15/mo</strong></span>
+                  <span>Plans from <strong className="text-text-primary">$19/mo</strong></span>
                   <span className="text-border-default">·</span>
                   <span><strong className="text-text-primary">Cancel anytime</strong></span>
                 </div>
@@ -664,8 +664,8 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href="/compare" className="btn-accent">
-                Try the comparison
+              <a href="/playground" className="btn-accent">
+                Open the playground
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </a>
               <a href="/playground" className="btn-secondary">
@@ -682,7 +682,7 @@ export default function HomePage() {
               Developer plans from $15/month.<br />Cancel anytime.
             </h2>
             <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-              20 free queries/day in the playground. Upgrade when you need API access and higher limits.
+              Start free in the playground. Upgrade when you need API access and higher limits.
             </p>
             <div className="flex items-center justify-center gap-4">
               <a href="/playground" className="btn-accent">
@@ -705,7 +705,6 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/playground" className="text-sm text-text-secondary hover:text-accent-primary">Playground</a></li>
                   <li><a href="/models" className="text-sm text-text-secondary hover:text-accent-primary">Models</a></li>
-                  <li><a href="/benchmarks" className="text-sm text-text-secondary hover:text-accent-primary">Benchmarks</a></li>
                   <li><a href="/pricing" className="text-sm text-text-secondary hover:text-accent-primary">Pricing</a></li>
                 </ul>
               </div>
@@ -714,14 +713,12 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/docs" className="text-sm text-text-secondary hover:text-accent-primary">Documentation</a></li>
                   <li><a href="/enterprise" className="text-sm text-text-secondary hover:text-accent-primary">Enterprise</a></li>
-                  <li><a href="/about" className="text-sm text-text-secondary hover:text-accent-primary">About Us</a></li>
                 </ul>
               </div>
               <div>
                 <h4 className="text-sm font-semibold text-text-primary mb-3">Connect</h4>
                 <ul className="space-y-2">
                   <li><a href="https://github.com/notSaiful/temuclaude" className="text-sm text-text-secondary hover:text-accent-primary" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                  <li><a href="/contact" className="text-sm text-text-secondary hover:text-accent-primary">Contact Us</a></li>
                 </ul>
               </div>
               <div>
@@ -729,8 +726,7 @@ export default function HomePage() {
                 <ul className="space-y-2">
                   <li><a href="/terms" className="text-sm text-text-muted hover:text-accent-primary">Terms of Service</a></li>
                   <li><a href="/privacy" className="text-sm text-text-muted hover:text-accent-primary">Privacy Policy</a></li>
-                  <li><a href="/cancellation-refunds" className="text-sm text-text-muted hover:text-accent-primary">Cancellation & Refunds</a></li>
-                  <li><a href="/shipping" className="text-sm text-text-muted hover:text-accent-primary">Shipping Policy</a></li>
+                  <li><a href="/refunds" className="text-sm text-text-muted hover:text-accent-primary">Cancellation & Refunds</a></li>
                 </ul>
               </div>
             </div>

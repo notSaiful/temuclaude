@@ -17,13 +17,10 @@ const sections: DocSection[] = [
   {
     title: 'Legal & Info',
     items: [
-      { label: 'About Us', href: '/about' },
       { label: 'Pricing', href: '/pricing' },
-      { label: 'Contact Us', href: '/contact' },
       { label: 'Terms of Service', href: '/terms' },
       { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Shipping Policy', href: '/shipping' },
-      { label: 'Cancellation & Refunds', href: '/cancellation-refunds' },
+      { label: 'Cancellation & Refunds', href: '/refunds' },
       { label: 'Refund Policy', href: '/refunds' },
     ],
   },
@@ -100,14 +97,14 @@ export default function DocsPage() {
               <h2 className="text-xl font-semibold text-text-primary mb-3">Quickstart</h2>
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
-              <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — sign in, ask anything, and get a superior answer. 20 free queries/day.</p>
+              <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — sign in, ask anything, and use the current free-tier limits.</p>
               <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
   -H "Content-Type: application/json" \\
   -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
 
 # Response: SSE stream with answer + orchestration metadata`} />
-              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
+              <Callout type="tip">The playground uses the same orchestration API as the supported chat endpoint. Current usage limits are shown in the product.</Callout>
             </section>
 
             <section id="data-privacy" className="mb-12">
@@ -405,7 +402,7 @@ Response: SSE stream
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
               <p className="text-text-secondary mb-4">Free trial: no authentication needed. Paid developer wallets use the live API key generated from the dashboard:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "Authorization: Bearer tc_live_f893d2b10a2c88ef092e10f" \\
+  -H "Authorization: Bearer \${TEMUCLAUDE_API_KEY}" \\
   -H "Content-Type: application/json" \\
   -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
             </section>
@@ -420,7 +417,7 @@ Response: SSE stream
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Monthly credits</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">50K credits (20 queries/day)</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Free</td><td className="py-2 px-3 text-text-secondary">10</td><td className="py-2 px-3 text-text-secondary">Current free-tier limits</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Developer</td><td className="py-2 px-3 text-text-secondary">60</td><td className="py-2 px-3 text-text-secondary">5M credits</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Pro</td><td className="py-2 px-3 text-text-secondary">300</td><td className="py-2 px-3 text-text-secondary">25M credits</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary">Max</td><td className="py-2 px-3 text-text-secondary">1,000</td><td className="py-2 px-3 text-text-secondary">100M credits</td></tr>

@@ -122,6 +122,7 @@ export function resolveOpenRouterModel(model: string): string {
     'mistralai/mistral-large-2': 'mistralai/mistral-large-2512',
     'anthropic/claude-3.5-sonnet': 'anthropic/claude-sonnet-4.6',
     'anthropic/claude-sonnet-5': 'anthropic/claude-sonnet-4.6',
+    'openai/gpt-oss-120b:free': 'openai/gpt-oss-120b',
   };
   return replacements[model] || model;
 }
@@ -142,12 +143,18 @@ function deepinfraFallbackEnabled(): boolean {
   return ['1', 'true', 'yes', 'on'].includes((process.env.DEEPINFRA_FALLBACK_ENABLED || '').toLowerCase());
 }
 
-function extractText(message: any): string {
-  const content = message?.content;
+function extractText(message: unknown): string {
+  if (!message || typeof message !== 'object') return '';
+  const content = (message as Record<string, unknown>).content;
   if (typeof content === 'string' && content.trim()) return content.trim();
   if (Array.isArray(content)) {
     const text = content
-      .map((part) => typeof part === 'string' ? part : part?.text || '')
+      .map((part) => {
+        if (typeof part === 'string') return part;
+        if (!part || typeof part !== 'object') return '';
+        const text = (part as Record<string, unknown>).text;
+        return typeof text === 'string' ? text : '';
+      })
       .join('');
     if (text.trim()) return text.trim();
   }

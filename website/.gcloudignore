@@ -1,0 +1,13 @@
+# Exclude heavy/regenerated/local-only paths from the gcloud source upload so
+# `gcloud run deploy --source` is fast. The Docker build's own .dockerignore
+# re-excludes these from the image. Do NOT list Dockerfile/.dockerignore/source
+# here — Cloud Build needs them to build the image.
+.gcloudignore
+.git
+node_modules
+.next
+.env
+.env.local
+.env.*.local
+.vercel
+.DS_Store

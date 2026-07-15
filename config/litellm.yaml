@@ -44,12 +44,12 @@ model_list:
 
   - model_name: gpt-oss-120b-free
     litellm_params:
-      model: openrouter/openai/gpt-oss-120b:free
+      model: openrouter/openai/gpt-oss-120b
       api_key: "os.environ/OPENROUTER_API_KEY"
 
   - model_name: nemotron-3-ultra-free
     litellm_params:
-      model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
+      model: openrouter/nvidia/nemotron-3-ultra-550b-a55b
       api_key: "os.environ/OPENROUTER_API_KEY"
 
 router_settings:

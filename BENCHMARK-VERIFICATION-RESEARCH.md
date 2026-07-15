@@ -143,7 +143,7 @@ For ArtificialAnalysis to test us, our API must:
 - Agentic task completion with file outputs
 - Pairwise comparison (Elo) by judge panel
 - Weight: 20%
-- Our projected score: 63% (from PLAN-v2)
+- An early, unverified projection estimated 63%; it is not a production claim.
 
 ### τ³-Banking
 - 97 tasks

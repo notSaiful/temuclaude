@@ -11,7 +11,6 @@ import { getStoredSession, isSupabaseConfigured, onAuthSessionChange, signOut, t
 const primaryNavItems = [
   { label: 'Models', href: '/models' },
   { label: 'Playground', href: '/playground' },
-  { label: 'Compare', href: '/compare' },
   { label: 'Docs', href: '/docs' },
   { label: 'Pricing', href: '/pricing' },
 ];
@@ -91,7 +90,7 @@ export function Navbar() {
         <div className="container-max h-full flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2" aria-label="TemuClaude home">
-            {/* The Spark — small core, frontier output */}
+            {/* TemuClaude spark mark */}
             <svg width="28" height="28" viewBox="0 0 100 100" className="shrink-0" aria-hidden="true">
               <circle cx="50" cy="50" r="11" fill="#E25822"/>
               <line x1="50" y1="50" x2="50" y2="10" stroke="#E25822" strokeWidth="4.5" strokeLinecap="round"/>
@@ -241,28 +240,5 @@ export function Navbar() {
         </div>
       )}
     </>
-  );
-}
-
-function OrchestrationLogo({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-      {/* Connection lines */}
-      <line x1="20" y1="30" x2="50" y2="50" stroke="#E25822" strokeWidth="1.5" opacity="0.4" />
-      <line x1="35" y1="15" x2="50" y2="50" stroke="#E25822" strokeWidth="1.5" opacity="0.4" />
-      <line x1="50" y1="10" x2="50" y2="50" stroke="#E25822" strokeWidth="1.5" opacity="0.4" />
-      <line x1="65" y1="15" x2="50" y2="50" stroke="#E25822" strokeWidth="1.5" opacity="0.4" />
-      <line x1="80" y1="30" x2="50" y2="50" stroke="#E25822" strokeWidth="1.5" opacity="0.4" />
-
-      {/* Model nodes */}
-      <circle cx="20" cy="30" r="6" fill="#E8D5C4" />
-      <circle cx="35" cy="15" r="6" fill="#D4A574" />
-      <circle cx="50" cy="10" r="6" fill="#C97B50" />
-      <circle cx="65" cy="15" r="6" fill="#D4A574" />
-      <circle cx="80" cy="30" r="6" fill="#E8D5C4" />
-
-      {/* Central hub */}
-      <circle cx="50" cy="50" r="10" fill="#E25822" />
-    </svg>
   );
 }

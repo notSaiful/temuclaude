@@ -1,6 +1,7 @@
 // Central pricing configuration — single source of truth
 // All amounts in USD and INR paise for future checkout provider integration.
-// Updated July 9, 2026 — Credit-based pricing for profitable frontier orchestration.
+// Credit-based pricing and usage limits. Public pages import this file instead
+// of maintaining separate plan lists.
 
 export type PlanId = 'free' | 'developer' | 'pro' | 'max' | 'enterprise';
 
@@ -33,11 +34,10 @@ export const PLANS: Record<PlanId, Plan> = {
     period: 'forever',
     description: 'Sign in and try TemuClaude in the playground.',
     features: [
-      'Standard usage limits apply',
-      'Standard Mixture-of-Agents access',
-      'Full 10-layer orchestration',
-      'All 8 models',
-      'Visible orchestration panel',
+      '12,500 credits per week',
+      '20 requests per 5-hour window',
+      'Playground access',
+      'Request progress and usage details',
       'Community support',
     ],
     cta: 'Start Free',
@@ -57,13 +57,10 @@ export const PLANS: Record<PlanId, Plan> = {
     period: '/month',
     description: 'For indie developers, researchers, and prototypes.',
     features: [
-      '5x more usage than Free plan',
-      'Full API Access enabled',
-      'All 8 models, full orchestration',
+      '1.25 million credits per week',
+      'API access',
       'Email support (48h)',
-      'Usage dashboard + metrics',
-      '60 requests/min rate limit',
-      'Developer overage support',
+      'Usage dashboard',
     ],
     cta: 'Request Developer',
     featured: true,
@@ -83,13 +80,10 @@ export const PLANS: Record<PlanId, Plan> = {
     period: '/month',
     description: 'For power users and small teams who need more.',
     features: [
-      '5x more usage than Developer plan',
-      'Full API Access enabled',
-      'Priority routing + faster latency',
+      '6 million credits per week',
+      'API access',
       'Email support (24h)',
-      'Usage dashboard + analytics',
-      '300 requests/min rate limit',
-      'Dedicated overage support',
+      'Usage dashboard',
     ],
     cta: 'Request Pro',
     featured: false,
@@ -109,13 +103,10 @@ export const PLANS: Record<PlanId, Plan> = {
     period: '/month',
     description: 'For power users doing heavy coding, research, and agentic work.',
     features: [
-      '10x more usage than Pro plan',
-      'Full API Access enabled',
-      'High-priority routing',
+      '25 million credits per week',
+      'API access',
       'Priority support',
-      'Advanced analytics',
-      '1,000 requests/min rate limit',
-      'Dedicated overage support',
+      'Usage dashboard',
     ],
     cta: 'Request Max',
     featured: false,
@@ -135,13 +126,11 @@ export const PLANS: Record<PlanId, Plan> = {
     period: '/month',
     description: 'For teams and organizations at scale.',
     features: [
-      'Custom usage allocations',
-      'SSO/SAML integration',
-      'SLA 99.9% guarantee',
-      'Dedicated support + Slack channel',
-      '10 seats included',
-      'Custom integrations + models',
-      '10,000 requests/min rate limit',
+      '75 million credits per week',
+      'API access',
+      'Custom usage review',
+      'Dedicated support',
+      'Contract terms agreed before activation',
     ],
     cta: 'Contact Sales',
     featured: false,
