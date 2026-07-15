@@ -221,7 +221,7 @@ async function runLiteStack(
   sendProgress(controller, encoder, 'Calling Lite model', `${model.split('/').pop()} is drafting`);
 
   const codeInstruction = isCodeGeneration
-    ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.`
+    ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML document (<!doctype html> through </html>) in a single fenced html code block with all CSS and JavaScript included. The preview allows CDN libraries (cdn.jsdelivr.net, unpkg.com, cdnjs.cloudflare.com), Google Fonts, and remote https images, but blocks fetch/XHR/WebSockets and form submissions — inline any data the page needs. Do not outline phases or defer implementation.`
     : ENGLISH_SYSTEM.content;
   let result = await callOpenRouterLite(model, [
     {
@@ -328,7 +328,9 @@ async function runCodeGeneration(
     content: [
       'You are TemuClaude Code. Execute the user request now; do not ask follow-up questions when reasonable defaults are possible.',
       'For a game, website, or interactive app request, return a complete runnable deliverable.',
-      'When a single-file HTML game is requested or suitable, output one complete HTML fenced file with all CSS and JavaScript included.',
+      'When a single-file HTML game or webpage is requested or suitable, output exactly one complete HTML document starting with <!doctype html> and ending with </html>, wrapped in a single ```html fenced block, with all CSS and JavaScript included.',
+      'The preview sandbox can load libraries from https://cdn.jsdelivr.net, https://unpkg.com, and https://cdnjs.cloudflare.com (via <script src> and <link rel=stylesheet>), Google Fonts (fonts.googleapis.com / fonts.gstatic.com), and remote https images — so prefer CDN tags for libraries such as Three.js, p5.js, Phaser, or Tailwind instead of inlining large libraries.',
+      'The preview blocks fetch, XMLHttpRequest, WebSockets, and form submissions, so inline any data the page needs (levels, configs, word lists, assets) and do not rely on runtime network calls.',
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
