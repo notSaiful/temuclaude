@@ -24,25 +24,27 @@ const jetbrains = JetBrains_Mono({
   variable: '--font-mono',
 });
 
+const description = 'One AI endpoint that chooses a suitable model, checks difficult work when needed, and returns one answer.';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://temuclaude.com'),
-  title: 'TemuClaude — Multi-Model AI Orchestration | 8 Models, 6-Layer Pipeline',
-  description: 'TemuClaude orchestrates 8 AI models with bounded roles, self-checks responses, and escalates only when needed. A fraction of comparable frontier direct token cost. Try it free.',
-  keywords: ['LLM orchestration', 'multi-model AI', 'Mixture of Agents', 'AI playground', 'model fusion', 'open source AI', 'frontier AI', 'cheap AI API'],
+  title: 'TemuClaude — One reliable answer',
+  description,
+  keywords: ['AI API', 'AI playground', 'model routing', 'OpenAI-compatible API'],
   authors: [{ name: 'Mohammad Saiful Haque' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 6-layer quality pipeline. A fraction of comparable frontier direct token cost. Open source. 25% to charity.',
+    title: 'TemuClaude — One reliable answer',
+    description,
     type: 'website',
     url: 'https://temuclaude.com',
     siteName: 'TemuClaude',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TemuClaude — Multi-Model AI Orchestration' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'TemuClaude' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 6-layer pipeline. Fraction of the cost. Open source. 25% to charity.',
+    title: 'TemuClaude — One reliable answer',
+    description,
     images: ['/og-image.png'],
     site: '@temuclaude',
   },
@@ -55,16 +57,11 @@ const structuredData = {
   name: 'TemuClaude',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
-  description: 'Multi-model AI orchestration platform. 8 models, 6-layer quality pipeline, and a cost-aware frontier escalation policy. Open source.',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  description,
   url: 'https://temuclaude.com',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sourceSans.variable} ${newsreader.variable} ${jetbrains.variable}`}>
       <head>

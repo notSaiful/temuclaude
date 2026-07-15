@@ -116,5 +116,5 @@ hermes cron edit <job_id>  # shows current config
 - `research/raw/huggingface_*.json` — New model/dataset discoveries
 - `research/findings/*.md` — Distilled, evaluated findings
 - `research/weekly/*.md` — Weekly digests
-- `research/SWARM-PLAN.md` — Master plan (source of truth)
+- `ROADMAP.md` — Current product priorities and release gate
 - `research/TRACKER.md` — Integration tracking

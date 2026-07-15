@@ -27,9 +27,9 @@ def test_hybrid_model_pool_config():
     assert MODEL_POOL["claude-3.5-sonnet"]["role"] == "frontier_fallback"
 
     assert OPENROUTER_MODELS["llama-3.3-70b-instruct"] == "meta-llama/llama-3.3-70b-instruct"
-    assert OPENROUTER_MODELS["gemini-2.0-flash"] == "google/gemini-2.0-flash"
-    assert OPENROUTER_MODELS["mistral-large-2"] == "mistralai/mistral-large-2"
-    assert OPENROUTER_MODELS["claude-3.5-sonnet"] == "anthropic/claude-3.5-sonnet"
+    assert OPENROUTER_MODELS["gemini-2.0-flash"] == "google/gemini-2.5-flash"
+    assert OPENROUTER_MODELS["mistral-large-2"] == "mistralai/mistral-large-2512"
+    assert OPENROUTER_MODELS["claude-3.5-sonnet"] == "anthropic/claude-sonnet-4.6"
 
 
 @pytest.mark.asyncio

@@ -29,7 +29,7 @@ M_GEMINI = "google/gemini-3.5-flash"
 M_HY3 = "tencent/hy3-preview"
 M_MINIMAX = "minimax/minimax-m3"
 M_MIMO = "xiaomi/mimo-v2.5"
-M_NEMOTRON = "nvidia/nemotron-3-ultra-550b-a55b:free"
+M_NEMOTRON = "nvidia/nemotron-3-ultra-550b-a55b"
 M_CLAUDE = "anthropic/claude-sonnet-5"
 
 

@@ -194,7 +194,7 @@
 - Proxy server with virtual keys, admin UI, caching, guardrails
 - Works with Ollama
 
-**This is our infrastructure layer.** Already chosen in PLAN-v6.
+**This is an infrastructure option.** Runtime choices must follow measured results.
 
 ---
 

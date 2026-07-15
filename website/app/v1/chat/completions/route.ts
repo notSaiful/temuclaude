@@ -1,39 +1,14 @@
-/**
- * TemuClaude OpenAI-Compatible API — 8-Model Full Pipeline
- * POST /v1/chat/completions
- *
- * Eight models, each assigned to a bounded capability role:
- * 1. DeepSeek V4 Flash — low-cost trivial requests
- * 2. DeepSeek V4 Pro — math, code, and hard reasoning
- * 3. GLM-5.2 — knowledge, agentic work, and synthesis
- * 4. MiniMax M3 — creative and long-context generation
- * 5. Gemini 3.5 Flash — multimodal work
- * 6. GPT-5.6 Luna — QA-failure escalation only
- * 7. Grok 4.5 — code-repair escalation only
- * 8. Nemotron 3 Ultra — independent QA verifier
- *
- * GPT-5.6 Terra is deliberately outside the normal pool and is attempted
- * only as the last emergency rescue after the open-core routes fail.
- *
- * Pipeline:
- * 1. Classify difficulty (heuristic, no API call)
- * 2. Trivial → DeepSeek Flash | Medium → best bounded specialist | Hard → full MoA
- * 3. Layer 1: 3 models propose in parallel (GLM + DeepSeek Pro + Nemotron)
- * 4. Layer 2: Self-consistency for math (3 samples, parallel with Layer 1)
- * 5. Layer 3: Aggregation — analyze consensus, contradictions (1 call)
- * 6. Layer 4: QA gate — 5-rubric score by Nemotron (FREE, independent)
- * 7. Layer 5: Reflexion if QA < 8 — retry with feedback (1 call)
- * 8. Layer 6: QA-failure escalation if QA < 6 — GPT-5.6 Luna (1 call)
- * Timeout: 45s race → single GLM fallback
- */
+/** OpenAI-compatible chat completions with automatic model selection. */
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync, getRollingWindowUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS } from '@/lib/plans';
 import { callOpenRouter } from '@/lib/openrouter';
 import { callOpenRouterLite, type LiteModelId } from '@/lib/openrouter-lite';
 import { callModalChatCompletions, isModalConfigured, isModalRequired } from '@/lib/modal';
+import { LITE_MODEL_POOL, MODEL_IDS, PUBLIC_API_MODELS, PUBLIC_MODEL_ROLES } from '@/lib/model-catalog';
+import { validateChatMessages, validateMaxTokens, validateTemperature } from '@/lib/chat-contract';
 
 // Global in-memory circuit breaker state (retained during warm serverless container instances)
 let consecutiveFailures = 0;
@@ -43,26 +18,26 @@ let circuitTrippedUntil = 0;
 const modelActivityStore = new AsyncLocalStorage<string[]>();
 
 export const runtime = 'nodejs';
-// Raised from 120s to 300s on 2026-07-14: hard MoA queries can reach ~210s via
+// Raised from 120s to 300s on 2026-07-14: hard requests can reach ~210s via
 // the 85s race -> empty GLM fallback -> finalRescue chain, which exceeded the
 // old 120s Vercel cap and 504'd. 300s is the Vercel plan ceiling.
 export const maxDuration = 300;
 
 // ── 8-MODEL POOL ──────────────────────────────────────────────
-const M_FLASH = 'deepseek/deepseek-v4-flash';
-const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';
-const M_GLM = 'z-ai/glm-5.2';
-const M_MINIMAX = 'minimax/minimax-m3';
-const M_GEMINI = 'google/gemini-3.5-flash';
-const M_LUNA = 'openai/gpt-5.6-luna';
-const M_GROK = 'x-ai/grok-4.5';
-const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b';
-const M_TERRA = 'openai/gpt-5.6-terra'; // emergency rescue only
-const LITE_DEFAULT: LiteModelId = 'deepseek/deepseek-v4-flash';
-const LITE_REASONING: LiteModelId = 'qwen/qwen3.7-plus';
-const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
-const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
-const TEMUCLAUDE_PRO_MODEL = 'temuclaude/temuclaude-pro';
+const M_FLASH = MODEL_IDS.flash;
+const M_DEEPSEEK = MODEL_IDS.reasoning;
+const M_GLM = MODEL_IDS.planner;
+const M_MINIMAX = MODEL_IDS.creative;
+const M_GEMINI = MODEL_IDS.multimodal;
+const M_LUNA = MODEL_IDS.qualityEscalation;
+const M_GROK = MODEL_IDS.codeRepair;
+const M_NEMOTRON = MODEL_IDS.verifier;
+const M_TERRA = MODEL_IDS.emergencyEscalation;
+const LITE_DEFAULT: LiteModelId = LITE_MODEL_POOL.default;
+const LITE_REASONING: LiteModelId = LITE_MODEL_POOL.reasoning;
+const LITE_AGENT: LiteModelId = LITE_MODEL_POOL.agent;
+const LITE_VERIFIER: LiteModelId = LITE_MODEL_POOL.verifier;
+const TEMUCLAUDE_PRO_MODEL = PUBLIC_API_MODELS.pro;
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
@@ -88,8 +63,34 @@ function upstreamFailure(message: string, status = 503) {
   );
 }
 
-function extractAssistantContent(data: any): string {
-  return data?.choices?.[0]?.message?.content || '';
+function bearerToken(request: NextRequest): string {
+  const authorization = request.headers.get('authorization') || '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || request.headers.get('x-api-key')?.trim() || '';
+}
+
+function secretsEqual(left: string, right: string): boolean {
+  const leftDigest = createHash('sha256').update(left).digest();
+  const rightDigest = createHash('sha256').update(right).digest();
+  return timingSafeEqual(leftDigest, rightDigest);
+}
+
+function extractAssistantContent(data: unknown): string {
+  if (!data || typeof data !== 'object') return '';
+  const choices = (data as Record<string, unknown>).choices;
+  if (!Array.isArray(choices) || !choices[0] || typeof choices[0] !== 'object') return '';
+  const message = (choices[0] as Record<string, unknown>).message;
+  if (!message || typeof message !== 'object') return '';
+  const content = (message as Record<string, unknown>).content;
+  return typeof content === 'string' ? content : '';
+}
+
+async function recordApiUsage(userId: string, promptTokens: number, completionTokens: number): Promise<void> {
+  try {
+    await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore());
+  } catch (error) {
+    console.error('API usage recording failed:', error instanceof Error ? error.message : 'unknown error');
+  }
 }
 
 function recordModelActivity(model: string | null | undefined) {
@@ -194,8 +195,7 @@ async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promi
 
 /**
  * Difficulty Classifier — heuristic, no API call.
- * Code generation tasks route to "medium" (single strong model) not "hard" (full MoA),
- * because code needs one strong model with high output, not 3 models debating.
+ * Code generation tasks route to one strong model instead of the multi-draft route.
  */
 function classify(text: string): 'trivial' | 'medium' | 'hard' {
   const l = text.toLowerCase();
@@ -209,7 +209,7 @@ function classify(text: string): 'trivial' | 'medium' | 'hard' {
   if ((text.match(/[;,.]/g) || []).length > 3) s += 1;
   if (/\b(if|when|where|given|assuming|suppose)\b/i.test(l)) s += 1;
 
-  // Code generation detection — route to medium (single model), not hard (MoA).
+  // Code generation uses one strong model rather than merging several drafts.
   // Code needs one strong model with high max_tokens, not 3 models debating.
   const isCodeGen = /\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b/i.test(l) &&
                     /\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b/i.test(l);
@@ -225,7 +225,7 @@ function classify(text: string): 'trivial' | 'medium' | 'hard' {
 
 /**
  * Detect if the query is a code generation task (not a code reasoning/debugging task).
- * Code generation should route to a single strong model, not the full MoA pipeline.
+ * Code generation should route to a single strong model.
  */
 function isCodeGen(text: string): boolean {
   const l = text.toLowerCase();
@@ -413,7 +413,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
 
   // ── MEDIUM: Route to best specialist ──
   if (diff === 'medium') {
-    let model = M_GLM; // default to GLM (strongest overall)
+    let model: string = M_GLM;
     if (math) model = M_DEEPSEEK;
     else if (creative) model = M_MINIMAX;
     else if (multimodal) model = M_GEMINI;
@@ -423,7 +423,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     return { content: r.content, tokens: r.tokens, tier: 'medium', time: Date.now() - start };
   }
 
-  // ── HARD: Full 8-Model MoA Pipeline ──
+  // Hard requests use parallel drafts followed by review and synthesis.
 
   // MATH: self-consistency replaces single DeepSeek call (runs parallel)
   if (math) {
@@ -560,21 +560,38 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
 export async function POST(request: NextRequest) {
   return modelActivityStore.run([], async () => {
   try {
-    const body = await request.json();
-    const { model, messages, temperature, max_tokens } = body;
-    const wantsStream = body.stream === true;
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
       return NextResponse.json(
-        { error: { message: 'messages array is required', type: 'invalid_request_error' } },
+        { error: { message: 'Request body must be valid JSON', type: 'invalid_request_error' } },
         { status: 400 }
       );
     }
+    const payload = body && typeof body === 'object' ? body as Record<string, unknown> : {};
+    const model = payload.model;
+    const validatedMessages = validateChatMessages(payload.messages, ['system', 'user', 'assistant'] as const);
+    if ('error' in validatedMessages) {
+      return NextResponse.json({ error: { message: validatedMessages.error, type: 'invalid_request_error' } }, { status: 400 });
+    }
+    const messages: Msg[] = validatedMessages.messages;
+    const temperature = validateTemperature(payload.temperature);
+    if (temperature && typeof temperature === 'object') {
+      return NextResponse.json({ error: { message: temperature.error, type: 'invalid_request_error' } }, { status: 400 });
+    }
+    const max_tokens = validateMaxTokens(payload.max_tokens);
+    if (max_tokens && typeof max_tokens === 'object') {
+      return NextResponse.json({ error: { message: max_tokens.error, type: 'invalid_request_error' } }, { status: 400 });
+    }
+    if (payload.stream !== undefined && typeof payload.stream !== 'boolean') {
+      return NextResponse.json({ error: { message: 'stream must be a boolean', type: 'invalid_request_error' } }, { status: 400 });
+    }
+    const wantsStream = payload.stream === true;
 
     // ── Auth & Usage ──────────────────────────────────────
     // 1. Try API key (Bearer token or x-api-key header)
-    const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') ||
-                   request.headers.get('x-api-key') || '';
+    const apiKey = bearerToken(request);
     const masterKey = process.env.TEMUCLAUDE_MASTER_KEY;
 
     let userId: string | null = null;
@@ -584,7 +601,7 @@ export async function POST(request: NextRequest) {
 
     if (apiKey) {
       // Check master key first (for evaluation platforms — AA, LMSys, LiveBench, etc.)
-      if (masterKey && apiKey === masterKey) {
+      if (masterKey && secretsEqual(apiKey, masterKey)) {
         isEvalMode = true;
       } else {
         // Validate against DB
@@ -599,7 +616,7 @@ export async function POST(request: NextRequest) {
         userPlan = valid.user.plan || 'free';
         if (userPlan === 'free') {
           return NextResponse.json(
-            { error: { message: 'API access requires a Developer, Pro, or Enterprise plan.', type: 'permission_error' } },
+            { error: { message: 'API access requires a Developer, Pro, Max, or Enterprise plan.', type: 'permission_error' } },
             { status: 403 }
           );
         }
@@ -703,13 +720,13 @@ export async function POST(request: NextRequest) {
         }
       }
       if (!isEvalMode && userId) {
-        try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+        await recordApiUsage(userId, promptTokens, completionTokens);
       }
       return completionResponse({
         id: `chatcmpl-${Date.now()}`,
         object: 'chat.completion',
         created: Math.floor(Date.now() / 1000),
-        model: 'temuclaude/temuclaude-lite',
+        model: PUBLIC_API_MODELS.lite,
         choices: [{ index: 0, message: { role: 'assistant', content: lite.content.trim() }, finish_reason: 'stop' }],
         usage: {
           prompt_tokens: promptTokens,
@@ -757,7 +774,7 @@ export async function POST(request: NextRequest) {
               const usage = modal.data?.usage || {};
               const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
               const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
-              try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+              await recordApiUsage(userId, promptTokens, completionTokens);
             }
             if (wantsStream) {
               return completionResponse({
@@ -775,9 +792,10 @@ export async function POST(request: NextRequest) {
           consecutiveFailures += 1;
           console.warn(`Upstream Modal call failed. Consecutive failure count: ${consecutiveFailures}`);
         }
-      } catch (e: any) {
+      } catch (error) {
         consecutiveFailures += 1;
-        console.error(`Error during Modal execution: ${e.message}. Failure count: ${consecutiveFailures}`);
+        const message = error instanceof Error ? error.message : 'unknown error';
+        console.error(`Error during Modal execution: ${message}. Failure count: ${consecutiveFailures}`);
       }
 
       if (consecutiveFailures >= 3) {
@@ -822,7 +840,7 @@ export async function POST(request: NextRequest) {
     if (!isEvalMode && userId) {
       const promptTokens = promptTokenEstimate(messages);
       const completionTokens = completionTokenEstimate(finalContent);
-      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+      await recordApiUsage(userId, promptTokens, completionTokens);
     }
 
     return completionResponse({
@@ -854,18 +872,8 @@ export async function GET() {
   return NextResponse.json({
     status: 'ok',
     model: 'temuclaude',
-    description: 'TemuClaude — 8-Model Multi-Model AI Orchestration (OpenAI-compatible)',
-    models: [
-      { name: 'DeepSeek V4 Flash', role: 'Trivial routing', iq: null },
-      { name: 'DeepSeek V4 Pro', role: 'Reasoning + math + code', iq: null },
-      { name: 'GLM-5.2', role: 'Knowledge + synthesis', iq: null },
-      { name: 'MiniMax M3', role: 'Creative + long context', iq: null },
-      { name: 'Gemini 3.5 Flash', role: 'Multimodal', iq: null },
-      { name: 'GPT-5.6 Luna', role: 'QA-failure escalation', iq: null },
-      { name: 'Grok 4.5', role: 'Code-repair escalation', iq: null },
-      { name: 'Nemotron 3 Ultra', role: 'Independent QA', iq: null },
-      { name: 'TemuClaude Lite', role: 'Cost-bounded OpenRouter cascade', model: 'temuclaude/temuclaude-lite' },
-    ],
-    pipeline: ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback'],
+    description: 'OpenAI-compatible chat completions with automatic model selection.',
+    profiles: Object.values(PUBLIC_API_MODELS),
+    models: PUBLIC_MODEL_ROLES.map(({ name, role }) => ({ name, role })),
   });
 }
