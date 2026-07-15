@@ -42,7 +42,9 @@ class FirewallResult:
 # ─── Secret patterns ───────────────────────────────────────────
 SECRET_PATTERNS = [
     # API keys (various formats)
-    (r"sk-[a-zA-Z0-9]{20,}", "api_key"),
+    # OpenAI-style and OpenRouter-style keys can contain underscores and
+    # hyphens after the shared ``sk-`` prefix.
+    (r"sk-[a-zA-Z0-9_-]{20,}", "api_key"),
     (r"AKIA[0-9A-Z]{16}", "aws_access_key"),
     (r"ghp_[a-zA-Z0-9]{36}", "github_pat"),
     (r"gho_[a-zA-Z0-9]{36}", "github_oauth"),
@@ -114,8 +116,7 @@ def scan_output(output: str, canary_tokens: list[str] = None) -> FirewallResult:
 
     # Step 2: Scan and redact secrets
     for pattern, name in SECRET_PATTERNS:
-        matches = re.finditer(pattern, cleaned)
-        for match in matches:
+        def redact_secret(match: re.Match[str]) -> str:
             secrets_found.append(name)
             redactions.append({
                 "type": "secret",
@@ -123,13 +124,13 @@ def scan_output(output: str, canary_tokens: list[str] = None) -> FirewallResult:
                 "position": match.start(),
                 "redacted": True,
             })
-            # Replace the secret with a redaction marker
-            cleaned = cleaned[:match.start()] + f"[REDACTED: {name}]" + cleaned[match.end():]
+            return f"[REDACTED: {name}]"
+
+        cleaned = re.sub(pattern, redact_secret, cleaned)
 
     # Step 3: Scan and redact PII
     for pattern, name in PII_PATTERNS:
-        matches = re.finditer(pattern, cleaned)
-        for match in matches:
+        def redact_pii(match: re.Match[str]) -> str:
             pii_found.append(name)
             redactions.append({
                 "type": "pii",
@@ -137,7 +138,9 @@ def scan_output(output: str, canary_tokens: list[str] = None) -> FirewallResult:
                 "position": match.start(),
                 "redacted": True,
             })
-            cleaned = cleaned[:match.start()] + f"[REDACTED: {name}]" + cleaned[match.end():]
+            return f"[REDACTED: {name}]"
+
+        cleaned = re.sub(pattern, redact_pii, cleaned)
 
     # Step 4: Check for system prompt content leakage
     for indicator in SYSTEM_PROMPT_INDICATORS:

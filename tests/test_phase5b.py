@@ -145,18 +145,18 @@ def test_model_ids():
 
 
 # ============================================================
-# TEST 5: Free Models Available
+# TEST 5: Low-cost Models Available
 # ============================================================
 def test_free_models():
-    """Test that free model IDs are defined."""
-    print("\n=== FREE MODELS TESTS ===")
+    """Test that current low-cost model IDs are defined."""
+    print("\n=== LOW-COST MODEL TESTS ===")
     
     if len(OPENROUTER_FREE_MODELS) < 2:
-        _fail(f"only {len(OPENROUTER_FREE_MODELS)} free models")
+        _fail(f"only {len(OPENROUTER_FREE_MODELS)} low-cost models")
     
     for name, model_id in OPENROUTER_FREE_MODELS.items():
-        if ":free" not in model_id:
-            _fail(f"{name} ({model_id}) doesn't end with :free")
+        if model_id.endswith(":free"):
+            _fail(f"{name} still uses removed provider alias {model_id}")
         print(f"  OK: {name} → {model_id}")
     
     print(f"  {len(OPENROUTER_FREE_MODELS)}/{len(OPENROUTER_FREE_MODELS)} passed")

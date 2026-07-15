@@ -1,14 +1,10 @@
 import { isApprovedOpenRouterModel, type ChatMessage } from '@/lib/openrouter';
+import { LITE_MODEL_IDS, type LiteModelId } from '@/lib/model-catalog';
+
+export { LITE_MODEL_IDS };
+export type { LiteModelId };
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-
-export const LITE_MODEL_IDS = [
-  'deepseek/deepseek-v4-flash',
-  'qwen/qwen3.7-plus',
-  'nvidia/nemotron-3-ultra-550b-a55b',
-] as const;
-
-export type LiteModelId = (typeof LITE_MODEL_IDS)[number];
 
 export type LiteOpenRouterResult = {
   success: boolean;

@@ -59,7 +59,7 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
   'TemuClaude could not produce a non-empty completion',
   'Modal backend returned an empty completion',
   'finalContent',
-  'temuclaude/temuclaude-lite',
+  'PUBLIC_API_MODELS.lite',
   "TEMUCLAUDE_USE_MODAL_BACKEND === 'true'",
   'direct-code-generation',
   'if (isCodeGen(text)) return LITE_DEFAULT',
@@ -79,10 +79,38 @@ assertIncludes('website/app/api/chat/route.ts', [
 
 assertIncludes('website/lib/openrouter-lite.ts', [
   'LITE_MODEL_ALLOWLIST',
-  'nvidia/nemotron-3-ultra-550b-a55b',
+  "from '@/lib/model-catalog'",
   'isApprovedOpenRouterModel(model, actualModel)',
   'OpenRouter returned unapproved model',
 ]);
+
+assertIncludes('website/lib/model-catalog.ts', [
+  'deepseek/deepseek-v4-flash',
+  'deepseek/deepseek-v4-pro',
+  'nvidia/nemotron-3-ultra-550b-a55b',
+  'PUBLIC_API_MODELS',
+]);
+
+assertIncludes('website/app/api/chat/route.ts', [
+  "from '@/lib/chat-contract'",
+  'validateChatMessages',
+]);
+
+assertIncludes('website/app/v1/chat/completions/route.ts', [
+  "from '@/lib/chat-contract'",
+  'validateChatMessages',
+  'validateTemperature',
+  'validateMaxTokens',
+]);
+
+for (const removedPath of [
+  'website/app/api/compare/route.ts',
+  'website/app/compare/page.tsx',
+  'website/app/benchmarks/page.tsx',
+  'website/content/benchmarks.md',
+]) {
+  assert(!fs.existsSync(path.join(root, removedPath)), `${removedPath} must remain removed.`);
+}
 
 assertIncludes('website/lib/openrouter.ts', [
   'return uniqueModels(explicitFallbacks || [])',
@@ -94,7 +122,7 @@ assertIncludes('website/lib/openrouter.ts', [
 ]);
 
 assertIncludes('website/app/playground/page.tsx', [
-  'id="model-profile"',
+  'title="Choose TemuClaude model profile"',
   'HTML deliverable',
   "anchor.download = 'temuclaude-game.html'",
   'Preview · sandboxed',
@@ -102,7 +130,6 @@ assertIncludes('website/app/playground/page.tsx', [
   'sandboxPreviewDocument',
   "connect-src 'none'",
   'Run isolated preview',
-  'Save to project',
   'extractHtmlArtifact',
 ]);
 

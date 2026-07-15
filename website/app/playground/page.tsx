@@ -329,7 +329,7 @@ export default function PlaygroundPage() {
     });
     setInput('');
     setStatus('submitted');
-    const queuedProgress: ProgressStep = { label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' };
+    const queuedProgress: ProgressStep = { label: 'Queued request', detail: 'Preparing the request', status: 'active' };
     setProgressSteps([queuedProgress]);
     addActivity(streamingIdxRef.current, queuedProgress);
     abortControllerRef.current = new AbortController();
@@ -636,7 +636,7 @@ export default function PlaygroundPage() {
                     Ask TemuClaude anything
                   </h2>
                   <p className="text-text-secondary mb-8">
-                    One model. Eight minds behind the scenes. One superior answer.
+                    One request. A suitable route. One clear answer.
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {EXAMPLE_PROMPTS.map((prompt, i) => (
@@ -670,7 +670,9 @@ export default function PlaygroundPage() {
                       aria-live={message.role === 'assistant' ? 'polite' : undefined}
                       aria-atomic="false"
                     >
-                      {message.content || (message.role === 'assistant' && status === 'submitted' ? 'Working…' : '')}
+                      {message.role === 'assistant'
+                        ? (stripHtmlArtifact(message.content) || (status === 'submitted' ? 'Working…' : ''))
+                        : message.content}
                       {status === 'streaming' && i === messages.length - 1 && message.role === 'assistant' && (
                         <span className="inline-block w-2 h-4 bg-accent-primary ml-0.5 animate-blink" />
                       )}
@@ -753,11 +755,11 @@ export default function PlaygroundPage() {
                         <div role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
                           <button role="option" aria-selected={modelProfile === 'pro'} onClick={() => { setModelProfile('pro'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'pro' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
                             <span className="block text-xs font-semibold text-text-primary">TemuClaude Pro</span>
-                            <span className="mt-0.5 block text-[11px] text-text-muted">Full routed orchestration for demanding tasks</span>
+                            <span className="mt-0.5 block text-[11px] text-text-muted">More checks and specialist access for demanding work</span>
                           </button>
                           <button role="option" aria-selected={modelProfile === 'lite'} onClick={() => { setModelProfile('lite'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'lite' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
                             <span className="block text-xs font-semibold text-text-primary">TemuClaude Lite</span>
-                            <span className="mt-0.5 block text-[11px] text-text-muted">Cost-bounded routing for everyday work</span>
+                            <span className="mt-0.5 block text-[11px] text-text-muted">Lower-cost routing for everyday work</span>
                           </button>
                         </div>
                       )}
@@ -931,7 +933,10 @@ function AgentActivity({
 }
 
 function CodeArtifact({ content }: { content: string }) {
-  const [previewOpen, setPreviewOpen] = useState(false);
+  // Auto-open the preview so the user sees the rendered result, not the raw
+  // code (which stripHtmlArtifact now hides from the chat bubble). The toggle
+  // below still lets the user collapse it.
+  const [previewOpen, setPreviewOpen] = useState(true);
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const html = extractHtmlArtifact(content);
@@ -1030,6 +1035,26 @@ function extractHtmlArtifact(content: string): string | null {
   return /<\/html>\s*$/i.test(candidate) ? candidate : null;
 }
 
+// Hide the raw HTML/code block from the chat bubble so the user sees only the
+// prose explanation + the rendered preview (CodeArtifact) instead of a code
+// dump. Only strips when a COMPLETE artifact exists — exactly when CodeArtifact
+// renders a preview — so the code disappears iff the preview appears. During
+// streaming (incomplete artifact) the code stays visible until the block
+// closes, then collapses to prose + preview in one clean transition. If the
+// model returned only code (no prose), a friendly placeholder keeps the bubble
+// from going blank.
+function stripHtmlArtifact(content: string): string {
+  if (!extractHtmlArtifact(content)) return content;
+  const fenced = content.match(/```(?:html|htm)\s*\n[\s\S]*?```/i);
+  if (fenced) {
+    const stripped = content.replace(fenced[0], '').trim();
+    return stripped || 'Generated an HTML deliverable. See the preview below.';
+  }
+  const start = content.search(/<!doctype\s+html\b|<html\b/i);
+  const prose = content.slice(0, start).trim();
+  return prose || 'Generated an HTML deliverable. See the preview below.';
+}
+
 function sandboxPreviewDocument(html: string): string {
   // Generated code is untrusted. The preview iframe runs with sandbox=
   // "allow-scripts" (opaque origin — it cannot read TemuClaude cookies,
@@ -1048,12 +1073,12 @@ function sandboxPreviewDocument(html: string): string {
 }
 
 const TECHNIQUE_LABELS: Record<string, string> = {
-  'llm-classification': 'LLM classification',
-  'deliberation': 'Deliberation',
-  'regex-classification-fallback': 'Regex fallback',
-  'direct-routing': 'Direct routing',
-  'specialist-routing': 'Specialist routing',
-  'reflexion': 'Reflexion',
+  'llm-classification': 'Request classification',
+  'deliberation': 'Second review',
+  'regex-classification-fallback': 'Local classification fallback',
+  'direct-routing': 'Direct answer',
+  'specialist-routing': 'Specialist selected',
+  'reflexion': 'Answer revised',
 };
 
 function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClose: () => void }) {
@@ -1112,7 +1137,7 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
                   ))}
                 </div>
                 <div className="text-xs text-text-muted mt-2">
-                  Aggregated by: {data.aggregator} · Consensus: {data.consensus}/3 agree
+                  Final review: {data.aggregator} · Agreement: {data.consensus}/3
                 </div>
               </div>
             </div>
@@ -1137,7 +1162,7 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
               </div>
               <div>
                 <div className="text-sm font-medium text-text-primary">Quality check</div>
-                <div className="text-xs text-text-muted">Self-QA score: {data.qaScore}/10 · {data.qaScore >= 8 ? '✓ Passed' : '⚠ Below threshold'}</div>
+                <div className="text-xs text-text-muted">Review score: {data.qaScore}/10 · {data.qaScore >= 8 ? '✓ Passed' : '⚠ Below threshold'}</div>
               </div>
             </div>
           )}
