@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { getAccessToken, getStoredSession, type LocalSession } from '@/lib/auth';
+import { resolveChatEndpoint } from '@/lib/chat-endpoint';
 import { inferMediaKind } from '@/lib/media-intent';
 
 type Message = {
@@ -341,11 +342,10 @@ export default function PlaygroundPage() {
         return;
       }
 
-      // When NEXT_PUBLIC_CHAT_API_URL is set (the Cloud Run chat service), the
-      // playground calls it cross-origin with the bearer Supabase access token
-      // (already attached below) so hard orchestration can exceed Vercel's 300s
-      // ceiling. Unset = same-origin Vercel route (current behavior).
-      const chatUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || '/api/chat';
+      // Accept the base service URL printed by `gcloud run deploy` as well as
+      // a full /api/chat URL. The normalizer prevents an immediate 405 CORS
+      // failure when production is configured with the Cloud Run root URL.
+      const chatUrl = resolveChatEndpoint(process.env.NEXT_PUBLIC_CHAT_API_URL);
       const response = await fetch(chatUrl, {
         method: 'POST',
         headers: {

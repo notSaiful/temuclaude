@@ -122,6 +122,7 @@ assertIncludes('website/lib/openrouter.ts', [
 ]);
 
 assertIncludes('website/app/playground/page.tsx', [
+  'resolveChatEndpoint(process.env.NEXT_PUBLIC_CHAT_API_URL)',
   'title="Choose TemuClaude model profile"',
   'HTML deliverable',
   "anchor.download = 'temuclaude-game.html'",
@@ -131,6 +132,11 @@ assertIncludes('website/app/playground/page.tsx', [
   "connect-src 'none'",
   'Run isolated preview',
   'extractHtmlArtifact',
+]);
+
+assertIncludes('website/lib/chat-endpoint.ts', [
+  "const DEFAULT_CHAT_ENDPOINT = '/api/chat'",
+  "url.pathname = DEFAULT_CHAT_ENDPOINT",
 ]);
 
 assertIncludes('website/lib/e2b-preview.ts', [
