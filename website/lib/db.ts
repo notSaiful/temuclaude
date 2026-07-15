@@ -258,11 +258,31 @@ export function getActiveSubscription(userId: string): SubscriptionRecord | null
 
 // === API KEY OPERATIONS ===
 
+function apiKeyPepper(): string {
+  const pepper = process.env.TEMUCLAUDE_API_KEY_PEPPER || process.env.SUPABASE_SECRET_KEY;
+  if (pepper) return pepper;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('TEMUCLAUDE_API_KEY_PEPPER or SUPABASE_SECRET_KEY is required in production');
+  }
+  return 'temuclaude-development-only-api-key-pepper';
+}
+
+function hashApiKey(rawKey: string): string {
+  return crypto.createHmac('sha256', apiKeyPepper()).update(rawKey).digest('hex');
+}
+
+function legacyApiKeyHash(rawKey: string): string {
+  // Existing records used SHA-256 over 256-bit random API keys. Keep this only
+  // for a one-use migration to the keyed hash above; it is not used for newly
+  // created records.
+  return crypto.createHash('sha256').update(rawKey).digest('hex'); // lgtm[js/insufficient-password-hash]
+}
+
 export function createApiKey(userId: string, name = 'default'): { key: string; id: string } {
   const db = loadDB();
   const id = generateId();
   const rawKey = `tmc_${crypto.randomBytes(32).toString('hex')}`;
-  const keyHash = crypto.createHash('sha256').update(rawKey).digest('hex');
+  const keyHash = hashApiKey(rawKey);
   const keyPrefix = rawKey.substring(0, 12);
 
   db.api_keys[id] = {
@@ -286,9 +306,11 @@ export function revokeApiKey(keyId: string): void {
 
 export function validateApiKey(rawKey: string): { userId: string; user: User } | null {
   const db = loadDB();
-  const keyHash = crypto.createHash('sha256').update(rawKey).digest('hex');
+  const keyHash = hashApiKey(rawKey);
+  const legacyHash = legacyApiKeyHash(rawKey);
   for (const record of Object.values(db.api_keys)) {
-    if (record.key_hash === keyHash) {
+    if (record.key_hash === keyHash || record.key_hash === legacyHash) {
+      record.key_hash = keyHash;
       // Update last used
       record.last_used = Math.floor(Date.now() / 1000);
       saveDB();
@@ -653,7 +675,7 @@ export async function createApiKeyAsync(userId: string, name = 'default'): Promi
 
   const id = generateId();
   const rawKey = `tmc_${crypto.randomBytes(32).toString('hex')}`;
-  const keyHash = crypto.createHash('sha256').update(rawKey).digest('hex');
+  const keyHash = hashApiKey(rawKey);
   const keyPrefix = rawKey.substring(0, 12);
 
   const { error } = await client
@@ -676,11 +698,12 @@ export async function validateApiKeyAsync(rawKey: string): Promise<{ userId: str
   const client = getSupabaseAdminClient();
   if (!client) return validateApiKey(rawKey);
 
-  const keyHash = crypto.createHash('sha256').update(rawKey).digest('hex');
+  const keyHash = hashApiKey(rawKey);
+  const legacyHash = legacyApiKeyHash(rawKey);
   const { data, error } = await client
     .from('temuclaude_api_keys')
     .select('*')
-    .eq('key_hash', keyHash)
+    .in('key_hash', [keyHash, legacyHash])
     .maybeSingle();
 
   if (error) throw error;
@@ -688,7 +711,7 @@ export async function validateApiKeyAsync(rawKey: string): Promise<{ userId: str
 
   await client
     .from('temuclaude_api_keys')
-    .update({ last_used: nowUnix() })
+    .update({ key_hash: keyHash, last_used: nowUnix() })
     .eq('id', data.id);
 
   const user = await getUserAsync(data.user_id);
