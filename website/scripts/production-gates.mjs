@@ -159,7 +159,7 @@ assertIncludes('website/lib/db.ts', [
   'assertPersistentDbAvailable',
   'ALLOW_EPHEMERAL_DB',
   'Supabase admin credentials are required in production',
-  "createHmac('sha256', apiKeyPepper())",
+  'scryptSync(rawKey, apiKeyPepper(), 32)',
   ".in('key_hash', [keyHash, legacyHash])",
 ]);
 
