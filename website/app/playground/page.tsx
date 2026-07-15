@@ -987,10 +987,17 @@ function extractHtmlArtifact(content: string): string | null {
 }
 
 function sandboxPreviewDocument(html: string): string {
-  // Generated code is untrusted. The preview has an opaque origin and a CSP
-  // that permits only its inline code; it cannot access TemuClaude data,
-  // navigate the parent page, submit forms, or call out to another service.
-  const policy = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; media-src data:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'\">";
+  // Generated code is untrusted. The preview iframe runs with sandbox=
+  // "allow-scripts" (opaque origin — it cannot read TemuClaude cookies,
+  // storage, or DOM, navigate the parent page, submit forms, or call out to
+  // another service), so allowing external resources does not expose user
+  // data. Generated games commonly load a library (Three.js, p5.js, Phaser,
+  // Tailwind) from a CDN, remote images, and Google Fonts; the previous
+  // policy blocked all of those and the preview rendered blank for anything
+  // but fully-inline code. Allowlist the major CDNs + https images/fonts.
+  // connect-src stays 'none' so the untrusted page cannot beacon out or call
+  // APIs; pages that need data must inline it.
+  const policy = "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src data: blob: https:; media-src data: blob: https:; font-src data: https://fonts.gstatic.com; connect-src 'none'; form-action 'none'; base-uri 'none'\">";
   return /<head[^>]*>/i.test(html)
     ? html.replace(/<head([^>]*)>/i, `<head$1>${policy}`)
     : `${policy}${html}`;
