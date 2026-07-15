@@ -23,7 +23,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Build-time public vars only. Runtime secrets (OPENROUTER_API_KEY, Supabase
 # keys) are injected at deploy time and read by the server at runtime.
 COPY --from=deps /app/node_modules ./node_modules
-COPY ./
+COPY . .
 RUN npm run build
 
 FROM node:22-alpine AS runner
