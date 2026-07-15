@@ -268,7 +268,7 @@ function apiKeyPepper(): string {
 }
 
 function hashApiKey(rawKey: string): string {
-  return crypto.createHmac('sha256', apiKeyPepper()).update(rawKey).digest('hex');
+  return crypto.scryptSync(rawKey, apiKeyPepper(), 32).toString('hex');
 }
 
 function legacyApiKeyHash(rawKey: string): string {
