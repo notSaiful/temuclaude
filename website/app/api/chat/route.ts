@@ -503,10 +503,13 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
+    // Cross-review writes an improved response, not a one-word verdict, so it
+    // needs a real output budget — the callModel 2k/10s default truncated hard-
+    // query reviews and let an empty review silently drop to the raw proposals.
     const reviewResult = await callModel(reviewer.name.includes('glm') ? POOL.orchestrator : reviewer.name.includes('deepseek') ? POOL.reasoning : POOL.specialist, [
       { role: 'system', content: 'You are reviewing other AI models\' responses. Identify errors, missing information, and strengths. Provide an improved response.' },
       { role: 'user', content: reviewPrompt },
-    ]);
+    ], { maxTokens: 4_096, timeoutMs: 20_000 });
     crossReviewResults.push(reviewResult);
   }
 
@@ -521,10 +524,16 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     query,
     reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals,
   );
+  // The aggregator writes the FINAL answer for a hard query — synthesizing
+  // three drafts — so it is the single most important call in the stack. The
+  // callModel 2k/10s default (the same starved budget #28 fixed on the propose
+  // layer) routinely left it empty, silently falling back to proposal[0] so the
+  // MoA "consensus/contradiction synthesis" never actually ran. Give it a real
+  // budget and an explicit fallback chain.
   const aggResult = await callModel(POOL.orchestrator, [
     { role: 'system', content: 'You are TemuClaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
     { role: 'user', content: fusionPrompt },
-  ]);
+  ], { maxTokens: 6_144, timeoutMs: 30_000, temperature: 0.5, fallbacks: [POOL.reasoning, POOL.fastRoute] });
   let finalAnswer = aggResult.ok ? aggResult.content : workingProposals[0].content;
   sendProgress(controller, encoder, 'Aggregation complete', aggResult.ok ? 'Primary synthesis ready' : 'Using strongest available draft', 'done');
 
@@ -565,13 +574,13 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       const reflection = await callModel(POOL.verifier, [
         { role: 'system', content: 'You are a code verifier. The previous answer may have errors. Explain what went wrong and how to fix it.' },
         { role: 'user', content: `Question: ${query}\nAnswer: ${finalAnswer.substring(0, 500)}\n\nWhat is wrong with this answer? How should it be fixed?` },
-      ]);
+      ], { maxTokens: 2_048, timeoutMs: 15_000 });
       if (reflection.ok) {
         const retryResult = await callModel(POOL.reasoning, [
           ...messages,
           { role: 'assistant', content: finalAnswer },
           { role: 'user', content: `A verifier found these issues:\n${reflection.content}\n\nPlease provide a corrected answer.` },
-        ]);
+        ], { maxTokens: 6_144, timeoutMs: 30_000, fallbacks: [POOL.orchestrator] });
         if (retryResult.ok) finalAnswer = retryResult.content;
         codeVerified = await verifyCode(finalAnswer);
       }
@@ -582,7 +591,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         const repair = await callModel(POOL.codeRepair, [
           { role: 'system', content: 'Repair the submitted solution. Return a complete, correct, self-contained answer with working code where relevant.' },
           { role: 'user', content: `Task:\n${query}\n\nCurrent attempted answer:\n${finalAnswer}` },
-        ]);
+        ], { maxTokens: 6_144, timeoutMs: 30_000 }); // reasoning stays ON (Grok 4.5 requires it; the 2k/10s default starved a full repair)
         if (repair.ok) {
           finalAnswer = repair.content;
           codeVerified = await verifyCode(finalAnswer);
@@ -602,13 +611,13 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     const reflection = await callModel(POOL.verifier, [
       { role: 'system', content: 'You are a quality verifier. The answer scored low on quality. Explain what is wrong.' },
       { role: 'user', content: `Question: ${query}\nAnswer: ${finalAnswer.substring(0, 500)}\nQuality score: ${qaScore.toFixed(2)}/1.0\n\nWhat needs to be improved?` },
-    ]);
+    ], { maxTokens: 2_048, timeoutMs: 15_000 });
     if (reflection.ok) {
       const retryResult = await callModel(POOL.orchestrator, [
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: `A quality check found these issues:\n${reflection.content}\n\nPlease provide an improved answer.` },
-      ]);
+      ], { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.reasoning] });
       if (retryResult.ok) {
         const newScore = await runUSVA(query, retryResult.content);
         if (newScore > qaScore) { finalAnswer = retryResult.content; qaScore = newScore; }
@@ -624,7 +633,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       ...messages,
       { role: 'assistant', content: finalAnswer + '\n\nWait' },
       { role: 'user', content: 'Continue your reasoning in more detail. Provide a thorough step-by-step solution.' },
-    ]);
+    ], { maxTokens: 4_096, timeoutMs: 25_000 });
     if (forcedResult.ok && forcedResult.content.length > finalAnswer.length) {
       finalAnswer = forcedResult.content;
     }
@@ -644,7 +653,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'Your solution has an error in one of the reasoning steps. Re-examine each step carefully and provide a corrected solution with verified code for each step.' },
-      ]);
+      ], { maxTokens: 4_096, timeoutMs: 25_000 });
       if (retryResult.ok) {
         const reVerified = await stepLevelVerify(query, retryResult.content);
         if (reVerified) { finalAnswer = retryResult.content; codeVerified = true; }
@@ -665,7 +674,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'A logical analysis found contradictions in your answer. Please identify and resolve any contradictory statements, then provide a corrected answer.' },
-      ]);
+      ], { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.reasoning] });
       if (retryResult.ok) finalAnswer = retryResult.content;
     }
   }
@@ -691,10 +700,17 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // For the hardest queries where QA score is still low after all retries
   if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 130_000) {
     techniques.push('frontier-fallback');
+    // Frontier reasoning models need ~100s+ to first token at high effort
+    // (GPT-5.6 Luna ~116s). The callModel 10s default guaranteed a timeout, so
+    // this escalation layer never actually fired — Luna was dead weight in the
+    // pool. Give it a real deadline (reasoning stays ON — that is the point of
+    // escalating to the frontier). The layer is already heavily gated (low QA
+    // + needsFrontier + within the time budget), so it fires rarely; fallbacks
+    // only help if Luna returns faster than the deadline.
     const frontierResult = await callModel(POOL.frontier, [
       { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
       { role: 'user', content: `Question: ${query}\n\nPrevious best answer (scored ${qaScore.toFixed(2)}/1.0):\n${finalAnswer.substring(0, 2000)}\n\nProvide a better answer:` },
-    ]);
+    ], { maxTokens: 8_192, timeoutMs: 120_000, fallbacks: [POOL.reasoning, POOL.orchestrator] });
     if (frontierResult.ok) {
       const newScore = await runUSVA(query, frontierResult.content);
       if (newScore > qaScore) {
