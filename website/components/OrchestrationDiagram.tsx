@@ -54,7 +54,7 @@ export function OrchestrationDiagram() {
           { cx: 80, cy: 100, color: '#E8D5C4', label: 'GLM-5.2', delay: 0 },
           { cx: 200, cy: 60, color: '#D4A574', label: 'DeepSeek Pro', delay: 0.2 },
           { cx: 300, cy: 40, color: '#C97B50', label: 'Llama 3.3', delay: 0.4 },
-          { cx: 400, cy: 60, color: '#D4A574', label: 'Gemini 2.0', delay: 0.6 },
+          { cx: 400, cy: 60, color: '#D4A574', label: 'Gemini 2.5', delay: 0.6 },
           { cx: 520, cy: 100, color: '#E8D5C4', label: 'Mistral L2', delay: 0.8 },
         ].map((node, i) => (
           <g

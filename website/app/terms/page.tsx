@@ -12,7 +12,7 @@ export default function TermsPage() {
       <Navbar />
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Terms of Service">
         <div className="container-max max-w-2xl mx-auto">
-          <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Terms of Service</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Terms of Service</h1>
           <p className="text-sm text-text-muted mb-12">Last updated: July 4, 2026</p>
 
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
@@ -25,11 +25,11 @@ export default function TermsPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. Description of Service</h2>
               <p>TemuClaude is an AI orchestration platform that routes queries to multiple AI models, fuses their responses, and returns a single answer. The Service includes:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Playground (free, 20 queries/day)</li>
-                <li>Developer subscription ($15/month, 50,000 queries/month)</li>
-                <li>Pro subscription ($49/month, 500,000 queries/month)</li>
-                <li>Pay-as-you-go API ($0.50/M input, $2.00/M output tokens)</li>
-                <li>Enterprise subscription ($499/month, unlimited queries)</li>
+                <li>Playground (free, 20 queries/day and 50K monthly credits)</li>
+                <li>Developer Plan ($19/month, 5M monthly credits)</li>
+                <li>Pro Plan ($49/month, 25M monthly credits)</li>
+                <li>Max Plan ($149/month, 100M monthly credits)</li>
+                <li>Enterprise Plan (from $499/month, custom agreements, metered billing, SLA contracts)</li>
               </ul>
             </section>
 
@@ -49,25 +49,25 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">4. Subscription Terms</h2>
-              <p>Subscriptions are billed monthly via Razorpay. By subscribing, you agree to:</p>
+              <p>Paid plans are currently activated by request while hosted checkout is finalized. When paid access is activated, you agree to:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Pay the monthly fee in advance</li>
-                <li>Allow automatic renewal until cancelled</li>
-                <li>Cancel with 30 days written notice</li>
-                <li>Not exceed the query limit of your plan</li>
+                <li>Pay the monthly fee in advance when billing is enabled</li>
+                <li>Allow automatic renewal only after you have agreed to recurring billing terms</li>
+                <li>Cancel with written notice before the next billing period</li>
+                <li>Not exceed the credit or request limits of your plan</li>
               </ul>
-              <p className="mt-2">If you exceed your plan's query limit, additional queries will be billed at pay-as-you-go rates ($0.50/M input, $2.00/M output).</p>
+              <p className="mt-2">If you exceed your plan's monthly credits, additional usage may be billed at the overage rate shown on the pricing page or paused until your limit resets.</p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">5. API Usage</h2>
-              <p>API access is available on Developer, Pro, and Enterprise plans. You are responsible for:</p>
+              <p>API access is available on Developer, Pro, Max, and Enterprise plans. You are responsible for:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Keeping your API key secure</li>
                 <li>All usage under your API key</li>
                 <li>Notifying us within 24 hours of key compromise</li>
               </ul>
-              <p className="mt-2">API rate limits: 100 requests/minute (Pro), 1,000 requests/minute (Enterprise).</p>
+              <p className="mt-2">API rate limits: 60 requests/minute (Developer), 300 requests/minute (Pro), 1,000 requests/minute (Max), and custom limits for Enterprise.</p>
             </section>
 
             <section>
@@ -99,7 +99,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">10. Refunds</h2>
-              <p>See our <a href="/refunds" className="text-accent-primary hover:underline">Refund Policy</a> for details on refunds and cancellations.</p>
+              <p>See our <a href="/cancellation-refunds" className="text-accent-primary hover:underline">Cancellation and Refunds Policy</a> for details on refunds and cancellations.</p>
             </section>
 
             <section>
@@ -114,7 +114,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">13. Contact</h2>
-              <p>For questions about these Terms, contact us at: ggs@temuclaude.com</p>
+              <p>For questions about these Terms, contact us at: <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> or call <a href="tel:+17252686198" className="text-accent-primary hover:underline">+1 (725) 268-6198</a>.</p>
             </section>
           </div>
         </div>

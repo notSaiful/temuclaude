@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "production:gates": "node scripts/production-gates.mjs"
+    "production:gates": "node scripts/production-gates.mjs",
+    "audit:openrouter": "node scripts/audit-openrouter-models.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -26,11 +26,11 @@ export function CookieConsent() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-[90] bg-bg-primary border-t border-border-subtle shadow-lg"
+      className="fixed top-20 left-4 right-4 z-[90] bg-bg-primary border border-border-subtle shadow-lg rounded-md sm:left-auto sm:max-w-xl"
       role="region"
       aria-label="Cookie consent"
     >
-      <div className="container-max py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-sm text-text-secondary text-center sm:text-left">
           We use cookies to improve your experience. Read our{' '}
           <a href="/privacy" className="text-accent-primary hover:underline">Privacy Policy</a>.

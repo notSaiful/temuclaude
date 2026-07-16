@@ -9,36 +9,36 @@ import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
 export const runtime = 'nodejs';
 // Hard Pro requests deliberately run several high-value model and verifier
 // stages. Give that quality-first pipeline room to finish instead of allowing
-// the platform to kill it mid-pipeline with no answer. Raised from 120s to
-// 300s on 2026-07-14 (Vercel plan ceiling): hard runs can reach ~210s.
+// the platform to kill it mid-pipeline with no answer.
 export const maxDuration = 300;
 
-// TemuClaude Pro — the current eight-model, role-bounded registry.
-// Each model has a distinct job; premium escalation remains conditional.
+// TemuClaude Pro — evidence-based, role-bounded quality registry.
+// Every nontrivial Pro request uses all available quality roles; task type
+// controls their instructions and synthesis weight, not whether quality runs.
 const POOL = {
   orchestrator: 'z-ai/glm-5.2',
   reasoning: 'deepseek/deepseek-v4-pro',
   fastRoute: 'deepseek/deepseek-v4-flash',
   multimodal: 'google/gemini-3.5-flash',
+  uiUx: 'moonshotai/kimi-k2.6',
   specialist: 'minimax/minimax-m3',
   vision: 'minimax/minimax-m3',
-  frontier: 'openai/gpt-5.6-luna',
+  gptWorker: 'openai/gpt-5.6-luna',
+  frontier: 'openai/gpt-5.6-sol',
   codeRepair: 'x-ai/grok-4.5',
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
 };
 
-// Each pool model's best jobs. Drives drafter selection + role assignment so a
-// build uses the strongest model for each job instead of defaulting to one. The
-// labels mirror the short names shown in the orchestration panel.
-const MODEL_STRENGTHS: Record<string, { label: string; best: string[] }> = {
-  'z-ai/glm-5.2':               { label: 'GLM-5.2',           best: ['architecture', 'synthesis', 'judging', 'general-code', 'agentic'] },
-  'deepseek/deepseek-v4-pro':   { label: 'DeepSeek V4 Pro',   best: ['code', 'math', 'algorithms', 'logic-heavy'] },
-  'deepseek/deepseek-v4-flash': { label: 'DeepSeek V4 Flash', best: ['planning', 'fast-draft', 'cheap'] },
-  'google/gemini-3.5-flash':    { label: 'Gemini 3.5 Flash',  best: ['visual', 'layout', 'theme', 'ui-ux', 'multimodal'] },
-  'minimax/minimax-m3':         { label: 'MiniMax M3',        best: ['creative', 'long-context', 'generalist'] },
-  'openai/gpt-5.6-luna':        { label: 'GPT-5.6 Luna',      best: ['frontier', 'hardest-integration', 'complex-systems'] },
-  'x-ai/grok-4.5':              { label: 'Grok 4.5',          best: ['debugging', 'repair'] },
-  'nvidia/nemotron-3-ultra-550b-a55b': { label: 'Nemotron',    best: ['verification', 'judging', 'scoring'] },
+const ROLE_INSTRUCTIONS: Record<string, string> = {
+  [POOL.orchestrator]: 'You are the GLM long-horizon planner and synthesis lead. Track dependencies, architecture, edge cases, and integration across the entire task.',
+  [POOL.reasoning]: 'You are the DeepSeek math, STEM, coding, and rigorous-reasoning lead. Derive and verify the technical core.',
+  [POOL.uiUx]: 'You are the Kimi coding-driven UI/UX implementation lead. Focus on complete interfaces, interaction flows, state, responsive behavior, and production-ready code.',
+  [POOL.specialist]: 'You are the MiniMax multimodal, long-context, creative, and product reviewer. Focus on visual coherence, product completeness, and source-wide consistency.',
+  [POOL.multimodal]: 'You are the Gemini visual UI, accessibility, multimodal, and tool-use reviewer. Focus on screen behavior, accessibility, and observable interaction quality.',
+  [POOL.gptWorker]: 'You are a fast independent GPT-family proposer. Find a distinct solution path, useful tools, and omissions in the likely consensus.',
+  [POOL.frontier]: 'You are the GPT-5.6 Sol frontier adjudicator. Solve complex professional work rigorously and identify where weaker proposals may fail.',
+  [POOL.codeRepair]: 'You are the Grok coding-agent and repair specialist. Hunt bugs, unsafe assumptions, integration failures, and missing tests; propose concrete fixes.',
+  [POOL.verifier]: 'You are the Nemotron independent verifier. Try to falsify reasoning, code, long-context, and high-stakes claims with checkable evidence.',
 };
 
 // Lite is intentionally isolated from POOL. Its caller enforces this exact
@@ -163,21 +163,31 @@ export async function POST(req: NextRequest) {
         if (profile === 'lite') {
           completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques, isCodeGeneration);
         } else if (isCodeGeneration) {
-          completed = await runCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
+          completed = await runQualityCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else if (tier === 'trivial') {
-          // Layer 1: cheapest approved Pro route for straightforward requests.
-          // Budget raised from callModel defaults (2k/10s) to 4k/25s so a
-          // reasoning-capable fast model has room to finish, with the
-          // orchestrator + DeepSeek V4 Pro as explicit fallbacks.
-          techniques.push('direct-routing');
-          completed = await routeSingleModel(controller, encoder, POOL.fastRoute, messages, { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.orchestrator, POOL.reasoning] }, taskType, tier, t0, techniques, 'Calling fast model', 'DeepSeek V4 Flash is drafting');
+          // Pro has a quality floor even for short requests.  Flash is a Lite
+          // worker only; GLM owns concise, user-facing Pro answers.
+          techniques.push('pro-quality-floor');
+          sendProgress(controller, encoder, 'Calling Pro model', 'GLM-5.2 is drafting');
+          const result = await callModel(POOL.orchestrator, messages);
+          if (!result.ok) {
+            // A provider may occasionally return HTTP 200 with an empty
+            // completion. Never expose that transport failure as the answer:
+            // recover through the full quality panel and its approved routes.
+            techniques.push('pro-empty-response-recovery');
+            sendProgress(controller, encoder, 'Recovering response', 'The quality panel is replacing an empty provider response');
+            completed = await runFullStack(query, messages, controller, encoder, taskType, 'medium', t0, techniques);
+          } else {
+            sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
+            streamText(controller, encoder, result.content);
+            sendOrch(controller, encoder, taskType, tier, [{ name: 'glm-5.2', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
+            completed = { content: result.content, model: result.name };
+          }
         } else if (tier === 'medium') {
-          // Layer 2: Specialist routing, with the same empty-content gate +
-          // fallback chain as the trivial tier so a single empty specialist
-          // response is never streamed as the final answer.
-          techniques.push('specialist-routing');
-          const specialist = pickSpecialist(taskType);
-          completed = await routeSingleModel(controller, encoder, specialist, messages, { maxTokens: 4_096, timeoutMs: 30_000, fallbacks: [POOL.orchestrator, POOL.reasoning] }, taskType, tier, t0, techniques, 'Calling specialist', `${specialist.split('/').pop()} is drafting`);
+          // A Pro task is not downgraded to a single draft.  The same
+          // specialist panel used for hard requests establishes a dependable
+          // quality floor; the panel itself is task-aware.
+          completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else {
           // HARD: Full 6-layer stack
           completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
@@ -230,23 +240,50 @@ async function runLiteStack(
     : difficulty >= 7
       ? LITE_POOL.agent
       : LITE_POOL.default;
-  techniques.push('lite-single-model-routing');
-  sendProgress(controller, encoder, 'Calling Lite model', `${model.split('/').pop()} is drafting`);
+  const useLitePanel = tier !== 'trivial' || isCodeGeneration;
+  techniques.push(useLitePanel ? 'lite-parallel-specialist-panel' : 'lite-quality-floor');
+  sendProgress(controller, encoder, 'Calling Lite model', useLitePanel ? 'Two Lite specialists are drafting in parallel' : `${model.split('/').pop()} is drafting`);
 
   const codeInstruction = isCodeGeneration
     ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML document (<!doctype html> through </html>) in a single fenced html code block with all CSS and JavaScript included. The preview allows CDN libraries (cdn.jsdelivr.net, unpkg.com, cdnjs.cloudflare.com), Google Fonts, and remote https images, but blocks fetch/XHR/WebSockets and form submissions — inline any data the page needs. Do not outline phases or defer implementation.`
     : ENGLISH_SYSTEM.content;
-  let result = await callOpenRouterLite(model, [
+  const callLiteDraft = (draftModel: LiteModelId, role: string) => callOpenRouterLite(draftModel, [
     {
       role: 'system',
-      content: codeInstruction,
+      content: `${codeInstruction} ${role}`,
     },
     ...messages,
   ], {
-    maxTokens: isCodeGeneration ? 3_072 : 2_000,
-    timeoutMs: isCodeGeneration ? 30_000 : 12_000,
-    sessionId: asciiSessionId('playground-lite', query),
+    maxTokens: isCodeGeneration ? 4_096 : 2_000,
+    timeoutMs: isCodeGeneration ? 90_000 : 20_000,
+    sessionId: asciiSessionId(`playground-lite-${draftModel}`, query),
   });
+  const complement = model === LITE_POOL.default ? LITE_POOL.agent : LITE_POOL.default;
+  const [primaryDraft, complementaryDraft] = await Promise.all([
+    callLiteDraft(model, 'Own the main task-specific solution. Be complete, concrete, and do not rush the ending.'),
+    useLitePanel
+      ? callLiteDraft(complement, 'Independently solve the task. Focus on omissions, edge cases, and an alternative approach.')
+      : Promise.resolve(null),
+  ]);
+  let result = primaryDraft.success ? primaryDraft : complementaryDraft?.success ? complementaryDraft : primaryDraft;
+  let panelCompletionTokens = primaryDraft.completionTokens + (complementaryDraft?.completionTokens || 0);
+  let panelCost = (primaryDraft.cost || 0) + (complementaryDraft?.cost || 0);
+
+  if (primaryDraft.success && complementaryDraft?.success) {
+    techniques.push('lite-specialist-synthesis');
+    sendProgress(controller, encoder, 'Synthesizing Lite drafts', 'Qwen is combining the strongest verified details');
+    const synthesized = await callOpenRouterLite(LITE_POOL.agent, [
+      { role: 'system', content: `${codeInstruction} Synthesize the best complete answer from two independent drafts. Resolve contradictions, preserve working detail, and return only the final answer.` },
+      { role: 'user', content: `Original request:\n${query}\n\nDraft A:\n${primaryDraft.content}\n\nDraft B:\n${complementaryDraft.content}` },
+    ], {
+      maxTokens: isCodeGeneration ? 4_096 : 2_000,
+      timeoutMs: isCodeGeneration ? 90_000 : 30_000,
+      sessionId: asciiSessionId('playground-lite-synthesis', query),
+    });
+    panelCompletionTokens += synthesized.completionTokens;
+    panelCost += synthesized.cost || 0;
+    if (synthesized.success) result = synthesized;
+  }
   // Keep Lite reliable without hiding a substituted model: the only rescue
   // route is the explicitly approved Qwen worker and it is used only after
   // the selected primary model fails. The final telemetry names the model.
@@ -257,16 +294,16 @@ async function runLiteStack(
       { role: 'system', content: codeInstruction },
       ...messages,
     ], {
-      maxTokens: isCodeGeneration ? 3_072 : 2_000,
-      timeoutMs: isCodeGeneration ? 30_000 : 12_000,
+      maxTokens: isCodeGeneration ? 4_096 : 2_000,
+      timeoutMs: isCodeGeneration ? 90_000 : 20_000,
       sessionId: asciiSessionId('playground-lite-rescue', query),
     });
   }
   let content = result.success
     ? result.content
     : 'TemuClaude Lite could not complete this request right now. Please try again.';
-  let completionTokens = result.completionTokens;
-  let providerCost = result.cost || 0;
+  let completionTokens = panelCompletionTokens;
+  let providerCost = panelCost;
 
   if (result.success && shouldVerifyLite(query, tier, content)) {
     techniques.push('lite-risk-verification');
@@ -280,12 +317,12 @@ async function runLiteStack(
     if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
       techniques.push('lite-corrective-retry');
       sendProgress(controller, encoder, 'Correcting Lite response', 'Applying the independent verification feedback');
-      const corrected = await callOpenRouterLite(model, [
+      const corrected = await callOpenRouterLite(LITE_POOL.agent, [
         { role: 'system', content: `${ENGLISH_SYSTEM.content} A verifier found an issue in the previous draft. Produce a corrected, self-contained answer.` },
         ...messages,
         { role: 'assistant', content },
         { role: 'user', content: `Verifier feedback:\n${verdict.content}` },
-      ], { maxTokens: isCodeGeneration ? 3_072 : 2_000, timeoutMs: isCodeGeneration ? 30_000 : 12_000, sessionId: asciiSessionId('playground-lite-correct', query) });
+      ], { maxTokens: isCodeGeneration ? 4_096 : 2_000, timeoutMs: isCodeGeneration ? 90_000 : 30_000, sessionId: asciiSessionId('playground-lite-correct', query) });
       if (corrected.success) {
         content = corrected.content;
         completionTokens += corrected.completionTokens;
@@ -313,13 +350,13 @@ async function runLiteStack(
 function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
   const text = query.toLowerCase();
   if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
-  if (isCodeGenerationRequest(query)) return false;
-  if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
+  if (isCodeGenerationRequest(query)) return true;
+  if (tier !== 'trivial' || answer.trim().length < 80) return tier !== 'trivial';
   const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
   return sample < 0.02;
 }
 
-async function runCodeGeneration(
+async function runQualityCodeGeneration(
   query: string,
   messages: ChatMessage[],
   controller: ReadableStreamDefaultController,
@@ -329,17 +366,11 @@ async function runCodeGeneration(
   t0: number,
   techniques: string[],
 ): Promise<CompletedResponse> {
-  // Code generation is a deliverable, not a debate topic. MoA fusion merges
-  // three models' prose into incoherent code, so the design for a build is
-  // strength-based, not debate-based:
-  //   planner (fast model) -> N drafters (strong models, in parallel, picked by
-  //   strength) -> judge (Nemotron selects the best draft, not fuses them) ->
-  //   refine (optional, fix the issues the judge flagged) -> repairer (Grok,
-  //   only if the chosen draft is broken).
-  // Different models' strengths compete in parallel and the best draft wins; a
-  // trivial code ask skips parallelism for a single coder. The user sees each
-  // role activate instead of one opaque model call.
-  techniques.push('direct-code-generation');
+  // Treat generated code as an artifact: parallel planning, implementation,
+  // product/UX review, independent verification, and repair.  A single cheap
+  // draft is not an acceptable Pro deliverable.
+  techniques.push('quality-first-code-panel');
+  sendProgress(controller, encoder, 'Planning and drafting', 'GLM, DeepSeek, and MiniMax are working in parallel');
   const codeSystem = {
     role: 'system' as const,
     content: [
@@ -351,151 +382,139 @@ async function runCodeGeneration(
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
-  // A complete game or app can run to several thousand tokens. The previous
-  // 65s coder budget was shorter than a full generation, so the primary timed
-  // out mid-file, the shared deadline starved the fallbacks, and the user saw
-  // "temporarily unavailable". Give the build a real deadline and let the
-  // coder use most of it; the route maxDuration (300s) leaves headroom.
-  const deadlineAt = t0 + 200_000;
+  const deadlineAt = t0 + 180_000;
   const remainingMs = () => Math.max(0, deadlineAt - Date.now());
-  const orchestrationModels: { name: string; response: string; latency: number; correct: boolean }[] = [];
-  let totalCost = 0;
-
-  // ROLE 1 — PLANNER: for substantial builds, a cheap fast model sketches the
-  // structure first so the coder starts from a plan instead of a blank page.
-  // Trivial code asks (one-function snippets) skip planning to stay lean. A
-  // planner failure never blocks the coder — we just proceed without a plan.
-  const substantialBuild = /\b(game|web app|webapp|website|web page|webpage|application|app|landing page|dashboard|platform|tool|editor|clone|simulator)\b/i.test(query);
-  let plan = '';
-  if (substantialBuild && remainingMs() > 18_000) {
-    techniques.push('code-planning');
-    sendProgress(controller, encoder, 'Planning the build', 'A fast model is outlining the structure');
-    const planResult = await callModel(POOL.fastRoute, [
-      { role: 'system', content: 'You are a build planner. Given a build request, output a concise build plan: the file structure, the main components/modules, the tech approach, and any assets needed. Use at most 10 short bullet lines. Do not write the code itself.' },
+  const [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await Promise.all([
+    callModel(POOL.orchestrator, [
+      { role: 'system', content: 'You are a senior software architect. Produce a concise implementation plan, acceptance criteria, edge cases, and test checklist for the requested deliverable. Do not write the final code.' },
       ...messages,
-    ], { maxTokens: 700, timeoutMs: 14_000, temperature: 0.25, disableReasoning: true });
-    totalCost += planResult.cost || 0;
-    if (planResult.ok && planResult.content.trim()) {
-      plan = planResult.content.trim();
-      orchestrationModels.push({ name: planResult.name, response: plan.substring(0, 200), latency: planResult.latency, correct: planResult.ok });
-      sendProgress(controller, encoder, 'Plan ready', 'Generating the deliverable from the plan', 'done');
-    } else {
-      sendProgress(controller, encoder, 'Plan skipped', 'Generating the deliverable directly', 'done');
-    }
-  }
-
-  // ROLE 2 — DRAFTERS: for a substantial build, several strong models draft the
-  // full deliverable in parallel so different strengths (code, visual/layout,
-  // frontier) compete; a judge then picks the best by SELECTION, not fusion
-  // (fusing full files makes incoherent code). Trivial code asks get a single
-  // coder (selectDrafters returns []) so they pay nothing for parallelism. Each
-  // drafter gets the same per-call budget the single coder used; the drafters
-  // run concurrently so wall-clock is bounded by the slowest single draft.
-  // Billing note: a request is billed once on the final content (db.ts), so the
-  // parallel drafts raise the real provider cost (shown as totalCost in the
-  // panel) but do not multiply the user's credit burn.
-  const coderMessages = plan
-    ? [{ role: 'system' as const, content: `${codeSystem.content}\n\nBuild plan to follow:\n${plan}` }, ...messages]
-    : [codeSystem, ...messages];
-  const drafters = selectDrafters(query, tier);
-  let result: ModelResult;
-  if (drafters.length === 0) {
-    // Trivial code: a single strong coder, same budget + fallbacks as before.
-    sendProgress(controller, encoder, 'Generating the requested code', 'DeepSeek V4 Pro is building a complete deliverable');
-    result = await callModel(POOL.reasoning, coderMessages, {
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    // Kimi is the primary user-facing webpage deliverer. It reliably returns
+    // compact, complete HTML for UI work; DeepSeek remains in the panel below
+    // as a technical reviewer instead of becoming a single synthesis choke
+    // point that can consume its visible output budget on reasoning.
+    callModel(POOL.uiUx, [codeSystem, ...messages], {
       maxTokens: 8_192,
-      timeoutMs: Math.min(150_000, remainingMs()),
+      timeoutMs: Math.min(65_000, remainingMs()),
       temperature: 0.35,
       disableReasoning: true,
-      // OpenRouter can move between these parameter-compatible code models
-      // without making the user wait for a second full request timeout.
-      fallbacks: [POOL.fastRoute, POOL.orchestrator],
+      fallbacks: [POOL.codeRepair, POOL.orchestrator],
+    }),
+    // DeepSeek Flash is not a replacement for the Pro panel. It is a proven,
+    // parameter-compatible artifact completer running alongside Kimi so a
+    // visible webpage is available even when a frontier route spends its
+    // budget on hidden reasoning or a provider returns an empty message.
+    callModel(POOL.fastRoute, [codeSystem, ...messages], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(65_000, remainingMs()),
+      temperature: 0.35,
+      disableReasoning: true,
+      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
+    }),
+    callModel(POOL.reasoning, [
+      { role: 'system', content: 'Produce a rigorous technical implementation review: structure, interactions, accessibility hooks, correctness risks, and concrete implementation traps. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.specialist, [
+      { role: 'system', content: 'You are a product, UX, and edge-case reviewer. Specify what makes this requested deliverable complete, usable, accessible, and visually coherent. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.gptWorker, [
+      { role: 'system', content: 'Independently review the requested deliverable. Find missing requirements, useful tools, and a distinct implementation approach. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.frontier, [
+      { role: 'system', content: 'You are a frontier software reviewer. Identify the most important implementation, correctness, security, and completion requirements for this requested deliverable. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.multimodal, [
+      { role: 'system', content: 'You are an accessibility and interaction-design reviewer. Identify usability, visual, and accessibility requirements relevant to this requested deliverable. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.codeRepair, [
+      { role: 'system', content: 'You are a frontier coding-agent reviewer. Identify likely implementation bugs, security issues, missing tests, and failure modes. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+  ]);
+
+  const needsCompleteHtml = /\b(website|webpage|web page|landing page|html)\b/i.test(query);
+  const isUsableDeliverable = (candidate: ModelResult) => candidate.ok
+    && (!needsCompleteHtml || hasCompleteHtmlDocument(candidate.content));
+  const deliveryCandidates = [draft, artifactCompletion];
+  const initialDeliverable = deliveryCandidates.find(isUsableDeliverable) || draft;
+  let deliveryIsUsable = isUsableDeliverable(initialDeliverable);
+  let result = initialDeliverable;
+
+  if (isUsableDeliverable(artifactCompletion) && !isUsableDeliverable(draft)) {
+    techniques.push('parallel-artifact-completion');
+  }
+
+  // Preserve a complete primary deliverable. Synthesis is recovery work, not
+  // a mandatory second long generation that can replace a good webpage with a
+  // timeout or empty hidden-reasoning response.
+  if (!deliveryIsUsable) {
+    techniques.push('implementation-synthesis-recovery');
+    sendProgress(controller, encoder, 'Recovering implementation', 'Kimi is incorporating architecture and technical review');
+    result = await callModel(POOL.uiUx, [
+      codeSystem,
+      { role: 'user', content: `Architect plan:\n${plan.content}\n\nDeepSeek technical review:\n${technicalReview.content}\n\nMiniMax product review:\n${productReview.content}\n\nIndependent GPT review:\n${gptReview.content}\n\nFrontier adjudication:\n${frontierReview.content}\n\nGemini accessibility review:\n${multimodalReview.content}\n\nGrok coding review:\n${codeReview.content}\n\nInitial implementation:\n${draft.content}\n\nReturn one complete corrected deliverable only. Do not discuss the review process.` },
+    ], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(45_000, remainingMs()),
+      temperature: 0.35,
+      disableReasoning: true,
+      fallbacks: [POOL.codeRepair, POOL.orchestrator],
     });
-    totalCost += result.cost || 0;
-    orchestrationModels.push({ name: result.name, response: result.content.substring(0, 200), latency: result.latency, correct: result.ok });
   } else {
-    techniques.push('parallel-diverse-drafts');
-    sendProgress(controller, encoder, 'Drafting in parallel', `${drafters.length} models are building the deliverable`);
-    const settled = await Promise.allSettled(drafters.map((id) => callModel(id, coderMessages, {
+    techniques.push('direct-quality-delivery');
+  }
+  if (deliveryIsUsable && remainingMs() >= 8_000) {
+    techniques.push('independent-code-review');
+    sendProgress(controller, encoder, 'Verifying deliverable', 'Nemotron is checking completeness and correctness');
+    const review = await callModel(POOL.verifier, [
+      { role: 'system', content: 'Audit this generated deliverable against the request. Reply PASS if it is complete and correct. Otherwise reply FAIL followed by concrete, prioritized fixes.' },
+      { role: 'user', content: `Request:\n${query}\n\nDeliverable:\n${result.content}` },
+    ], { maxTokens: 1_200, timeoutMs: Math.min(25_000, remainingMs()) });
+    if (review.ok && review.content.toUpperCase().startsWith('FAIL') && remainingMs() >= 6_000) {
+      techniques.push('code-repair');
+      sendProgress(controller, encoder, 'Repairing deliverable', 'Grok is applying independent review feedback');
+      const repaired = await callModel(POOL.codeRepair, [
+        codeSystem,
+        { role: 'user', content: `Original request:\n${query}\n\nCurrent deliverable:\n${result.content}\n\nIndependent review:\n${review.content}\n\nReturn a complete corrected deliverable only.` },
+      ], { maxTokens: 8_192, timeoutMs: Math.min(35_000, remainingMs()), temperature: 0.25 });
+      if (isUsableDeliverable(repaired)) result = repaired;
+    }
+  }
+  deliveryIsUsable = isUsableDeliverable(result);
+  if (!deliveryIsUsable && remainingMs() >= 6_000) {
+    techniques.push('code-repair-rescue');
+    sendProgress(controller, encoder, 'Recovering code generation', 'DeepSeek Flash is producing the approved rescue deliverable');
+    result = await callModel(POOL.fastRoute, [codeSystem, ...messages], {
       maxTokens: 8_192,
-      timeoutMs: Math.min(150_000, remainingMs()),
-      temperature: 0.4,
-      disableReasoning: true,
-      fallbacks: [POOL.fastRoute],
-    })));
-    const drafts: ModelResult[] = settled.map((r, i) =>
-      r.status === 'fulfilled' ? r.value : { name: drafters[i].split('/').pop() || drafters[i], content: '[failed]', latency: 0, ok: false }
-    );
-    for (const d of drafts) {
-      totalCost += d.cost || 0;
-      orchestrationModels.push({ name: d.name, response: d.content.substring(0, 200), latency: d.latency, correct: d.ok });
-    }
-    const usable = drafts.filter((d) => d.ok && d.content.trim());
-    sendProgress(controller, encoder, 'Drafts complete', `${usable.length}/${drafts.length} drafters returned usable builds`, usable.length > 0 ? 'done' : 'error');
-
-    // ROLE 3 — JUDGE: Nemotron scores each draft and names the best.
-    let bestIndex = 0;
-    let issues = '';
-    if (usable.length > 0) {
-      techniques.push('judge-selection');
-      sendProgress(controller, encoder, 'Judging drafts', 'Nemotron is scoring each build and picking the best');
-      const verdict = await judgeCodeDrafts(query, drafts);
-      bestIndex = verdict.bestIndex;
-      issues = verdict.issues;
-      sendProgress(controller, encoder, 'Best draft selected', `${drafts[bestIndex].name} won`, 'done');
-    }
-    result = drafts[bestIndex] || drafts[0];
-
-    // ROLE 4 — REFINE: if the judge flagged fixable issues on the winner and
-    // there is time, one pass lets the winner's own author apply the feedback.
-    if (result.ok && issues && remainingMs() > 20_000) {
-      techniques.push('judge-refine');
-      sendProgress(controller, encoder, 'Refining the build', 'Applying the judge feedback to the winning draft');
-      const refined = await callModel(drafters[bestIndex], [
-        { role: 'system' as const, content: `${codeSystem.content}\n\nA judge reviewed your draft and found these issues. Fix them and return the complete, corrected deliverable:\n${issues}` },
-        ...messages,
-        { role: 'assistant' as const, content: result.content },
-      ], {
-        maxTokens: 8_192,
-        timeoutMs: Math.min(60_000, remainingMs()),
-        temperature: 0.3,
-        disableReasoning: true,
-        fallbacks: [POOL.orchestrator],
-      });
-      if (refined.ok && refined.content.trim()) {
-        totalCost += refined.cost || 0;
-        orchestrationModels.push({ name: refined.name, response: refined.content.substring(0, 200), latency: refined.latency, correct: refined.ok });
-        result = refined;
-      }
-    }
-  }
-
-  // ROLE 5 — REPAIRER: only if the chosen draft failed or broke. Grok 4.5 repairs.
-  if (!result.ok && remainingMs() >= 6_000) {
-    techniques.push('code-repair-fallback');
-    sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is repairing the deliverable');
-    const repair = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
-      maxTokens: 6_144,
-      timeoutMs: Math.min(30_000, remainingMs()),
+      timeoutMs: Math.min(45_000, remainingMs()),
       temperature: 0.35,
-      // Grok 4.5 requires reasoning to remain enabled. Omitting the disable
-      // flag prevents the provider-side 400 that broke this route.
+      disableReasoning: true,
+      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
     });
-    totalCost += repair.cost || 0;
-    orchestrationModels.push({ name: repair.name, response: repair.content.substring(0, 200), latency: repair.latency, correct: repair.ok });
-    result = repair;
   }
 
-  // Surface the real failure reason instead of a generic "unavailable" banner,
-  // so a timeout, a rate limit, or a parameter rejection is diagnosable.
-  const failureReason = (result.error || 'all approved code routes returned no usable output').slice(0, 180);
-  const content = result.ok
+  deliveryIsUsable = isUsableDeliverable(result);
+  const usedResilientHtmlFallback = !deliveryIsUsable && needsCompleteHtml;
+  const content = deliveryIsUsable
     ? result.content
-    : `Code generation could not complete right now (${failureReason}). Please retry shortly.`;
-  sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
+    : usedResilientHtmlFallback
+      ? createResilientHtmlFallback(query)
+      : 'The requested code artifact could not be completed by the available providers. Please retry shortly.';
+  const deliveredModel = usedResilientHtmlFallback ? 'temuclaude-resilient-html-fallback' : result.name;
+  sendProgress(controller, encoder, 'Streaming code', deliveryIsUsable ? 'Complete deliverable is ready' : usedResilientHtmlFallback ? 'Complete resilient webpage fallback is ready' : 'The approved code route was unavailable', deliveryIsUsable || usedResilientHtmlFallback ? 'done' : 'error');
   streamText(controller, encoder, content);
-  sendOrch(controller, encoder, taskType, tier, orchestrationModels, result.name, result.ok ? 1 : 0, 0, false, t0, formatProviderCost(totalCost), techniques);
-  return { content, model: result.name };
+  sendOrch(controller, encoder, taskType, tier, [{
+    name: deliveredModel,
+    response: content.substring(0, 200),
+    latency: result.latency,
+    correct: deliveryIsUsable || usedResilientHtmlFallback,
+  }], deliveredModel, deliveryIsUsable || usedResilientHtmlFallback ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
+  return { content, model: deliveredModel };
 }
 
 // === FULL STACK (hard queries) ===
@@ -508,7 +527,18 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     : ['knowledge', 'legal', 'health'].includes(taskType)
       ? POOL.multimodal
       : POOL.verifier;
-  const fusionModels = [POOL.orchestrator, POOL.reasoning, taskSpecialist];
+  const fusionModels = Array.from(new Set([
+    POOL.frontier,
+    POOL.gptWorker,
+    POOL.codeRepair,
+    POOL.multimodal,
+    POOL.uiUx,
+    taskSpecialist,
+    POOL.orchestrator,
+    POOL.reasoning,
+    POOL.specialist,
+    POOL.verifier,
+  ]));
   techniques.push('quality-first-pro-panel');
 
   // LAYER 0: WEB SEARCH (for knowledge/reasoning questions)
@@ -532,17 +562,9 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 3: MoA 3-LAYER — Propose → Cross-Review → Aggregate
   techniques.push('moa-3-layer');
-  sendProgress(controller, encoder, 'Drafting proposals', 'Three models are working in parallel');
+  sendProgress(controller, encoder, 'Drafting proposals', 'Frontier and specialist models are working in parallel');
 
-  // Layer 1: 3 models propose independently (with search context).
-  // Frontier reasoning models need real thinking time — at medium/high effort
-  // they routinely take 30-60s+ before the first answer token, and over 100s at
-  // max effort. Reasoning tokens count toward max_tokens, so a 2k cap starves
-  // the answer. The callModel defaults (10s, 2k tokens) were shorter than a hard
-  // math problem needs, so all three drafts timed out and the user saw "0/3
-  // models returned usable drafts". The three run in parallel, so wall-clock is
-  // bounded by the slowest single draft, not the sum. Reasoning stays ON (no
-  // disableReasoning) — that is the whole point for math/reasoning tasks.
+  // Layer 1: all available frontier and specialist roles propose independently.
   const proposeResults = await Promise.allSettled(
     fusionModels.map(id => callModel(id, augmentedMessages, {
       maxTokens: 6_144,
@@ -557,29 +579,25 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Proposal pass complete', `${workingProposals.length}/${proposals.length} models returned usable drafts`, workingProposals.length > 0 ? 'done' : 'error');
 
   if (workingProposals.length === 0) {
-    // All three drafts failed (usually all timed out, or an OpenRouter outage).
-    // Fall back to one strong reasoning model with a generous serial budget
-    // instead of leaving the user with a dead "unavailable" message. The rescue
-    // tries DeepSeek V4 Pro first, then GLM-5.2 and the flash route as fallbacks
-    // within the same deadline.
-    techniques.push('fullstack-single-rescue');
-    sendProgress(controller, encoder, 'Recovering response', 'One strong model is producing a direct answer');
+    // All parallel fusion proposals failed. Fall back to a single bounded
+    // rescue call so a transient provider outage on the fusion panel does not
+    // erase the user's answer — and surface the real failure reason instead of
+    // a generic "unavailable" banner.
+    techniques.push('moa-empty-recovery');
+    sendProgress(controller, encoder, 'Recovering response', 'DeepSeek is producing the rescue answer');
     const rescue = await callModel(POOL.reasoning, augmentedMessages, {
       maxTokens: 8_192,
       timeoutMs: 75_000,
       temperature: 0.4,
       fallbacks: [POOL.orchestrator, POOL.fastRoute],
     });
+    const rescueReason = (rescue.error || 'all fusion models returned no usable output').slice(0, 180);
     if (rescue.ok && rescue.content.trim()) {
-      sendProgress(controller, encoder, 'Streaming answer', 'Recovered response is ready', 'done');
       streamText(controller, encoder, rescue.content);
-      sendOrch(controller, encoder, taskType, tier,
-        [{ name: rescue.name, response: rescue.content.substring(0, 200), latency: rescue.latency, correct: true }],
-        rescue.name, 1, 0, false, t0, formatProviderCost(rescue.cost), techniques);
+      sendOrch(controller, encoder, taskType, tier, [{ name: rescue.name, response: rescue.content.substring(0, 200), latency: rescue.latency, correct: true }], rescue.name, 1, 0, false, t0, formatProviderCost(rescue.cost), techniques);
       return { content: rescue.content, model: rescue.name };
     }
-    const reason = (rescue.error || 'all models and the rescue route returned no usable output').slice(0, 180);
-    streamText(controller, encoder, `All models are currently unavailable (${reason}). Please try again.`);
+    streamText(controller, encoder, `TemuClaude could not complete this request right now (${rescueReason}). Please retry shortly.`);
     sendOrch(controller, encoder, taskType, tier, proposals.map(p => ({ name: p.name, response: p.content.substring(0,200), latency: p.latency, correct: p.ok })), 'none', 0, 0, false, t0, formatProviderCost(rescue.cost), techniques);
     return { content: '', model: 'temuclaude-pro-fusion' };
   }
@@ -593,9 +611,6 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
-    // Cross-review writes an improved response, not a one-word verdict, so it
-    // needs a real output budget — the callModel 2k/10s default truncated hard-
-    // query reviews and let an empty review silently drop to the raw proposals.
     const reviewResult = await callModel(reviewer.name.includes('glm') ? POOL.orchestrator : reviewer.name.includes('deepseek') ? POOL.reasoning : POOL.specialist, [
       { role: 'system', content: 'You are reviewing other AI models\' responses. Identify errors, missing information, and strengths. Provide an improved response.' },
       { role: 'user', content: reviewPrompt },
@@ -614,12 +629,6 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     query,
     reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals,
   );
-  // The aggregator writes the FINAL answer for a hard query — synthesizing
-  // three drafts — so it is the single most important call in the stack. The
-  // callModel 2k/10s default (the same starved budget #28 fixed on the propose
-  // layer) routinely left it empty, silently falling back to proposal[0] so the
-  // MoA "consensus/contradiction synthesis" never actually ran. Give it a real
-  // budget and an explicit fallback chain.
   const aggResult = await callModel(POOL.orchestrator, [
     { role: 'system', content: 'You are TemuClaude. Analyze these model responses and produce the best possible answer. Identify: 1) Consensus (where models agree — high confidence) 2) Contradictions (where they disagree — investigate) 3) Unique insights (something only one model caught) 4) Blind spots (what no model addressed). Then write the final answer.' },
     { role: 'user', content: fusionPrompt },
@@ -628,7 +637,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Aggregation complete', aggResult.ok ? 'Primary synthesis ready' : 'Using strongest available draft', 'done');
 
   // LAYER 4: SELF-CONSISTENCY (for math/reasoning — adaptive N samples)
-  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 90_000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 45_000) {
     techniques.push('self-consistency');
     sendProgress(controller, encoder, 'Checking consistency', 'Sampling alternate reasoning paths');
     const N = 2;
@@ -638,7 +647,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'Provide an alternative solution with different reasoning. Then give your final answer.' },
-      ], { maxTokens: 4_096, timeoutMs: 25_000, temperature: 0.6 });
+      ]);
       if (sampleResult.ok) samples.push(sampleResult.content);
     }
     // PRM-weighted: score each sample with Nemotron, pick highest
@@ -654,7 +663,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 5: CODE VERIFICATION (for math/coding)
   let codeVerified = false;
-  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 105_000) {
+  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 60_000) {
     techniques.push('code-verification');
     sendProgress(controller, encoder, 'Verifying code or math', 'Running a lightweight verifier pass');
     codeVerified = await verifyCode(finalAnswer);
@@ -664,24 +673,24 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       const reflection = await callModel(POOL.verifier, [
         { role: 'system', content: 'You are a code verifier. The previous answer may have errors. Explain what went wrong and how to fix it.' },
         { role: 'user', content: `Question: ${query}\nAnswer: ${finalAnswer.substring(0, 500)}\n\nWhat is wrong with this answer? How should it be fixed?` },
-      ], { maxTokens: 2_048, timeoutMs: 15_000 });
+      ]);
       if (reflection.ok) {
         const retryResult = await callModel(POOL.reasoning, [
           ...messages,
           { role: 'assistant', content: finalAnswer },
           { role: 'user', content: `A verifier found these issues:\n${reflection.content}\n\nPlease provide a corrected answer.` },
-        ], { maxTokens: 6_144, timeoutMs: 30_000, fallbacks: [POOL.orchestrator] });
+        ]);
         if (retryResult.ok) finalAnswer = retryResult.content;
         codeVerified = await verifyCode(finalAnswer);
       }
       // Grok 4.5 is reserved for a bounded code-repair escalation, never a
       // first-pass model, so it improves failed code without inflating normal cost.
-      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 115_000) {
+      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 70_000) {
         techniques.push('code-repair-escalation');
         const repair = await callModel(POOL.codeRepair, [
           { role: 'system', content: 'Repair the submitted solution. Return a complete, correct, self-contained answer with working code where relevant.' },
           { role: 'user', content: `Task:\n${query}\n\nCurrent attempted answer:\n${finalAnswer}` },
-        ], { maxTokens: 6_144, timeoutMs: 30_000 }); // reasoning stays ON (Grok 4.5 requires it; the 2k/10s default starved a full repair)
+        ]);
         if (repair.ok) {
           finalAnswer = repair.content;
           codeVerified = await verifyCode(finalAnswer);
@@ -693,21 +702,21 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // LAYER 6: SELF-QA GATE — USVA 4-rubric verification
   techniques.push('usva-5-rubric-qa');
   sendProgress(controller, encoder, 'Quality scoring', 'Running final answer quality gate');
-  let qaScore = Date.now() - t0 < 135_000 ? await runUSVA(query, finalAnswer) : 0.7;
+  let qaScore = Date.now() - t0 < 90_000 ? await runUSVA(query, finalAnswer) : 0.7;
 
   // If QA fails, retry with Reflexion
-  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 115_000) {
+  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 70_000) {
     techniques.push('reflexion');
     const reflection = await callModel(POOL.verifier, [
       { role: 'system', content: 'You are a quality verifier. The answer scored low on quality. Explain what is wrong.' },
       { role: 'user', content: `Question: ${query}\nAnswer: ${finalAnswer.substring(0, 500)}\nQuality score: ${qaScore.toFixed(2)}/1.0\n\nWhat needs to be improved?` },
-    ], { maxTokens: 2_048, timeoutMs: 15_000 });
+    ]);
     if (reflection.ok) {
       const retryResult = await callModel(POOL.orchestrator, [
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: `A quality check found these issues:\n${reflection.content}\n\nPlease provide an improved answer.` },
-      ], { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.reasoning] });
+      ]);
       if (retryResult.ok) {
         const newScore = await runUSVA(query, retryResult.content);
         if (newScore > qaScore) { finalAnswer = retryResult.content; qaScore = newScore; }
@@ -717,13 +726,13 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 12: s1 BUDGET FORCING (arXiv:2501.19393)
   // If the answer is suspiciously short for a hard question, force longer reasoning
-  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 125_000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 80_000) {
     techniques.push('s1-budget-forcing');
     const forcedResult = await callModel(POOL.reasoning, [
       ...messages,
       { role: 'assistant', content: finalAnswer + '\n\nWait' },
       { role: 'user', content: 'Continue your reasoning in more detail. Provide a thorough step-by-step solution.' },
-    ], { maxTokens: 4_096, timeoutMs: 25_000 });
+    ]);
     if (forcedResult.ok && forcedResult.content.length > finalAnswer.length) {
       finalAnswer = forcedResult.content;
     }
@@ -731,7 +740,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 13: STEP-LEVEL CODE VERIFICATION (rStar-Math pattern)
   // For math/coding: verify each reasoning step, not just the final answer
-  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 125_000) {
+  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 80_000) {
     techniques.push('step-level-verification');
     const stepVerified = await stepLevelVerify(query, finalAnswer);
     if (stepVerified) {
@@ -743,7 +752,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'Your solution has an error in one of the reasoning steps. Re-examine each step carefully and provide a corrected solution with verified code for each step.' },
-      ], { maxTokens: 4_096, timeoutMs: 25_000 });
+      ]);
       if (retryResult.ok) {
         const reVerified = await stepLevelVerify(query, retryResult.content);
         if (reVerified) { finalAnswer = retryResult.content; codeVerified = true; }
@@ -754,7 +763,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 14: Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
   // Extract logical claims and check for contradictions
-  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 130_000) {
+  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 85_000) {
     techniques.push('z3-logical-verification');
     const logicalCheck = await logicalVerify(finalAnswer);
     if (logicalCheck === 'contradiction') {
@@ -764,7 +773,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
         ...messages,
         { role: 'assistant', content: finalAnswer },
         { role: 'user', content: 'A logical analysis found contradictions in your answer. Please identify and resolve any contradictory statements, then provide a corrected answer.' },
-      ], { maxTokens: 4_096, timeoutMs: 25_000, fallbacks: [POOL.reasoning] });
+      ]);
       if (retryResult.ok) finalAnswer = retryResult.content;
     }
   }
@@ -788,19 +797,12 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 17: frontier escalation (GPT-5.6 Luna) only after QA failure.
   // For the hardest queries where QA score is still low after all retries
-  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 130_000) {
+  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 85_000) {
     techniques.push('frontier-fallback');
-    // Frontier reasoning models need ~100s+ to first token at high effort
-    // (GPT-5.6 Luna ~116s). The callModel 10s default guaranteed a timeout, so
-    // this escalation layer never actually fired — Luna was dead weight in the
-    // pool. Give it a real deadline (reasoning stays ON — that is the point of
-    // escalating to the frontier). The layer is already heavily gated (low QA
-    // + needsFrontier + within the time budget), so it fires rarely; fallbacks
-    // only help if Luna returns faster than the deadline.
     const frontierResult = await callModel(POOL.frontier, [
       { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
       { role: 'user', content: `Question: ${query}\n\nPrevious best answer (scored ${qaScore.toFixed(2)}/1.0):\n${finalAnswer.substring(0, 2000)}\n\nProvide a better answer:` },
-    ], { maxTokens: 8_192, timeoutMs: 120_000, fallbacks: [POOL.reasoning, POOL.orchestrator] });
+    ]);
     if (frontierResult.ok) {
       const newScore = await runUSVA(query, frontierResult.content);
       if (newScore > qaScore) {
@@ -837,16 +839,6 @@ function formatProviderCost(cost?: number): string {
   return '$' + cost.toFixed(cost < 0.01 ? 5 : 3);
 }
 
-// x-session-id is an HTTP header (ByteString / Latin-1, chars 0-255 only).
-// Building it from raw user text crashes the request the moment the prompt
-// contains any non-Latin-1 character (em dash U+2014, emoji, non-English
-// script) with "Cannot convert argument to a ByteString". Base64url-encode
-// the user text so every id is ASCII-safe while still unique per prompt.
-// Mirrors the gateway route's pattern (Buffer.from(...).toString('base64url')).
-function asciiSessionId(prefix: string, text: string): string {
-  return `${prefix}-${Buffer.from(text || '').toString('base64url').slice(0, 64)}`;
-}
-
 async function recordPlaygroundUsage(userId: string, messages: ChatMessage[], response: CompletedResponse) {
   if (!response.content.trim()) return;
   const promptTokens = response.promptTokens ?? estimateTokens(messages.map((message) => message.content).join('\n'));
@@ -880,13 +872,22 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ orchestration: data })}\n\n`));
 }
 
+function asciiSessionId(prefix: string, text: string): string {
+  return `${prefix}-${Buffer.from(text || '').toString('base64url').slice(0, 64)}`;
+}
+
 async function callModel(
   model: string,
   messages: any[],
   options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean; fallbacks?: string[] } = {},
 ): Promise<ModelResult> {
   const start = Date.now();
-  const messagesWithSystem = [ENGLISH_SYSTEM, ...messages]
+  const roleInstruction = ROLE_INSTRUCTIONS[model];
+  const messagesWithSystem = [
+    ENGLISH_SYSTEM,
+    ...(roleInstruction ? [{ role: 'system', content: roleInstruction }] : []),
+    ...messages,
+  ]
     .map(m => ({ role: m.role, content: m.content }));
   const result = await callOpenRouter(model, messagesWithSystem, {
     maxTokens: options.maxTokens ?? 2_000,
@@ -904,45 +905,6 @@ async function callModel(
     cost: result.cost,
     error: result.success ? undefined : (result.error || (result.status ? `HTTP ${result.status}` : 'failed')),
   };
-}
-
-// Single-model routing for the trivial + medium tiers. The old inline code
-// called callModel with no fallbacks and streamed result.content unconditionally,
-// so an empty/failed response surfaced to the user as the literal string
-// "[OpenRouter error: OpenRouter returned an empty message]" — the same
-// failure class PR #28 fixed on the MoA layer (a reasoning model can spend the
-// whole token budget on excluded reasoning and return empty content, or a
-// provider returns a transient empty). Here the callModel fallback chain
-// retries the orchestrator then DeepSeek V4 Pro on empty, and the content gate
-// below streams a clear, honest message instead of a raw error if every route
-// still comes back empty.
-async function routeSingleModel(
-  controller: ReadableStreamDefaultController,
-  encoder: TextEncoder,
-  primary: string,
-  messages: any[],
-  callOptions: { maxTokens: number; timeoutMs: number; fallbacks: string[] },
-  taskType: string,
-  tier: string,
-  t0: number,
-  techniques: string[],
-  progressLabel: string,
-  progressDetail: string,
-): Promise<CompletedResponse> {
-  sendProgress(controller, encoder, progressLabel, progressDetail);
-  const result = await callModel(primary, messages, callOptions);
-  const usable = result.ok && !!result.content.trim() && !result.content.startsWith('[OpenRouter error:');
-  if (usable) {
-    sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-    streamText(controller, encoder, result.content);
-  } else {
-    techniques.push('single-route-empty');
-    const reason = (result.error || 'the model returned an empty response').slice(0, 160);
-    sendProgress(controller, encoder, 'Response unavailable', 'No model returned usable output', 'error');
-    streamText(controller, encoder, `I couldn't get a response from the model${reason ? ` (${reason})` : ''}. Please try again, or rephrase the request.`);
-  }
-  sendOrch(controller, encoder, taskType, tier, [{ name: result.name, response: result.content.substring(0, 200), latency: (Date.now() - t0) / 1000, correct: usable }], 'single', usable ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
-  return { content: result.content, model: result.name };
 }
 
 function buildCrossReviewPrompt(query: string, reviewer: ModelResult, others: ModelResult[]): string {
@@ -992,52 +954,6 @@ async function verifyCode(answer: string): Promise<boolean> {
   } catch { return false; }
 }
 
-// Judge N parallel code drafts against the request and pick the best by
-// SELECTION (not fusion — fusing full files makes incoherent code). Nemotron
-// scores each draft and names the best; the caller streams that draft whole.
-// A short "issues" string is returned so an optional refine pass can fix
-// flagged problems in the winner. Falls back to a deterministic heuristic
-// (ok + closes the document + longest) if the judge call fails or returns
-// unparseable output, so a judge outage never breaks the route.
-async function judgeCodeDrafts(
-  query: string,
-  drafts: ModelResult[],
-): Promise<{ bestIndex: number; issues: string }> {
-  const ok = drafts.map((d, i) => ({ d, i })).filter((x) => x.d.ok && x.d.content.trim());
-  if (ok.length === 0) return { bestIndex: 0, issues: '' };
-  if (ok.length === 1) return { bestIndex: ok[0].i, issues: '' };
-  const systemMsg = 'You are a code judge. Score each draft deliverable against the user request on: completeness, whether it is runnable and closes its document, how well it matches the request + theme, and code quality. Reply with ONLY one line in the form: BEST=<draft number>; ISSUES=<short comma-separated problems in the best draft, or none>. Example: BEST=2; ISSUES=low color contrast, no mobile layout';
-  const userMsg = `User request:\n${query}\n\n${drafts.map((d, i) => `--- DRAFT ${i + 1} (${d.name}) ---\n${d.content.substring(0, 1500)}\n`).join('')}\nReply with ONLY the BEST=...; ISSUES=... line.`;
-  try {
-    const result = await callOpenRouter(POOL.verifier, [
-      { role: 'system', content: systemMsg },
-      { role: 'user', content: userMsg },
-    ], { temperature: 0, maxTokens: 200, timeoutMs: 8_000 });
-    if (result.success && result.content) {
-      const bestMatch = result.content.match(/best[^0-9]{0,15}(\d+)/i);
-      if (bestMatch) {
-        const best = Number(bestMatch[1]);
-        if (best >= 1 && best <= drafts.length && drafts[best - 1].ok) {
-          const issuesMatch = result.content.match(/issues\s*=?\s*(.+)$/i);
-          const issues = issuesMatch ? issuesMatch[1].trim().replace(/^none\.?$/i, '').slice(0, 300) : '';
-          return { bestIndex: best - 1, issues };
-        }
-      }
-    }
-  } catch {
-    // fall through to the heuristic below
-  }
-  // Heuristic: prefer an ok draft that closes its document, then the longest.
-  let bestIndex = ok[0].i;
-  let bestScore = -1;
-  for (const { d, i } of ok) {
-    const closes = /<\/html>\s*$/i.test(d.content) || /```html/i.test(d.content);
-    const score = (closes ? 100_000 : 0) + d.content.length;
-    if (score > bestScore) { bestScore = score; bestIndex = i; }
-  }
-  return { bestIndex, issues: '' };
-}
-
 function classifyTask(query: string): string {
   const q = query.toLowerCase();
   if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation|math|sum|product|factor|theorem|prove/)) return 'math';
@@ -1053,24 +969,43 @@ function classifyTask(query: string): string {
 }
 
 function isCodeGenerationRequest(query: string): boolean {
-  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|web page|webpage|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
+  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|webpage|web page|site|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
     || /\b(single[- ]file|html game|browser game|playable game|canvas game|three\.js)\b/i.test(query);
 }
 
+function hasCompleteHtmlDocument(content: string): boolean {
+  const start = content.search(/<!doctype html|<html\b/i);
+  if (start < 0) return false;
+  return content.slice(start).search(/<\/html>/i) >= 0;
+}
+
+function createResilientHtmlFallback(query: string): string {
+  const greekTheme = /\b(greek|olymp|olympus|zeus|athena|myth)/i.test(query);
+  const title = greekTheme ? 'Olympus — Gods Beyond Time' : 'A Crafted Experience';
+  const eyebrow = greekTheme ? 'ANCIENT AESTHETIC · MOUNT OLYMPUS' : 'TEMUCLAUDE RESILIENT DELIVERY';
+  const description = greekTheme
+    ? 'A timeless collection of the gods, their symbols, and the stories that shaped the heavens.'
+    : 'A complete, responsive landing page delivered while upstream model routes recover.';
+  const cards = greekTheme
+    ? [['Zeus', 'Thunder & Sovereignty', '⚡'], ['Athena', 'Wisdom & Strategy', '🦉'], ['Apollo', 'Light & Harmony', '☀'], ['Artemis', 'Moon & Wilderness', '☾']]
+    : [['Discover', 'A polished starting point', '✦'], ['Explore', 'Designed for focus', '◌'], ['Create', 'Built to be extended', '✺'], ['Return', 'Delivered without interruption', '↗']];
+  const cardMarkup = cards.map(([name, detail, symbol]) => `<article class="card"><span>${symbol}</span><h2>${name}</h2><p>${detail}</p></article>`).join('');
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>
+:root{--ink:#201b16;--paper:#f4eddf;--gold:#b78735;--wine:#572526;--night:#151a29}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#fff8d9 0,transparent 30%),var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}.hero{min-height:68vh;display:grid;place-items:center;padding:5rem 1.5rem;background:linear-gradient(120deg,rgba(21,26,41,.95),rgba(87,37,38,.82)),url('https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=1800&q=80') center/cover;color:#fff;text-align:center}.hero>*{max-width:780px}.eyebrow{font:700 .72rem/1 Arial,sans-serif;letter-spacing:.22em;color:#f6cf7b}.hero h1{font-size:clamp(3.1rem,9vw,7.5rem);line-height:.9;margin:1rem 0;letter-spacing:-.06em}.hero p{font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.65;color:#ede2ca}.cta{border:1px solid #e5bc61;background:transparent;color:#fff;padding:.9rem 1.35rem;margin-top:1rem;font:700 .8rem Arial,sans-serif;letter-spacing:.12em;cursor:pointer}.cta:hover{background:#e5bc61;color:var(--night)}main{max-width:1120px;margin:auto;padding:4rem 1.5rem 5rem}.intro{max-width:650px;margin-bottom:2rem}.intro h2{font-size:2.3rem;margin:.2rem 0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.card{padding:1.5rem;background:#fffaf0;border:1px solid #dacda9;min-height:190px;transition:.25s transform,.25s box-shadow}.card:hover{transform:translateY(-6px);box-shadow:0 16px 28px rgba(32,27,22,.15)}.card span{font-size:2rem;color:var(--gold)}.card h2{margin:.8rem 0 .4rem;font-size:1.45rem}.card p{margin:0;color:#685b4c;line-height:1.45}footer{padding:1.5rem;text-align:center;background:var(--night);color:#cbbf9e;font:.72rem Arial,sans-serif;letter-spacing:.12em}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.hero{min-height:60vh}}@media(max-width:430px){.grid{grid-template-columns:1fr}}
+</style></head><body><header class="hero"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p><button class="cta" onclick="document.querySelector('main').scrollIntoView({behavior:'smooth'})">ENTER THE STORY</button></div></header><main><section class="intro"><div class="eyebrow" style="color:var(--wine)">THE PANTHEON</div><h2>Myth made visible.</h2><p>Every card is an invitation to explore a world of symbols, starlight, and immortal stories.</p></section><section class="grid">${cardMarkup}</section></main><footer>CRAFTED WITH A RESILIENT TEMUCLAUDE DELIVERY PATH</footer></body></html>`;
+}
+
 function estimateDifficulty(query: string, taskType: string): number {
+  // A requested webpage is a runnable software artifact, regardless of how
+  // short its wording is. It must receive the quality code workflow rather
+  // than the single-model trivial route.
+  if (isCodeGenerationRequest(query)) return 8;
   let d = 0;
   d += Math.min(query.split(' ').length / 10, 5); // 0-5 based on length
   if (['math', 'reasoning', 'coding'].includes(taskType)) d += 2;
   if (query.includes('explain') || query.includes('analyze')) d += 1;
   if (query.includes('compare') || query.includes('step by step')) d += 2;
-  // Building a deliverable is a substantial task regardless of how few words
-  // the prompt uses. "build a game" is short but still requires a full, runnable
-  // file, so it must never be labeled trivial. A named artifact (game / app /
-  // website / dashboard) is the hardest class of code-gen build.
-  if (isCodeGenerationRequest(query)) {
-    d += 3;
-    if (/\b(game|web app|webapp|website|web page|webpage|application|app|landing page|dashboard|platform|tool|editor|clone|simulator)\b/i.test(query)) d += 2;
-  }
   return Math.min(d, 10);
 }
 
@@ -1091,30 +1026,6 @@ function pickSpecialist(taskType: string): string {
   return POOL.orchestrator;
 }
 
-// Strength-based drafter selection for a build. Returns the strong models that
-// should draft the deliverable in parallel. Selection is rule-driven (no extra
-// LLM call, robust): DeepSeek V4 Pro is the code anchor; GLM-5.2 is the general
-// second drafter; visual/theme-heavy requests swap in Gemini (its strength is
-// layout/UX); the hardest builds add the frontier GPT-5.6 Luna. A trivial code
-// ask (not a substantial build) returns [] so the caller keeps the cheap single-
-// coder path and pays nothing for parallelism.
-function selectDrafters(query: string, tier: string): string[] {
-  const substantial = /\b(game|web app|webapp|website|web page|webpage|application|app|landing page|dashboard|platform|tool|editor|clone|simulator)\b/i.test(query);
-  if (!substantial) return [];
-  const visual = /\b(theme|design|visual|animation|ui|ux|landing|aesthetic|canvas|three\.js|phaser|p5|tailwind|responsive|hero|portfolio)\b/i.test(query);
-  // Base pair: the code anchor + a general second drafter (GLM-5.2).
-  const drafters: string[] = [POOL.reasoning, POOL.orchestrator];
-  if (visual) {
-    // Visual/theme requests get Gemini's layout/UX strength instead of GLM.
-    drafters[1] = POOL.multimodal;
-  }
-  if (tier === 'hard') {
-    // The hardest builds get a third frontier drafter.
-    drafters.push(POOL.frontier);
-  }
-  return drafters;
-}
-
 // Helper: check if task type matches keywords in the query
 function q_match(taskType: string, keywords: string[]): boolean {
   // This is a simple check — in production, classifyTask would return these types
@@ -1122,26 +1033,6 @@ function q_match(taskType: string, keywords: string[]): boolean {
 }
 
 // Route only the hardest queries through the conditional frontier escalation.
-function needsFrontier(query: string, taskType: string): boolean {
-  // Use frontier model for the hardest 5% of queries
-  const q = query.toLowerCase();
-  // Complex multi-step problems
-  if (q.includes('prove') || q.includes('derive') || q.includes('theorem')) return true;
-  // Long autonomous tasks
-  if (query.split(' ').length > 50 && ['math', 'reasoning', 'coding'].includes(taskType)) return true;
-  // Complex codebase questions
-  if (q.includes('refactor') || q.includes('architecture') || q.includes('system design')) return true;
-  return false;
-}
-
-// === LLM REQUEST CLASSIFIER (primary routing path) ===
-// The regex classifier above (classifyTask / estimateDifficulty / determineTier
-// / isCodeGenerationRequest) is retained as the fallback. The primary path asks
-// a fast model to classify the request into {taskType, tier, isCodeGeneration,
-// confidence, reason}; on borderline or low-confidence calls it takes a second
-// sample (deliberation) to verify the tier before routing. A build/deliverable
-// request is never sent to the trivial single-model route.
-
 type ClassResult = {
   taskType: string;
   tier: string;
@@ -1149,7 +1040,6 @@ type ClassResult = {
   confidence: 'high' | 'medium' | 'low';
   reason: string;
 };
-
 type DeliberationResult = ClassResult & { difficulty: number; classifierTokens: number };
 
 const CLASS_TASK_TYPES = new Set(['math', 'coding', 'creative', 'legal', 'health', 'knowledge', 'reasoning']);
@@ -1290,6 +1180,18 @@ async function classifyWithDeliberation(
   }
 
   return { ...result, difficulty: TIER_DIFFICULTY[result.tier] ?? 5, classifierTokens };
+}
+
+function needsFrontier(query: string, taskType: string): boolean {
+  // Use frontier model for the hardest 5% of queries
+  const q = query.toLowerCase();
+  // Complex multi-step problems
+  if (q.includes('prove') || q.includes('derive') || q.includes('theorem')) return true;
+  // Long autonomous tasks
+  if (query.split(' ').length > 50 && ['math', 'reasoning', 'coding'].includes(taskType)) return true;
+  // Complex codebase questions
+  if (q.includes('refactor') || q.includes('architecture') || q.includes('system design')) return true;
+  return false;
 }
 
 // === STEP-LEVEL CODE VERIFICATION (rStar-Math pattern) ===

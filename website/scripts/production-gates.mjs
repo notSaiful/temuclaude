@@ -61,20 +61,35 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
   'finalContent',
   'temuclaude/temuclaude-lite',
   "TEMUCLAUDE_USE_MODAL_BACKEND === 'true'",
-  'direct-code-generation',
+  "classifiedDifficulty === 'medium' ? 'hard'",
+  'all nine Pro roles propose in parallel',
+  'call(M_LUNA, messages, temp, maxTok)',
+  'call(M_SOL, messages, temp, maxTok)',
+  'call(M_KIMI, messages, temp, maxTok)',
+  'call(M_GEMINI, messages, temp, maxTok)',
+  'call(M_GROK, messages, temp, maxTok)',
   'if (isCodeGen(text)) return LITE_DEFAULT',
+  'Synthesize the strongest complete answer from two independent drafts',
 ]);
 
 assertIncludes('website/app/api/chat/route.ts', [
   "profile must be either \"pro\" or \"lite\"",
   'runLiteStack',
-  'runCodeGeneration',
-  'direct-code-generation',
+  'runQualityCodeGeneration',
+  'quality-first-code-panel',
+  'quality-first-pro-panel',
+  'deadlineAt = t0 + 180_000',
+  'POOL.frontier',
+  'POOL.codeRepair',
+  'POOL.multimodal',
+  'POOL.uiUx',
+  'POOL.gptWorker',
   'reviewOrProposalInputs.length > 0 ? reviewOrProposalInputs : workingProposals',
   'formatProviderCost',
   'recordPlaygroundUsage',
   'disableReasoning: true',
-  'lite-approved-rescue',
+  'lite-parallel-specialist-panel',
+  'lite-specialist-synthesis',
 ]);
 
 assertIncludes('website/lib/openrouter-lite.ts', [
@@ -82,6 +97,8 @@ assertIncludes('website/lib/openrouter-lite.ts', [
   'nvidia/nemotron-3-ultra-550b-a55b',
   'isApprovedOpenRouterModel(model, actualModel)',
   'OpenRouter returned unapproved model',
+  "finishReason === 'length'",
+  '120_000',
 ]);
 
 assertIncludes('website/lib/openrouter.ts', [
@@ -91,6 +108,11 @@ assertIncludes('website/lib/openrouter.ts', [
   'OpenRouter returned unapproved model',
   'Reasoning traces are not user deliverables',
   'disableReasoning',
+  "sort: 'throughput'",
+  "quantizations: ['bf16', 'fp16', 'fp8']",
+  'openrouter:resilience:',
+  'result.status !== 401 && result.status !== 403',
+  'fixedSampling',
 ]);
 
 assertIncludes('website/app/playground/page.tsx', [
@@ -102,7 +124,7 @@ assertIncludes('website/app/playground/page.tsx', [
   'sandboxPreviewDocument',
   "connect-src 'none'",
   'Run isolated preview',
-  'Save to project',
+  'Download .html', // export control (was "Save to project", reworked 2026-07-13)
   'extractHtmlArtifact',
 ]);
 
@@ -127,6 +149,7 @@ assert(!navbarSource.includes('className="btn-primary"'), 'Navbar must not rende
 assert(navbarSource.includes("className={`nav-link ${pathname?.startsWith('/dashboard')"), 'Dashboard must use the shared header-link treatment.');
 assert(navbarSource.includes('className="nav-link cursor-pointer border-0 bg-transparent p-0"'), 'Sign Out must use the shared header-link treatment.');
 assert(fs.existsSync(path.join(website, 'app', 'login', 'page.tsx')), 'website/app/login/page.tsx is required to prevent header Sign In 404s.');
+assert(fs.existsSync(path.join(website, 'app', 'health', 'route.ts')), 'website/app/health/route.ts is required for deployment health checks.');
 
 assertIncludes('website/lib/db.ts', [
   'assertPersistentDbAvailable',

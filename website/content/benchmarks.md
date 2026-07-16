@@ -1,4 +1,4 @@
-# Temuclaude vs The World
+# Temuclaude vs Fable 5
 
 | Model | Pass Rate |
 |-------|-----------|

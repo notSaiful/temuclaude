@@ -665,9 +665,7 @@ export default function PlaygroundPage() {
                       aria-live={message.role === 'assistant' ? 'polite' : undefined}
                       aria-atomic="false"
                     >
-                      {message.role === 'assistant'
-                        ? (stripHtmlArtifact(message.content) || (status === 'submitted' ? 'Working…' : ''))
-                        : message.content}
+                      {message.content || (message.role === 'assistant' && status === 'submitted' ? 'Working…' : '')}
                       {status === 'streaming' && i === messages.length - 1 && message.role === 'assistant' && (
                         <span className="inline-block w-2 h-4 bg-accent-primary ml-0.5 animate-blink" />
                       )}
@@ -747,7 +745,7 @@ export default function PlaygroundPage() {
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
                       </button>
                       {showModelPicker && (
-                        <div role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
+                        <div id="model-profile" role="listbox" aria-label="TemuClaude model profiles" className="absolute bottom-10 right-0 z-30 w-72 overflow-hidden rounded-md border border-border-default bg-bg-primary p-1 shadow-xl">
                           <button role="option" aria-selected={modelProfile === 'pro'} onClick={() => { setModelProfile('pro'); setShowModelPicker(false); }} className={`w-full rounded-sm px-3 py-2.5 text-left ${modelProfile === 'pro' ? 'bg-accent-primary/10' : 'hover:bg-bg-tertiary'}`}>
                             <span className="block text-xs font-semibold text-text-primary">TemuClaude Pro</span>
                             <span className="mt-0.5 block text-[11px] text-text-muted">Full routed orchestration for demanding tasks</span>
@@ -868,7 +866,6 @@ function toActivityEvent(step: ProgressStep): ActivityEvent {
   const label = step.label.toLowerCase();
   if (label.includes('queued')) return { heading: 'Prepared a work plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('classifying')) return { heading: 'Understood the request', detail: step.detail, kind: 'routing', status: step.status };
-  if (label.includes('deliberat')) return { heading: 'Re-verified a borderline classification', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('routing')) return { heading: 'Selected a response plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('search')) return { heading: label.includes('complete') ? 'Finished web research' : 'Searched the web', detail: step.detail, kind: 'research', status: step.status };
   if (label.includes('draft') || label.includes('calling')) return { heading: 'Consulted the selected model', detail: step.detail, kind: 'model', status: step.status };
@@ -928,10 +925,7 @@ function AgentActivity({
 }
 
 function CodeArtifact({ content }: { content: string }) {
-  // Auto-open the preview so the user sees the rendered result, not the raw
-  // code (which stripHtmlArtifact now hides from the chat bubble). The toggle
-  // below still lets the user collapse it.
-  const [previewOpen, setPreviewOpen] = useState(true);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const html = extractHtmlArtifact(content);
@@ -1030,26 +1024,6 @@ function extractHtmlArtifact(content: string): string | null {
   return /<\/html>\s*$/i.test(candidate) ? candidate : null;
 }
 
-// Hide the raw HTML/code block from the chat bubble so the user sees only the
-// prose explanation + the rendered preview (CodeArtifact) instead of a code
-// dump. Only strips when a COMPLETE artifact exists — exactly when CodeArtifact
-// renders a preview — so the code disappears iff the preview appears. During
-// streaming (incomplete artifact) the code stays visible until the block
-// closes, then collapses to prose + preview in one clean transition. If the
-// model returned only code (no prose), a friendly placeholder keeps the bubble
-// from going blank.
-function stripHtmlArtifact(content: string): string {
-  if (!extractHtmlArtifact(content)) return content;
-  const fenced = content.match(/```(?:html|htm)\s*\n[\s\S]*?```/i);
-  if (fenced) {
-    const stripped = content.replace(fenced[0], '').trim();
-    return stripped || 'Generated an HTML deliverable. See the preview below.';
-  }
-  const start = content.search(/<!doctype\s+html\b|<html\b/i);
-  const prose = content.slice(0, start).trim();
-  return prose || 'Generated an HTML deliverable. See the preview below.';
-}
-
 function sandboxPreviewDocument(html: string): string {
   // Generated code is untrusted. The preview iframe runs with sandbox=
   // "allow-scripts" (opaque origin — it cannot read TemuClaude cookies,
@@ -1066,15 +1040,6 @@ function sandboxPreviewDocument(html: string): string {
     ? html.replace(/<head([^>]*)>/i, `<head$1>${policy}`)
     : `${policy}${html}`;
 }
-
-const TECHNIQUE_LABELS: Record<string, string> = {
-  'llm-classification': 'LLM classification',
-  'deliberation': 'Deliberation',
-  'regex-classification-fallback': 'Regex fallback',
-  'direct-routing': 'Direct routing',
-  'specialist-routing': 'Specialist routing',
-  'reflexion': 'Reflexion',
-};
 
 function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClose: () => void }) {
   return (
@@ -1098,15 +1063,6 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
             <div>
               <div className="text-sm font-medium text-text-primary">Understanding your question</div>
               <div className="text-xs text-text-muted">Classified as: {data.taskType} · Routed to: {data.tier} tier</div>
-              {data.techniques && data.techniques.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  {data.techniques.map((technique, i) => (
-                    <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-sm bg-bg-tertiary text-text-muted border border-border-subtle">
-                      {TECHNIQUE_LABELS[technique] ?? technique}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 

@@ -2,18 +2,18 @@ import { Navbar } from '@/components/Navbar';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Refund Policy — TemuClaude',
-  description: 'Refund and cancellation policy for TemuClaude subscriptions.',
+  title: 'Cancellation and Refunds Policy — TemuClaude',
+  description: 'Cancellation and refunds policy for TemuClaude subscriptions and API access.',
 };
 
 export default function RefundsPage() {
   return (
     <>
       <Navbar />
-      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Refund Policy">
+      <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Cancellation and Refunds Policy">
         <div className="container-max max-w-2xl mx-auto">
-          <h1 className="text-3xl font-light text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Refund Policy</h1>
-          <p className="text-sm text-text-muted mb-12">Last updated: July 4, 2026</p>
+          <h1 className="text-3xl md:text-4xl font-serif text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Cancellation and Refunds Policy</h1>
+          <p className="text-sm text-text-muted mb-12">Last updated: July 9, 2026</p>
 
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
             <section>
@@ -25,9 +25,9 @@ export default function RefundsPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. How to Request a Refund</h2>
               <p>To request a refund:</p>
               <ol className="list-decimal list-inside mt-2 space-y-1">
-                <li>Email ggs@temuclaude.com with the subject "Refund Request"</li>
-                <li>Include your account email and the date of your subscription</li>
-                <li>We process refunds within 5-7 business days</li>
+                <li>Email <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> with the subject "Refund Request"</li>
+                <li>Include your account email, payment date, payment amount, and payment reference if available</li>
+                <li>We initiate approved refunds within 5-7 business days</li>
                 <li>Refunds are credited to your original payment method</li>
               </ol>
             </section>
@@ -36,7 +36,7 @@ export default function RefundsPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">3. Cancellation</h2>
               <p>You can cancel your subscription at any time:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Email ggs@temuclaude.com to cancel</li>
+                <li>Email <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> with the subject "Cancellation Request"</li>
                 <li>Cancellation takes effect at the end of your current billing cycle</li>
                 <li>You retain access until the end of the paid period</li>
                 <li>No further charges after cancellation</li>
@@ -54,7 +54,7 @@ export default function RefundsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">5. Enterprise Refunds</h2>
-              <p>Enterprise subscriptions ($499/month) are eligible for the 30-day money-back guarantee on the first month only. Subsequent months are non-refundable but cancellable with 30 days notice.</p>
+              <p>Enterprise contracts are eligible for the 30-day money-back guarantee on the first month only. Subsequent months are subject to the terms of the signed enterprise contract agreement.</p>
             </section>
 
             <section>
@@ -63,6 +63,7 @@ export default function RefundsPage() {
                 <li>API usage charges beyond the 30-day guarantee period</li>
                 <li>Charges for queries that were successfully processed but yielded unsatisfactory AI responses</li>
                 <li>Charges incurred after the 30-day guarantee window</li>
+                <li>Enterprise setup or custom integration work after written approval and delivery has started</li>
               </ul>
             </section>
 
@@ -75,8 +76,8 @@ export default function RefundsPage() {
               <h2 className="text-lg font-semibold text-text-primary mb-3">8. Dispute Resolution</h2>
               <p>If you have a dispute about a charge:</p>
               <ol className="list-decimal list-inside mt-2 space-y-1">
-                <li>Contact us at ggs@temuclaude.com first — we resolve most issues within 48 hours</li>
-                <li>If unresolved, you may file a dispute with Razorpay</li>
+                <li>Contact us at <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> first — we resolve most issues within 48 hours</li>
+                <li>If unresolved, you may file a dispute with the payment provider used for your purchase</li>
                 <li>As a last resort, disputes will be resolved in the courts of Nagpur, Maharashtra, India</li>
               </ol>
             </section>
@@ -88,7 +89,7 @@ export default function RefundsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">10. Contact</h2>
-              <p>For refund requests or questions: ggs@temuclaude.com</p>
+              <p>For cancellation, refund, or billing questions, email <a href="mailto:hello@temuclaude.com" className="text-accent-primary hover:underline">hello@temuclaude.com</a> or call <a href="tel:+17252686198" className="text-accent-primary hover:underline">+1 (725) 268-6198</a>.</p>
             </section>
           </div>
         </div>
