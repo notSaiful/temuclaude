@@ -180,9 +180,13 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096, o
 
 async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
   const start = Date.now();
+  // Last-ditch rescue: one OpenRouter call with a 4-model fallback chain.
+  // 45s budget (lowered from 100s on 2026-07-14): rescue is a fallback of a
+  // fallback, not the primary path — enough for the chain to try each model
+  // once, and it bounds the hard-query worst case (see race budget below).
   const result = await call(M_FLASH, messages, temp, maxTok, {
     fallbacks: [M_GLM, M_DEEPSEEK, M_TERRA],
-    timeoutMs: 100_000,
+    timeoutMs: 45_000,
   });
   return {
     content: result.success ? result.content.trim() : '',
@@ -797,14 +801,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Timeout safeguard: reserve enough time for one strong GLM response
-    // before Vercel's 120-second function deadline.
+    // Hard-query latency budget (2026-07-14): cap total time well under Vercel's
+    // 300s maxDuration (raised from 120s in #24) so hard queries feel responsive
+    // instead of stalling to ~210s. Budget: 70s MoA race → 25s GLM fallback →
+    // 45s final rescue ≈ 140s worst case. (Race lowered from 85s; rescue from 100s.)
     const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
     const timeout = new Promise<OrchestrationResult>(resolve => {
       setTimeout(async () => {
         const fb = await call(M_GLM, messages, 0.6, max_tokens ?? 4096, { timeoutMs: 25_000 });
-        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 85_000 });
-      }, 85_000);
+        resolve({ content: fb.content, tokens: fb.tokens, tier: 'timeout-fallback', time: 70_000 });
+      }, 70_000);
     });
 
     let result = await Promise.race([pipeline, timeout]);
