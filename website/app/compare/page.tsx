@@ -394,7 +394,8 @@ const PlayableWebGLHorrorCanvas = ({ shaderCode }: { shaderCode: string }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onClick={handleCanvasClick}
-        className={`bg-black rounded-xl border shadow-2xl transition-all ${
+        aria-label="Playable Backrooms prototype. Click to focus, then use WASD or arrow keys to move."
+        className={`bg-black rounded-xl border shadow-2xl transition-all touch-none ${
           isFocused ? 'border-[#738E54] ring-2 ring-[#738E54]/20 cursor-move' : 'border-border-subtle cursor-pointer'
         }`}
       />
@@ -565,7 +566,7 @@ export default function ComparePage() {
               temuClaude vs Frontier direct baseline Fallback
             </h1>
             <p className="text-text-secondary text-sm max-w-xl">
-              Compare actual generated output components and orchestration routing architectures side-by-side.
+              Side-by-side reference examples: temuClaude's own in-project components versus third-party frontier-baseline reference projects. These are illustrative comparisons, not measured benchmark output.
             </p>
           </div>
 
@@ -617,7 +618,7 @@ export default function ComparePage() {
                 {/* Column 1: temuClaude */}
                 <div className="flex flex-col p-6 rounded-xl bg-white border border-[#738E54]/30 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 bg-[#738E54] text-white text-[10px] uppercase font-mono px-3 py-1 rounded-bl font-semibold">
-                    temuClaude output (Real Rendered)
+                    temuClaude component (in-project)
                   </div>
 
                   {/* Toggle Mode */}
@@ -683,7 +684,7 @@ export default function ComparePage() {
                 {/* Column 2: Frontier direct baseline */}
                 <div className="flex flex-col p-6 rounded-xl bg-white border border-border-default shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 bg-amber-600 text-white text-[10px] uppercase font-mono px-3 py-1 rounded-bl font-semibold">
-                    Frontier direct baseline output (Real Rendered)
+                    Frontier baseline reference (third-party)
                   </div>
 
                   {/* Toggle Mode */}
@@ -772,7 +773,7 @@ export default function ComparePage() {
                 {/* Column 1: temuClaude (Playable 3D WebGL Game) */}
                 <div className="flex flex-col p-6 rounded-xl bg-white border border-[#738E54]/30 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 bg-[#738E54] text-white text-[10px] uppercase font-mono px-3 py-1 rounded-bl font-semibold">
-                    temuClaude output (WebGL Playable 3D Game)
+                    temuClaude game (in-project)
                   </div>
 
                   {/* Toggle Mode */}
@@ -795,16 +796,13 @@ export default function ComparePage() {
                   </div>
 
                   {temuMode === 'preview' ? (
-                    <div className="flex flex-col justify-center items-center bg-black p-8 rounded-xl border border-border-subtle overflow-hidden min-h-[260px] relative">
-                      <div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/d/d4/Texture_of_white_noise.png')] opacity-10 mix-blend-overlay animate-pulse" />
-                      <div className="absolute top-4 left-4 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-red-600 rounded-full animate-ping" />
-                        <span className="text-xs font-mono text-red-500 font-bold">REC</span>
-                      </div>
-                      <h3 className="text-xl font-bold tracking-widest text-amber-100 mb-4 drop-shadow-[0_0_10px_rgba(255,200,100,0.5)] z-10">LEVEL 0</h3>
-                      <p className="text-xs text-amber-100/60 mb-6 text-center z-10">Fully standalone 3D WebGL experience.<br/>Made with Three.js</p>
-                      <a href="/play/backrooms" target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-amber-100 text-black font-bold tracking-widest text-xs hover:bg-white transition-colors z-10">
-                        PLAY FULL GAME
+                    <div className="flex flex-col items-center bg-black p-4 rounded-xl border border-border-subtle overflow-hidden min-h-[320px] relative">
+                      <PlayableWebGLHorrorCanvas shaderCode={TEMU_BACKROOMS_PLAYABLE_SHADER} />
+                      <p className="mt-3 text-center text-[10px] font-mono text-amber-100/70">
+                        Click the prototype to focus. WASD / arrow keys move; drag to look.
+                      </p>
+                      <a href="/play/backrooms" target="_blank" rel="noopener noreferrer" className="mt-3 px-4 py-2 bg-amber-100 text-black font-bold tracking-widest text-[10px] hover:bg-white transition-colors">
+                        OPEN FULL GAME
                       </a>
                     </div>
                   ) : (
@@ -828,7 +826,7 @@ export default function ComparePage() {
                 {/* Column 2: Frontier direct baseline */}
                 <div className="flex flex-col p-6 rounded-xl bg-white border border-border-default shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 bg-amber-600 text-white text-[10px] uppercase font-mono px-3 py-1 rounded-bl font-semibold">
-                    Frontier direct baseline output (Live Game Frame)
+                    Frontier baseline reference (third-party)
                   </div>
 
                   {/* Toggle Mode */}
@@ -853,7 +851,7 @@ export default function ComparePage() {
                   {frontierMode === 'preview' ? (
                     <div className="flex flex-col justify-center items-center bg-black p-8 rounded-xl border border-border-subtle overflow-hidden min-h-[260px]">
                       <h3 className="text-xl font-bold tracking-widest text-white mb-4">BACKROOMS ESCAPE</h3>
-                      <p className="text-xs text-gray-400 mb-6 text-center">Frontier direct baseline generated Three.js game.<br/>Deployed on Vercel.</p>
+                      <p className="text-xs text-gray-400 mb-6 text-center">Reference: StarKnightt's Three.js Backrooms game (third-party).<br/>Deployed on Vercel.</p>
                       <a href="https://backroom-escape.vercel.app" target="_blank" rel="noopener noreferrer" className="px-6 py-2 bg-white text-black font-bold tracking-widest text-xs hover:bg-gray-200 transition-colors">
                         PLAY FULL GAME
                       </a>

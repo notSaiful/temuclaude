@@ -102,7 +102,7 @@ assertIncludes('website/app/playground/page.tsx', [
   'sandboxPreviewDocument',
   "connect-src 'none'",
   'Run isolated preview',
-  'Save to project',
+  'Download .html', // export control (was "Save to project", reworked 2026-07-13)
   'extractHtmlArtifact',
 ]);
 

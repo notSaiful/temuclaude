@@ -7,6 +7,9 @@ __pycache__/
 venv/
 env/
 .env
+.env.*
+!.env.example
+!.env.staging.example
 *.egg-info/
 dist/
 build/
@@ -67,3 +70,10 @@ research/cost_reports/*.json
 research/radar_reports/radar_*.json
 config/ui_ux_memory/iteration_notes/
 .vercel
+website/.env.*
+!website/.env.example
+!website/.env.staging.example
+
+# Personal Obsidian vault + Supabase CLI temp — never commit (added 2026-07-14)
+TemuClaude/
+supabase/.temp/
