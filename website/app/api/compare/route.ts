@@ -9,6 +9,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouter } from '@/lib/openrouter';
+import { hasInternalAdminAccess } from '@/lib/internal-admin';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -67,6 +68,9 @@ async function callTemuClaude(messages: Msg[], temp: number, maxTok: number): Pr
 }
 
 export async function POST(request: NextRequest) {
+  if (!hasInternalAdminAccess(request)) {
+    return NextResponse.json({ error: 'Unauthorized: operator key required' }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { messages, temperature, max_tokens } = body;

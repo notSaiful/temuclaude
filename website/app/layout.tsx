@@ -27,7 +27,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://temuclaude.com'),
   title: 'TemuClaude — Multi-Model AI Orchestration | 8 Models, 6-Layer Pipeline',
-  description: 'TemuClaude orchestrates 8 AI models with bounded roles, self-checks responses, and escalates only when needed. A fraction of comparable frontier direct token cost. Try it free.',
+  description: 'TemuClaude assigns ten AI model roles by capability, synthesizes parallel specialist work, and independently verifies nontrivial responses. Try it free.',
   keywords: ['LLM orchestration', 'multi-model AI', 'Mixture of Agents', 'AI playground', 'model fusion', 'open source AI', 'frontier AI', 'cheap AI API'],
   authors: [{ name: 'Mohammad Saiful Haque' }],
   icons: { icon: '/favicon.svg' },

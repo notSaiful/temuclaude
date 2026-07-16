@@ -12,7 +12,7 @@ const sections: DocSection[] = [
   { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Evaluation & Trust', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
-  { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Rate Limits', 'Error Codes'] },
+  { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Use with Hermes Agent', 'Rate Limits', 'Error Codes'] },
   { title: 'Enterprise', items: ['Self-Hosting & Private VPC'] },
   {
     title: 'Legal & Info',
@@ -101,12 +101,13 @@ export default function DocsPage() {
               <p className="text-text-secondary mb-4">Get started with TemuClaude in under 5 minutes.</p>
               <p className="text-sm text-text-secondary mb-2">Option 1 — Use the playground (no installation):</p>
               <p className="text-sm text-text-secondary mb-4"><a href="/playground" className="text-accent-primary hover:underline">Open the playground →</a> — sign in, ask anything, and get a superior answer. 20 free queries/day.</p>
-              <p className="text-sm text-text-secondary mb-2">Option 2 — API access:</p>
+              <p className="text-sm text-text-secondary mb-2">Option 2 — OpenAI-compatible API access:</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
+  -H "Authorization: Bearer tmc_your_api_key" \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "What is 9.9 vs 9.11?"}]}'
+  -d '{"model":"temuclaude","messages":[{"role":"user","content":"What is 9.9 vs 9.11?"}]}'
 
-# Response: SSE stream with answer + orchestration metadata`} />
+ # Response: OpenAI-compatible chat completion JSON`} />
               <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
             </section>
 
@@ -122,15 +123,15 @@ export default function DocsPage() {
 
             <section id="architecture" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Architecture</h2>
-              <p className="text-text-secondary mb-4">TemuClaude is one endpoint that orchestrates 8 AI models behind the scenes. When you ask a question, it:</p>
+              <p className="text-text-secondary mb-4">TemuClaude is one endpoint that assigns each model an evidence-based capability role. When you ask a question, it:</p>
               <ol className="space-y-2 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li><strong className="text-text-primary">Classifies</strong> your query (math, coding, reasoning, knowledge, creative, legal, health, agentic)</li>
                 <li><strong className="text-text-primary">Estimates difficulty</strong> (trivial, medium, hard)</li>
                 <li><strong className="text-text-primary">Routes</strong> to the best strategy:
                   <ul className="list-disc list-inside ml-4 mt-1">
-                    <li>Simple → DeepSeek V4 Flash</li>
-                    <li>Specialist → DeepSeek V4 Pro, GLM-5.2, or MiniMax M3</li>
-                    <li>Premium → Gemini 3.5 Flash, Grok 4.5, or GPT-5.6 Luna only when the step has demonstrated value</li>
+                    <li>Pro trivial → GLM-5.2 quality floor</li>
+                    <li>Pro nontrivial → all available role specialists in parallel, followed by synthesis and verification</li>
+                    <li>Lite nontrivial → parallel DeepSeek/Qwen drafts, Qwen synthesis, and Nemotron verification</li>
                   </ul>
                 </li>
                 <li><strong className="text-text-primary">Adapts step models</strong> for search, verification, consistency, QA gates, debate, and post-processing using telemetry when enough evidence exists</li>
@@ -141,19 +142,21 @@ export default function DocsPage() {
 
             <section id="lite-profile" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">TemuClaude Lite</h2>
-              <p className="text-text-secondary mb-4">Lite keeps the same authenticated Playground, task classification, answer trace, and safety policy as Pro, with a bounded model cascade designed for lower cost.</p>
+              <p className="text-text-secondary mb-4">Lite keeps the same authenticated Playground, task classification, answer trace, and safety policy as Pro, with a bounded quality ensemble designed for lower cost.</p>
               <ul className="space-y-2 text-sm text-text-secondary list-disc list-inside mb-4">
                 <li><strong className="text-text-primary">DeepSeek V4 Flash</strong> is the default worker.</li>
                 <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> handles hard structured reasoning and agentic work.</li>
                 <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> handles vision, UI, long-context, and agentic work.</li>
-                <li><strong className="text-text-primary">Nemotron 3 Ultra</strong> is a conditional independent verifier for high-risk, explicit-check, and small audit-sample requests.</li>
+                <li><strong className="text-text-primary">DeepSeek and Qwen</strong> produce complementary drafts in parallel for every nontrivial request.</li>
+                <li><strong className="text-text-primary">Qwen 3.7 Plus</strong> synthesizes the strongest complete result.</li>
+                <li><strong className="text-text-primary">Nemotron 3 Ultra</strong> independently verifies every nontrivial result and risky or sampled trivial work.</li>
               </ul>
-              <Callout type="note">Lite is not an always-on ensemble: it permits one primary model call, one same-profile availability fallback, and a verifier/corrective pass only when the risk gate requires it.</Callout>
+              <Callout type="note">Lite remains cost-bounded because every draft, synthesis, verification, and correction route is restricted to its explicit four-model allowlist.</Callout>
             </section>
 
             <section id="model-pool" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Model Pool</h2>
-              <p className="text-text-secondary mb-4">TemuClaude has eight active routing roles. It does not call all eight for every answer.</p>
+              <p className="text-text-secondary mb-4">TemuClaude has ten active routing roles. Every available Pro specialist participates in nontrivial work with a distinct role prompt.</p>
               <div className="overflow-x-auto mb-4">
                 <table className="w-full text-sm">
                   <thead><tr className="border-b border-border-default">
@@ -163,37 +166,39 @@ export default function DocsPage() {
                     <th className="text-left py-2 px-3 font-semibold text-text-primary">Context</th>
                   </tr></thead>
                   <tbody>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Flash</td><td className="py-2 px-3 text-text-secondary">High-volume worker</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Flash</td><td className="py-2 px-3 text-text-secondary">Lite / explicit-savings worker</td><td className="py-2 px-3 text-text-secondary">40</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">DeepSeek V4 Pro</td><td className="py-2 px-3 text-text-secondary">Hard reasoning + math</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GLM-5.2</td><td className="py-2 px-3 text-text-secondary">Planning + aggregation</td><td className="py-2 px-3 text-text-secondary">51</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiniMax M3</td><td className="py-2 px-3 text-text-secondary">Budget multimodal + long context</td><td className="py-2 px-3 text-text-secondary">44</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 3.5 Flash</td><td className="py-2 px-3 text-text-secondary">Premium multimodal + tools</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPT-5.6 Luna</td><td className="py-2 px-3 text-text-secondary">Quality escalation</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Preview</td></tr>
-                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Grok 4.5</td><td className="py-2 px-3 text-text-secondary">Coding-agent escalation</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Provider dependent</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Kimi K2.6</td><td className="py-2 px-3 text-text-secondary">Coding-driven UI/UX implementation</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">262K</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">MiniMax M3</td><td className="py-2 px-3 text-text-secondary">Multimodal + creative + long context</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Gemini 3.5 Flash</td><td className="py-2 px-3 text-text-secondary">Visual UI + accessibility + tools</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPT-5.6 Luna</td><td className="py-2 px-3 text-text-secondary">Fast independent GPT proposer</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1.05M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">GPT-5.6 Sol</td><td className="py-2 px-3 text-text-secondary">Frontier adjudicator</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">1.05M</td></tr>
+                    <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Grok 4.5</td><td className="py-2 px-3 text-text-secondary">Coding-agent critic + repair</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Provider dependent</td></tr>
                     <tr className="border-b border-border-subtle"><td className="py-2 px-3 text-text-primary font-medium">Nemotron 3 Ultra</td><td className="py-2 px-3 text-text-secondary">Independent verifier</td><td className="py-2 px-3 text-text-secondary">48</td><td className="py-2 px-3 text-text-secondary">1M</td></tr>
                     <tr><td className="py-2 px-3 text-text-primary font-medium">Z3 Solver</td><td className="py-2 px-3 text-text-secondary">Logical Verifier (SMT equations)</td><td className="py-2 px-3 text-text-secondary">—</td><td className="py-2 px-3 text-text-secondary">Local</td></tr>
                   </tbody>
                 </table>
               </div>
-              <Callout type="tip">GPT-5.6 Terra is an explicit, disabled emergency fallback. Premium routes require their provider key and are promoted only after the benchmark gate passes. Arithmetic and coding checks use execution and Z3 where applicable.</Callout>
+              <Callout type="tip">Every available frontier and specialist role participates in nontrivial Pro work. GPT-5.6 Terra remains a disabled emergency fallback. The Vercel gateways use model-based verification; local execution and Z3 belong to the separate Python research runtime.</Callout>
             </section>
 
             {/* === FEATURES === */}
 
             <section id="10-layer-pipeline" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Pipeline</h2>
-              <p className="text-text-secondary mb-4">For hard queries, TemuClaude runs up to 10 quality layers to guarantee logical soundness and accuracy:</p>
+              <p className="text-text-secondary mb-4">For nontrivial Pro queries, TemuClaude runs a bounded quality pipeline designed to improve completeness and catch errors:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
                 <li><strong className="text-text-primary">Web Search</strong> — Dynamic knowledge retrieval for real-time information query enhancement.</li>
                 <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Layered peer reviews where multiple specialist models refine each other's outputs before aggregation.</li>
                 <li><strong className="text-text-primary">Self-Consistency</strong> — Weighted voting frameworks selecting the most logically consistent path.</li>
-                <li><strong className="text-text-primary">Code Verification</strong> — Sandboxed programmatic execution to mathematically verify logical outputs.</li>
+                <li><strong className="text-text-primary">Code Review</strong> — Independent coding-agent and verifier critiques identify implementation defects and missing requirements.</li>
                 <li><strong className="text-text-primary">Reflexion</strong> — Verbal correction logic to automatically re-evaluate reasoning steps when validation indicators flag errors.</li>
                 <li><strong className="text-text-primary">Self-QA Gate</strong> — Multi-dimensional quality scoring system assessing logical coherence, completeness, and goal alignment.</li>
-                <li><strong className="text-text-primary">Z3/SMT Verification</strong> — Boolean logic validation checking for internal contradictions in structured arguments.</li>
+                <li><strong className="text-text-primary">Consistency Verification</strong> — Independent checks look for contradictions in structured arguments.</li>
                 <li><strong className="text-text-primary">Budget Forcing</strong> — Adaptive token management extending system computation time on complex derivations.</li>
                 <li><strong className="text-text-primary">Step-Level Verification</strong> — Independent validation of intermediate logical statements.</li>
-                <li><strong className="text-text-primary">Frontier Fallback</strong> — Quality escalation paths routing to elite networks on high-difficulty edge cases.</li>
+                <li><strong className="text-text-primary">Frontier Adjudication</strong> — Frontier models contribute proposals and return for corrective synthesis when QA is low.</li>
               </ol>
             </section>
 
@@ -279,9 +284,9 @@ export default function DocsPage() {
             </section>
 
             <section id="frontier-fallback" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Fallback</h2>
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Frontier Participation</h2>
               <p className="text-text-secondary mb-4">
-                In rare edge cases where intermediate logical validation fails to reach confidence targets, the query escalates to elite frontier backup nodes. These nodes leverage the cumulative context of the previous attempts to formulate the final response.
+                Available frontier models participate in the first panel for every nontrivial Pro request. When verification remains below the quality threshold, they receive the accumulated draft and feedback for a corrective adjudication pass.
               </p>
             </section>
 
@@ -343,25 +348,19 @@ export default function DocsPage() {
 
             <section id="rest-api" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">REST API</h2>
-              <p className="text-text-secondary mb-4">TemuClaude exposes a single endpoint:</p>
-              <CodeBlock lang="bash" code={`POST /api/chat
+              <p className="text-text-secondary mb-4">Use the OpenAI-compatible endpoint for assistants and developer tools:</p>
+              <CodeBlock lang="bash" code={`POST https://temuclaude.com/v1/chat/completions
 
 Request:
 {
-  "profile": "lite",
+  "model": "temuclaude",
   "messages": [
     {"role": "user", "content": "What is 9.9 vs 9.11?"}
   ]
 }
 
-Response: SSE stream
-  data: {"chunk": "9.9"}
-  data: {"chunk": " is"}
-  data: {"chunk": " larger"}
-  ...
-  data: {"orchestration": {...}}
-  data: [DONE]`} />
-              <p className="text-sm text-text-secondary">Set <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">profile</code> to <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"pro"</code> (default) or <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">"lite"</code>. The server validates the profile and keeps model selection internal.</p>
+Response: OpenAI-compatible chat completion JSON`} />
+              <p className="text-sm text-text-secondary">Use model <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">temuclaude</code>. The server keeps model selection and orchestration internal.</p>
             </section>
 
             <section id="streaming" className="mb-12">
@@ -403,11 +402,30 @@ Response: SSE stream
 
             <section id="authentication" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Authentication</h2>
-              <p className="text-text-secondary mb-4">Free trial: no authentication needed. Paid developer wallets use the live API key generated from the dashboard:</p>
+              <p className="text-text-secondary mb-4">API requests require a TemuClaude API key generated in the developer dashboard. Keys begin with <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">tmc_</code>; keep them server-side and revoke unused keys immediately.</p>
               <CodeBlock lang="bash" code={`curl -X POST https://temuclaude.com/v1/chat/completions \\
-  -H "Authorization: Bearer tc_live_f893d2b10a2c88ef092e10f" \\
+  -H "Authorization: Bearer tmc_your_api_key" \\
   -H "Content-Type: application/json" \\
-  -d '{"messages": [{"role": "user", "content": "Hello"}]}'`} />
+  -d '{"model":"temuclaude","messages":[{"role":"user","content":"Hello"}]}'`} />
+            </section>
+
+            <section id="use-with-hermes-agent" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Use with Hermes Agent</h2>
+              <p className="text-text-secondary mb-4">Recommended for agent workflows: Hermes can use TemuClaude as its reasoning backend while Hermes provides its own tools, workspace access, skills, and approvals.</p>
+              <CodeBlock lang="bash" code={`hermes model
+
+# Choose: Custom endpoint (self-hosted / VLLM / etc.)
+# Base URL: https://temuclaude.com/v1
+# API key:  tmc_your_api_key
+# Model:    temuclaude`} />
+              <CodeBlock lang="yaml" code={`# ~/.hermes/config.yaml
+model:
+  provider: custom
+  base_url: https://temuclaude.com/v1
+  api_key: tmc_your_api_key
+  default: temuclaude`} />
+              <Callout type="tip">Use this setup when you want Hermes tools and workflows with TemuClaude routing. Start with ordinary chat tasks. Streaming, tool-call, and structured-output compatibility should be validated for your Hermes version before production automation.</Callout>
+              <Callout type="warning">Do not paste an API key into a shared shell history, repository, or client-side application. Use a local secret manager or environment variable instead.</Callout>
             </section>
 
             <section id="rate-limits" className="mb-12">

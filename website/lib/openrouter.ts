@@ -29,10 +29,12 @@ const OPENROUTER_ROLE_FALLBACKS: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-flash'],
   'z-ai/glm-5.2': ['deepseek/deepseek-v4-pro', 'deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-pro'],
+  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
   'google/gemini-3.5-flash': ['minimax/minimax-m3', 'z-ai/glm-5.2'],
   'openai/gpt-5.6-luna': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'x-ai/grok-4.5': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'openai/gpt-5.6-terra': ['openai/gpt-5.6-luna', 'deepseek/deepseek-v4-pro'],
+  'openai/gpt-5.6-sol': ['x-ai/grok-4.5', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'x-ai/grok-4.5': ['openai/gpt-5.6-sol', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'openai/gpt-5.6-terra': ['openai/gpt-5.6-sol', 'x-ai/grok-4.5', 'deepseek/deepseek-v4-pro'],
   'google/gemini-2.0-flash': ['google/gemini-2.5-flash', 'google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'google/gemini-2.5-flash': ['google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'mistralai/mistral-large-2': ['mistralai/mistral-large-2512', 'minimax/minimax-m3', 'deepseek/deepseek-v4-pro'],
@@ -56,6 +58,7 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['deepseek/deepseek-v4-pro'],
   'deepseek/deepseek-v4-flash': ['deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['minimax/minimax-m3'],
+  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'openai/gpt-oss-120b': ['openai/gpt-oss-120b'],
   'openai/gpt-oss-120b:free': ['openai/gpt-oss-120b'],
   'nvidia/nemotron-3-ultra-550b-a55b:free': [
@@ -70,6 +73,7 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'anthropic/claude-sonnet-4.6': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3.5-flash': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-luna': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
+  'openai/gpt-5.6-sol': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'x-ai/grok-4.5': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-terra': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3-flash-preview': ['zhipu/glm-5.2'],
@@ -183,12 +187,19 @@ async function postOpenRouter(
   sessionId?: string,
   modelFallbacks: string[] = [],
   disableReasoning = false,
+  strictQuality = true,
   responseFormat?: 'json_object',
 ): Promise<OpenRouterResult> {
   const key = process.env.OPENROUTER_API_KEY || '';
   const resolvedModel = resolveOpenRouterModel(model);
   const models = uniqueModels(modelFallbacks.map(resolveOpenRouterModel))
     .filter((fallback) => fallback !== resolvedModel);
+  // GPT-5.6 endpoints expose reasoning controls but not `temperature`.
+  // With require_parameters=true, sending temperature makes every otherwise
+  // healthy Luna/Sol endpoint ineligible. Omit it whenever the approved
+  // primary/fallback chain contains a fixed-sampling GPT-5.6 route.
+  const fixedSampling = [resolvedModel, ...models]
+    .some((candidate) => candidate.startsWith('openai/gpt-5.6-'));
 
   if (!key) {
     return {
@@ -217,13 +228,19 @@ async function postOpenRouter(
         model: resolvedModel,
         ...(models.length ? { models } : {}),
         messages,
-        temperature,
+        ...(!fixedSampling ? { temperature } : {}),
         // `max_completion_tokens` is not supported by every OpenRouter
         // endpoint. Requiring it made valid approved models look unavailable.
         max_tokens: Math.max(16, maxTokens),
         provider: {
           allow_fallbacks: true,
           require_parameters: true,
+          // Pro fixes the model explicitly and prefers full/high precision,
+          // high-throughput endpoints. OpenRouter otherwise price-weights
+          // provider selection, which conflicts with TemuClaude's quality-first
+          // product contract.
+          sort: 'throughput',
+          ...(strictQuality ? { quantizations: ['bf16', 'fp16', 'fp8'] } : {}),
         },
         ...(disableReasoning ? { reasoning: { enabled: false, exclude: true } } : {}),
         ...(responseFormat ? { response_format: { type: responseFormat } } : {}),
@@ -449,10 +466,14 @@ function uniqueModels(models: string[]): string[] {
 }
 
 function getOpenRouterFallbacks(model: string, explicitFallbacks?: string[]): string[] {
-  // Model fallbacks are a product policy, not a transport concern. The old
-  // implicit list silently let a failed call become an unrelated free model,
-  // which made the OpenRouter logs and customer cost contract untrustworthy.
-  return uniqueModels(explicitFallbacks || []).filter((fallback) => fallback !== model);
+  // Model fallbacks are a product policy, not an OpenRouter price decision.
+  // Every role has an allowlisted, capability-compatible recovery chain so an
+  // empty completion or transient provider outage cannot turn into a raw user
+  // error. Explicit call-site fallbacks take precedence for artifact delivery.
+  const configured = explicitFallbacks && explicitFallbacks.length > 0
+    ? explicitFallbacks
+    : OPENROUTER_ROLE_FALLBACKS[model] || [];
+  return uniqueModels(configured).filter((fallback) => fallback !== model);
 }
 
 function getAimlFallbacks(openRouterModels: string[]): string[] {
@@ -482,7 +503,8 @@ export async function callOpenRouter(
     /**
      * Opt-in JSON mode for structured calls (e.g. the request classifier).
      * Best-effort: models that don't support it ignore it and return text,
-     * which the caller must parse with a fallback. No existing caller sets it.
+     * which the caller must parse with a fallback. No existing Pro/Lite caller
+     * sets it; only the deliberation classifier uses JSON mode.
      */
     responseFormat?: 'json_object';
   } = {},
@@ -507,22 +529,50 @@ export async function callOpenRouter(
     const attemptTimeoutMs = remainingTimeoutMs();
     if (attemptTimeoutMs < 250) break;
     const candidate = openRouterModels[i];
-    attemptedModels.push(`openrouter:${candidate}`);
+    attemptedModels.push(`openrouter:quality:${candidate}`);
     const result = await postOpenRouter(
       candidate,
       messages,
       temperature,
       maxTokens,
-      attemptTimeoutMs,
+      Math.max(250, Math.floor(attemptTimeoutMs * 0.6)),
       options.sessionId,
       openRouterModels.slice(i + 1),
       options.disableReasoning,
+      true,
       options.responseFormat,
     );
     if (result.success) {
       return { ...result, attemptedModels };
     }
     last = result;
+
+    // A precision filter can temporarily leave an otherwise approved model
+    // without a routable endpoint. Retry the exact same approved model with
+    // throughput-first provider routing before moving to a different model.
+    // Authentication/permission errors are not retried because they require
+    // configuration changes, not transport recovery.
+    const relaxedTimeoutMs = remainingTimeoutMs();
+    const retryable = result.status !== 401 && result.status !== 403;
+    if (retryable && relaxedTimeoutMs >= 250) {
+      attemptedModels.push(`openrouter:resilience:${candidate}`);
+      const relaxed = await postOpenRouter(
+        candidate,
+        messages,
+        temperature,
+        maxTokens,
+        relaxedTimeoutMs,
+        options.sessionId,
+        openRouterModels.slice(i + 1),
+        options.disableReasoning,
+        false,
+        options.responseFormat,
+      );
+      if (relaxed.success) {
+        return { ...relaxed, attemptedModels };
+      }
+      last = relaxed;
+    }
   }
 
   if (options.allowExternalFallbacks && deepinfraFallbackEnabled()) {

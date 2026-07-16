@@ -52,7 +52,7 @@ export function FusionPipeline() {
   const models = [
     { name: 'GLM-5.2', color: '#E25822', delay: 0 },
     { name: 'DeepSeek Pro', color: '#788C5D', delay: 0.3 },
-    { name: 'Gemini 2.0', color: '#C46686', delay: 0.6 },
+    { name: 'Gemini 2.5', color: '#C46686', delay: 0.6 },
   ];
 
   return (

@@ -10,7 +10,7 @@ import { MagneticButton } from '@/components/MagneticButton';
  * 
  * Pricing tier card design adapted from 21st.dev PricingTier component
  * by ugahpraiseaudu — Linear/Vercel-style with real hierarchy.
- * Restyled to match TemuClaude's warm Anthropic-inspired palette.
+ * Restyled to match TemuClaude's warm product palette.
  */
 
 const tiers = [
@@ -20,7 +20,8 @@ const tiers = [
     annual: 0,
     features: [
       '20 queries per day',
-      'No signup required',
+      '50K monthly credits',
+      'Account-based playground access',
       'All 8 models included',
       'Community support',
       'Full orchestration metadata',
@@ -30,35 +31,52 @@ const tiers = [
     popular: false,
   },
   {
-    name: 'Starter',
-    monthly: 5,
-    annual: 4,
+    name: 'Developer',
+    monthly: 19,
+    annual: 15,
     features: [
-      '5,000 queries per month',
+      '5M monthly credits',
       'API key included',
-      'Email support',
+      'Email support (48h)',
       'Priority model routing',
       'Usage dashboard',
-      'No rate limits',
+      '60 requests/min',
+      '$4 per extra 1M credits',
     ],
-    cta: 'Choose Starter',
-    href: '/pricing',
+    cta: 'Request Developer',
+    href: '/contact',
     popular: true,
   },
   {
     name: 'Pro',
-    monthly: 25,
-    annual: 20,
+    monthly: 49,
+    annual: 39,
     features: [
-      '50,000 queries per month',
+      '25M monthly credits',
       'API key + webhooks',
       'Priority support (24h)',
-      'Custom model weights',
       'Advanced analytics',
-      'Team sharing',
+      '300 requests/min',
+      '$3 per extra 1M credits',
     ],
-    cta: 'Choose Pro',
-    href: '/pricing',
+    cta: 'Request Pro',
+    href: '/contact',
+    popular: false,
+  },
+  {
+    name: 'Max',
+    monthly: 149,
+    annual: 119,
+    features: [
+      '100M monthly credits',
+      'High-priority routing',
+      'Heavy coding and research usage',
+      'Priority support',
+      '1,000 requests/min',
+      '$2 per extra 1M credits',
+    ],
+    cta: 'Request Max',
+    href: '/contact',
     popular: false,
   },
 ];
@@ -66,11 +84,11 @@ const tiers = [
 const faqs = [
   {
     q: 'How are you this cheap?',
-    a: '60% of queries go to Llama 3.3 / Gemini 2.0 Flash (cheapest). 30% route to specialized shepherding logic. Only 10% trigger the full MCTS-guided multi-agent fusion. Verifications are fast and secure.',
+    a: '60% of queries go to Llama 3.3 / Gemini 2.5 Flash and other efficient models. 30% route to specialized shepherding logic. Only 10% trigger the full MCTS-guided multi-agent fusion. Verifications are fast and secure.',
   },
   {
     q: 'Is quality really frontier-level?',
-    a: 'For hard questions, we run MCTS reasoning search and a Generator-Discriminator self-play loop. We execute symbolic code in safe sandboxes and run Z3 constraint solvers. If quality verification checks fail, it falls back to Claude 3.5 Sonnet.',
+    a: 'For hard questions, we run MCTS reasoning search and a Generator-Discriminator self-play loop. We execute symbolic code in safe sandboxes and run Z3 constraint solvers. If quality verification checks fail, it escalates to a private frontier fallback.',
   },
   {
     q: 'Can I use this in production?',
@@ -78,7 +96,7 @@ const faqs = [
   },
   {
     q: 'What if I exceed my plan?',
-    a: 'Free tier resets daily. Paid tiers: we notify you at 80% and 100% usage. You can upgrade instantly or let it pause until the next billing cycle. No surprise charges.',
+    a: 'Free tier resets daily. Paid tiers use monthly credits with clear overage pricing. We notify you at 80% and 100% usage so there are no surprise charges.',
   },
   {
     q: 'Do you store my data?',
@@ -92,9 +110,7 @@ const faqs = [
 
 const competitors = [
   { name: 'TemuClaude', input: 0.06, output: 0.21, color: '#E25822' },
-  { name: 'Claude Sonnet 5', input: 2, output: 10, color: '#8E8B85' },
-  { name: 'GPT-5.5', input: 5, output: 30, color: '#8E8B85' },
-  { name: 'Claude Fable 5', input: 10, output: 50, color: '#8E8B85' },
+  { name: 'Fable 5 Direct', input: 10, output: 50, color: '#8E8B85' },
 ];
 
 export function PricingSection() {
@@ -110,7 +126,7 @@ export function PricingSection() {
             Pricing that makes sense.
           </h2>
           <p className="text-text-secondary">
-            20 free queries/day. No signup. Upgrade when you need more. Cancel anytime.
+            20 free queries/day after sign-in. Paid plans are available by request while hosted checkout is finalized.
           </p>
         </div>
 
@@ -135,7 +151,7 @@ export function PricingSection() {
         </div>
 
         {/* Pricing cards */}
-        <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mb-16">
           {tiers.map((tier) => {
             const price = annual ? tier.annual : tier.monthly;
             return (
@@ -204,7 +220,7 @@ export function PricingSection() {
           <div className="space-y-3">
             {competitors.map((comp) => {
               const total = comp.input + comp.output;
-              const maxWidth = 150; // max competitor total
+              const maxWidth = 60; // Fable 5 input + output total
               const widthPct = Math.min((total / maxWidth) * 100, 100);
               return (
                 <div key={comp.name} className="flex items-center gap-4">
@@ -231,7 +247,7 @@ export function PricingSection() {
             })}
           </div>
           <p className="text-xs text-text-muted mt-3 text-center">
-            TemuClaude: $0.06 input + $0.21 output (Llama 3.3, trivial tier). Blended ~$1.44/M across all tiers. Others: published API pricing.
+            TemuClaude: $0.06 input + $0.21 output (trivial tier). Blended ~$0.94/M across all tiers. Fable 5: published direct API pricing.
           </p>
         </div>
 

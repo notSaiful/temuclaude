@@ -1,30 +1,32 @@
 /**
- * TemuClaude OpenAI-Compatible API — 8-Model Full Pipeline
+ * TemuClaude OpenAI-Compatible API — evidence-based specialist pipeline
  * POST /v1/chat/completions
  *
  * Eight models, each assigned to a bounded capability role:
- * 1. DeepSeek V4 Flash — low-cost trivial requests
+ * 1. DeepSeek V4 Flash — Lite-only low-cost requests
  * 2. DeepSeek V4 Pro — math, code, and hard reasoning
  * 3. GLM-5.2 — knowledge, agentic work, and synthesis
- * 4. MiniMax M3 — creative and long-context generation
- * 5. Gemini 3.5 Flash — multimodal work
- * 6. GPT-5.6 Luna — QA-failure escalation only
- * 7. Grok 4.5 — code-repair escalation only
- * 8. Nemotron 3 Ultra — independent QA verifier
+ * 4. Kimi K2.6 — coding-driven UI/UX and multi-agent implementation
+ * 5. MiniMax M3 — multimodal, creative, product, and long-context review
+ * 6. Gemini 3.5 Flash — visual UI, accessibility, and tool-use review
+ * 7. GPT-5.6 Luna — fast independent GPT-family proposer
+ * 8. GPT-5.6 Sol — frontier adjudicator
+ * 9. Grok 4.5 — coding-agent critic and repair specialist
+ * 10. Nemotron 3 Ultra — independent QA verifier
  *
  * GPT-5.6 Terra is deliberately outside the normal pool and is attempted
  * only as the last emergency rescue after the open-core routes fail.
  *
  * Pipeline:
  * 1. Classify difficulty (heuristic, no API call)
- * 2. Trivial → DeepSeek Flash | Medium → best bounded specialist | Hard → full MoA
- * 3. Layer 1: 3 models propose in parallel (GLM + DeepSeek Pro + Nemotron)
+ * 2. Pro → quality-floor specialist or full MoA; Lite → bounded low-cost route
+ * 3. Layer 1: all nine Pro roles propose in parallel for nontrivial work
  * 4. Layer 2: Self-consistency for math (3 samples, parallel with Layer 1)
  * 5. Layer 3: Aggregation — analyze consensus, contradictions (1 call)
  * 6. Layer 4: QA gate — 5-rubric score by Nemotron (FREE, independent)
  * 7. Layer 5: Reflexion if QA < 8 — retry with feedback (1 call)
  * 8. Layer 6: QA-failure escalation if QA < 6 — GPT-5.6 Luna (1 call)
- * Timeout: 45s race → single GLM fallback
+ * Timeout: bounded quality pipeline → frontier-first rescue
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
@@ -43,9 +45,6 @@ let circuitTrippedUntil = 0;
 const modelActivityStore = new AsyncLocalStorage<string[]>();
 
 export const runtime = 'nodejs';
-// Raised from 120s to 300s on 2026-07-14: hard MoA queries can reach ~210s via
-// the 85s race -> empty GLM fallback -> finalRescue chain, which exceeded the
-// old 120s Vercel cap and 504'd. 300s is the Vercel plan ceiling.
 export const maxDuration = 300;
 
 // ── 8-MODEL POOL ──────────────────────────────────────────────
@@ -54,7 +53,9 @@ const M_DEEPSEEK = 'deepseek/deepseek-v4-pro';
 const M_GLM = 'z-ai/glm-5.2';
 const M_MINIMAX = 'minimax/minimax-m3';
 const M_GEMINI = 'google/gemini-3.5-flash';
+const M_KIMI = 'moonshotai/kimi-k2.6';
 const M_LUNA = 'openai/gpt-5.6-luna';
+const M_SOL = 'openai/gpt-5.6-sol';
 const M_GROK = 'x-ai/grok-4.5';
 const M_NEMOTRON = 'nvidia/nemotron-3-ultra-550b-a55b';
 const M_TERRA = 'openai/gpt-5.6-terra'; // emergency rescue only
@@ -63,6 +64,18 @@ const LITE_REASONING: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
 const TEMUCLAUDE_PRO_MODEL = 'temuclaude/temuclaude-pro';
+
+const MODEL_ROLE_PROMPTS: Record<string, string> = {
+  [M_GLM]: 'You are the GLM long-horizon planner and synthesis lead. Track dependencies, architecture, edge cases, and integration.',
+  [M_DEEPSEEK]: 'You are the DeepSeek math, STEM, coding, and rigorous-reasoning lead. Derive and verify the technical core.',
+  [M_KIMI]: 'You are the Kimi coding-driven UI/UX implementation lead. Focus on complete interfaces, interaction flows, state, responsive behavior, and production-ready code.',
+  [M_MINIMAX]: 'You are the MiniMax multimodal, long-context, creative, and product reviewer. Focus on visual coherence and product completeness.',
+  [M_GEMINI]: 'You are the Gemini visual UI, accessibility, multimodal, and tool-use reviewer. Focus on observable interaction quality.',
+  [M_LUNA]: 'You are a fast independent GPT-family proposer. Find a distinct solution path, useful tools, and consensus omissions.',
+  [M_SOL]: 'You are the GPT-5.6 Sol frontier adjudicator. Solve complex professional work rigorously and identify weaker assumptions.',
+  [M_GROK]: 'You are the Grok coding-agent and repair specialist. Hunt bugs, unsafe assumptions, integration failures, and missing tests.',
+  [M_NEMOTRON]: 'You are the Nemotron independent verifier. Try to falsify reasoning, code, long-context, and high-stakes claims.',
+};
 
 interface Msg { role: 'system' | 'user' | 'assistant'; content: string }
 interface Result { success: boolean; content: string; tokens: number }
@@ -165,6 +178,8 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096, o
   if (!messages.some(m => m.role === 'system')) {
     msgs = [{ role: 'system', content: 'You are TemuClaude, an AI assistant. Always respond in clear, professional English. Be concise and direct.' }, ...messages];
   }
+  const rolePrompt = MODEL_ROLE_PROMPTS[model];
+  if (rolePrompt) msgs = [{ role: 'system', content: rolePrompt }, ...msgs];
 
   const result = await callOpenRouter(model, msgs, {
     temperature: temp,
@@ -180,8 +195,8 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096, o
 
 async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
   const start = Date.now();
-  const result = await call(M_FLASH, messages, temp, maxTok, {
-    fallbacks: [M_GLM, M_DEEPSEEK, M_TERRA],
+  const result = await call(M_SOL, messages, temp, maxTok, {
+    fallbacks: [M_GROK, M_DEEPSEEK, M_GLM, M_TERRA],
     timeoutMs: 100_000,
   });
   return {
@@ -193,9 +208,9 @@ async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promi
 }
 
 /**
- * Difficulty Classifier — heuristic, no API call.
- * Code generation tasks route to "medium" (single strong model) not "hard" (full MoA),
- * because code needs one strong model with high output, not 3 models debating.
+ * Difficulty Classifier — heuristic, no API call.  Pro code generation is a
+ * hard artifact task: it receives the full panel, aggregation, QA, and repair
+ * rather than an economy-oriented single draft.
  */
 function classify(text: string): 'trivial' | 'medium' | 'hard' {
   const l = text.toLowerCase();
@@ -209,11 +224,10 @@ function classify(text: string): 'trivial' | 'medium' | 'hard' {
   if ((text.match(/[;,.]/g) || []).length > 3) s += 1;
   if (/\b(if|when|where|given|assuming|suppose)\b/i.test(l)) s += 1;
 
-  // Code generation detection — route to medium (single model), not hard (MoA).
-  // Code needs one strong model with high max_tokens, not 3 models debating.
+  // Code generation is a hard artifact task on Pro.
   const isCodeGen = /\b(build|create|generate|write|make|develop|implement|code|html|css|javascript|python|function|class|component|game|website|webpage|app|script|program|landing page|dashboard)\b/i.test(l) &&
                     /\b(html|css|js|javascript|python|code|function|component|page|game|app|script|file|complete)\b/i.test(l);
-  if (isCodeGen) return 'medium';
+  if (isCodeGen) return 'hard';
 
   // General coding keywords still add to score but won't force hard if code gen detected
   if (/\b(function|code|debug|program|algorithm|python|javascript|implement|write.*code|compile|runtime|complexity|recursive|sort|search)\b/i.test(l)) s += 3;
@@ -273,8 +287,8 @@ function selectLiteApiModel(text: string, tier: string): LiteModelId {
 function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
   const text = query.toLowerCase();
   if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
-  if (isCodeGen(query)) return false;
-  if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
+  if (isCodeGen(query)) return true;
+  if (tier !== 'trivial' || answer.trim().length < 80) return tier !== 'trivial';
   const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
   return sample < 0.02;
 }
@@ -376,68 +390,58 @@ async function reflexion(q: string, prevAnswer: string, feedback: string, maxTok
 }
 
 /**
- * Full 8-Model Orchestration Pipeline
+ * Full capability-aware orchestration pipeline
  */
 async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   const start = Date.now();
   let tokens = 0;
   const q = messages[messages.length - 1]?.content || '';
-  const diff = classify(q);
+  const classifiedDifficulty = classify(q);
+  // Pro reserves single-model routing for genuinely trivial prompts. Every
+  // nontrivial request receives the full quality pipeline.
+  const diff = classifiedDifficulty === 'medium' ? 'hard' : classifiedDifficulty;
   const math = isMath(q);
   const creative = isCreative(q);
   const multimodal = isMultimodal(q);
 
-  // A code or game request needs a complete file, not a fusion discussion.
-  // This is deliberately the same direct delivery contract used by Playground.
-  if (isCodeGen(q)) {
-    const r = await call(M_DEEPSEEK, [
-      { role: 'system', content: 'You are TemuClaude Code. Execute the request now; do not ask follow-up questions when reasonable defaults are possible. Return a complete, runnable deliverable. For a single-file web game, output one complete HTML fenced file with all CSS and JavaScript included. Do not describe phases or defer implementation.' },
-      ...messages,
-    ], 0.35, Math.min(Math.max(maxTok, 4096), 8192), {
-      fallbacks: [M_GLM, M_GROK],
-      timeoutMs: 100_000,
-    });
-    return { content: r.content, tokens: r.tokens, tier: 'direct-code-generation', time: Date.now() - start };
-  }
-
-  // ── TRIVIAL: DeepSeek V4 Flash ──
+  // ── TRIVIAL PRO: GLM quality floor ──
   if (diff === 'trivial') {
-    const r = await call(M_FLASH, messages, temp, maxTok);
+    const r = await call(M_GLM, messages, temp, maxTok);
     if (r.success && r.content) {
       return { content: r.content, tokens: r.tokens, tier: 'trivial', time: Date.now() - start };
     }
-    // Fallback to GLM if Flash fails
-    const r2 = await call(M_GLM, messages, temp, maxTok);
+    // Availability fallback only; Flash is deliberately not a Pro quality fallback.
+    const r2 = await call(M_DEEPSEEK, messages, temp, maxTok);
     return { content: r2.content, tokens: r2.tokens, tier: 'trivial-fallback', time: Date.now() - start };
   }
 
-  // ── MEDIUM: Route to best specialist ──
-  if (diff === 'medium') {
-    let model = M_GLM; // default to GLM (strongest overall)
-    if (math) model = M_DEEPSEEK;
-    else if (creative) model = M_MINIMAX;
-    else if (multimodal) model = M_GEMINI;
-    // Code generation uses GLM (best at following complex instructions)
-    // isCodeGen already detected by classifier, routing here is automatic via medium
-    const r = await call(model, messages, temp, maxTok);
-    return { content: r.content, tokens: r.tokens, tier: 'medium', time: Date.now() - start };
-  }
-
-  // ── HARD: Full 8-Model MoA Pipeline ──
+  // ── HARD: Full capability-aware MoA pipeline ──
 
   // MATH: self-consistency replaces single DeepSeek call (runs parallel)
   if (math) {
-    const [r1, r3, sc] = await Promise.all([
+    const [r1, r3, sc, r4, r5, r6, r7, r8, r9] = await Promise.all([
       call(M_GLM, messages, temp, maxTok),
       call(M_NEMOTRON, messages, temp, maxTok),
       selfConsistency(q, maxTok),
+      call(M_LUNA, messages, temp, maxTok),
+      call(M_GEMINI, messages, temp, maxTok),
+      call(M_MINIMAX, messages, temp, maxTok),
+      call(M_GROK, messages, temp, maxTok),
+      call(M_KIMI, messages, temp, maxTok),
+      call(M_SOL, messages, temp, maxTok),
     ]);
-    tokens += r1.tokens + r3.tokens + sc.tokens;
+    tokens += r1.tokens + r3.tokens + sc.tokens + r4.tokens + r5.tokens + r6.tokens + r7.tokens + r8.tokens + r9.tokens;
 
     const l1: { name: string; content: string }[] = [];
     if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
     if (sc.answer) l1.push({ name: 'Model B (DeepSeek, self-consistency)', content: sc.answer });
     if (r3.success && r3.content) l1.push({ name: 'Model C (Nemotron 3 Ultra)', content: r3.content });
+    if (r4.success && r4.content) l1.push({ name: 'Model D (GPT-5.6 Luna independent worker)', content: r4.content });
+    if (r5.success && r5.content) l1.push({ name: 'Model E (Gemini multimodal)', content: r5.content });
+    if (r6.success && r6.content) l1.push({ name: 'Model F (MiniMax long-context)', content: r6.content });
+    if (r7.success && r7.content) l1.push({ name: 'Model G (Grok critic)', content: r7.content });
+    if (r8.success && r8.content) l1.push({ name: 'Model H (Kimi UI/UX implementation)', content: r8.content });
+    if (r9.success && r9.content) l1.push({ name: 'Model I (GPT-5.6 Sol frontier)', content: r9.content });
 
     if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -457,7 +461,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
         if (qa2.score > qa.score) final = ref.content;
       }
       if (qa.score < 6) {
-        const frontier = await call(M_LUNA, messages, temp, maxTok);
+        const frontier = await call(M_SOL, messages, temp, maxTok);
         tokens += frontier.tokens;
         if (frontier.success && frontier.content) {
           const qa3 = await qaGate(q, frontier.content);
@@ -471,17 +475,29 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
 
   // CREATIVE: Route to MiniMax M3 as 3rd proposer instead of Gemini
   if (creative) {
-    const [r1, r2, r3] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6, r7, r8, r9] = await Promise.all([
       call(M_GLM, messages, temp, maxTok),
       call(M_DEEPSEEK, messages, temp, maxTok),
       call(M_MINIMAX, messages, temp, maxTok),
+      call(M_GEMINI, messages, temp, maxTok),
+      call(M_LUNA, messages, temp, maxTok),
+      call(M_GROK, messages, temp, maxTok),
+      call(M_NEMOTRON, messages, temp, maxTok),
+      call(M_KIMI, messages, temp, maxTok),
+      call(M_SOL, messages, temp, maxTok),
     ]);
-    tokens += r1.tokens + r2.tokens + r3.tokens;
+    tokens += r1.tokens + r2.tokens + r3.tokens + r4.tokens + r5.tokens + r6.tokens + r7.tokens + r8.tokens + r9.tokens;
 
     const l1: { name: string; content: string }[] = [];
     if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
     if (r2.success && r2.content) l1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content });
     if (r3.success && r3.content) l1.push({ name: 'Model C (MiniMax M3, creative)', content: r3.content });
+    if (r4.success && r4.content) l1.push({ name: 'Model D (Gemini multimodal)', content: r4.content });
+    if (r5.success && r5.content) l1.push({ name: 'Model E (GPT-5.6 Luna independent worker)', content: r5.content });
+    if (r6.success && r6.content) l1.push({ name: 'Model F (Grok critic)', content: r6.content });
+    if (r7.success && r7.content) l1.push({ name: 'Model G (Nemotron verifier)', content: r7.content });
+    if (r8.success && r8.content) l1.push({ name: 'Model H (Kimi UI/UX implementation)', content: r8.content });
+    if (r9.success && r9.content) l1.push({ name: 'Model I (GPT-5.6 Sol frontier)', content: r9.content });
 
     if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -501,7 +517,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
         if (qa2.score > qa.score) final = ref.content;
       }
       if (qa.score < 6) {
-        const frontier = await call(M_LUNA, messages, temp, maxTok);
+        const frontier = await call(M_SOL, messages, temp, maxTok);
         tokens += frontier.tokens;
         if (frontier.success && frontier.content) {
           const qa3 = await qaGate(q, frontier.content);
@@ -513,18 +529,30 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
     return { content: final, tokens, tier: 'hard-creative', time: Date.now() - start };
   }
 
-  // HARD (general): core three-model panel only; premium models do not join by default.
-  const [r1, r2, r3] = await Promise.all([
+  // HARD (general): every configured frontier and specialist role contributes.
+  const [r1, r2, r3, r4, r5, r6, r7, r8, r9] = await Promise.all([
     call(M_GLM, messages, temp, maxTok),
     call(M_DEEPSEEK, messages, temp, maxTok),
     call(M_NEMOTRON, messages, temp, maxTok),
+    call(M_LUNA, messages, temp, maxTok),
+    call(M_GEMINI, messages, temp, maxTok),
+    call(M_MINIMAX, messages, temp, maxTok),
+    call(M_GROK, messages, temp, maxTok),
+    call(M_KIMI, messages, temp, maxTok),
+    call(M_SOL, messages, temp, maxTok),
   ]);
-  tokens += r1.tokens + r2.tokens + r3.tokens;
+  tokens += r1.tokens + r2.tokens + r3.tokens + r4.tokens + r5.tokens + r6.tokens + r7.tokens + r8.tokens + r9.tokens;
 
   const l1: { name: string; content: string }[] = [];
   if (r1.success && r1.content) l1.push({ name: 'Model A (GLM-5.2)', content: r1.content });
   if (r2.success && r2.content) l1.push({ name: 'Model B (DeepSeek V4 Pro)', content: r2.content });
   if (r3.success && r3.content) l1.push({ name: 'Model C (Nemotron 3 Ultra)', content: r3.content });
+  if (r4.success && r4.content) l1.push({ name: 'Model D (GPT-5.6 Luna independent worker)', content: r4.content });
+  if (r5.success && r5.content) l1.push({ name: 'Model E (Gemini multimodal)', content: r5.content });
+  if (r6.success && r6.content) l1.push({ name: 'Model F (MiniMax specialist)', content: r6.content });
+  if (r7.success && r7.content) l1.push({ name: 'Model G (Grok critic)', content: r7.content });
+  if (r8.success && r8.content) l1.push({ name: 'Model H (Kimi UI/UX implementation)', content: r8.content });
+  if (r9.success && r9.content) l1.push({ name: 'Model I (GPT-5.6 Sol frontier)', content: r9.content });
 
   if (l1.length === 0) return { content: '', tokens, tier: 'hard', time: Date.now() - start };
 
@@ -544,7 +572,7 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
       if (qa2.score > qa.score) final = ref.content;
     }
     if (qa.score < 6) {
-      const frontier = await call(M_LUNA, messages, temp, maxTok);
+      const frontier = await call(M_SOL, messages, temp, maxTok);
       tokens += frontier.tokens;
       if (frontier.success && frontier.content) {
         const qa3 = await qaGate(q, frontier.content);
@@ -655,22 +683,52 @@ export async function POST(request: NextRequest) {
       const liteMessages: Msg[] = liteCodeRequest
         ? [{ role: 'system', content: 'You are TemuClaude Code. Execute the requested coding task now; do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable. When suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.' }, ...messages]
         : messages;
-      recordModelActivity(liteModel);
-      let lite = await callOpenRouterLite(liteModel, liteMessages, {
-        temperature: temperature ?? 0.45,
-        maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 3072 : 2048), 4096),
-        timeoutMs: 60_000,
-        sessionId: `v1-lite-${Date.now()}`,
-      });
+      const useLitePanel = tier !== 'trivial' || liteCodeRequest;
+      const complement: LiteModelId = liteModel === LITE_DEFAULT ? LITE_AGENT : LITE_DEFAULT;
+      const callLiteDraft = (draftModel: LiteModelId, role: string) => {
+        recordModelActivity(draftModel);
+        return callOpenRouterLite(draftModel, [
+          { role: 'system', content: role },
+          ...liteMessages,
+        ], {
+          temperature: temperature ?? 0.45,
+          maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 4096 : 2048), 4096),
+          timeoutMs: liteCodeRequest ? 90_000 : 60_000,
+          sessionId: `v1-lite-${draftModel}-${Date.now()}`,
+        });
+      };
+      const [primaryDraft, complementaryDraft] = await Promise.all([
+        callLiteDraft(liteModel, 'Own the main task-specific solution. Be complete, concrete, and do not rush the ending.'),
+        useLitePanel
+          ? callLiteDraft(complement, 'Independently solve the task. Focus on omissions, edge cases, and a different approach.')
+          : Promise.resolve(null),
+      ]);
+      let lite = primaryDraft.success ? primaryDraft : complementaryDraft?.success ? complementaryDraft : primaryDraft;
       if (!lite.success || !hasUsableContent(lite.content)) {
         return upstreamFailure(lite.error || 'TemuClaude Lite is temporarily unavailable.', 503);
       }
-      let promptTokens = lite.promptTokens || promptTokenEstimate(messages);
-      let completionTokens = lite.completionTokens || completionTokenEstimate(lite.content);
+      let promptTokens = primaryDraft.promptTokens + (complementaryDraft?.promptTokens || 0) || promptTokenEstimate(messages);
+      let completionTokens = primaryDraft.completionTokens + (complementaryDraft?.completionTokens || 0) || completionTokenEstimate(lite.content);
 
-      // Keep the API profile aligned with Playground Lite: an independent
-      // critic runs only for high-risk, explicit-check, or audit-sampled work.
-      // A correction makes at most three Lite model calls in total.
+      if (primaryDraft.success && complementaryDraft?.success) {
+        recordModelActivity(LITE_AGENT);
+        const synthesized = await callOpenRouterLite(LITE_AGENT, [
+          { role: 'system', content: 'Synthesize the strongest complete answer from two independent drafts. Resolve contradictions, preserve working detail, and return only the final answer.' },
+          { role: 'user', content: `Original request:\n${latestUserText}\n\nDraft A:\n${primaryDraft.content}\n\nDraft B:\n${complementaryDraft.content}` },
+        ], {
+          temperature: temperature ?? 0.35,
+          maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 4096 : 2048), 4096),
+          timeoutMs: liteCodeRequest ? 90_000 : 60_000,
+          sessionId: `v1-lite-synthesis-${Date.now()}`,
+        });
+        promptTokens += synthesized.promptTokens;
+        completionTokens += synthesized.completionTokens;
+        if (synthesized.success && hasUsableContent(synthesized.content)) lite = synthesized;
+      }
+
+      // Keep the API profile aligned with Playground Lite: nontrivial work is
+      // synthesized from complementary drafts and independently verified. A
+      // corrective pass stays inside the Lite allowlist.
       if (shouldVerifyLite(latestUserText, tier, lite.content)) {
         recordModelActivity(LITE_VERIFIER);
         const verdict = await callOpenRouterLite(LITE_VERIFIER, [
@@ -684,15 +742,15 @@ export async function POST(request: NextRequest) {
         completionTokens += verdict.completionTokens;
         promptTokens += verdict.promptTokens;
         if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
-          recordModelActivity(liteModel);
-          const corrected = await callOpenRouterLite(liteModel, [
+          recordModelActivity(LITE_AGENT);
+          const corrected = await callOpenRouterLite(LITE_AGENT, [
             ...messages,
             { role: 'assistant', content: lite.content },
             { role: 'user', content: `Verifier feedback:\n${verdict.content}\n\nReturn a corrected, self-contained answer.` },
           ], {
             temperature: temperature ?? 0.35,
-            maxTokens: Math.min(max_tokens ?? 2048, 4096),
-            timeoutMs: 60_000,
+            maxTokens: Math.min(max_tokens ?? (liteCodeRequest ? 4096 : 2048), 4096),
+            timeoutMs: liteCodeRequest ? 90_000 : 60_000,
             sessionId: `v1-lite-correct-${Date.now()}`,
           });
           if (corrected.success && hasUsableContent(corrected.content)) {
@@ -703,7 +761,7 @@ export async function POST(request: NextRequest) {
         }
       }
       if (!isEvalMode && userId) {
-        try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+        try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
       }
       return completionResponse({
         id: `chatcmpl-${Date.now()}`,
@@ -757,7 +815,7 @@ export async function POST(request: NextRequest) {
               const usage = modal.data?.usage || {};
               const promptTokens = Number(usage.prompt_tokens || promptTokenEstimate(messages));
               const completionTokens = Number(usage.completion_tokens || completionTokenEstimate(modalContent));
-              try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+              try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
             }
             if (wantsStream) {
               return completionResponse({
@@ -798,7 +856,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Timeout safeguard: reserve enough time for one strong GLM response
-    // before Vercel's 120-second function deadline.
+    // before Vercel's 300-second function deadline. (Raised from 120s on
+    // 2026-07-14: hard MoA queries can reach ~210s via race → GLM fallback
+    // → finalRescue, which exceeded the old 120s cap and 504'd on Vercel.)
     const pipeline = orchestrate(messages, temperature ?? 0.6, max_tokens ?? 4096);
     const timeout = new Promise<OrchestrationResult>(resolve => {
       setTimeout(async () => {
@@ -822,7 +882,7 @@ export async function POST(request: NextRequest) {
     if (!isEvalMode && userId) {
       const promptTokens = promptTokenEstimate(messages);
       const completionTokens = completionTokenEstimate(finalContent);
-      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()); } catch {}
+      try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
     }
 
     return completionResponse({
@@ -854,14 +914,16 @@ export async function GET() {
   return NextResponse.json({
     status: 'ok',
     model: 'temuclaude',
-    description: 'TemuClaude — 8-Model Multi-Model AI Orchestration (OpenAI-compatible)',
+    description: 'TemuClaude — capability-aware multi-model AI orchestration (OpenAI-compatible)',
     models: [
       { name: 'DeepSeek V4 Flash', role: 'Trivial routing', iq: null },
       { name: 'DeepSeek V4 Pro', role: 'Reasoning + math + code', iq: null },
-      { name: 'GLM-5.2', role: 'Knowledge + synthesis', iq: null },
-      { name: 'MiniMax M3', role: 'Creative + long context', iq: null },
-      { name: 'Gemini 3.5 Flash', role: 'Multimodal', iq: null },
-      { name: 'GPT-5.6 Luna', role: 'QA-failure escalation', iq: null },
+      { name: 'GLM-5.2', role: 'Planning + project engineering + synthesis', iq: null },
+      { name: 'Kimi K2.6', role: 'Coding-driven UI/UX + multi-agent implementation', iq: null },
+      { name: 'MiniMax M3', role: 'Multimodal + creative + long context', iq: null },
+      { name: 'Gemini 3.5 Flash', role: 'Visual UI + accessibility + tools', iq: null },
+      { name: 'GPT-5.6 Luna', role: 'Fast independent GPT proposer', iq: null },
+      { name: 'GPT-5.6 Sol', role: 'Frontier adjudication', iq: null },
       { name: 'Grok 4.5', role: 'Code-repair escalation', iq: null },
       { name: 'Nemotron 3 Ultra', role: 'Independent QA', iq: null },
       { name: 'TemuClaude Lite', role: 'Cost-bounded OpenRouter cascade', model: 'temuclaude/temuclaude-lite' },
