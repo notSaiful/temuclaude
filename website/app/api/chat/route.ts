@@ -488,12 +488,18 @@ async function runQualityCodeGeneration(
   deliveryIsUsable = isUsableDeliverable(result);
   if (!deliveryIsUsable && remainingMs() >= 6_000) {
     techniques.push('code-repair-rescue');
-    sendProgress(controller, encoder, 'Recovering code generation', 'DeepSeek Flash is producing the approved rescue deliverable');
-    result = await callModel(POOL.fastRoute, [codeSystem, ...messages], {
-      maxTokens: 8_192,
+    sendProgress(controller, encoder, 'Recovering code generation', 'DeepSeek V4 Pro is producing the approved rescue deliverable');
+    // Pro-tier rescue: DeepSeek V4 Pro reasons over the full request. Reasoning
+    // is intentionally NOT disabled here — a reasoning model under
+    // disableReasoning can return an empty completion (the original "approved
+    // route unavailable" outage), so we let it reason and give it token room
+    // for both the hidden chain-of-thought and the visible deliverable. The
+    // resilient HTML fallback below catches the rare timeout/empty case so the
+    // user always gets a runnable webpage. Quality over cost: rescue is Pro.
+    result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
+      maxTokens: 12_000,
       timeoutMs: Math.min(45_000, remainingMs()),
       temperature: 0.35,
-      disableReasoning: true,
       fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
     });
   }
