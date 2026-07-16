@@ -81,6 +81,10 @@ Vercel OpenAI-compatible gateway, research plans, benchmark evidence.
 - Nontrivial Lite requests no longer stop after one cheap draft: both gateways
   run complementary Lite drafts concurrently, synthesize them, and verify the
   result inside the Lite allowlist.
+- Playground requests such as “create webpage …” are classified as hard code
+  artifacts, not trivial creative prompts. If the Pro concise-response floor
+  receives an empty provider message, it escalates to the full quality panel
+  instead of exposing the transport error to the user.
 
 ## Required work before any “beats frontier” claim
 

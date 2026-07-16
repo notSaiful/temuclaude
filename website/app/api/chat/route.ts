@@ -170,10 +170,19 @@ export async function POST(req: NextRequest) {
           techniques.push('pro-quality-floor');
           sendProgress(controller, encoder, 'Calling Pro model', 'GLM-5.2 is drafting');
           const result = await callModel(POOL.orchestrator, messages);
-          sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-          streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'glm-5.2', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
-          completed = { content: result.content, model: result.name };
+          if (!result.ok) {
+            // A provider may occasionally return HTTP 200 with an empty
+            // completion. Never expose that transport failure as the answer:
+            // recover through the full quality panel and its approved routes.
+            techniques.push('pro-empty-response-recovery');
+            sendProgress(controller, encoder, 'Recovering response', 'The quality panel is replacing an empty provider response');
+            completed = await runFullStack(query, messages, controller, encoder, taskType, 'medium', t0, techniques);
+          } else {
+            sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
+            streamText(controller, encoder, result.content);
+            sendOrch(controller, encoder, taskType, tier, [{ name: 'glm-5.2', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
+            completed = { content: result.content, model: result.name };
+          }
         } else if (tier === 'medium') {
           // A Pro task is not downgraded to a single draft.  The same
           // specialist panel used for hard requests establishes a dependable
@@ -883,11 +892,15 @@ function classifyTask(query: string): string {
 }
 
 function isCodeGenerationRequest(query: string): boolean {
-  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
+  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|webpage|web page|site|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
     || /\b(single[- ]file|html game|browser game|playable game|canvas game|three\.js)\b/i.test(query);
 }
 
 function estimateDifficulty(query: string, taskType: string): number {
+  // A requested webpage is a runnable software artifact, regardless of how
+  // short its wording is. It must receive the quality code workflow rather
+  // than the single-model trivial route.
+  if (isCodeGenerationRequest(query)) return 8;
   let d = 0;
   d += Math.min(query.split(' ').length / 10, 5); // 0-5 based on length
   if (['math', 'reasoning', 'coding'].includes(taskType)) d += 2;

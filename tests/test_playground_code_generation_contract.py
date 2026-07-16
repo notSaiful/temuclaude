@@ -42,6 +42,15 @@ def test_playground_pro_pipeline_is_quality_first_and_has_runtime_headroom():
     assert "Promise.all(steps.slice(0, 5).map" in route
 
 
+def test_webpage_requests_are_code_artifacts_and_empty_trivial_responses_recover():
+    route = (ROOT / "website/app/api/chat/route.ts").read_text()
+
+    assert "website|webpage|web page|site|web app" in route
+    assert "if (isCodeGenerationRequest(query)) return 8;" in route
+    assert "pro-empty-response-recovery" in route
+    assert "completed = await runFullStack(query, messages, controller, encoder, taskType, 'medium', t0, techniques);" in route
+
+
 def test_openrouter_timeout_is_shared_by_all_fallback_attempts():
     transport = (ROOT / "website/lib/openrouter.ts").read_text()
 
