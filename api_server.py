@@ -42,6 +42,7 @@ class ChatRequest(BaseModel):
     temperature: float = Field(default=0.6, ge=0, le=2)
     max_tokens: int = Field(default=2048, ge=1, le=8192)
     model_profile: Literal["pro", "lite"] = "pro"
+    budget_profile: Literal["max_quality", "max_savings", "balanced"] = "max_quality"
 
     @field_validator("messages")
     @classmethod
@@ -105,6 +106,7 @@ async def chat_completions(payload: ChatRequest, request: Request, authorization
         app.state.orchestrator.complete,
         system_prompt="\n\n".join(system_messages) or None,
         session_id=session_id[:128],
+        orchestrator_kwargs={"budget_profile": payload.budget_profile},
     )
     if result.blocked:
         raise HTTPException(status_code=400, detail=result.block_reason or "Request blocked by security policy")

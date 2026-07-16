@@ -7,20 +7,38 @@ import { getOrCreateUserByEmailAsync, getRollingWindowUsageAsync, incrementUsage
 import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// Hard Pro requests deliberately run several high-value model and verifier
+// stages. Give that quality-first pipeline room to finish instead of allowing
+// the platform to kill it mid-pipeline with no answer.
+export const maxDuration = 300;
 
-// TemuClaude Pro — the current eight-model, role-bounded registry.
-// Each model has a distinct job; premium escalation remains conditional.
+// TemuClaude Pro — evidence-based, role-bounded quality registry.
+// Every nontrivial Pro request uses all available quality roles; task type
+// controls their instructions and synthesis weight, not whether quality runs.
 const POOL = {
   orchestrator: 'z-ai/glm-5.2',
   reasoning: 'deepseek/deepseek-v4-pro',
   fastRoute: 'deepseek/deepseek-v4-flash',
   multimodal: 'google/gemini-3.5-flash',
+  uiUx: 'moonshotai/kimi-k2.6',
   specialist: 'minimax/minimax-m3',
   vision: 'minimax/minimax-m3',
-  frontier: 'openai/gpt-5.6-luna',
+  gptWorker: 'openai/gpt-5.6-luna',
+  frontier: 'openai/gpt-5.6-sol',
   codeRepair: 'x-ai/grok-4.5',
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
+};
+
+const ROLE_INSTRUCTIONS: Record<string, string> = {
+  [POOL.orchestrator]: 'You are the GLM long-horizon planner and synthesis lead. Track dependencies, architecture, edge cases, and integration across the entire task.',
+  [POOL.reasoning]: 'You are the DeepSeek math, STEM, coding, and rigorous-reasoning lead. Derive and verify the technical core.',
+  [POOL.uiUx]: 'You are the Kimi coding-driven UI/UX implementation lead. Focus on complete interfaces, interaction flows, state, responsive behavior, and production-ready code.',
+  [POOL.specialist]: 'You are the MiniMax multimodal, long-context, creative, and product reviewer. Focus on visual coherence, product completeness, and source-wide consistency.',
+  [POOL.multimodal]: 'You are the Gemini visual UI, accessibility, multimodal, and tool-use reviewer. Focus on screen behavior, accessibility, and observable interaction quality.',
+  [POOL.gptWorker]: 'You are a fast independent GPT-family proposer. Find a distinct solution path, useful tools, and omissions in the likely consensus.',
+  [POOL.frontier]: 'You are the GPT-5.6 Sol frontier adjudicator. Solve complex professional work rigorously and identify where weaker proposals may fail.',
+  [POOL.codeRepair]: 'You are the Grok coding-agent and repair specialist. Hunt bugs, unsafe assumptions, integration failures, and missing tests; propose concrete fixes.',
+  [POOL.verifier]: 'You are the Nemotron independent verifier. Try to falsify reasoning, code, long-context, and high-stakes claims with checkable evidence.',
 };
 
 // Lite is intentionally isolated from POOL. Its caller enforces this exact
@@ -145,26 +163,22 @@ export async function POST(req: NextRequest) {
         if (profile === 'lite') {
           completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques, isCodeGeneration);
         } else if (isCodeGeneration) {
-          completed = await runCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
+          completed = await runQualityCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else if (tier === 'trivial') {
-          // Layer 1: cheapest approved Pro route for straightforward requests.
-          techniques.push('direct-routing');
-          sendProgress(controller, encoder, 'Calling fast model', 'DeepSeek V4 Flash is drafting');
-          const result = await callModel(POOL.fastRoute, messages);
+          // Pro has a quality floor even for short requests.  Flash is a Lite
+          // worker only; GLM owns concise, user-facing Pro answers.
+          techniques.push('pro-quality-floor');
+          sendProgress(controller, encoder, 'Calling Pro model', 'GLM-5.2 is drafting');
+          const result = await callModel(POOL.orchestrator, messages);
           sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
           streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: 'deepseek-v4-flash', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
+          sendOrch(controller, encoder, taskType, tier, [{ name: 'glm-5.2', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
           completed = { content: result.content, model: result.name };
         } else if (tier === 'medium') {
-          // Layer 2: Specialist routing
-          techniques.push('specialist-routing');
-          const specialist = pickSpecialist(taskType);
-          sendProgress(controller, encoder, 'Calling specialist', `${specialist.split('/').pop()} is drafting`);
-          const result = await callModel(specialist, messages);
-          sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-          streamText(controller, encoder, result.content);
-          sendOrch(controller, encoder, taskType, tier, [{ name: specialist.split('/').pop()||'', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
-          completed = { content: result.content, model: result.name };
+          // A Pro task is not downgraded to a single draft.  The same
+          // specialist panel used for hard requests establishes a dependable
+          // quality floor; the panel itself is task-aware.
+          completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
         } else {
           // HARD: Full 6-layer stack
           completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
@@ -211,23 +225,50 @@ async function runLiteStack(
     : difficulty >= 7
       ? LITE_POOL.agent
       : LITE_POOL.default;
-  techniques.push('lite-single-model-routing');
-  sendProgress(controller, encoder, 'Calling Lite model', `${model.split('/').pop()} is drafting`);
+  const useLitePanel = tier !== 'trivial' || isCodeGeneration;
+  techniques.push(useLitePanel ? 'lite-parallel-specialist-panel' : 'lite-quality-floor');
+  sendProgress(controller, encoder, 'Calling Lite model', useLitePanel ? 'Two Lite specialists are drafting in parallel' : `${model.split('/').pop()} is drafting`);
 
   const codeInstruction = isCodeGeneration
     ? `${ENGLISH_SYSTEM.content} Execute the requested coding task now. Do not ask follow-up questions when reasonable defaults are possible. For a game, website, or interactive app, return a complete runnable deliverable; when suitable, return one complete HTML fenced file with all CSS and JavaScript included. Do not outline phases or defer implementation.`
     : ENGLISH_SYSTEM.content;
-  let result = await callOpenRouterLite(model, [
+  const callLiteDraft = (draftModel: LiteModelId, role: string) => callOpenRouterLite(draftModel, [
     {
       role: 'system',
-      content: codeInstruction,
+      content: `${codeInstruction} ${role}`,
     },
     ...messages,
   ], {
-    maxTokens: isCodeGeneration ? 3_072 : 2_000,
-    timeoutMs: isCodeGeneration ? 30_000 : 12_000,
-    sessionId: `playground-lite-${query.slice(0, 80)}`,
+    maxTokens: isCodeGeneration ? 4_096 : 2_000,
+    timeoutMs: isCodeGeneration ? 90_000 : 20_000,
+    sessionId: `playground-lite-${draftModel}-${query.slice(0, 64)}`,
   });
+  const complement = model === LITE_POOL.default ? LITE_POOL.agent : LITE_POOL.default;
+  const [primaryDraft, complementaryDraft] = await Promise.all([
+    callLiteDraft(model, 'Own the main task-specific solution. Be complete, concrete, and do not rush the ending.'),
+    useLitePanel
+      ? callLiteDraft(complement, 'Independently solve the task. Focus on omissions, edge cases, and an alternative approach.')
+      : Promise.resolve(null),
+  ]);
+  let result = primaryDraft.success ? primaryDraft : complementaryDraft?.success ? complementaryDraft : primaryDraft;
+  let panelCompletionTokens = primaryDraft.completionTokens + (complementaryDraft?.completionTokens || 0);
+  let panelCost = (primaryDraft.cost || 0) + (complementaryDraft?.cost || 0);
+
+  if (primaryDraft.success && complementaryDraft?.success) {
+    techniques.push('lite-specialist-synthesis');
+    sendProgress(controller, encoder, 'Synthesizing Lite drafts', 'Qwen is combining the strongest verified details');
+    const synthesized = await callOpenRouterLite(LITE_POOL.agent, [
+      { role: 'system', content: `${codeInstruction} Synthesize the best complete answer from two independent drafts. Resolve contradictions, preserve working detail, and return only the final answer.` },
+      { role: 'user', content: `Original request:\n${query}\n\nDraft A:\n${primaryDraft.content}\n\nDraft B:\n${complementaryDraft.content}` },
+    ], {
+      maxTokens: isCodeGeneration ? 4_096 : 2_000,
+      timeoutMs: isCodeGeneration ? 90_000 : 30_000,
+      sessionId: `playground-lite-synthesis-${query.slice(0, 64)}`,
+    });
+    panelCompletionTokens += synthesized.completionTokens;
+    panelCost += synthesized.cost || 0;
+    if (synthesized.success) result = synthesized;
+  }
   // Keep Lite reliable without hiding a substituted model: the only rescue
   // route is the explicitly approved Qwen worker and it is used only after
   // the selected primary model fails. The final telemetry names the model.
@@ -238,16 +279,16 @@ async function runLiteStack(
       { role: 'system', content: codeInstruction },
       ...messages,
     ], {
-      maxTokens: isCodeGeneration ? 3_072 : 2_000,
-      timeoutMs: isCodeGeneration ? 30_000 : 12_000,
+      maxTokens: isCodeGeneration ? 4_096 : 2_000,
+      timeoutMs: isCodeGeneration ? 90_000 : 20_000,
       sessionId: `playground-lite-rescue-${query.slice(0, 72)}`,
     });
   }
   let content = result.success
     ? result.content
     : 'TemuClaude Lite could not complete this request right now. Please try again.';
-  let completionTokens = result.completionTokens;
-  let providerCost = result.cost || 0;
+  let completionTokens = panelCompletionTokens;
+  let providerCost = panelCost;
 
   if (result.success && shouldVerifyLite(query, tier, content)) {
     techniques.push('lite-risk-verification');
@@ -261,12 +302,12 @@ async function runLiteStack(
     if (verdict.success && verdict.content.toUpperCase().startsWith('FAIL')) {
       techniques.push('lite-corrective-retry');
       sendProgress(controller, encoder, 'Correcting Lite response', 'Applying the independent verification feedback');
-      const corrected = await callOpenRouterLite(model, [
+      const corrected = await callOpenRouterLite(LITE_POOL.agent, [
         { role: 'system', content: `${ENGLISH_SYSTEM.content} A verifier found an issue in the previous draft. Produce a corrected, self-contained answer.` },
         ...messages,
         { role: 'assistant', content },
         { role: 'user', content: `Verifier feedback:\n${verdict.content}` },
-      ], { maxTokens: isCodeGeneration ? 3_072 : 2_000, timeoutMs: isCodeGeneration ? 30_000 : 12_000, sessionId: `playground-lite-correct-${query.slice(0, 72)}` });
+      ], { maxTokens: isCodeGeneration ? 4_096 : 2_000, timeoutMs: isCodeGeneration ? 90_000 : 30_000, sessionId: `playground-lite-correct-${query.slice(0, 72)}` });
       if (corrected.success) {
         content = corrected.content;
         completionTokens += corrected.completionTokens;
@@ -294,13 +335,13 @@ async function runLiteStack(
 function shouldVerifyLite(query: string, tier: string, answer: string): boolean {
   const text = query.toLowerCase();
   if (/(medical|diagnosis|medication|legal advice|financial advice|investment decision|safety critical|verify|fact-check|audit)/.test(text)) return true;
-  if (isCodeGenerationRequest(query)) return false;
-  if (tier !== 'hard' || answer.trim().length < 80) return tier === 'hard';
+  if (isCodeGenerationRequest(query)) return true;
+  if (tier !== 'trivial' || answer.trim().length < 80) return tier !== 'trivial';
   const sample = createHash('sha256').update(query).digest().readUInt32BE(0) / 0x1_0000_0000;
   return sample < 0.02;
 }
 
-async function runCodeGeneration(
+async function runQualityCodeGeneration(
   query: string,
   messages: ChatMessage[],
   controller: ReadableStreamDefaultController,
@@ -310,11 +351,11 @@ async function runCodeGeneration(
   t0: number,
   techniques: string[],
 ): Promise<CompletedResponse> {
-  // Code generation is a deliverable, not a debate topic. A single capable
-  // coding model with a real output budget produces materially better files
-  // than asking a fusion aggregator to discuss other model responses.
-  techniques.push('direct-code-generation');
-  sendProgress(controller, encoder, 'Generating the requested code', 'DeepSeek V4 Pro is building a complete deliverable');
+  // Treat generated code as an artifact: parallel planning, implementation,
+  // product/UX review, independent verification, and repair.  A single cheap
+  // draft is not an acceptable Pro deliverable.
+  techniques.push('quality-first-code-panel');
+  sendProgress(controller, encoder, 'Planning and drafting', 'GLM, DeepSeek, and MiniMax are working in parallel');
   const codeSystem = {
     role: 'system' as const,
     content: [
@@ -324,26 +365,88 @@ async function runCodeGeneration(
       'Do not describe phases, request model outputs, or defer implementation. State only brief assumptions, then provide the finished code.',
     ].join(' '),
   };
-  let result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
+  const deadlineAt = t0 + 180_000;
+  const remainingMs = () => Math.max(0, deadlineAt - Date.now());
+  const [plan, draft, uiUxReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await Promise.all([
+    callModel(POOL.orchestrator, [
+      { role: 'system', content: 'You are a senior software architect. Produce a concise implementation plan, acceptance criteria, edge cases, and test checklist for the requested deliverable. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.reasoning, [codeSystem, ...messages], {
+      maxTokens: 8_192, timeoutMs: Math.min(65_000, remainingMs()), temperature: 0.35, disableReasoning: true,
+    }),
+    callModel(POOL.uiUx, [
+      { role: 'system', content: 'Produce a coding-driven UI/UX implementation review: component structure, interactions, state, responsiveness, accessibility hooks, and concrete implementation traps. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.specialist, [
+      { role: 'system', content: 'You are a product, UX, and edge-case reviewer. Specify what makes this requested deliverable complete, usable, accessible, and visually coherent. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.gptWorker, [
+      { role: 'system', content: 'Independently review the requested deliverable. Find missing requirements, useful tools, and a distinct implementation approach. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.frontier, [
+      { role: 'system', content: 'You are a frontier software reviewer. Identify the most important implementation, correctness, security, and completion requirements for this requested deliverable. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.multimodal, [
+      { role: 'system', content: 'You are an accessibility and interaction-design reviewer. Identify usability, visual, and accessibility requirements relevant to this requested deliverable. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+    callModel(POOL.codeRepair, [
+      { role: 'system', content: 'You are a frontier coding-agent reviewer. Identify likely implementation bugs, security issues, missing tests, and failure modes. Do not write the final code.' },
+      ...messages,
+    ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
+  ]);
+
+  techniques.push('implementation-synthesis');
+  sendProgress(controller, encoder, 'Synthesizing implementation', 'DeepSeek is incorporating architecture and UX review');
+  let result = await callModel(POOL.reasoning, [
+    codeSystem,
+    { role: 'user', content: `Architect plan:\n${plan.content}\n\nKimi UI/UX implementation review:\n${uiUxReview.content}\n\nMiniMax product and multimodal review:\n${productReview.content}\n\nIndependent GPT review:\n${gptReview.content}\n\nFrontier adjudication:\n${frontierReview.content}\n\nGemini accessibility and interaction review:\n${multimodalReview.content}\n\nGrok coding-agent review:\n${codeReview.content}\n\nInitial implementation:\n${draft.content}\n\nReturn the complete corrected deliverable only. Satisfy every applicable acceptance criterion; do not discuss the review process.` },
+  ], {
     maxTokens: 8_192,
-    timeoutMs: 45_000,
+    timeoutMs: Math.min(65_000, remainingMs()),
     temperature: 0.35,
     disableReasoning: true,
+    // OpenRouter can move between these parameter-compatible code models
+    // without making the user wait for a second full request timeout.
+    fallbacks: [POOL.orchestrator, POOL.codeRepair],
   });
-  if (!result.ok) {
-    techniques.push('code-repair-fallback');
-    sendProgress(controller, encoder, 'Recovering code generation', 'Grok 4.5 is producing the fallback deliverable');
+  if (result.ok && remainingMs() >= 8_000) {
+    techniques.push('independent-code-review');
+    sendProgress(controller, encoder, 'Verifying deliverable', 'Nemotron is checking completeness and correctness');
+    const review = await callModel(POOL.verifier, [
+      { role: 'system', content: 'Audit this generated deliverable against the request. Reply PASS if it is complete and correct. Otherwise reply FAIL followed by concrete, prioritized fixes.' },
+      { role: 'user', content: `Request:\n${query}\n\nDeliverable:\n${result.content}` },
+    ], { maxTokens: 1_200, timeoutMs: Math.min(25_000, remainingMs()) });
+    if (review.ok && review.content.toUpperCase().startsWith('FAIL') && remainingMs() >= 6_000) {
+      techniques.push('code-repair');
+      sendProgress(controller, encoder, 'Repairing deliverable', 'Grok is applying independent review feedback');
+      const repaired = await callModel(POOL.codeRepair, [
+        codeSystem,
+        { role: 'user', content: `Original request:\n${query}\n\nCurrent deliverable:\n${result.content}\n\nIndependent review:\n${review.content}\n\nReturn a complete corrected deliverable only.` },
+      ], { maxTokens: 8_192, timeoutMs: Math.min(35_000, remainingMs()), temperature: 0.25 });
+      if (repaired.ok) result = repaired;
+    }
+  }
+  if (!result.ok && remainingMs() >= 6_000) {
+    techniques.push('code-repair-rescue');
+    sendProgress(controller, encoder, 'Recovering code generation', 'Grok is producing the approved rescue deliverable');
     result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
-      maxTokens: 8_192,
-      timeoutMs: 45_000,
+      maxTokens: 6_144,
+      timeoutMs: Math.min(30_000, remainingMs()),
       temperature: 0.35,
-      disableReasoning: true,
+      // Grok 4.5 requires reasoning to remain enabled. Omitting the
+      // disable flag prevents the provider-side 400 that broke this route.
     });
   }
 
   const content = result.ok
     ? result.content
-    : 'The code-generation model was temporarily unavailable. Please retry; no partial or substituted model response was returned.';
+    : 'Code generation is temporarily unavailable after all approved routes were tried. Please retry shortly.';
   sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
   streamText(controller, encoder, content);
   sendOrch(controller, encoder, taskType, tier, [{
@@ -357,8 +460,27 @@ async function runCodeGeneration(
 
 // === FULL STACK (hard queries) ===
 async function runFullStack(query: string, messages: any[], controller: ReadableStreamDefaultController, encoder: TextEncoder, taskType: string, tier: string, t0: number, techniques: string[]): Promise<CompletedResponse> {
-  // Fusion panel: GLM synthesis, DeepSeek reasoning, and MiniMax generation.
-  const fusionModels = [POOL.orchestrator, POOL.reasoning, POOL.specialist];
+  // Quality-first Pro panel: keep the planner and reasoning anchor, then add
+  // the strongest specialist for this task instead of using the cheapest
+  // fixed panel for every domain.
+  const taskSpecialist = taskType === 'creative'
+    ? POOL.specialist
+    : ['knowledge', 'legal', 'health'].includes(taskType)
+      ? POOL.multimodal
+      : POOL.verifier;
+  const fusionModels = Array.from(new Set([
+    POOL.frontier,
+    POOL.gptWorker,
+    POOL.codeRepair,
+    POOL.multimodal,
+    POOL.uiUx,
+    taskSpecialist,
+    POOL.orchestrator,
+    POOL.reasoning,
+    POOL.specialist,
+    POOL.verifier,
+  ]));
+  techniques.push('quality-first-pro-panel');
 
   // LAYER 0: WEB SEARCH (for knowledge/reasoning questions)
   let searchContext = '';
@@ -381,9 +503,9 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 3: MoA 3-LAYER — Propose → Cross-Review → Aggregate
   techniques.push('moa-3-layer');
-  sendProgress(controller, encoder, 'Drafting proposals', 'Three models are working in parallel');
+  sendProgress(controller, encoder, 'Drafting proposals', 'Frontier and specialist models are working in parallel');
 
-  // Layer 1: 3 models propose independently (with search context)
+  // Layer 1: all available frontier and specialist roles propose independently.
   const proposeResults = await Promise.allSettled(
     fusionModels.map(id => callModel(id, augmentedMessages))
   );
@@ -404,7 +526,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Cross-reviewing drafts', 'Models are checking each other for gaps');
   const crossReviewResults: ModelResult[] = [];
   for (let i = 0; i < Math.min(workingProposals.length, 1); i++) {
-    if (Date.now() - t0 > 28000) break;
+    if (Date.now() - t0 > 45_000) break;
     const reviewer = workingProposals[i];
     const others = workingProposals.filter((_, j) => j !== i);
     const reviewPrompt = buildCrossReviewPrompt(query, reviewer, others);
@@ -434,7 +556,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   sendProgress(controller, encoder, 'Aggregation complete', aggResult.ok ? 'Primary synthesis ready' : 'Using strongest available draft', 'done');
 
   // LAYER 4: SELF-CONSISTENCY (for math/reasoning — adaptive N samples)
-  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 25000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && Date.now() - t0 < 45_000) {
     techniques.push('self-consistency');
     sendProgress(controller, encoder, 'Checking consistency', 'Sampling alternate reasoning paths');
     const N = 2;
@@ -449,18 +571,18 @@ async function runFullStack(query: string, messages: any[], controller: Readable
     }
     // PRM-weighted: score each sample with Nemotron, pick highest
     techniques.push('prm-weighted-voting');
+    const scores = await Promise.all(samples.map((sample) => scoreAnswer(query, sample)));
     let bestScore = -1;
     let bestAnswer = finalAnswer;
-    for (const sample of samples) {
-      const score = await scoreAnswer(query, sample);
-      if (score > bestScore) { bestScore = score; bestAnswer = sample; }
-    }
+    samples.forEach((sample, index) => {
+      if (scores[index] > bestScore) { bestScore = scores[index]; bestAnswer = sample; }
+    });
     finalAnswer = bestAnswer;
   }
 
   // LAYER 5: CODE VERIFICATION (for math/coding)
   let codeVerified = false;
-  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'coding') && Date.now() - t0 < 60_000) {
     techniques.push('code-verification');
     sendProgress(controller, encoder, 'Verifying code or math', 'Running a lightweight verifier pass');
     codeVerified = await verifyCode(finalAnswer);
@@ -482,7 +604,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
       }
       // Grok 4.5 is reserved for a bounded code-repair escalation, never a
       // first-pass model, so it improves failed code without inflating normal cost.
-      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 35000) {
+      if (taskType === 'coding' && !codeVerified && Date.now() - t0 < 70_000) {
         techniques.push('code-repair-escalation');
         const repair = await callModel(POOL.codeRepair, [
           { role: 'system', content: 'Repair the submitted solution. Return a complete, correct, self-contained answer with working code where relevant.' },
@@ -499,10 +621,10 @@ async function runFullStack(query: string, messages: any[], controller: Readable
   // LAYER 6: SELF-QA GATE — USVA 4-rubric verification
   techniques.push('usva-5-rubric-qa');
   sendProgress(controller, encoder, 'Quality scoring', 'Running final answer quality gate');
-  let qaScore = Date.now() - t0 < 42000 ? await runUSVA(query, finalAnswer) : 0.7;
+  let qaScore = Date.now() - t0 < 90_000 ? await runUSVA(query, finalAnswer) : 0.7;
 
   // If QA fails, retry with Reflexion
-  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 35000) {
+  if (qaScore < 0.8 && !techniques.includes('reflexion') && Date.now() - t0 < 70_000) {
     techniques.push('reflexion');
     const reflection = await callModel(POOL.verifier, [
       { role: 'system', content: 'You are a quality verifier. The answer scored low on quality. Explain what is wrong.' },
@@ -523,7 +645,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 12: s1 BUDGET FORCING (arXiv:2501.19393)
   // If the answer is suspiciously short for a hard question, force longer reasoning
-  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'reasoning') && finalAnswer.length < 500 && Date.now() - t0 < 80_000) {
     techniques.push('s1-budget-forcing');
     const forcedResult = await callModel(POOL.reasoning, [
       ...messages,
@@ -537,7 +659,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 13: STEP-LEVEL CODE VERIFICATION (rStar-Math pattern)
   // For math/coding: verify each reasoning step, not just the final answer
-  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 35000) {
+  if ((taskType === 'math' || taskType === 'coding') && !codeVerified && Date.now() - t0 < 80_000) {
     techniques.push('step-level-verification');
     const stepVerified = await stepLevelVerify(query, finalAnswer);
     if (stepVerified) {
@@ -560,7 +682,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 14: Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern)
   // Extract logical claims and check for contradictions
-  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 35000) {
+  if ((taskType === 'reasoning' || taskType === 'knowledge') && Date.now() - t0 < 85_000) {
     techniques.push('z3-logical-verification');
     const logicalCheck = await logicalVerify(finalAnswer);
     if (logicalCheck === 'contradiction') {
@@ -594,7 +716,7 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 17: frontier escalation (GPT-5.6 Luna) only after QA failure.
   // For the hardest queries where QA score is still low after all retries
-  if (qaScore < 0.75 && needsFrontier(query, taskType) && Date.now() - t0 < 35000) {
+  if (qaScore < 0.82 && needsFrontier(query, taskType) && Date.now() - t0 < 85_000) {
     techniques.push('frontier-fallback');
     const frontierResult = await callModel(POOL.frontier, [
       { role: 'system', content: 'You are TemuClaude Frontier. Solve this problem with maximum rigor. Previous attempts scored low on quality. Provide a definitive answer.' },
@@ -672,16 +794,22 @@ function sendOrch(controller: ReadableStreamDefaultController, encoder: TextEnco
 async function callModel(
   model: string,
   messages: any[],
-  options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean } = {},
+  options: { maxTokens?: number; timeoutMs?: number; temperature?: number; disableReasoning?: boolean; fallbacks?: string[] } = {},
 ): Promise<ModelResult> {
   const start = Date.now();
-  const messagesWithSystem = [ENGLISH_SYSTEM, ...messages]
+  const roleInstruction = ROLE_INSTRUCTIONS[model];
+  const messagesWithSystem = [
+    ENGLISH_SYSTEM,
+    ...(roleInstruction ? [{ role: 'system', content: roleInstruction }] : []),
+    ...messages,
+  ]
     .map(m => ({ role: m.role, content: m.content }));
   const result = await callOpenRouter(model, messagesWithSystem, {
     maxTokens: options.maxTokens ?? 2_000,
     timeoutMs: options.timeoutMs ?? 10_000,
     temperature: options.temperature ?? 0.45,
     disableReasoning: options.disableReasoning,
+    fallbacks: options.fallbacks,
     sessionId: `playground-${messages[messages.length - 1]?.content?.slice(0, 80) || Date.now()}`,
   });
   return {
@@ -812,24 +940,23 @@ async function stepLevelVerify(query: string, answer: string): Promise<boolean> 
   const steps = answer.match(stepRegex) || [];
   if (steps.length === 0) return false;
 
-  // For each step, ask Nemotron to verify if the logic is correct
-  let allStepsCorrect = true;
-  for (let i = 0; i < Math.min(steps.length, 5); i++) {
-    const step = steps[i].substring(0, 300);
+  // Independent checks are parallel: verification quality stays intact while
+  // five steps consume one bounded latency window instead of five in series.
+  const verdicts = await Promise.all(steps.slice(0, 5).map(async (rawStep) => {
+    const step = rawStep.substring(0, 300);
     try {
       const result = await callOpenRouter(POOL.verifier, [
         { role: 'system', content: 'You are a step-level code verifier. For the given reasoning step, determine if it is logically correct. Reply with ONLY "CORRECT" or "INCORRECT".' },
         { role: 'user', content: `Question: ${query.substring(0, 200)}\n\nStep to verify:\n${step}\n\nIs this step logically correct? Reply ONLY "CORRECT" or "INCORRECT".` },
       ], { temperature: 0, maxTokens: 10, timeoutMs: 8000 });
-      if (!result.success) { allStepsCorrect = false; break; }
+      if (!result.success) return false;
       const verdict = result.content.toUpperCase();
-      if (!verdict.includes('CORRECT') || verdict.includes('INCORRECT')) {
-        allStepsCorrect = false;
-        break;
-      }
-    } catch { allStepsCorrect = false; break; }
-  }
-  return allStepsCorrect;
+      return verdict.includes('CORRECT') && !verdict.includes('INCORRECT');
+    } catch {
+      return false;
+    }
+  }));
+  return verdicts.every(Boolean);
 }
 
 // === Z3/SMT LOGICAL VERIFICATION (ConsistPRM pattern) ===

@@ -19,7 +19,7 @@ Usage:
 """
 from __future__ import annotations
 import asyncio
-from typing import Callable, Awaitable, Optional
+from typing import Any, Callable, Awaitable, Mapping, Optional
 from dataclasses import dataclass, field
 
 from .guard import guard_input, check_output_for_leaks, ThreatLevel, get_canary_manager
@@ -46,6 +46,7 @@ async def secure_complete(
     orchestrator_complete_func: Callable[..., Awaitable[str]],
     system_prompt: str = None,
     session_id: str = "default",
+    orchestrator_kwargs: Optional[Mapping[str, Any]] = None,
 ) -> SecurityResult:
     """Run the full security pipeline around the orchestrator's complete() function.
     
@@ -103,13 +104,14 @@ async def secure_complete(
 
     # ─── LAYER 4: Call Orchestrator ────────────────────────────
     try:
+        call_kwargs = dict(orchestrator_kwargs or {})
         if guard_result.threat_level == ThreatLevel.SUSPICIOUS:
             # Suspicious but not blocked — add a warning to the system prompt
             warning = "\n\n[SECURITY WARNING: This input showed suspicious patterns. Be extra cautious.]"
             enhanced_prompt = (system_prompt or "") + warning if system_prompt else warning
-            raw_response = await orchestrator_complete_func(sanitized_query, enhanced_prompt)
+            raw_response = await orchestrator_complete_func(sanitized_query, enhanced_prompt, **call_kwargs)
         else:
-            raw_response = await orchestrator_complete_func(sanitized_query, system_prompt)
+            raw_response = await orchestrator_complete_func(sanitized_query, system_prompt, **call_kwargs)
     except Exception as e:
         chamber_manager.close_chamber(session_id)
         return SecurityResult(

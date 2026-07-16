@@ -29,10 +29,12 @@ const OPENROUTER_ROLE_FALLBACKS: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-flash'],
   'z-ai/glm-5.2': ['deepseek/deepseek-v4-pro', 'deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-pro'],
+  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
   'google/gemini-3.5-flash': ['minimax/minimax-m3', 'z-ai/glm-5.2'],
   'openai/gpt-5.6-luna': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'x-ai/grok-4.5': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'openai/gpt-5.6-terra': ['openai/gpt-5.6-luna', 'deepseek/deepseek-v4-pro'],
+  'openai/gpt-5.6-sol': ['x-ai/grok-4.5', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'x-ai/grok-4.5': ['openai/gpt-5.6-sol', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'openai/gpt-5.6-terra': ['openai/gpt-5.6-sol', 'x-ai/grok-4.5', 'deepseek/deepseek-v4-pro'],
   'google/gemini-2.0-flash': ['google/gemini-2.5-flash', 'google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'google/gemini-2.5-flash': ['google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'mistralai/mistral-large-2': ['mistralai/mistral-large-2512', 'minimax/minimax-m3', 'deepseek/deepseek-v4-pro'],
@@ -56,6 +58,7 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['deepseek/deepseek-v4-pro'],
   'deepseek/deepseek-v4-flash': ['deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['minimax/minimax-m3'],
+  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'openai/gpt-oss-120b': ['openai/gpt-oss-120b'],
   'openai/gpt-oss-120b:free': ['openai/gpt-oss-120b'],
   'nvidia/nemotron-3-ultra-550b-a55b:free': [
@@ -70,6 +73,7 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'anthropic/claude-sonnet-4.6': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3.5-flash': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-luna': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
+  'openai/gpt-5.6-sol': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'x-ai/grok-4.5': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-terra': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3-flash-preview': ['zhipu/glm-5.2'],
@@ -183,11 +187,18 @@ async function postOpenRouter(
   sessionId?: string,
   modelFallbacks: string[] = [],
   disableReasoning = false,
+  strictQuality = true,
 ): Promise<OpenRouterResult> {
   const key = process.env.OPENROUTER_API_KEY || '';
   const resolvedModel = resolveOpenRouterModel(model);
   const models = uniqueModels(modelFallbacks.map(resolveOpenRouterModel))
     .filter((fallback) => fallback !== resolvedModel);
+  // GPT-5.6 endpoints expose reasoning controls but not `temperature`.
+  // With require_parameters=true, sending temperature makes every otherwise
+  // healthy Luna/Sol endpoint ineligible. Omit it whenever the approved
+  // primary/fallback chain contains a fixed-sampling GPT-5.6 route.
+  const fixedSampling = [resolvedModel, ...models]
+    .some((candidate) => candidate.startsWith('openai/gpt-5.6-'));
 
   if (!key) {
     return {
@@ -216,13 +227,19 @@ async function postOpenRouter(
         model: resolvedModel,
         ...(models.length ? { models } : {}),
         messages,
-        temperature,
+        ...(!fixedSampling ? { temperature } : {}),
         // `max_completion_tokens` is not supported by every OpenRouter
         // endpoint. Requiring it made valid approved models look unavailable.
         max_tokens: Math.max(16, maxTokens),
         provider: {
           allow_fallbacks: true,
           require_parameters: true,
+          // Pro fixes the model explicitly and prefers full/high precision,
+          // high-throughput endpoints. OpenRouter otherwise price-weights
+          // provider selection, which conflicts with TemuClaude's quality-first
+          // product contract.
+          sort: 'throughput',
+          ...(strictQuality ? { quantizations: ['bf16', 'fp16', 'fp8'] } : {}),
         },
         ...(disableReasoning ? { reasoning: { enabled: false, exclude: true } } : {}),
         stream: false,
@@ -482,6 +499,12 @@ export async function callOpenRouter(
   const temperature = options.temperature ?? 0.6;
   const maxTokens = options.maxTokens ?? 4096;
   const timeoutMs = options.timeoutMs ?? 60000;
+  // `timeoutMs` is the budget for the complete routed call, not for every
+  // fallback independently. Reusing the full timeout for each candidate made
+  // a three-model route take up to 3x its advertised limit and allowed Vercel
+  // to terminate the Playground before it could return a response.
+  const deadlineAt = Date.now() + Math.max(1, timeoutMs);
+  const remainingTimeoutMs = () => Math.max(0, deadlineAt - Date.now());
   const openRouterModels = uniqueModels([
     resolveOpenRouterModel(model),
     ...getOpenRouterFallbacks(resolveOpenRouterModel(model), options.fallbacks).map(resolveOpenRouterModel),
@@ -490,26 +513,57 @@ export async function callOpenRouter(
 
   let last: OpenRouterResult | null = null;
   for (let i = 0; i < openRouterModels.length; i++) {
+    const attemptTimeoutMs = remainingTimeoutMs();
+    if (attemptTimeoutMs < 250) break;
     const candidate = openRouterModels[i];
-    attemptedModels.push(`openrouter:${candidate}`);
+    attemptedModels.push(`openrouter:quality:${candidate}`);
     const result = await postOpenRouter(
       candidate,
       messages,
       temperature,
       maxTokens,
-      timeoutMs,
+      Math.max(250, Math.floor(attemptTimeoutMs * 0.6)),
       options.sessionId,
       openRouterModels.slice(i + 1),
       options.disableReasoning,
+      true,
     );
     if (result.success) {
       return { ...result, attemptedModels };
     }
     last = result;
+
+    // A precision filter can temporarily leave an otherwise approved model
+    // without a routable endpoint. Retry the exact same approved model with
+    // throughput-first provider routing before moving to a different model.
+    // Authentication/permission errors are not retried because they require
+    // configuration changes, not transport recovery.
+    const relaxedTimeoutMs = remainingTimeoutMs();
+    const retryable = result.status !== 401 && result.status !== 403;
+    if (retryable && relaxedTimeoutMs >= 250) {
+      attemptedModels.push(`openrouter:resilience:${candidate}`);
+      const relaxed = await postOpenRouter(
+        candidate,
+        messages,
+        temperature,
+        maxTokens,
+        relaxedTimeoutMs,
+        options.sessionId,
+        openRouterModels.slice(i + 1),
+        options.disableReasoning,
+        false,
+      );
+      if (relaxed.success) {
+        return { ...relaxed, attemptedModels };
+      }
+      last = relaxed;
+    }
   }
 
   if (options.allowExternalFallbacks && deepinfraFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, DEEPINFRA_MODEL_MAP)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`deepinfra:${candidate}`);
       const result = await postCompatibleProvider(
         'deepinfra',
@@ -519,7 +573,7 @@ export async function callOpenRouter(
         messages,
         temperature,
         maxTokens,
-        timeoutMs,
+        attemptTimeoutMs,
       );
       if (result.success) {
         return { ...result, attemptedModels };
@@ -530,6 +584,8 @@ export async function callOpenRouter(
 
   if (options.allowExternalFallbacks && groqFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, GROQ_MODEL_MAP)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`groq:${candidate}`);
       const result = await postCompatibleProvider(
         'groq',
@@ -539,7 +595,7 @@ export async function callOpenRouter(
         messages,
         temperature,
         maxTokens,
-        timeoutMs,
+        attemptTimeoutMs,
       );
       if (result.success) {
         return { ...result, attemptedModels };
@@ -550,8 +606,10 @@ export async function callOpenRouter(
 
   if (options.allowExternalFallbacks && aimlFallbackEnabled()) {
     for (const candidate of getAimlFallbacks(openRouterModels)) {
+      const attemptTimeoutMs = remainingTimeoutMs();
+      if (attemptTimeoutMs < 250) break;
       attemptedModels.push(`aiml:${candidate}`);
-      const result = await postAiml(candidate, messages, temperature, maxTokens, timeoutMs);
+      const result = await postAiml(candidate, messages, temperature, maxTokens, attemptTimeoutMs);
       if (result.success) {
         return { ...result, attemptedModels };
       }
@@ -566,7 +624,7 @@ export async function callOpenRouter(
       tokens: 0,
       model: resolveOpenRouterModel(model),
       provider: 'openrouter' as const,
-      error: 'No providers were attempted',
+      error: attemptedModels.length > 0 ? 'Model routing deadline exhausted' : 'No providers were attempted',
     }),
     success: false,
     attemptedModels,

@@ -10,7 +10,7 @@
 - The **website (Vercel)** runs two TypeScript gateways. Website users hit these, **not** the
   Python orchestrator.
 - The **Python orchestrator** (`src/orchestrator.py`) is a separate, richer 10-layer engine
-  served by `api_server.py` (FastAPI, Fly). The website **does not call it** — the TS routes
+  served by `api_server.py` (FastAPI; configured for Fly). The website **does not call it** — the TS routes
   reimplement orchestration standalone.
 - Therefore features that exist only in the Python engine (Z3/SMT, sandboxed code execution,
   MCTS / self-play, shepherding) are **not** experienced by website users. Public copy must not
@@ -44,14 +44,22 @@ This is the OpenAI-compatible endpoint website users and API clients call. Its p
 (from the route's own `pipeline` array and function inventory):
 
 1. **Classify** — `classify()` → `trivial` | `medium` | `hard`.
-2. **Route** — trivial → DeepSeek V4 Flash (single cheap model); medium → a single strong
-   specialist; hard → full MoA panel.
+2. **Route** — Pro trivial → GLM quality floor; every nontrivial Pro request → full
+   frontier/specialist MoA panel. DeepSeek V4 Flash is reserved for Lite or explicit savings routes.
 3. **MoA fusion** — `aggregate()` blends a multi-model panel (`moa-fusion`).
 4. **Self-consistency** — 3 samples + majority vote for math/reasoning.
 5. **QA gate** — an **independent verifier model (Nemotron 3 Ultra)** scores the answer
    (LLM-as-judge, *not* Z3/SymPy/sandbox execution).
 6. **Reflexion** — if the QA gate flags issues, a corrective re-draft.
-7. **Frontier fallback** — escalation only on verified failure.
+7. **Frontier adjudication** — frontier models propose in the initial panel and re-enter corrective escalation after a low QA score.
+
+The Pro role matrix is explicit: GLM plans and synthesizes; DeepSeek owns the
+hard technical core; Kimi owns coding-driven UI/UX implementation; MiniMax
+reviews multimodal/product/long-context concerns; Gemini reviews visual UI and
+accessibility; Luna provides a fast independent GPT-family proposal; Sol is the
+frontier adjudicator; Grok finds and repairs code failures; Nemotron verifies.
+Lite applies the same draft/synthesize/verify pattern inside its smaller
+DeepSeek/Qwen/Nemotron allowlist.
 
 `pipeline = ['moa-fusion', 'self-consistency', 'aggregation', 'qa-gate', 'reflexion', 'frontier-fallback']`
 

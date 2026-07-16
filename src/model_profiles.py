@@ -72,7 +72,9 @@ PRO_MODEL_PROFILE = ModelProfile(
         "minimax-m3",
         "gemini-3.5-flash",
         "gpt-5.6-luna",
+        "gpt-5.6-sol",
         "grok-4.5",
+        "kimi-k2.6",
         "nemotron-3-ultra",
     ),
     default_model="glm-5.2",
@@ -116,8 +118,8 @@ LITE_MODEL_PROFILE = ModelProfile(
     # Leave headroom for system prompts and provider tokenization variance.
     max_input_tokens=240_000,
     max_output_tokens=4096,
-    # One primary, one availability fallback, and at most one verifier.
-    max_model_calls=3,
+    # Two parallel drafts, one synthesis, one verifier, and one correction.
+    max_model_calls=5,
     verifier_model="nemotron-3-ultra",
     verifier_sample_rate=0.02,
 )
@@ -214,7 +216,7 @@ def projected_lite_price_per_million() -> ModelPrice:
 
 
 def requires_lite_verification(query: str, tier: str, answer: str = "") -> bool:
-    """Gate the expensive Ultra critic to risk, uncertainty, or a 2% audit sample.
+    """Verify all nontrivial Lite work plus risky or sampled trivial work.
 
     This is deterministic for identical prompts, which makes costs reproducible
     and avoids random routing changes during retries.
@@ -246,8 +248,8 @@ def requires_lite_verification(query: str, tier: str, answer: str = "") -> bool:
 
     if high_risk or explicit_check or uncertain or suspiciously_short:
         return True
-    if tier != "hard":
-        return False
+    if tier != "trivial":
+        return True
 
     sample = int.from_bytes(hashlib.sha256(query.encode("utf-8")).digest()[:8], "big") / 2**64
     return sample < LITE_MODEL_PROFILE.verifier_sample_rate

@@ -9,7 +9,7 @@ MODEL_POOL = {
     "glm-5.2": {
         "ollama_tag": "glm-5.2:cloud",
         "role": "orchestrator",
-        "strengths": ["reasoning", "coding", "knowledge", "agentic"],
+        "strengths": ["planning", "project_software_engineering", "long_horizon_agentic", "synthesis"],
         "context_length": 1_000_000,
         "thinking": True,
         "tools": True,
@@ -28,9 +28,9 @@ MODEL_POOL = {
     },
     "kimi-k2.6": {
         "ollama_tag": "kimi-k2.6:cloud",
-        "role": "long_context_specialist",
-        "strengths": ["long_context", "vision", "reasoning", "swarm"],
-        "context_length": 1_000_000,
+        "role": "ui_ux_coding_specialist",
+        "strengths": ["coding", "ui_ux_generation", "multimodal", "multi_agent_orchestration"],
+        "context_length": 262_144,
         "thinking": True,
         "tools": True,
         "cost_tier": "flat",
@@ -38,8 +38,8 @@ MODEL_POOL = {
     },
     "minimax-m3": {
         "ollama_tag": "minimax-m3:cloud",
-        "role": "generation_specialist",
-        "strengths": ["generation", "vision", "reasoning", "creative"],
+        "role": "multimodal_long_context_specialist",
+        "strengths": ["image_video_understanding", "long_context", "creative", "agentic"],
         "context_length": 1_000_000,
         "thinking": True,
         "tools": True,
@@ -49,8 +49,8 @@ MODEL_POOL = {
     "nemotron-3-ultra": {
         "ollama_tag": "nemotron-3-ultra:cloud",
         "role": "verifier",
-        "strengths": ["verification", "agentic", "evaluation"],
-        "context_length": 262_144,
+        "strengths": ["verification", "reasoning", "agentic", "long_context", "high_stakes_rag"],
+        "context_length": 1_000_000,
         "thinking": True,
         "tools": True,
         "cost_tier": "flat",
@@ -71,12 +71,22 @@ MODEL_POOL = {
     },
     "gpt-5.6-luna": {
         "ollama_tag": "gpt-5.6-luna",
-        "role": "frontier_escalation",
-        "strengths": ["reasoning", "coding", "knowledge", "agentic"],
+        "role": "fast_gpt_worker",
+        "strengths": ["high_volume", "tool_use", "long_context", "independent_proposal"],
         "context_length": 1_000_000,
         "thinking": True,
         "tools": True,
         "cost_tier": "premium",
+        "routing_weight": 0.0,
+    },
+    "gpt-5.6-sol": {
+        "ollama_tag": "gpt-5.6-sol",
+        "role": "frontier_adjudicator",
+        "strengths": ["complex_reasoning", "coding", "professional_work", "adjudication"],
+        "context_length": 1_050_000,
+        "thinking": True,
+        "tools": True,
+        "cost_tier": "frontier",
         "routing_weight": 0.0,
     },
     "grok-4.5": {
@@ -192,15 +202,25 @@ TASK_MODEL_MAP = {
     "creative": "minimax-m3",
     "agentic": "glm-5.2",
     "verification": "nemotron-3-ultra",
-    "vision": "minimax-m3",
-    "ui_ux": "minimax-m3",
+    "vision": "gemini-3.5-flash",
+    "ui_ux": "kimi-k2.6",
     "simple": "deepseek-v4-flash",
 }
 
-# The hard route is a three-model panel, not an always-on five-model ensemble.
-# Additional premium specialists enter only at their explicit step and only if
-# the corresponding provider is configured.
-FUSION_PANEL = ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"]
+# Pro uses every configured frontier and specialist role for complex work.
+# Unconfigured direct-provider models resolve to strong in-pool routes and are
+# deduplicated by the fusion panel. Lite and explicit savings modes stay bounded.
+FUSION_PANEL = [
+    "glm-5.2",
+    "deepseek-v4-pro",
+    "kimi-k2.6",
+    "minimax-m3",
+    "gemini-3.5-flash",
+    "gpt-5.6-luna",
+    "gpt-5.6-sol",
+    "grok-4.5",
+    "nemotron-3-ultra",
+]
 
 # Dynamic aggregator selection
 AGGREGATOR_MAP = {
@@ -242,6 +262,7 @@ OPENROUTER_MODELS = {
     # providers from being selected as a normal route.
     "gemini-3.5-flash": "google/gemini-3.5-flash",
     "gpt-5.6-luna": "openai/gpt-5.6-luna",
+    "gpt-5.6-sol": "openai/gpt-5.6-sol",
     "grok-4.5": "x-ai/grok-4.5",
     "gpt-5.6-terra": "openai/gpt-5.6-terra",
     "qwen3-235b-moe": "qwen/qwen3-235b-a22b-2507",      # $0.09/$0.10/M — MoE reasoning
@@ -267,8 +288,9 @@ OPENROUTER_MODEL_FALLBACKS = {
     "qwen3.7-plus": ["deepseek-v4-flash"],
     "gemini-3.5-flash": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
     "gpt-5.6-luna": ["glm-5.2", "deepseek-v4-pro"],
-    "grok-4.5": ["gpt-5.6-luna", "glm-5.2", "deepseek-v4-pro"],
-    "gpt-5.6-terra": ["gpt-5.6-luna", "grok-4.5", "glm-5.2", "deepseek-v4-pro"],
+    "gpt-5.6-sol": ["grok-4.5", "deepseek-v4-pro", "glm-5.2"],
+    "grok-4.5": ["gpt-5.6-sol", "deepseek-v4-pro", "glm-5.2"],
+    "gpt-5.6-terra": ["gpt-5.6-sol", "grok-4.5", "deepseek-v4-pro", "glm-5.2"],
     "gemini-2.0-flash": ["gemini-3-flash", "glm-5.2"],
     "gemini-2.5-flash": ["gemini-3-flash", "glm-5.2"],
     "mistral-large-2": ["minimax-m3", "deepseek-v4-pro"],
@@ -280,16 +302,18 @@ OPENROUTER_MODEL_FALLBACKS = {
     "kimi-k2.6": ["glm-5.2", "deepseek-v4-pro"],
 }
 
-# Updated stack: eight active roles plus a disabled emergency fallback.  A
-# model's position here is not a mandate to call it for every request; the
-# router must select the cheapest role that has enough expected quality.
+# Updated stack: ten active roles plus a disabled emergency fallback. Pro
+# selects the strongest available role set for the task; Lite and explicit
+# savings profiles own cost-bounded routing.
 UPDATED_MODEL_STACK = {
     "deepseek-v4-flash": "high-volume worker",
     "deepseek-v4-pro": "reasoning, math, and technical analysis",
     "glm-5.2": "planning, orchestration, and synthesis",
-    "minimax-m3": "budget multimodal and long context",
+    "kimi-k2.6": "coding-driven UI/UX and multi-agent implementation",
+    "minimax-m3": "multimodal, creative, product, and long-context review",
     "gemini-3.5-flash": "premium multimodal and tool use",
-    "gpt-5.6-luna": "general closed-model escalation",
+    "gpt-5.6-luna": "fast GPT-family proposal and tool work",
+    "gpt-5.6-sol": "frontier reasoning, coding, and adjudication",
     "grok-4.5": "hard coding-agent escalation",
     "nemotron-3-ultra": "independent verification",
 }
@@ -307,6 +331,11 @@ DIRECT_MODEL_PROVIDERS = {
         "env": "OPENAI_API_KEY",
         "base_url": "https://api.openai.com/v1",
         "model": "gpt-5.6-luna",
+    },
+    "gpt-5.6-sol": {
+        "env": "OPENAI_API_KEY",
+        "base_url": "https://api.openai.com/v1",
+        "model": "gpt-5.6-sol",
     },
     "grok-4.5": {
         "env": "XAI_API_KEY",
@@ -347,7 +376,19 @@ def get_runtime_model(model: str, environ=None, _seen=None) -> str:
     in-pool route rather than issuing an invalid provider request or silently
     charging an unexpected model.
     """
-    if model not in DIRECT_MODEL_PROVIDERS or get_direct_model_provider(model, environ):
+    import os
+
+    environ = os.environ if environ is None else environ
+
+    # Frontier aliases are valid OpenRouter routes too. A configured
+    # OpenRouter key makes them available even if the corresponding native
+    # provider credential is absent; call_model still prefers an explicitly
+    # configured direct provider before selecting OpenRouter.
+    if (
+        model not in DIRECT_MODEL_PROVIDERS
+        or get_direct_model_provider(model, environ)
+        or (environ.get("OPENROUTER_API_KEY") and model in OPENROUTER_MODELS)
+    ):
         return model
 
     seen = set() if _seen is None else _seen

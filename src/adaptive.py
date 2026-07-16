@@ -29,8 +29,8 @@ STEP_MODEL_DEFAULTS = {
     "consistency": None,  # Aggregator-specific fallback.
     "qa_gate": "nemotron-3-ultra",
     "debate": "glm-5.2",
-    "premium_escalation": "gpt-5.6-luna",
-    "frontier_fallback": "gpt-5.6-terra",
+    "premium_escalation": "gpt-5.6-sol",
+    "frontier_fallback": "gpt-5.6-sol",
     "budget_forcing": None,
     "formal_verification": "z3",
     "postprocess": "glm-5.2",

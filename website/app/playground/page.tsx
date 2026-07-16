@@ -63,24 +63,6 @@ type Conversation = {
 
 type ModelProfile = 'pro' | 'lite';
 
-type WorkspaceProject = {
-  id: string;
-  title: string;
-  profile: ModelProfile;
-  updated_at: number;
-};
-
-type ProjectPreview = {
-  previewUrl: string;
-  expiresAt: string;
-  entrypoint: 'static' | 'server';
-};
-
-type WorkspaceApproval = {
-  title: string;
-  action: { id: string; action_type: string; status: string };
-};
-
 const EXAMPLE_PROMPTS = [
   'What is 9.9 vs 9.11 — which is larger?',
   'Write a Python function to merge two sorted lists',
@@ -96,19 +78,6 @@ export default function PlaygroundPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [modelProfile, setModelProfile] = useState<ModelProfile>('pro');
   const [showModelPicker, setShowModelPicker] = useState(false);
-  const [workspaceProjects, setWorkspaceProjects] = useState<WorkspaceProject[]>([]);
-  const [activeWorkspaceProjectId, setActiveWorkspaceProjectId] = useState<string | null>(null);
-  const [workspaceState, setWorkspaceState] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [workspaceError, setWorkspaceError] = useState<string | null>(null);
-  const [workspaceExportState, setWorkspaceExportState] = useState<'idle' | 'exporting' | 'error'>('idle');
-  const [workspaceExportMessage, setWorkspaceExportMessage] = useState<string | null>(null);
-  const [projectPreview, setProjectPreview] = useState<ProjectPreview | null>(null);
-  const [projectPreviewState, setProjectPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
-  const [projectPreviewMessage, setProjectPreviewMessage] = useState<string | null>(null);
-  const [workspaceAnalysis, setWorkspaceAnalysis] = useState<string | null>(null);
-  const [workspaceAnalysisState, setWorkspaceAnalysisState] = useState<'idle' | 'analyzing' | 'error'>('idle');
-  const [workspaceApprovals, setWorkspaceApprovals] = useState<WorkspaceApproval[]>([]);
-  const [workspaceActionState, setWorkspaceActionState] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [showOrchestration, setShowOrchestration] = useState<string | null>(null);
@@ -185,36 +154,6 @@ export default function PlaygroundPage() {
       return next;
     });
   }, [activeConversationId, messages, modelProfile, session?.id]);
-
-  const loadWorkspaceProjects = useCallback(async () => {
-    if (!session?.id) return;
-    setWorkspaceState('loading');
-    try {
-      const token = await getAccessToken();
-      if (!token) {
-        setWorkspaceState('idle');
-        return;
-      }
-      const response = await fetch('/api/projects', { headers: { Authorization: `Bearer ${token}` } });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !Array.isArray(data.projects)) throw new Error(data.error || 'Workspace storage is unavailable.');
-      const projects = data.projects as WorkspaceProject[];
-      setWorkspaceProjects(projects);
-      setActiveWorkspaceProjectId((current) => current && projects.some((project) => project.id === current) ? current : projects[0]?.id || null);
-      setWorkspaceError(null);
-      setWorkspaceState('idle');
-    } catch (error) {
-      // Preserve the server's safe, actionable error instead of making a
-      // signed-in user guess whether storage, authentication, or a migration
-      // is at fault.
-      setWorkspaceError(error instanceof Error ? error.message : 'Project storage is unavailable.');
-      setWorkspaceState('error');
-    }
-  }, [session?.id]);
-
-  useEffect(() => {
-    void loadWorkspaceProjects();
-  }, [loadWorkspaceProjects]);
 
   // Check usage on mount and after each query
   const checkUsage = useCallback(async () => {
@@ -386,9 +325,6 @@ export default function PlaygroundPage() {
     });
     setInput('');
     setStatus('submitted');
-    // Workspace awareness is part of the normal Playground request flow. It
-    // runs alongside chat only when the user selected a project to inspect.
-    if (activeWorkspaceProjectId) void analyzeWorkspace(userMessage.content);
     const queuedProgress: ProgressStep = { label: 'Queued request', detail: 'Preparing orchestration plan', status: 'active' };
     setProgressSteps([queuedProgress]);
     addActivity(streamingIdxRef.current, queuedProgress);
@@ -511,7 +447,7 @@ export default function PlaygroundPage() {
         streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, activeWorkspaceProjectId, modelProfile, addProgress, addActivity, analyzeWorkspace, handleMediaSend]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity, handleMediaSend]);
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
@@ -527,133 +463,6 @@ export default function PlaygroundPage() {
     setModelProfile('pro');
     setShowOrchestration(null);
   };
-
-  const createWorkspaceProject = useCallback(async () => {
-    if (!session?.id) throw new Error('Sign in to create a project.');
-    const token = await getAccessToken();
-    if (!token) throw new Error('Sign in to create a project.');
-    const response = await fetch('/api/projects', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: `Untitled project ${workspaceProjects.length + 1}`, profile: modelProfile }),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.project) throw new Error(data.error || 'Could not create a project.');
-    const project = data.project as WorkspaceProject;
-    setWorkspaceProjects((previous) => [project, ...previous]);
-    setActiveWorkspaceProjectId(project.id);
-    setWorkspaceError(null);
-    setWorkspaceState('idle');
-    return project;
-  }, [modelProfile, session?.id, workspaceProjects.length]);
-
-  const saveHtmlToWorkspace = useCallback(async (html: string) => {
-    let projectId = activeWorkspaceProjectId;
-    if (!projectId) projectId = (await createWorkspaceProject()).id;
-    const token = await getAccessToken();
-    if (!token) throw new Error('Sign in to save a project file.');
-    const response = await fetch(`/api/projects/${encodeURIComponent(projectId)}/files`, {
-      method: 'PUT',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filePath: 'index.html', language: 'html', content: html }),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.file) throw new Error(data.error || 'Could not save index.html.');
-    setActiveWorkspaceProjectId(projectId);
-    await loadWorkspaceProjects();
-    return data.file as { file_path: string };
-  }, [activeWorkspaceProjectId, createWorkspaceProject, loadWorkspaceProjects]);
-
-  const exportWorkspaceProject = useCallback(async () => {
-    if (!activeWorkspaceProjectId) return;
-    setWorkspaceExportState('exporting');
-    try {
-      const token = await getAccessToken();
-      if (!token) throw new Error('Sign in to export this project.');
-      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/export`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Project export failed.');
-      }
-      const blob = await response.blob();
-      const href = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = href;
-      anchor.download = 'temuclaude-project.zip';
-      anchor.click();
-      URL.revokeObjectURL(href);
-      setWorkspaceExportMessage(null);
-      setWorkspaceExportState('idle');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Project export failed.';
-      setWorkspaceExportMessage(/no files to export/i.test(message)
-        ? 'This project is empty. Ask TemuClaude to create a website or game, then click “Save to project” on its HTML deliverable before exporting.'
-        : message);
-      setWorkspaceExportState('error');
-    }
-  }, [activeWorkspaceProjectId]);
-
-  const runWorkspaceProject = useCallback(async () => {
-    if (!activeWorkspaceProjectId) return;
-    setProjectPreviewState('starting');
-    try {
-      const token = await getAccessToken();
-      if (!token) throw new Error('Sign in to preview this project.');
-      const response = await fetch('/api/sandbox/project-preview', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: activeWorkspaceProjectId }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data?.preview?.previewUrl) throw new Error(data?.error || 'Project preview failed.');
-      setProjectPreview(data.preview as ProjectPreview);
-      setProjectPreviewMessage(null);
-      setProjectPreviewState('idle');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Project preview failed.';
-      setProjectPreview(null);
-      setProjectPreviewMessage(/index\.html|server\.mjs/i.test(message)
-        ? 'This project has no runnable file yet. Ask TemuClaude to create a website or game, then click “Save to project” on its HTML deliverable before running it.'
-        : message);
-      setProjectPreviewState('error');
-    }
-  }, [activeWorkspaceProjectId]);
-
-  async function analyzeWorkspace(prompt: string) {
-    if (!prompt.trim() || !activeWorkspaceProjectId) return;
-    setWorkspaceAnalysisState('analyzing');
-    try {
-      const token = await getAccessToken();
-      if (!token) throw new Error('Sign in to analyse the workspace.');
-      const response = await fetch(`/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/agent`, {
-        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || typeof data?.plan?.content !== 'string') throw new Error(data?.error || 'Workspace analysis is unavailable.');
-      setWorkspaceAnalysis(data.plan.content); setWorkspaceApprovals(Array.isArray(data.actions) ? data.actions : []); setWorkspaceAnalysisState('idle');
-    } catch { setWorkspaceAnalysis('Workspace analysis could not complete. Your chat response is still available; try again after checking the OpenRouter service configuration.'); setWorkspaceAnalysisState('error'); }
-  }
-
-  const approveAndExecuteWorkspaceAction = useCallback(async (approval: WorkspaceApproval) => {
-    if (!activeWorkspaceProjectId) return;
-    setWorkspaceActionState(approval.action.id);
-    try {
-      const token = await getAccessToken();
-      if (!token) throw new Error('Sign in to approve this action.');
-      const base = `/api/projects/${encodeURIComponent(activeWorkspaceProjectId)}/actions/${encodeURIComponent(approval.action.id)}`;
-      const approvalResponse = await fetch(base, { method: 'PATCH', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ approve: true }) });
-      if (!approvalResponse.ok) throw new Error('Approval failed.');
-      const executionResponse = await fetch(`${base}/execute`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-      const data = await executionResponse.json().catch(() => ({}));
-      if (!executionResponse.ok) throw new Error(data?.error || 'Execution failed.');
-      setWorkspaceApprovals((previous) => previous.filter((item) => item.action.id !== approval.action.id));
-      setWorkspaceAnalysis((previous) => `${previous || 'Workspace analysis'}\n\n✓ Completed: ${approval.title}`);
-    } catch {
-      setWorkspaceAnalysis((previous) => `${previous || 'Workspace analysis'}\n\n⚠ Could not complete: ${approval.title}`);
-    } finally { setWorkspaceActionState(null); }
-  }, [activeWorkspaceProjectId]);
 
   const handleSelectConversation = (conversation: Conversation) => {
     if (status === 'submitted' || status === 'streaming') return;
@@ -719,57 +528,6 @@ export default function PlaygroundPage() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             New chat
           </button>
-          <div className="mt-5 flex items-center justify-between px-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">Projects</span>
-            <div className="flex items-center gap-2">
-              {activeWorkspaceProjectId && (
-                <button
-                  onClick={() => void runWorkspaceProject()}
-                  disabled={projectPreviewState === 'starting'}
-                  className="text-[10px] text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
-                  title="Run the selected project in an isolated preview"
-                >
-                  {projectPreviewState === 'starting' ? 'Starting…' : 'Run'}
-                </button>
-              )}
-              {activeWorkspaceProjectId && (
-                <button
-                  onClick={() => void exportWorkspaceProject()}
-                  disabled={workspaceExportState === 'exporting'}
-                  className="text-[10px] text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
-                  title="Download the selected project as a ZIP file"
-                >
-                  {workspaceExportState === 'exporting' ? 'Exporting…' : 'Export ZIP'}
-                </button>
-              )}
-              <button
-                onClick={() => void createWorkspaceProject().catch((error) => {
-                  setWorkspaceError(error instanceof Error ? error.message : 'Could not create a project.');
-                  setWorkspaceState('error');
-                })}
-                className="rounded-sm px-1 text-sm text-text-muted hover:text-accent-primary"
-                title="Create project"
-                aria-label="Create project"
-              >+</button>
-            </div>
-          </div>
-          <div className="mt-2 space-y-1">
-            {workspaceState === 'loading' && <p className="px-2 py-1 text-[11px] text-text-muted">Loading projects…</p>}
-            {workspaceState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{workspaceError || 'Project storage is unavailable. Chats and downloads still work.'}</p>}
-            {workspaceExportState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{workspaceExportMessage || 'This project could not be exported.'}</p>}
-            {projectPreviewState === 'error' && <p className="px-2 py-1 text-[11px] leading-relaxed text-accent-fig">{projectPreviewMessage || 'This project could not be previewed.'}</p>}
-            {workspaceState === 'idle' && workspaceProjects.length === 0 && <p className="px-2 py-1 text-[11px] text-text-muted">Save a deliverable to start a project.</p>}
-            {workspaceProjects.slice(0, 6).map((project) => (
-              <button
-                key={project.id}
-                onClick={() => setActiveWorkspaceProjectId(project.id)}
-                title={project.title}
-                className={`block w-full truncate rounded-sm px-2 py-1.5 text-left text-xs ${activeWorkspaceProjectId === project.id ? 'bg-bg-tertiary text-text-primary' : 'text-text-secondary hover:bg-bg-tertiary/60'}`}
-              >
-                {project.title}
-              </button>
-            ))}
-          </div>
           <div className="mt-5 px-2 text-[10px] font-mono uppercase tracking-wider text-text-muted">Recent chats</div>
           <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
             {visibleConversations.map((conversation) => (
@@ -804,7 +562,7 @@ export default function PlaygroundPage() {
               </div>
             ))}
           </div>
-          <p className="px-2 pt-3 text-[10px] leading-relaxed text-text-muted">Chats stay in this browser. Project files are saved to your account.</p>
+          <p className="px-2 pt-3 text-[10px] leading-relaxed text-text-muted">Chats stay in this browser.</p>
         </aside>
 
         <main className="flex-1 flex flex-col h-[calc(100vh-4rem)] bg-bg-primary" aria-label="TemuClaude Playground" id="main-content">
@@ -873,7 +631,7 @@ export default function PlaygroundPage() {
                       )}
                     </div>
 
-                    {message.role === 'assistant' && <CodeArtifact content={message.content} onSaveToWorkspace={saveHtmlToWorkspace} />}
+                    {message.role === 'assistant' && <CodeArtifact content={message.content} />}
                     {message.role === 'assistant' && message.media && <MediaOutput job={message.media} />}
 
                     {/* Orchestration summary bar */}
@@ -917,7 +675,6 @@ export default function PlaygroundPage() {
                 <p className="mb-2 text-xs text-text-muted" aria-live="polite">TemuClaude is working…</p>
               )}
               <div className="rounded-md border border-border-default bg-bg-primary shadow-[0_1px_6px_rgba(26,24,22,0.04)] focus-within:border-accent-primary">
-                {workspaceAnalysis && <div className="m-3 rounded-sm border border-accent-primary/30 bg-accent-primary/5 p-3 text-xs text-text-secondary"><strong className="text-text-primary">Hermes workspace plan</strong><pre className="mt-2 whitespace-pre-wrap font-sans">{workspaceAnalysis}</pre>{workspaceApprovals.length > 0 && <div className="mt-3 space-y-2"><p className="text-[11px] font-medium text-text-primary">Ready for your approval</p>{workspaceApprovals.map((approval) => <div key={approval.action.id} className="flex items-center justify-between gap-3 rounded-sm border border-border-subtle bg-bg-primary p-2"><span className="text-[11px] text-text-secondary">{approval.title}</span><button type="button" onClick={() => void approveAndExecuteWorkspaceAction(approval)} disabled={workspaceActionState !== null} className="btn-secondary !px-2 !py-1 text-[10px] disabled:opacity-50">{workspaceActionState === approval.action.id ? 'Running…' : 'Approve & run'}</button></div>)}</div>}<p className="mt-2 text-[11px] text-text-muted">Approved changes and commands run in an isolated workspace. Network, GitHub, browser, and production deployment access stay separately approval-gated.</p></div>}
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -936,7 +693,6 @@ export default function PlaygroundPage() {
                 <div className="flex items-center justify-between gap-3 border-t border-border-subtle px-3 py-2">
                   <span className="text-[11px] text-text-muted">Enter to send · Shift+Enter for a new line</span>
                   <div className="flex items-center gap-2">
-                    {activeWorkspaceProjectId && workspaceAnalysisState === 'analyzing' && <span className="text-[10px] text-text-muted">Analysing workspace…</span>}
                     <div className="relative">
                       <button
                         type="button"
@@ -990,20 +746,6 @@ export default function PlaygroundPage() {
           </div>
         </main>
       </div>
-      {projectPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-dark/50 p-4" role="dialog" aria-modal="true" aria-label="Project preview">
-          <div className="flex h-[min(48rem,88vh)] w-[min(72rem,96vw)] flex-col overflow-hidden rounded-sm border border-border-default bg-bg-primary shadow-xl">
-            <div className="flex items-center justify-between gap-4 border-b border-border-subtle px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-text-primary">Isolated project preview</p>
-                <p className="text-[11px] text-text-muted">{projectPreview.entrypoint === 'server' ? 'Node service' : 'Static project'} · expires {new Date(projectPreview.expiresAt).toLocaleTimeString()}</p>
-              </div>
-              <button onClick={() => setProjectPreview(null)} className="text-xs text-text-secondary hover:text-text-primary" aria-label="Close project preview">Close</button>
-            </div>
-            <iframe title="Isolated project preview" src={projectPreview.previewUrl} sandbox="allow-scripts" referrerPolicy="no-referrer" className="min-h-0 flex-1 bg-white" />
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -1144,12 +886,10 @@ function AgentActivity({
   );
 }
 
-function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveToWorkspace: (html: string) => Promise<{ file_path: string }> }) {
+function CodeArtifact({ content }: { content: string }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
-  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [saveError, setSaveError] = useState<string | null>(null);
   const html = extractHtmlArtifact(content);
   if (!html) return null;
 
@@ -1190,18 +930,6 @@ function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveT
       setIsolatedPreviewState('error');
     }
   };
-  const saveToWorkspace = async () => {
-    setSaveState('saving');
-    try {
-      await onSaveToWorkspace(html);
-      setSaveError(null);
-      setSaveState('saved');
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'This file could not be saved to the selected project.');
-      setSaveState('error');
-    }
-  };
-
   return (
     <div className="mt-3 border-t border-border-subtle pt-3 text-xs">
       <div className="flex items-center gap-2">
@@ -1214,15 +942,9 @@ function CodeArtifact({ content, onSaveToWorkspace }: { content: string; onSaveT
         </button>
         <button onClick={copy} className="text-text-secondary hover:text-text-primary">Copy</button>
         <button onClick={download} className="text-text-secondary hover:text-text-primary">Download .html</button>
-        <button onClick={saveToWorkspace} disabled={saveState === 'saving' || saveState === 'saved'} className="text-text-secondary hover:text-text-primary disabled:opacity-50">
-          {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved to project' : 'Save to project'}
-        </button>
       </div>
       {isolatedPreviewState === 'error' && (
         <p className="mt-2 text-xs text-accent-fig">The isolated preview could not start. The downloadable HTML is still available.</p>
-      )}
-      {saveState === 'error' && (
-        <p className="mt-2 text-xs text-accent-fig">{saveError || 'This file could not be saved to the selected project.'} Your download is still available.</p>
       )}
       {previewOpen && (
         <div className="mt-3 overflow-hidden rounded-sm border border-border-default bg-white">

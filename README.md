@@ -17,31 +17,50 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-sp
 - **Benchmarks**: https://temuclaude.com/benchmarks
 - **Models**: https://temuclaude.com/models
 
+## Use with Hermes Agent
+
+TemuClaude exposes an authenticated OpenAI-compatible Chat Completions endpoint:
+
+```text
+Base URL: https://temuclaude.com/v1
+Model: temuclaude
+```
+
+Generate a `tmc_...` API key from the TemuClaude dashboard, then configure
+Hermes with `hermes model` → **Custom endpoint** using that base URL, key, and
+model name. Hermes supplies the agent tools and workspace; TemuClaude supplies
+the routed model response. Keep API keys in a local secret store and validate
+streaming/tool-call compatibility before using the endpoint for autonomous
+production actions.
+
 ## Updated Model Stack + Step Router
 
-TemuClaude uses eight active *roles*, not an always-on eight-model ensemble.
-The router begins on the least-expensive model expected to succeed and only
-adds specialists after uncertainty, verifier failure, or a clear modality need.
+TemuClaude Pro is **quality-first**: complex or generative work uses a
+task-specific specialist panel, synthesis, and independent verification before
+delivery. It does not silently substitute a cheap draft to protect margin.
+TemuClaude Lite and the explicit `max_savings` API profile are the only
+cost-bounded routes.
 
 | Model | Role | Route policy |
 |-------|------|--------------|
-| DeepSeek V4 Flash | High-volume worker | Default for simple drafting, extraction, and low-risk steps |
+| DeepSeek V4 Flash | Lite worker | Explicit Lite and savings routes only |
 | DeepSeek V4 Pro | Reasoning specialist | Math, technical analysis, and difficult code reasoning |
 | GLM-5.2 | Planner + aggregator | Long-horizon planning, orchestration, and synthesis |
-| MiniMax M3 | Budget multimodal | Image/video, UI, and long-context work |
-| Gemini 3.5 Flash | Premium multimodal | Only when its tools/UI-control capability has expected value |
-| GPT-5.6 Luna | Closed-model escalation | Only after a hard response fails the QA gate |
-| Grok 4.5 | Coding-agent escalation | Targeted repair for difficult coding-agent work |
-| Nemotron 3 Ultra | Independent verifier | Conditional QA and verification, never an always-on panel member |
+| Kimi K2.6 | UI/UX implementation specialist | Coding-driven interfaces, interaction state, and multi-agent implementation |
+| MiniMax M3 | Multimodal + long-context specialist | Image/video understanding, creative/product review, and long-context work |
+| Gemini 3.5 Flash | Visual UI specialist | Screen interaction, accessibility, multimodal, and tool-aware review |
+| GPT-5.6 Luna | Fast GPT-family worker | Independent proposal, tool opportunities, and consensus-diversity review |
+| GPT-5.6 Sol | Frontier adjudicator | Complex professional reasoning/coding and low-score correction |
+| Grok 4.5 | Coding-agent critic + repair | Participates in every nontrivial Pro panel and targeted code repair |
+| Nemotron 3 Ultra | Independent verifier | Quality gate and panel critic for complex Pro work |
 
 GPT-5.6 Terra is a disabled emergency fallback. It needs both approved API
-access and `TEMUCLAUDE_ENABLE_TERRA_FALLBACK=true`; GPT-5.6 Sol is excluded.
-Kimi K2.6 and legacy models remain compatibility fallbacks while they are
-evaluated against this stack.
+access and `TEMUCLAUDE_ENABLE_TERRA_FALLBACK=true`. Sol is the normal frontier
+adjudicator; Luna remains a distinct, faster GPT-family panel worker.
 
 Runtime selection is no longer only whole-query routing. TemuClaude records per-step telemetry for search, verification, consistency, QA gates, debate, post-processing, and formal verification, then uses observed success/cost/progress signals to recommend better step-level model choices when enough evidence exists.
 
-The active budget controller now runs in shadow mode. It records recommended actions (`continue`, `verify`, `debate`, `stop`, `escalate`, `cheap_draft`) alongside cost risk and PRM/verifier state, but runtime gates stay disabled until the benchmark-promotion gate proves quality non-regression and cost savings.
+The active budget controller now runs in shadow mode. It records recommended actions (`continue`, `verify`, `debate`, `stop`, `escalate`, `cheap_draft`) alongside cost risk and PRM/verifier state, but runtime gates stay disabled until the benchmark-promotion gate proves quality non-regression. Cost remains a secondary diagnostic, not a reason to reduce Pro quality.
 
 ## Pricing
 
@@ -67,11 +86,12 @@ authenticated usage controls with a stricter cost boundary:
 | Default worker | DeepSeek V4 Flash | Routine queries and first-pass drafting |
 | Hard reasoning | Qwen 3.7 Plus | Math, structured reasoning, and agentic work |
 | Multimodal / agent specialist | Qwen 3.7 Plus | Long-context, UI, vision, coding, and agent tasks |
-| Independent critic | Nemotron 3 Ultra | High-risk, explicit-verification, or 2% hard-task audit sample only |
+| Independent critic | Nemotron 3 Ultra | Every nontrivial result, plus high-risk or sampled trivial requests |
 
-Lite is a cost-bounded cascade, not a four-model ensemble. It makes one
-primary call, permits one same-profile availability fallback, and allows a
-single verifier/corrective pass only when the risk gate fires. The target mix
+Lite is a bounded quality ensemble for nontrivial work: two complementary
+drafts run in parallel, Qwen synthesizes them, and Nemotron independently
+verifies the result before an optional correction. Trivial requests retain a
+single-model quality floor. The target mix
 projects about **$0.113/M input** and **$0.371/M output** before provider
 discounts, caching, and prompt-token variation. It must not be marketed as a
 universal replacement for frontier systems; its quality/cost claim is subject
@@ -82,7 +102,8 @@ to the same benchmark-promotion gate as Pro.
 | Model | Input $/1M | Output $/1M | vs TemuClaude |
 |-------|-----------|------------|-------------|
 | Claude Fable 5 | $10.00 | $50.00 | Peak single-model reference |
-| GPT-5.6 Luna | $1.00 | $6.00 | General escalation candidate |
+| GPT-5.6 Luna | $1.00 | $6.00 | Fast independent GPT worker |
+| GPT-5.6 Sol | $5.00 | $30.00 | Frontier adjudicator |
 | Grok 4.5 | $2.00 | $6.00 | Coding-agent escalation candidate |
 | Gemini 3.5 Flash | $1.50 | $9.00 | Premium multimodal candidate |
 | GLM-5.2 | $0.54 | $1.76 | Open planning/synthesis route |
@@ -107,7 +128,7 @@ Shadow Active Budget Controller
 ┌──────────────────────────────────────────┐
 │  SIMPLE          → DeepSeek V4 Flash     │
 │  SPECIALIST      → DeepSeek Pro / GLM / M3│
-│  PREMIUM         → Gemini / Grok / Luna  │
+│  PREMIUM         → Sol / Gemini / Grok / Kimi │
 │  EMERGENCY       → Terra (explicit opt-in)│
 └──────────────────────────────────────────┘
     ↓
@@ -121,7 +142,7 @@ Shadow Active Budget Controller
 7. s1 budget forcing (extend short responses)
 8. Step-level code verification (rStar-Math)
 9. Z3/SMT logical verification
-10. Luna escalation after failed QA; Terra only as an explicit emergency fallback
+10. Sol frontier escalation after failed QA; Terra only as an explicit emergency fallback
     ↓
 Final Answer + Budget/Progress/Failure/Controller Telemetry
 ```
@@ -183,7 +204,7 @@ temuclaude/
 ## Status
 
 - **Website**: Live at temuclaude.com
-- **Models**: eight active routing roles; premium routes are shadow/promotion-gated
+- **Models**: ten active routing roles; nontrivial Pro work uses the full available specialist panel
 - **Legal**: Terms, Privacy, Refunds all live
 - **Email**: OTP, support, welcome, billing, security, marketing, and inbound webhook mail via configurable provider
 - **Build**: Passing

@@ -162,10 +162,11 @@ def test_model_pool():
         else:
             passed += 1
 
-    # Check fusion panel has 5 models
-    if len(FUSION_PANEL) != 5:
+    # Quality-first Pro keeps every active capability role in the default
+    # fusion registry. Lite and max_savings own the bounded-cost policy.
+    if len(FUSION_PANEL) != 9:
         failed += 1
-        failures.append(f"Fusion panel should have 5 models, has {len(FUSION_PANEL)}")
+        failures.append(f"Fusion panel should have 9 models, has {len(FUSION_PANEL)}")
     else:
         passed += 1
 

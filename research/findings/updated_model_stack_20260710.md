@@ -2,6 +2,12 @@
 
 Generated: 2026-07-10
 
+> Superseded on 2026-07-16 by
+> `QUALITY_FIRST_ORCHESTRATION_PLAN_20260716.md`. Fresh provider evidence and
+> live OpenRouter availability moved Sol into frontier adjudication, Luna into
+> fast independent GPT work, and Kimi into coding-driven UI/UX. This file is
+> retained as historical decision evidence, not the current runtime contract.
+
 ## Decision
 
 Promote an eight-role *candidate* stack to shadow-capable routing. Do not make

@@ -202,20 +202,21 @@ def test_env_example():
 
 
 # ============================================================
-# TEST 8: Dockerfile Uses Auto-Detect Config
+# TEST 8: Dockerfile Uses Fly API Entrypoint
 # ============================================================
 def test_dockerfile_config():
-    """Test that Dockerfile references the correct config."""
-    print("\n=== DOCKERFILE CONFIG TESTS ===")
+    """Test that Dockerfile starts the authenticated FastAPI service."""
+    print("\n=== DOCKERFILE API TESTS ===")
     
     dockerfile_path = os.path.join(os.path.dirname(__file__), "..", "Dockerfile")
     with open(dockerfile_path) as f:
         content = f.read()
     
-    if "config/litellm.yaml" not in content:
-        _fail("Dockerfile doesn't reference litellm.yaml")
-    
-    print(f"  OK: Dockerfile uses config/litellm.yaml (auto-detect)")
+    for required in ("api_server.py", "start.sh", "8080"):
+        if required not in content:
+            _fail(f"Dockerfile doesn't reference {required}")
+
+    print(f"  OK: Dockerfile uses the Fly API entrypoint")
     print(f"  1/1 passed")
 
 

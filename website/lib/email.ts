@@ -458,7 +458,7 @@ export async function sendWelcomeEmail(
       <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0;">
         <p style="color: #0f172a; font-size: 16px;">Hi ${name},</p>
         <p style="color: #475569; line-height: 1.6;">
-          You now have access to 8 AI models working together behind one API.
+          You now have access to ten capability-specific AI model roles working together behind one API.
           Every question you ask gets routed, fused, verified, and quality-checked — 
           automatically. You never pick models. TemuClaude does it for you.
         </p>

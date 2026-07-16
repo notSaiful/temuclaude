@@ -494,7 +494,7 @@ class Temuclaude:
 
         # Inject Quiet-STaR implicit thought directive for thinker models
         thinker_models = [
-            "glm-5.2", "deepseek-v4-pro", "gpt-5.6-luna", "gpt-5.6-terra", "grok-4.5",
+            "glm-5.2", "deepseek-v4-pro", "gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "grok-4.5",
             "llama-3.3-70b-instruct", "claude-3.5-sonnet",
             "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2512", "anthropic/claude-sonnet-4.6"
         ]
@@ -549,7 +549,16 @@ class Temuclaude:
                 ollama_tag = OPENROUTER_MODELS.get(model, model)
             api_key = os.environ.get("OPENROUTER_API_KEY", "")
             request_client = self.client
-            request_kwargs = {"extra_body": {"provider": {"allow_fallbacks": True}}}
+            request_kwargs = {
+                "extra_body": {
+                    "provider": {
+                        "allow_fallbacks": True,
+                        "require_parameters": True,
+                        "sort": "throughput",
+                        "quantizations": ["bf16", "fp16", "fp8"],
+                    }
+                }
+            }
         else:
             # Ollama: use :cloud suffix
             ollama_tag = MODEL_POOL.get(model, CHEAP_MODELS.get(model, {})).get("ollama_tag", model)
@@ -559,14 +568,28 @@ class Temuclaude:
         
         for attempt in range(2):  # 1 retry max
             try:
+                attempt_kwargs = request_kwargs
+                if attempt == 1 and _USE_OPENROUTER and request_kwargs:
+                    # Preserve the exact approved model but relax only the
+                    # endpoint precision filter when no strict endpoint is
+                    # currently routable. This prevents a quality preference
+                    # from becoming a connection outage.
+                    provider = dict(request_kwargs["extra_body"]["provider"])
+                    provider.pop("quantizations", None)
+                    attempt_kwargs = {"extra_body": {"provider": provider}}
+                completion_kwargs = {
+                    "model": ollama_tag,
+                    "messages": messages_copy,
+                    "max_tokens": max_tokens,
+                    **attempt_kwargs,
+                }
+                # OpenAI GPT-5.6 Luna/Sol/Terra endpoints do not advertise a
+                # temperature parameter. Combined with require_parameters,
+                # sending it makes all healthy OpenRouter endpoints ineligible.
+                if not model.startswith("gpt-5.6-") and not str(ollama_tag).startswith("openai/gpt-5.6-"):
+                    completion_kwargs["temperature"] = temperature
                 response = await asyncio.wait_for(
-                    request_client.chat.completions.create(
-                        model=ollama_tag,
-                        messages=messages_copy,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                        **request_kwargs,
-                    ),
+                    request_client.chat.completions.create(**completion_kwargs),
                     timeout=timeout,
                 )
                 content = self._extract_model_content(response.choices[0].message)
@@ -776,7 +799,7 @@ class Temuclaude:
             candidate = get_runtime_model(candidate)
             if candidate != model and candidate not in fallbacks:
                 fallbacks.append(candidate)
-        for candidate in ["glm-5.2", "deepseek-v4-pro", "deepseek-v4-flash", "minimax-m3"]:
+        for candidate in ["glm-5.2", "deepseek-v4-pro", "minimax-m3", "nemotron-3-ultra"]:
             candidate = get_runtime_model(candidate)
             if candidate != model and candidate not in fallbacks:
                 fallbacks.append(candidate)
@@ -850,7 +873,7 @@ class Temuclaude:
         tier: str,
         start_time: float,
     ) -> str:
-        """Bounded Lite route: primary, availability fallback, optional verifier."""
+        """Bounded Lite route with parallel drafts, synthesis, and verification."""
         policy = get_model_profile(LITE_PROFILE)
         if len(query) > policy.max_input_tokens * 4:
             return f"[ERROR: TemuClaude Lite supports up to {policy.max_input_tokens:,} input tokens]"
@@ -863,9 +886,42 @@ class Temuclaude:
             {"role": "user", "content": query},
         ]
         track_skill_usage(task_type)
-        answer = await self.call_lite_model(model, messages, max_tokens=token_budget)
-        models_used = [model]
-        strategy = "lite_primary"
+        use_panel = tier != "trivial"
+        complement = "qwen3.7-plus" if model == "deepseek-v4-flash" else "deepseek-v4-flash"
+        if use_panel:
+            primary_messages = [
+                {"role": "system", "content": prompt + "\nOwn the main task-specific solution. Be complete and do not rush the ending."},
+                {"role": "user", "content": query},
+            ]
+            complement_messages = [
+                {"role": "system", "content": prompt + "\nIndependently solve the task. Focus on omissions, edge cases, and a different approach."},
+                {"role": "user", "content": query},
+            ]
+            primary_answer, complement_answer = await asyncio.gather(
+                self.call_lite_model(model, primary_messages, max_tokens=token_budget),
+                self.call_lite_model(complement, complement_messages, max_tokens=token_budget),
+            )
+            models_used = [model, complement]
+            answer = primary_answer if not primary_answer.startswith("[ERROR") else complement_answer
+            strategy = "lite_parallel_specialists"
+            if not primary_answer.startswith("[ERROR") and not complement_answer.startswith("[ERROR"):
+                synthesis_messages = [
+                    {
+                        "role": "system",
+                        "content": "Synthesize the strongest complete answer from two independent drafts. Resolve contradictions, preserve working detail, and return only the final answer.",
+                    },
+                    {"role": "user", "content": f"Request:\n{query}\n\nDraft A:\n{primary_answer}\n\nDraft B:\n{complement_answer}"},
+                ]
+                synthesis_model = "qwen3.7-plus"
+                synthesis = await self.call_lite_model(synthesis_model, synthesis_messages, max_tokens=token_budget)
+                models_used.append(synthesis_model)
+                if not synthesis.startswith("[ERROR"):
+                    answer = synthesis
+                    strategy += "+synthesis"
+        else:
+            answer = await self.call_lite_model(model, messages, max_tokens=token_budget)
+            models_used = [model]
+            strategy = "lite_quality_floor"
 
         if answer.startswith("[ERROR"):
             for fallback in get_profile_fallbacks(LITE_PROFILE, model):
@@ -982,7 +1038,7 @@ class Temuclaude:
         self,
         query: str,
         system_prompt: str = None,
-        budget_profile: str = "balanced",
+        budget_profile: str = "max_quality",
         model_profile: str = "pro",
     ) -> str:
         """
@@ -1074,11 +1130,12 @@ class Temuclaude:
             )
             return ui_result
 
-        # Apply cost-quality budget profile constraints
+        # Pro is quality-first by default.  Savings is an explicit opt-in; the
+        # historical "balanced" value is retained as a compatibility alias for
+        # the quality route so callers cannot silently receive a cheap draft.
         n_samples = None
-        if budget_profile == "max_quality":
-            if tier != "trivial":
-                tier = "hard"
+        if budget_profile in ("max_quality", "balanced"):
+            tier = "hard"
             token_budget = 8192
             n_samples = 10
         elif budget_profile == "max_savings":
@@ -1217,7 +1274,7 @@ class Temuclaude:
                 moa_layers = 3 if budget_profile == "max_quality" else 2
                 fusion_result = await fuse(
                     query, task_type, self.call_model_with_fallback,
-                    max_tokens=token_budget, moa_layers=moa_layers
+                    panel_size=9, max_tokens=token_budget, moa_layers=moa_layers
                 )
                 answer = fusion_result["answer"]
                 models_used = fusion_result["panel"] + [fusion_result["aggregator"]]
@@ -1282,7 +1339,7 @@ class Temuclaude:
                 strategy += "+usva_qa_passed"
             elif qa_result["attempts"] > 1:
                 escalation_model, _, _ = get_model_for_step(task_type, tier, "premium_escalation")
-                if escalation_model == "gpt-5.6-luna":
+                if escalation_model == "gpt-5.6-sol":
                     escalation_messages = [
                         {"role": "system", "content": "You are a senior verifier. Correct the candidate answer using the original request. Return only a precise, final answer."},
                         {"role": "user", "content": f"Original request:\n{query}\n\nCandidate answer that failed QA:\n{answer}"},
@@ -1293,9 +1350,9 @@ class Temuclaude:
                     if not escalated.startswith("[ERROR"):
                         answer = escalated
                         models_used.append(escalation_model)
-                        strategy += "+luna_quality_escalation"
+                        strategy += "+sol_frontier_escalation"
                     else:
-                        strategy += "+luna_escalation_failed"
+                        strategy += "+sol_escalation_failed"
                 else:
                     debate_result = await multi_agent_debate(
                         query, self.call_model_with_fallback,

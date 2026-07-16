@@ -18,7 +18,7 @@ def test_lite_profile_is_a_strict_four_model_pool():
         "qwen3.7-plus",
         "nemotron-3-ultra",
     )
-    assert LITE_MODEL_PROFILE.max_model_calls == 3
+    assert LITE_MODEL_PROFILE.max_model_calls == 5
     assert LITE_MODEL_PROFILE.verifier_sample_rate == 0.02
 
 

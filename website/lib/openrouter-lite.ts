@@ -16,6 +16,7 @@ export type LiteOpenRouterResult = {
   model: string;
   promptTokens: number;
   completionTokens: number;
+  finishReason?: string;
   /** Provider-reported successful request cost, when available. */
   cost?: number;
   status?: number;
@@ -118,26 +119,32 @@ export async function callOpenRouterLite(
         stream: false,
         ...(options.sessionId ? { session_id: options.sessionId.slice(0, 256) } : {}),
       }),
-      signal: AbortSignal.timeout(Math.min(options.timeoutMs ?? 12_000, 20_000)),
+      signal: AbortSignal.timeout(Math.min(options.timeoutMs ?? 30_000, 120_000)),
     });
 
     const data = await response.json().catch(() => ({}));
     const content = extractText(data?.choices?.[0]?.message);
     const usage = data?.usage || {};
     const actualModel = typeof data?.model === 'string' ? data.model : model;
+    const finishReason = typeof data?.choices?.[0]?.finish_reason === 'string'
+      ? data.choices[0].finish_reason
+      : '';
 
-    if (!response.ok || !content || !isApprovedOpenRouterModel(model, actualModel)) {
+    if (!response.ok || !content || finishReason === 'length' || !isApprovedOpenRouterModel(model, actualModel)) {
       return {
         success: false,
         content: '',
         model: actualModel,
         promptTokens: Number(usage.prompt_tokens) || 0,
         completionTokens: Number(usage.completion_tokens) || 0,
+        finishReason,
         cost: Number(usage.cost) || 0,
         status: response.status,
         error: !isApprovedOpenRouterModel(model, actualModel)
           ? `OpenRouter returned unapproved model ${actualModel} for TemuClaude Lite`
-          : data?.error?.message || data?.message || (content ? response.statusText : 'OpenRouter returned an empty message'),
+          : finishReason === 'length'
+            ? 'OpenRouter response reached the Lite output limit before completion'
+            : data?.error?.message || data?.message || (content ? response.statusText : 'OpenRouter returned an empty message'),
       };
     }
 
@@ -147,6 +154,7 @@ export async function callOpenRouterLite(
       model: actualModel,
       promptTokens: Number(usage.prompt_tokens) || 0,
       completionTokens: Number(usage.completion_tokens) || 0,
+      finishReason,
       cost: Number(usage.cost) || 0,
     };
   } catch (error) {

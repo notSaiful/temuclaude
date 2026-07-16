@@ -8,8 +8,8 @@ from typing import Optional
 
 
 DEFAULT_THRESHOLDS = {
-    "max_quality_drop": 0.02,
-    "min_cost_reduction": 0.15,
+    "max_quality_drop": 0.0,
+    "min_cost_reduction": 0.0,
     "max_latency_increase": 0.10,
     "max_failure_rate_increase": 0.01,
 }

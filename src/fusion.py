@@ -28,8 +28,10 @@ from .models import (
 )
 
 
-# Configurable panel size (3 for Ollama Pro, 5 for Ollama Max)
-DEFAULT_PANEL_SIZE = 3
+# Pro is quality-first. Every active capability role participates when its
+# provider is available; explicit smaller panels remain possible for Lite or
+# deliberately economical callers.
+DEFAULT_PANEL_SIZE = 9
 
 # A third cross-review layer doubles panel calls. Keep the default at two
 # layers; callers can explicitly request three only for a benchmarked premium
@@ -47,19 +49,18 @@ def get_panel(task_type: str, panel_size: int = DEFAULT_PANEL_SIZE) -> list:
     For creative: prioritize MiniMax
     For agentic: prioritize GLM-5.2
     """
-    # Keep ordinary fusion to diverse, proven open routes.  Premium models are
-    # deliberately absent here: Grok is a conditional repair model and Gemini
-    # is a visual-review model.  Adding either to every hard request whenever a
-    # key is present quietly defeats the cost-aware cascade.
+    # Put the task specialist first so small explicit panels still honor the
+    # documented routing contract. Quality-first Pro uses the full panel, where
+    # frontier reviewers complement rather than displace that specialist.
     priority_map = {
-        "math": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
-        "coding": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
-        "knowledge": ["glm-5.2", "deepseek-v4-pro", "deepseek-v4-flash"],
-        "reasoning": ["deepseek-v4-pro", "glm-5.2", "nemotron-3-ultra"],
-        "creative": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
-        "agentic": ["glm-5.2", "deepseek-v4-pro", "nemotron-3-ultra"],
-        "vision": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
-        "ui_ux": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
+        "math": ["deepseek-v4-pro", "gpt-5.6-sol", "glm-5.2", "nemotron-3-ultra", "gpt-5.6-luna", "gemini-3.5-flash", "grok-4.5", "kimi-k2.6", "minimax-m3"],
+        "coding": ["deepseek-v4-pro", "grok-4.5", "gpt-5.6-sol", "kimi-k2.6", "glm-5.2", "gpt-5.6-luna", "gemini-3.5-flash", "minimax-m3", "nemotron-3-ultra"],
+        "knowledge": ["glm-5.2", "gpt-5.6-sol", "gpt-5.6-luna", "gemini-3.5-flash", "deepseek-v4-pro", "grok-4.5", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"],
+        "reasoning": ["deepseek-v4-pro", "gpt-5.6-sol", "glm-5.2", "nemotron-3-ultra", "grok-4.5", "gpt-5.6-luna", "gemini-3.5-flash", "kimi-k2.6", "minimax-m3"],
+        "creative": ["minimax-m3", "gpt-5.6-sol", "gemini-3.5-flash", "kimi-k2.6", "glm-5.2", "gpt-5.6-luna", "deepseek-v4-pro", "grok-4.5", "nemotron-3-ultra"],
+        "agentic": ["glm-5.2", "gpt-5.6-sol", "grok-4.5", "gemini-3.5-flash", "kimi-k2.6", "deepseek-v4-pro", "gpt-5.6-luna", "minimax-m3", "nemotron-3-ultra"],
+        "vision": ["gemini-3.5-flash", "minimax-m3", "gpt-5.6-sol", "kimi-k2.6", "gpt-5.6-luna", "glm-5.2", "deepseek-v4-pro", "grok-4.5", "nemotron-3-ultra"],
+        "ui_ux": ["gemini-3.5-flash", "kimi-k2.6", "minimax-m3", "grok-4.5", "gpt-5.6-sol", "glm-5.2", "gpt-5.6-luna", "deepseek-v4-pro", "nemotron-3-ultra"],
     }
 
     resolved = []
@@ -81,6 +82,35 @@ def get_aggregator(task_type: str) -> str:
     return AGGREGATOR_MAP.get(task_type, AGGREGATOR_MAP["default"])
 
 
+SPECIALIST_ROLE_PROMPTS = {
+    "glm-5.2": "Act as the long-horizon planner and project-level software engineering coordinator. Decompose dependencies and edge cases, then produce synthesis-ready conclusions.",
+    "deepseek-v4-pro": "Act as the math, STEM, coding, and rigorous reasoning specialist. Derive and check the hard technical core and surface concrete correctness risks.",
+    "kimi-k2.6": "Act as the coding-driven UI/UX and multi-agent implementation specialist. Focus on complete interfaces, interaction flows, state handling, and production-ready implementation details.",
+    "minimax-m3": "Act as the multimodal, long-context, creative, and product specialist. Check visual coherence, source-wide consistency, product completeness, and alternative designs.",
+    "gemini-3.5-flash": "Act as the visual UI, accessibility, multimodal, and tool-use reviewer. Focus on screen interaction, responsive behavior, accessibility, and evidence visible in images or structured artifacts.",
+    "gpt-5.6-luna": "Act as a fast independent GPT-family proposer. Look for a distinct solution path, useful tools, and omissions in the likely consensus.",
+    "gpt-5.6-sol": "Act as the frontier adjudicator for complex professional work. Produce the strongest independent solution and identify where weaker proposals are likely to fail.",
+    "grok-4.5": "Act as the coding-agent and repair specialist. Hunt bugs, unsafe assumptions, integration failures, missing tests, and concrete fixes.",
+    "nemotron-3-ultra": "Act as the independent verifier for reasoning, code, long-context, and high-stakes claims. Try to falsify the proposed answer and provide checkable corrections.",
+}
+
+
+def build_specialist_messages(question: str, model: str, task_type: str) -> list:
+    """Create a role-bounded proposal prompt for one panel member."""
+    role = SPECIALIST_ROLE_PROMPTS.get(model, "Provide an independent, rigorous solution.")
+    return [
+        {
+            "role": "system",
+            "content": (
+                "You are one specialist in TemuClaude's quality-first panel. "
+                f"Task class: {task_type}. {role} "
+                "Answer the task directly, state uncertainty, and do not imitate other roles."
+            ),
+        },
+        {"role": "user", "content": question},
+    ]
+
+
 def build_fusion_prompt(question: str, responses: dict, panel_models: list, task_type: str = "default") -> list:
     """Build the synthesis prompt for the aggregator model.
     
@@ -97,6 +127,9 @@ def build_fusion_prompt(question: str, responses: dict, panel_models: list, task
         "gemini-3.5-flash": "Model E (Gemini 3.5 Flash)",
         "grok-4.5": "Model F (Grok 4.5)",
         "nemotron-3-ultra": "Model G (Nemotron 3 Ultra)",
+        "gpt-5.6-luna": "Model H (GPT-5.6 Luna)",
+        "gpt-5.6-sol": "Model I (GPT-5.6 Sol)",
+        "kimi-k2.6": "Model J (Kimi K2.6)",
     }
 
     response_text = ""
@@ -152,6 +185,9 @@ def build_cross_review_prompt(question: str, model_name: str, all_responses: dic
         "gemini-3.5-flash": "Gemini 3.5 Flash",
         "grok-4.5": "Grok 4.5",
         "nemotron-3-ultra": "Nemotron 3 Ultra",
+        "gpt-5.6-luna": "GPT-5.6 Luna",
+        "gpt-5.6-sol": "GPT-5.6 Sol",
+        "kimi-k2.6": "Kimi K2.6",
     }
     
     other_responses = ""
@@ -222,14 +258,15 @@ async def fuse(
     panel = get_panel(task_type, panel_size)
     aggregator = get_aggregator(task_type)
 
-    # Build messages for each panel model
-    messages = [
-        {"role": "system", "content": f"You are Temuclaude, a helpful AI assistant. Answer the following question thoroughly and accurately."},
-        {"role": "user", "content": question},
-    ]
-
     # Layer 1: Call all panel models in parallel
-    tasks = [call_model_func(model, messages, max_tokens=max_tokens) for model in panel]
+    tasks = [
+        call_model_func(
+            model,
+            build_specialist_messages(question, model, task_type),
+            max_tokens=max_tokens,
+        )
+        for model in panel
+    ]
     responses_list = await asyncio.gather(*tasks)
 
     # Map responses to model names
