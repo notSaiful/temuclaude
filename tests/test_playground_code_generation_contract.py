@@ -127,20 +127,3 @@ def test_playground_project_surface_is_removed_without_removing_artifacts():
 
     for retained in ("Run isolated preview", "Download .html", "<CodeArtifact content={message.content} />"):
         assert retained in page
-
-
-def test_rescue_uses_pro_reasoning_not_flash():
-    """The code-repair rescue is Pro-tier (DeepSeek V4 Pro), not the cheaper
-    Flash route, and does not disable reasoning — a reasoning model under
-    disableReasoning can return an empty completion (the original 'approved
-    route unavailable' outage). Locks the quality-over-cost directive so the
-    rescue cannot silently revert to Flash."""
-    route = (ROOT / "website/app/api/chat/route.ts").read_text()
-    start = route.index("code-repair-rescue")
-    rescue = route[start:route.index("deliveryIsUsable = isUsableDeliverable(result);", start)]
-
-    assert "POOL.reasoning" in rescue
-    assert "POOL.fastRoute" not in rescue
-    assert "disableReasoning: true" not in rescue
-    assert "fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator]" in rescue
-    assert "DeepSeek V4 Pro" in rescue

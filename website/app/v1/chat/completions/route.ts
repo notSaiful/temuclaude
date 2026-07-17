@@ -29,7 +29,7 @@
  * Timeout: bounded quality pipeline → frontier-first rescue
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'crypto';
+import { createHash, timingSafeEqual } from 'crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { validateApiKeyAsync, getMonthUsageAsync, getTodayUsageAsync, incrementUsageAsync, getRollingWindowUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS } from '@/lib/plans';
@@ -585,21 +585,22 @@ async function orchestrate(messages: Msg[], temp: number, maxTok: number) {
   return { content: final, tokens, tier: 'hard', time: Date.now() - start };
 }
 
+// Constant-time secret comparison (avoids a timing side-channel on the master
+// key check). crypto.timingSafeEqual throws on length mismatch, so guard first.
+function constantTimeEqual(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
+}
+
 export async function POST(request: NextRequest) {
   return modelActivityStore.run([], async () => {
   try {
-    const body = await request.json();
-    const { model, messages, temperature, max_tokens } = body;
-    const wantsStream = body.stream === true;
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: { message: 'messages array is required', type: 'invalid_request_error' } },
-        { status: 400 }
-      );
-    }
-
     // ── Auth & Usage ──────────────────────────────────────
+    // Authenticate before parsing the body so an unauthenticated request gets
+    // 401 (not a body-validation 400 that reveals parsing ran). The master-key
+    // comparison is constant-time; the DB key path is the customer's secret.
     // 1. Try API key (Bearer token or x-api-key header)
     const apiKey = request.headers.get('authorization')?.replace('Bearer ', '') ||
                    request.headers.get('x-api-key') || '';
@@ -612,7 +613,7 @@ export async function POST(request: NextRequest) {
 
     if (apiKey) {
       // Check master key first (for evaluation platforms — AA, LMSys, LiveBench, etc.)
-      if (masterKey && apiKey === masterKey) {
+      if (masterKey && constantTimeEqual(apiKey, masterKey)) {
         isEvalMode = true;
       } else {
         // Validate against DB
@@ -665,11 +666,112 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // ── Body parse & validation (after auth) ──────────────
+    const body = await request.json();
+    const { model, messages, temperature, max_tokens } = body;
+    const wantsStream = body.stream === true;
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json(
+        { error: { message: 'messages array is required', type: 'invalid_request_error' } },
+        { status: 400 }
+      );
+    }
+
     if (!isLiteModel(model) && !isProModel(model)) {
       return NextResponse.json(
         { error: { message: 'Unsupported model. Use temuclaude/temuclaude-pro or temuclaude/temuclaude-lite.', type: 'invalid_request_error' } },
         { status: 400 },
       );
+    }
+
+    // ── Layer 1: Pro orchestration proxy to the Fly Python engine ──────────
+    // When TEMUCLAUDE_ENGINE_URL is configured, Pro completions are served by
+    // the real 10-layer Python orchestrator on Fly (api_server.py) instead of
+    // the in-process TS MoA pipeline below. Lite stays on the bounded Vercel
+    // cascade (its own cost contract). The flag is opt-in: with
+    // TEMUCLAUDE_ENGINE_URL unset, behavior is unchanged. On any engine failure
+    // we fall back to a single fast GLM call — never the full ~210s MoA — so a
+    // Fly hiccup degrades gracefully instead of 504'ing.
+    const engineUrl = process.env.TEMUCLAUDE_ENGINE_URL;
+    const engineKey = process.env.TEMUCLAUDE_ENGINE_API_KEY;
+    if (engineUrl && engineKey && isProModel(model) && !isLiteModel(model)) {
+      const engineBody = {
+        model: 'temuclaude',
+        messages,
+        temperature: temperature ?? 0.6,
+        max_tokens: Math.min(Number(max_tokens) || 2048, 8192),
+        model_profile: 'pro',
+        budget_profile: 'max_quality',
+      };
+      const requestId = request.headers.get('x-request-id') || `v1-pro-${Date.now()}`;
+      try {
+        const controller = new AbortController();
+        const engineTimeout = setTimeout(() => controller.abort(), 280_000);
+        const upstream = await fetch(`${engineUrl.replace(/\/$/, '')}/v1/chat/completions`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${engineKey}`,
+            'Content-Type': 'application/json',
+            'X-Request-ID': requestId,
+          },
+          body: JSON.stringify(engineBody),
+          signal: controller.signal,
+        });
+        clearTimeout(engineTimeout);
+        if (upstream.ok) {
+          const data = await upstream.json();
+          const content = extractAssistantContent(data);
+          if (hasUsableContent(content)) {
+            const pt = data?.usage?.prompt_tokens;
+            const ct = data?.usage?.completion_tokens;
+            const promptTokens = typeof pt === 'number' ? pt : promptTokenEstimate(messages);
+            const completionTokens = typeof ct === 'number' ? ct : completionTokenEstimate(content);
+            if (!isEvalMode && userId) {
+              try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
+            }
+            return completionResponse({
+              id: String(data?.id || `chatcmpl-${Date.now()}`),
+              object: 'chat.completion',
+              created: Number(data?.created) || Math.floor(Date.now() / 1000),
+              model: TEMUCLAUDE_PRO_MODEL,
+              choices: [{ index: 0, message: { role: 'assistant', content: content.trim() }, finish_reason: 'stop' }],
+              usage: {
+                prompt_tokens: promptTokens,
+                completion_tokens: completionTokens,
+                total_tokens: promptTokens + completionTokens,
+              },
+            }, wantsStream);
+          }
+          console.warn('Engine returned an empty completion; falling back to fast GLM.');
+        } else {
+          console.warn(`Engine proxy failed with status ${upstream.status}; falling back to fast GLM.`);
+        }
+      } catch (engineError: any) {
+        console.warn(`Engine proxy error: ${engineError?.message}; falling back to fast GLM.`);
+      }
+      // Fast fallback: a single GLM call, never the full MoA pipeline.
+      const fallback = await call(M_GLM, messages, temperature ?? 0.6, max_tokens ?? 4096, { timeoutMs: 25_000 });
+      if (hasUsableContent(fallback.content)) {
+        const fbPromptTokens = promptTokenEstimate(messages);
+        const fbCompletionTokens = completionTokenEstimate(fallback.content);
+        if (!isEvalMode && userId) {
+          try { await incrementUsageAsync(userId, fbPromptTokens, fbCompletionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
+        }
+        return completionResponse({
+          id: `chatcmpl-${Date.now()}`,
+          object: 'chat.completion',
+          created: Math.floor(Date.now() / 1000),
+          model: TEMUCLAUDE_PRO_MODEL,
+          choices: [{ index: 0, message: { role: 'assistant', content: fallback.content.trim() }, finish_reason: 'stop' }],
+          usage: {
+            prompt_tokens: fbPromptTokens,
+            completion_tokens: fbCompletionTokens,
+            total_tokens: fbPromptTokens + fbCompletionTokens,
+          },
+        }, wantsStream);
+      }
+      return upstreamFailure('TemuClaude could not produce a non-empty completion. Please retry shortly.', 503);
     }
 
     // Lite is a separately bounded public API profile. It must bypass Modal

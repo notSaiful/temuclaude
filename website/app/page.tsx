@@ -173,7 +173,7 @@ export default function HomePage() {
                 >
                   TemuClaude is a multi-agent orchestration engine. It routes each question across
                   an 8-model pool, runs the right specialists in parallel for hard questions, verifies
-                  code programmatically, and returns one answer — no model selection, no fallback juggling.
+                  code with an independent judge model, and returns one answer — no model selection, no fallback juggling.
                 </p>
 
                 {/* Code snippet — shows devs exactly how to use it */}
@@ -500,7 +500,7 @@ export default function HomePage() {
                 {
                   num: '02',
                   title: 'TemuClaude routes & fuses',
-                  desc: 'It classifies your question, picks the best models, runs them in parallel, and synthesizes the best answer. 6 quality layers for hard questions.',
+                  desc: 'It classifies your question, picks the best models, runs them in parallel, and synthesizes the best answer. Up to 10 quality layers for hard questions.',
                 },
                 {
                   num: '03',
@@ -544,7 +544,7 @@ export default function HomePage() {
               </h2>
               <p className="text-text-secondary">
                 TemuClaude routes automatically — the right model for the right question.
-                Easy questions use DeepSeek V4 Flash or Gemini 3.5 Flash (efficient). Hard ones get the full MCTS-guided multi-agent fusion.
+                Easy questions take an efficient fast path (e.g. DeepSeek V4 Flash). Hard ones get the full gauntlet — MCTS-guided multi-agent fusion, generator-discriminator self-play, and Z3 verification.
               </p>
             </div>
 
@@ -590,7 +590,7 @@ export default function HomePage() {
                 The pipeline
               </h2>
               <p className="text-text-secondary">
-                Every question goes through 6 quality layers. Here's what happens
+                For hard questions, TemuClaude runs up to 10 quality layers; easy questions take a fast path. Here's what happens
                 when you send a hard question.
               </p>
             </div>
@@ -599,9 +599,9 @@ export default function HomePage() {
               {[
                 { num: '01', title: 'Classify', desc: 'Your question is analyzed and classified by difficulty (trivial, medium, hard) and type (math, coding, creative, reasoning). No API call needed — pure heuristics.' },
                 { num: '02', title: 'Route', desc: 'Trivial questions go to the cheapest model (DeepSeek V4 Flash). Medium questions route to the best specialist. Hard questions trigger the full fusion pipeline.' },
-                { num: '03', title: 'Propose', desc: '3 models answer your question in parallel: GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash. For math, DeepSeek runs step-level tree search (MCTS).' },
+                { num: '03', title: 'Propose', desc: 'A 9-model panel answers your question in parallel — including GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash. For hard math, DeepSeek runs step-level MCTS tree search.' },
                 { num: '04', title: 'Aggregate', desc: 'GLM-5.2 analyzes all responses — finds consensus, resolves contradictions, extracts the best insights, and synthesizes one definitive answer.' },
-                { num: '05', title: 'QA Gate', desc: 'Gemini 3.5 Flash scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
+                { num: '05', title: 'QA Gate', desc: 'Nemotron 3 Ultra scores the answer on 5 rubrics: logical coherence, factual correctness, completeness, goal alignment, clarity. If it scores below 8/10, reflexion kicks in.' },
                 { num: '06', title: 'Reflexion', desc: 'Generator-Discriminator loops critique and repair logic errors. If verifications still fail, a private frontier fallback is called.' },
               ].map((step, i) => (
                 <StaggerItem key={i}>
@@ -626,7 +626,7 @@ export default function HomePage() {
                 See the difference. Live.
               </h2>
               <p className="text-text-secondary">
-                Type any question. We&apos;ll send it to both TemuClaude (full 8-model orchestration)
+                Type any question. We&apos;ll send it to both TemuClaude (routed 8-model orchestration)
                 and a GPT-5.6 Luna direct baseline. You see both answers side by side. Judge for yourself.
               </p>
             </div>
@@ -640,8 +640,8 @@ export default function HomePage() {
                     <span className="badge-accent text-xs ml-1">8 models</span>
                   </div>
                   <p className="text-sm text-text-secondary mb-3">
-                    Classifies, routes, runs 3 models in parallel, fuses answers,
-                    QA-checks quality, retries if low. One superior answer.
+                    Classifies and routes your question. For hard ones, it runs a multi-model
+                    panel in parallel, fuses answers, QA-checks quality, and retries if low. One superior answer.
                   </p>
                 </div>
                 <div>

@@ -1070,11 +1070,18 @@ class Temuclaude:
 
         # Apply cost-quality budget profile constraints
         n_samples = None
-        if budget_profile == "max_quality":
-            if tier != "trivial":
+        if budget_profile in ("max_quality", "balanced"):
+            # Layer 2 (2026-07-17): max_quality is difficulty-adaptive — trivial/medium
+            # Pro queries take the fast tier-dispatch path; only hard Pro runs the
+            # full gauntlet. `balanced` stays the always-hard compatibility alias so
+            # callers cannot silently receive a cheap draft.
+            if budget_profile == "max_quality" and tier in ("trivial", "medium"):
+                token_budget = self.get_adaptive_token_budget(tier)
+                n_samples = self.get_adaptive_n_samples(tier)
+            else:
                 tier = "hard"
-            token_budget = 8192
-            n_samples = 10
+                token_budget = 8192
+                n_samples = 10
         elif budget_profile == "max_savings":
             if tier == "hard":
                 tier = "medium"
