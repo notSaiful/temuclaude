@@ -459,7 +459,7 @@ export async function sendWelcomeEmail(
         <p style="color: #0f172a; font-size: 16px;">Hi ${name},</p>
         <p style="color: #475569; line-height: 1.6;">
           You now have access to ten capability-specific AI model roles working together behind one API.
-          Every question you ask gets routed, fused, verified, and quality-checked — 
+          Every question is routed first; for hard ones it is then fused, verified, and quality-checked — 
           automatically. You never pick models. TemuClaude does it for you.
         </p>
         <div style="margin: 25px 0;">
@@ -469,7 +469,7 @@ export async function sendWelcomeEmail(
           <strong>What you get (free):</strong><br>
           · 20 queries/day after sign-in<br>
           · 50K monthly credits<br>
-          · Full 10-layer orchestration<br>
+          · Adaptive orchestration (up to 10 layers for hard Pro)<br>
           · All 8 models<br>
           · Visible orchestration panel
         </p>

@@ -12,7 +12,7 @@ We asked a simple question: **what if you didn't have to choose between quality 
 
 Instead of using one expensive model, what if you used 8 models together — each with a specific role — and fused their answers into something better than any single model could produce?
 
-This is called **Mixture of Agents (MoA)**, and it's backed by research (arXiv:2406.04692) showing that 3-layer fusion improves AlpacaEval performance. We took this concept and built a full 10-layer pipeline around it.
+This is called **Mixture of Agents (MoA)**, and it's backed by research (arXiv:2406.04692) showing that 3-layer fusion improves AlpacaEval performance. We took this concept and built an adaptive pipeline around it — up to 10 layers for hard queries, a fast path for simple ones.
 
 ## The Architecture
 
@@ -20,14 +20,14 @@ When you ask TemuClaude a question, here's what happens:
 
 1. **Classification** — Your query is categorized (math, coding, reasoning, knowledge, etc.) and difficulty is estimated (trivial, medium, hard).
 
-2. **Routing** — 60% of queries are trivial and route to the cheapest model (Llama 3.3 at $0.06/M). 30% are medium and route to a specialist. Only 10% trigger the full fusion pipeline.
+2. **Routing** — Trivial queries route to an efficient model (e.g. DeepSeek V4 Flash). Medium ones route to the best specialist. Only genuinely hard ones trigger the full fusion pipeline.
 
 3. **3-Layer MoA Fusion** (for hard queries):
-   - **Layer 1**: GLM-5.2, DeepSeek Pro, and Gemini 2.0 Flash each answer independently
+   - **Layer 1**: GLM-5.2, DeepSeek V4 Pro, and Gemini 3.5 Flash each answer independently
    - **Layer 2**: Each model reviews the others' answers and refines its own
    - **Layer 3**: GLM-5.2 synthesizes all refined answers into one
 
-4. **Code Verification** — For math questions, an independent verifier model (Nemotron 3 Ultra) checks the draft. Our research engine additionally runs generated Python in a sandbox and checks it with a Z3/SMT solver; the live gateway uses the verifier-model QA gate, applying sandbox/Z3 where available.
+4. **Code Verification** — For math questions, an independent verifier model (Nemotron 3 Ultra) checks the draft. Our Python research engine additionally runs generated Python in a sandbox and checks it with a Z3/SMT solver for hard queries; the live gateway uses the verifier-model QA gate.
 
 5. **Self-QA Gate** — Every answer is scored on 5 rubrics (logical coherence, factual correctness, completeness, goal alignment, clarity). If it scores below 8/10, TemuClaude retries with reflexion feedback.
 
@@ -46,7 +46,7 @@ When you ask TemuClaude a question, here's what happens:
 | MiMo-V2.5 | Multimodal | 40 | $0.06 |
 | Z3 Solver | Logical Verifier | — | Local |
 
-The key insight: Arithmetic and coding answers are checked by an independent verifier model, with SymPy execution and Z3/SMT solvers applied in the research engine where available. And most queries route to efficient models, making the blended cost far below Fable 5 direct.
+The key insight: Arithmetic and coding answers are checked by an independent verifier model. SymPy execution and Z3/SMT solvers run in the Python research runtime for hard Pro queries, not the live gateway. And most queries route to efficient models, making the blended cost far below Fable 5 direct.
 
 ## The Results
 

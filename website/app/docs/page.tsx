@@ -9,7 +9,7 @@ type DocSection = {
 
 const sections: DocSection[] = [
   { title: 'Overview', items: ['Quickstart', 'Data Privacy', 'Architecture', 'Model Pool'] },
-  { title: 'Features', items: ['10-Layer Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Verification', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
+  { title: 'Features', items: ['Adaptive Pipeline', '3-Tier Routing', 'Step-Aware Model Router', 'MoA 3-Layer Fusion', 'Self-Consistency', 'Code Review', 'Self-QA Gate', 'Reflexion', 'Budget Forcing', 'Z3 Verification', 'Frontier Fallback'] },
   { title: 'Benchmarks', items: ['Methodology', 'Evaluation & Trust', 'Projected Scores'] },
   { title: 'Media', items: ['Media Orchestration', 'Image Generation', 'Video Generation', 'Text-to-Speech', 'Music Generation'] },
   { title: 'API', items: ['REST API', 'Streaming', 'Orchestration Data', 'Authentication', 'Use with Hermes Agent', 'Rate Limits', 'Error Codes'] },
@@ -108,7 +108,7 @@ export default function DocsPage() {
   -d '{"model":"temuclaude","messages":[{"role":"user","content":"What is 9.9 vs 9.11?"}]}'
 
  # Response: OpenAI-compatible chat completion JSON`} />
-              <Callout type="tip">The playground runs the full 10-layer orchestration stack — you get the same quality as our API. Free tier: 20 queries/day after sign-in.</Callout>
+              <Callout type="tip">The playground runs the same adaptive orchestration as the API — up to 10 layers for hard Pro queries, a fast path for trivial ones. Free tier: 20 queries/day after sign-in.</Callout>
             </section>
 
             <section id="data-privacy" className="mb-12">
@@ -185,19 +185,19 @@ export default function DocsPage() {
 
             {/* === FEATURES === */}
 
-            <section id="10-layer-pipeline" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">10-Layer Pipeline</h2>
-              <p className="text-text-secondary mb-4">For nontrivial Pro queries, TemuClaude runs a bounded quality pipeline designed to improve completeness and catch errors:</p>
+            <section id="adaptive-pipeline" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Adaptive Pipeline (up to 10 layers for hard Pro)</h2>
+              <p className="text-text-secondary mb-4">Trivial and medium Pro queries take a fast, efficient path — a single specialist or light shepherding. For genuinely hard Pro queries, TemuClaude runs a bounded quality pipeline with up to 10 layers designed to improve completeness and catch errors. Stages marked <em>research runtime</em> belong to the Python engine / playground and do not run on every request:</p>
               <ol className="space-y-3 text-sm text-text-secondary list-decimal list-inside mb-4">
-                <li><strong className="text-text-primary">Web Search</strong> — Dynamic knowledge retrieval for real-time information query enhancement.</li>
+                <li><strong className="text-text-primary">Web Search</strong> — <em>research runtime.</em> Dynamic knowledge retrieval for real-time information query enhancement.</li>
                 <li><strong className="text-text-primary">MoA 3-Layer Fusion</strong> — Layered peer reviews where multiple specialist models refine each other's outputs before aggregation.</li>
                 <li><strong className="text-text-primary">Self-Consistency</strong> — Weighted voting frameworks selecting the most logically consistent path.</li>
-                <li><strong className="text-text-primary">Code Review</strong> — Independent coding-agent and verifier critiques identify implementation defects and missing requirements.</li>
+                <li><strong className="text-text-primary">Code Review</strong> — Independent coding-agent and verifier models critique outputs to identify implementation defects and missing requirements.</li>
                 <li><strong className="text-text-primary">Reflexion</strong> — Verbal correction logic to automatically re-evaluate reasoning steps when validation indicators flag errors.</li>
-                <li><strong className="text-text-primary">Self-QA Gate</strong> — Multi-dimensional quality scoring system assessing logical coherence, completeness, and goal alignment.</li>
+                <li><strong className="text-text-primary">Self-QA Gate</strong> — An independent verifier model (Nemotron 3 Ultra) scores answers on logical coherence, completeness, and goal alignment.</li>
                 <li><strong className="text-text-primary">Consistency Verification</strong> — Independent checks look for contradictions in structured arguments.</li>
-                <li><strong className="text-text-primary">Budget Forcing</strong> — Adaptive token management extending system computation time on complex derivations.</li>
-                <li><strong className="text-text-primary">Step-Level Verification</strong> — Independent validation of intermediate logical statements.</li>
+                <li><strong className="text-text-primary">Budget Forcing</strong> — <em>research runtime.</em> Adaptive token management extending system computation time on complex derivations.</li>
+                <li><strong className="text-text-primary">Step-Level Verification</strong> — <em>research runtime.</em> Independent validation of intermediate logical statements.</li>
                 <li><strong className="text-text-primary">Frontier Adjudication</strong> — Frontier models contribute proposals and return for corrective synthesis when QA is low.</li>
               </ol>
             </section>
@@ -246,17 +246,17 @@ export default function DocsPage() {
               </p>
             </section>
 
-            <section id="code-verification" className="mb-12">
-              <h2 className="text-xl font-semibold text-text-primary mb-3">Code Verification</h2>
+            <section id="code-review" className="mb-12">
+              <h2 className="text-xl font-semibold text-text-primary mb-3">Code Review</h2>
               <p className="text-text-secondary mb-4">
-                When solving programming or mathematical problems, TemuClaude writes and runs scripts inside isolated sandbox environments. It parses output values to verify accuracy. If the execution errors, the system triggers the reflexion loop to rewrite and correct the script.
+                For hard Pro coding and math queries, an independent judge model reviews the generated code and reasoning for defects, missing requirements, and incorrect logic. Sandbox execution and Z3 constraint solving belong to the Python research runtime for hard queries, not the live gateway. When review flags an error, the reflexion loop rewrites and corrects the draft.
               </p>
             </section>
 
             <section id="self-qa-gate" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Self-QA Gate</h2>
               <p className="text-text-secondary mb-4">
-                All generated answers pass through an automated quality gate evaluating logical consistency, factual correctness, and goal alignment. If the safety thresholds are not met, the response is rejected and sent back to the pipeline for refinement.
+                For nontrivial queries, generated answers pass through an automated quality gate — scored by an independent verifier model (Nemotron 3 Ultra) — evaluating logical consistency, factual correctness, and goal alignment. If the thresholds are not met, the response is rejected and sent back to the pipeline for refinement.
               </p>
             </section>
 
@@ -278,9 +278,9 @@ export default function DocsPage() {
             <section id="z3-verification" className="mb-12">
               <h2 className="text-xl font-semibold text-text-primary mb-3">Z3 Logical Verification</h2>
               <p className="text-text-secondary mb-4">
-                For structural logic questions, TemuClaude translates key relationships into symbolic constraints. It runs these constraints through a logic solver to verify satisfiability. If any logical contradictions are detected, a multi-agent debate is triggered to resolve them.
+                For hard Pro structural-logic questions, the Python engine translates key relationships into symbolic constraints and runs them through a Z3 logic solver to verify satisfiability. If any logical contradictions are detected, a multi-agent debate is triggered to resolve them. This runs in the research runtime for hard queries and falls back gracefully when Z3 is unavailable.
               </p>
-              <Callout type="note">Requires z3-solver constraints. Falls back gracefully if unavailable.</Callout>
+              <Callout type="note">Requires z3-solver. Available in the Python research runtime for hard Pro queries; the live gateway falls back to the verifier-model QA gate when unavailable.</Callout>
             </section>
 
             <section id="frontier-fallback" className="mb-12">
@@ -397,7 +397,7 @@ Response: OpenAI-compatible chat completion JSON`} />
                    "reflexion", "usva-4-rubric-qa", "s1-budget-forcing"]
   }
 }`} />
-              <Callout type="tip">The <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which layers were activated. Full transparency — no black boxes.</Callout>
+              <Callout type="tip">For a hard Pro query, the <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">techniques</code> array shows exactly which layers were activated. Trivial queries take a fast path and activate fewer. Full transparency — no black boxes.</Callout>
             </section>
 
             <section id="authentication" className="mb-12">
@@ -473,7 +473,7 @@ model:
               <h2 className="text-xl font-semibold text-text-primary mb-3">Media Orchestration</h2>
               <p className="text-text-secondary mb-4">
                 TemuClaude also orchestrates media generation — images, video, text-to-speech, and music.
-                Same 10-stage pipeline (cache, intent, tier, parallel generation, judge, quality gate, reflexion, memory, return).
+                A similar multi-stage pipeline (cache, intent, tier, parallel generation, judge, quality gate, reflexion, memory, return) — up to 10 stages for complex media requests.
                 Each media type has its own model pool, routing logic, and quality gates.
               </p>
               <Callout type="note">Media orchestration requires an AIML API key (set <code className="font-mono text-xs bg-bg-tertiary px-1.5 py-0.5 rounded">AIML_API_KEY</code> env var). The LLM orchestration works with just OpenRouter.</Callout>
