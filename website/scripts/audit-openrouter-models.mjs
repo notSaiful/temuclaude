@@ -3,11 +3,10 @@
 const models = [
   'z-ai/glm-5.2',
   'deepseek/deepseek-v4-pro',
-  'moonshotai/kimi-k2.6',
+  'moonshotai/kimi-k3',
   'minimax/minimax-m3',
   'google/gemini-3.5-flash',
   'openai/gpt-5.6-luna',
-  'openai/gpt-5.6-sol',
   'x-ai/grok-4.5',
   'nvidia/nemotron-3-ultra-550b-a55b',
 ];

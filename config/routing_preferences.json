@@ -27,7 +27,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -61,7 +61,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -95,7 +95,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -193,7 +193,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6",
+        "kimi-k3",
         "deepseek-v4-pro",
         "deepseek-v4-pro+code",
         "deepseek-v4-pro+consistency_prm(n=10)"
@@ -246,7 +246,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -280,7 +280,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -378,7 +378,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6",
+        "kimi-k3",
         "deepseek-v4-pro",
         "deepseek-v4-pro+code",
         "deepseek-v4-pro+consistency_prm(n=10)"
@@ -431,7 +431,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -529,7 +529,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6",
+        "kimi-k3",
         "deepseek-v4-pro",
         "deepseek-v4-pro+consistency_prm(n=10)"
       ],
@@ -597,7 +597,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -711,7 +711,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1113,7 +1113,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1227,7 +1227,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1357,7 +1357,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1407,7 +1407,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1441,7 +1441,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1475,7 +1475,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1509,7 +1509,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1543,7 +1543,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1577,7 +1577,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1611,7 +1611,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1645,7 +1645,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1727,7 +1727,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1809,7 +1809,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1843,7 +1843,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1893,7 +1893,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -1927,7 +1927,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2009,7 +2009,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2091,7 +2091,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2141,7 +2141,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2175,7 +2175,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2209,7 +2209,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2259,7 +2259,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2293,7 +2293,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2327,7 +2327,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2361,7 +2361,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2443,7 +2443,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2477,7 +2477,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2559,7 +2559,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2593,7 +2593,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2643,7 +2643,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2677,7 +2677,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2727,7 +2727,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2761,7 +2761,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2795,7 +2795,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2877,7 +2877,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2895,7 +2895,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6",
+        "kimi-k3",
         "deepseek-v4-pro",
         "deepseek-v4-pro+code",
         "deepseek-v4-pro+consistency_prm(n=10)"
@@ -2948,7 +2948,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -2998,7 +2998,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3064,7 +3064,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3114,7 +3114,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3164,7 +3164,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3214,7 +3214,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3264,7 +3264,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3330,7 +3330,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3364,7 +3364,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3398,7 +3398,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3432,7 +3432,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3466,7 +3466,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3500,7 +3500,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3534,7 +3534,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3568,7 +3568,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3602,7 +3602,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3636,7 +3636,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3670,7 +3670,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3704,7 +3704,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3738,7 +3738,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3772,7 +3772,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3806,7 +3806,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3840,7 +3840,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3874,7 +3874,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3908,7 +3908,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3942,7 +3942,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -3976,7 +3976,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4010,7 +4010,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4044,7 +4044,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4078,7 +4078,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4112,7 +4112,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4146,7 +4146,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4180,7 +4180,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4214,7 +4214,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4248,7 +4248,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4282,7 +4282,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4316,7 +4316,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4350,7 +4350,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4384,7 +4384,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4418,7 +4418,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4452,7 +4452,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4486,7 +4486,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4520,7 +4520,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4554,7 +4554,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4588,7 +4588,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4622,7 +4622,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4656,7 +4656,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4690,7 +4690,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4724,7 +4724,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4758,7 +4758,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4792,7 +4792,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4826,7 +4826,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4860,7 +4860,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4894,7 +4894,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4928,7 +4928,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4962,7 +4962,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -4996,7 +4996,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5030,7 +5030,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5064,7 +5064,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5098,7 +5098,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5132,7 +5132,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5166,7 +5166,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5200,7 +5200,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5234,7 +5234,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5268,7 +5268,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5302,7 +5302,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5336,7 +5336,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5370,7 +5370,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5404,7 +5404,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5438,7 +5438,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5472,7 +5472,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5506,7 +5506,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5540,7 +5540,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5574,7 +5574,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5608,7 +5608,7 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5642,7 +5642,159 @@
       "models_used": [
         "deepseek-v4-pro",
         "glm-5.2",
-        "kimi-k2.6"
+        "kimi-k3"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-17T08:57:18.960092+00:00",
+      "query_preview": "Explain how photosynthesis works in plants.",
+      "query_length": 43,
+      "query_words": 6,
+      "task_type": "knowledge",
+      "tier": "medium",
+      "model": "glm-5.2",
+      "models_used": [
+        "glm-5.2"
+      ],
+      "strategy": "direct_specialist+skills+adaptive+adaptive_tokens+medium_qa_retried",
+      "latency_ms": 0,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-17T08:57:32.185794+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-17T08:57:32.189181+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k3"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:42:19.416060+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:42:19.418520+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k3"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:43:41.456489+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:43:41.459056+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k3"
+      ],
+      "strategy": "fusion+step_verify+prm_consistency",
+      "latency_ms": 15000,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:44:47.951246+00:00",
+      "query_preview": "What is 2+2?",
+      "query_length": 12,
+      "query_words": 3,
+      "task_type": "math",
+      "tier": "trivial",
+      "model": "gpt-oss-120b",
+      "models_used": [
+        "gpt-oss-120b"
+      ],
+      "strategy": "direct_cheap",
+      "latency_ms": 500,
+      "success": true,
+      "tokens_used": 0
+    },
+    {
+      "timestamp": "2026-07-20T18:44:47.953728+00:00",
+      "query_preview": "Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
+      "query_length": 128,
+      "query_words": 16,
+      "task_type": "reasoning",
+      "tier": "hard",
+      "model": "deepseek-v4-pro",
+      "models_used": [
+        "deepseek-v4-pro",
+        "glm-5.2",
+        "kimi-k3"
       ],
       "strategy": "fusion+step_verify+prm_consistency",
       "latency_ms": 15000,
@@ -5652,26 +5804,26 @@
   ],
   "task_type_model_stats": {
     "math_trivial": {
-      "count": 119,
-      "successes": 119,
+      "count": 123,
+      "successes": 123,
       "failures": 0,
       "avg_latency": 500.0,
-      "total_latency": 59500,
+      "total_latency": 61500,
       "models": {
-        "gpt-oss-120b": 119
+        "gpt-oss-120b": 123
       },
       "best_model": "gpt-oss-120b"
     },
     "reasoning_hard": {
-      "count": 119,
-      "successes": 119,
+      "count": 123,
+      "successes": 123,
       "failures": 0,
       "avg_latency": 15000.0,
-      "total_latency": 1785000,
+      "total_latency": 1845000,
       "models": {
-        "deepseek-v4-pro": 119,
-        "glm-5.2": 119,
-        "kimi-k2.6": 119
+        "deepseek-v4-pro": 123,
+        "glm-5.2": 123,
+        "kimi-k3": 123
       },
       "best_model": "deepseek-v4-pro"
     },
@@ -5717,11 +5869,22 @@
       "models": {
         "deepseek-v4-pro": 15,
         "glm-5.2": 4,
-        "kimi-k2.6": 4
+        "kimi-k3": 4
       },
       "best_model": "deepseek-v4-pro"
+    },
+    "knowledge_medium": {
+      "count": 1,
+      "successes": 1,
+      "failures": 0,
+      "avg_latency": 0.0,
+      "total_latency": 0,
+      "models": {
+        "glm-5.2": 1
+      },
+      "best_model": "glm-5.2"
     }
   },
-  "total_records": 337,
-  "last_updated": "2026-07-08T02:41:38.843292+00:00"
+  "total_records": 346,
+  "last_updated": "2026-07-20T18:44:47.953752+00:00"
 }

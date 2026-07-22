@@ -83,7 +83,7 @@ ZERO_WIDTH_CHARS = [
 # ─── Canary token management ───────────────────────────────────
 class CanaryTokenManager:
     """Manages canary tokens embedded in system prompts to detect leakage.
-    
+
     Based on tldrsec/prompt-injection-defenses: embed unique tokens in the
     system prompt that should NEVER appear in output. If they do, the system
     prompt has been leaked via prompt injection.
@@ -94,10 +94,10 @@ class CanaryTokenManager:
 
     def embed_tokens(self, system_prompt: str) -> tuple[str, list[str]]:
         """Embed canary tokens into a system prompt.
-        
+
         Args:
             system_prompt: The original system prompt
-        
+
         Returns:
             (prompt_with_tokens, list_of_tokens)
         """
@@ -125,7 +125,7 @@ class CanaryTokenManager:
 
     def check_output(self, output: str) -> list[str]:
         """Check if any canary tokens leaked into the output.
-        
+
         Returns:
             List of leaked token names (empty = no leak = safe)
         """
@@ -150,7 +150,7 @@ def get_canary_manager() -> CanaryTokenManager:
 # ─── Input sanitization ────────────────────────────────────────
 def sanitize_input(raw_input: str) -> str:
     """Sanitize user input by removing dangerous characters and normalizing.
-    
+
     Based on OWASP Cheat Sheet: Input Validation and Sanitization.
     """
     if not raw_input:
@@ -186,7 +186,7 @@ def sanitize_input(raw_input: str) -> str:
 # ─── Injection detection ──────────────────────────────────────
 def detect_injection(text: str) -> tuple[ThreatLevel, list[str], float]:
     """Detect prompt injection attempts in input.
-    
+
     Returns:
         (threat_level, list_of_detected_patterns, risk_score 0.0-1.0)
     """
@@ -221,7 +221,7 @@ def detect_injection(text: str) -> tuple[ThreatLevel, list[str], float]:
 
 def _detect_typoglycemia(text: str) -> list[str]:
     """Detect typoglycemia-based attacks (scrambled words).
-    
+
     Based on OWASP Cheat Sheet: typoglycemia exploits LLMs' ability to read
     scrambled words where first and last letters remain correct, bypassing
     keyword-based filters.
@@ -269,14 +269,14 @@ def _detect_suspicious_encoding(text: str) -> bool:
 # ─── Main guard function ───────────────────────────────────────
 def guard_input(raw_input: str, embed_canaries: bool = True) -> GuardResult:
     """Run the full guard pipeline on user input.
-    
+
     This is the entry point for the guard layer. Every user query passes
     through here before reaching the model.
-    
+
     Args:
         raw_input: Raw user input string
         embed_canaries: Whether to generate canary tokens (for system prompt)
-    
+
     Returns:
         GuardResult with sanitized input, threat assessment, and canary tokens
     """
@@ -313,30 +313,40 @@ def guard_input(raw_input: str, embed_canaries: bool = True) -> GuardResult:
 
 
 def check_output_for_leaks(output: str) -> tuple[bool, list[str]]:
-    """Check model output for system prompt leakage via canary tokens.
-    
+    """Check model output for system prompt leakage via canary tokens and honeypots.
+
     Args:
         output: Model output text
-    
+
     Returns:
         (leak_detected, list_of_leaked_token_names)
     """
     leaked = _canary_manager.check_output(output)
+
+    honeypots = {
+        "MOCK_AWS_SECRET_KEY": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+        "MOCK_DB_PASSWORD": "temu_db_pass_secret_example_998",
+        "MOCK_API_KEY": "tc_live_f893d2b10a2c88ef092e10f"
+    }
+    for key, val in honeypots.items():
+        if val in output:
+            leaked.append(f"honeypot_{key}")
+
     return len(leaked) > 0, leaked
 
 
 # ─── SmoothLLM perturbation ────────────────────────────────────
 def smooth_llm_perturb(text: str, n_copies: int = 3) -> list[str]:
     """SmoothLLM defense: create perturbed copies of input.
-    
+
     Based on SmoothLLM (arXiv:2302.12774): adversarially-generated prompts
     are brittle to character-level changes. Randomly perturbing copies of
     the input and aggregating predictions detects adversarial inputs.
-    
+
     Args:
         text: Input text
         n_copies: Number of perturbed copies to generate
-    
+
     Returns:
         List of perturbed copies (original NOT included)
     """

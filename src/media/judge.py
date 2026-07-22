@@ -8,8 +8,8 @@ Adapted from consistency.py's self-consistency voting pattern.
 
 Judges:
   1. MiniMax M3 (best vision, IQ 44) — weight 1.0
-  2. Gemini 3 Flash (multimodal, IQ 50) — weight 0.95
-  3. Claude Sonnet 5 (frontier reasoning, IQ 53) — weight 0.90
+  2. Gemini 2.5 Flash (multimodal, OpenRouter available) — weight 0.95
+  3. Claude Sonnet 4.6 (frontier reasoning, OpenRouter available) — weight 0.90
 
 Each judge scores 1-10 on 4 dimensions (USVA-adapted):
   - Prompt adherence (did it follow the prompt?)

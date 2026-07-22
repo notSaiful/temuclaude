@@ -89,7 +89,7 @@ def build_vision_messages(image: str, question: str) -> List[dict]:
 async def analyze_image(
     image: str,
     question: str,
-    model: str = "kimi-k2.6",
+    model: str = "kimi-k3",
     api_key: Optional[str] = None,
 ) -> str:
     """Analyze an image with a vision-capable model.
@@ -124,7 +124,7 @@ async def analyze_image(
     return response.choices[0].message.content
 
 
-async def describe_image(image: str, model: str = "kimi-k2.6", api_key: Optional[str] = None) -> str:
+async def describe_image(image: str, model: str = "kimi-k3", api_key: Optional[str] = None) -> str:
     """Generate a detailed description of an image."""
     return await analyze_image(
         image,
@@ -135,7 +135,7 @@ async def describe_image(image: str, model: str = "kimi-k2.6", api_key: Optional
     )
 
 
-async def extract_text_from_image(image: str, model: str = "kimi-k2.6", api_key: Optional[str] = None) -> str:
+async def extract_text_from_image(image: str, model: str = "kimi-k3", api_key: Optional[str] = None) -> str:
     """Extract text from an image (OCR via multimodal model)."""
     return await analyze_image(
         image,
@@ -149,7 +149,7 @@ async def extract_text_from_image(image: str, model: str = "kimi-k2.6", api_key:
 async def compare_images(
     images: List[str],
     question: str,
-    model: str = "kimi-k2.6",
+    model: str = "kimi-k3",
     api_key: Optional[str] = None,
 ) -> str:
     """Compare multiple images.

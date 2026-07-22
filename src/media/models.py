@@ -456,10 +456,10 @@ JUDGE_POOL = [
         "weight": 0.95,
     },
     {
-        "id": "anthropic/claude-sonnet-5",
-        "openrouter_id": "anthropic/claude-sonnet-5",
-        "aiml_id": "anthropic/claude-sonnet-5",
-        "role": "frontier reasoning (IQ 53), used for hardest 2%",
+        "id": "anthropic/claude-sonnet-4.6",
+        "openrouter_id": "anthropic/claude-sonnet-4.6",
+        "aiml_id": "anthropic/claude-sonnet-4.6",
+        "role": "frontier reasoning, used for hardest 2%",
         "vision_iq": 53,
         "weight": 0.90,  # lower weight — expensive, use sparingly
     },

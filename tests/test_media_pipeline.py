@@ -468,7 +468,7 @@ async def run_full_pipeline():
     print("\nComponents:")
     print("  • Provider Abstraction (AIML API + fal.ai + failover)")
     print("  • Model Pools (14 image + 12 video models)")
-    print("  • 3-Judge Consensus (MiniMax M3 + Gemini Flash + Claude Sonnet 5)")
+    print("  • 3-Judge Consensus (MiniMax M3 + Gemini 2.5 Flash + Claude Sonnet 4.6)")
     print("  • Quality Gate with Reflexion (max 3 iterations)")
     print("  • Post-Processing (Topaz Sharpen upscaling)")
     print("  • Memory Bank (learns which models win)")

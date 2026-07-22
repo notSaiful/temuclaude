@@ -26,11 +26,11 @@ MODEL_POOL = {
         "cost_tier": "flat",
         "routing_weight": 0.9,
     },
-    "kimi-k2.6": {
-        "ollama_tag": "kimi-k2.6:cloud",
+    "kimi-k3": {
+        "ollama_tag": "kimi-k3:cloud",
         "role": "ui_ux_coding_specialist",
         "strengths": ["coding", "ui_ux_generation", "multimodal", "multi_agent_orchestration"],
-        "context_length": 262_144,
+        "context_length": 1_048_576,
         "thinking": True,
         "tools": True,
         "cost_tier": "flat",
@@ -77,16 +77,6 @@ MODEL_POOL = {
         "thinking": True,
         "tools": True,
         "cost_tier": "premium",
-        "routing_weight": 0.0,
-    },
-    "gpt-5.6-sol": {
-        "ollama_tag": "gpt-5.6-sol",
-        "role": "frontier_adjudicator",
-        "strengths": ["complex_reasoning", "coding", "professional_work", "adjudication"],
-        "context_length": 1_050_000,
-        "thinking": True,
-        "tools": True,
-        "cost_tier": "frontier",
         "routing_weight": 0.0,
     },
     "grok-4.5": {
@@ -203,7 +193,7 @@ TASK_MODEL_MAP = {
     "agentic": "glm-5.2",
     "verification": "nemotron-3-ultra",
     "vision": "gemini-3.5-flash",
-    "ui_ux": "kimi-k2.6",
+    "ui_ux": "kimi-k3",
     "simple": "deepseek-v4-flash",
 }
 
@@ -211,13 +201,13 @@ TASK_MODEL_MAP = {
 # Unconfigured direct-provider models resolve to strong in-pool routes and are
 # deduplicated by the fusion panel. Lite and explicit savings modes stay bounded.
 FUSION_PANEL = [
+    "deepseek-v4-flash",
     "glm-5.2",
     "deepseek-v4-pro",
-    "kimi-k2.6",
+    "kimi-k3",
     "minimax-m3",
     "gemini-3.5-flash",
     "gpt-5.6-luna",
-    "gpt-5.6-sol",
     "grok-4.5",
     "nemotron-3-ultra",
 ]
@@ -244,7 +234,7 @@ OPENROUTER_MODELS = {
     "minimax-m3": "minimax/minimax-m3",                  # IQ 44 — vision + creative
     "claude-sonnet-5": "anthropic/claude-sonnet-4.6",   # legacy alias -> Sonnet 4.6
     "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",  # IQ 38 — verifier
-    "kimi-k2.6": "moonshotai/kimi-k2.6",                # legacy — kept for compatibility
+    "kimi-k3": "moonshotai/kimi-k3",                    # coding-driven UI/UX and implementation
     "kimi-k2.7-code": "moonshotai/kimi-k2.7-code",      # legacy — kept for compatibility
     "gpt-oss-120b": "openai/gpt-oss-120b",              # legacy — kept for compatibility
     # v3 Hybrid pool models
@@ -262,7 +252,6 @@ OPENROUTER_MODELS = {
     # providers from being selected as a normal route.
     "gemini-3.5-flash": "google/gemini-3.5-flash",
     "gpt-5.6-luna": "openai/gpt-5.6-luna",
-    "gpt-5.6-sol": "openai/gpt-5.6-sol",
     "grok-4.5": "x-ai/grok-4.5",
     "gpt-5.6-terra": "openai/gpt-5.6-terra",
     "qwen3-235b-moe": "qwen/qwen3-235b-a22b-2507",      # $0.09/$0.10/M — MoE reasoning
@@ -288,9 +277,8 @@ OPENROUTER_MODEL_FALLBACKS = {
     "qwen3.7-plus": ["deepseek-v4-flash"],
     "gemini-3.5-flash": ["minimax-m3", "glm-5.2", "deepseek-v4-pro"],
     "gpt-5.6-luna": ["glm-5.2", "deepseek-v4-pro"],
-    "gpt-5.6-sol": ["grok-4.5", "deepseek-v4-pro", "glm-5.2"],
-    "grok-4.5": ["gpt-5.6-sol", "deepseek-v4-pro", "glm-5.2"],
-    "gpt-5.6-terra": ["gpt-5.6-sol", "grok-4.5", "deepseek-v4-pro", "glm-5.2"],
+    "grok-4.5": ["kimi-k3", "deepseek-v4-pro", "glm-5.2"],
+    "gpt-5.6-terra": ["kimi-k3", "grok-4.5", "deepseek-v4-pro", "glm-5.2"],
     "gemini-2.0-flash": ["gemini-3-flash", "glm-5.2"],
     "gemini-2.5-flash": ["gemini-3-flash", "glm-5.2"],
     "mistral-large-2": ["minimax-m3", "deepseek-v4-pro"],
@@ -299,7 +287,7 @@ OPENROUTER_MODEL_FALLBACKS = {
     "claude-sonnet-4.6": ["glm-5.2", "deepseek-v4-pro"],
     "nemotron-3-ultra": ["nemotron-3-super", "gpt-oss-120b", "glm-5.2"],
     "llama-3.3-70b-instruct": ["hy3-preview", "gpt-oss-120b"],
-    "kimi-k2.6": ["glm-5.2", "deepseek-v4-pro"],
+    "kimi-k3": ["glm-5.2", "deepseek-v4-pro"],
 }
 
 # Updated stack: ten active roles plus a disabled emergency fallback. Pro
@@ -309,11 +297,10 @@ UPDATED_MODEL_STACK = {
     "deepseek-v4-flash": "high-volume worker",
     "deepseek-v4-pro": "reasoning, math, and technical analysis",
     "glm-5.2": "planning, orchestration, and synthesis",
-    "kimi-k2.6": "coding-driven UI/UX and multi-agent implementation",
+    "kimi-k3": "coding-driven UI/UX and multi-agent implementation",
     "minimax-m3": "multimodal, creative, product, and long-context review",
     "gemini-3.5-flash": "premium multimodal and tool use",
     "gpt-5.6-luna": "fast GPT-family proposal and tool work",
-    "gpt-5.6-sol": "frontier reasoning, coding, and adjudication",
     "grok-4.5": "hard coding-agent escalation",
     "nemotron-3-ultra": "independent verification",
 }
@@ -331,11 +318,6 @@ DIRECT_MODEL_PROVIDERS = {
         "env": "OPENAI_API_KEY",
         "base_url": "https://api.openai.com/v1",
         "model": "gpt-5.6-luna",
-    },
-    "gpt-5.6-sol": {
-        "env": "OPENAI_API_KEY",
-        "base_url": "https://api.openai.com/v1",
-        "model": "gpt-5.6-sol",
     },
     "grok-4.5": {
         "env": "XAI_API_KEY",

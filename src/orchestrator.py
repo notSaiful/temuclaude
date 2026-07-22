@@ -494,7 +494,7 @@ class Temuclaude:
 
         # Inject Quiet-STaR implicit thought directive for thinker models
         thinker_models = [
-            "glm-5.2", "deepseek-v4-pro", "gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra", "grok-4.5",
+            "glm-5.2", "deepseek-v4-pro", "gpt-5.6-luna", "kimi-k3", "gpt-5.6-terra", "grok-4.5",
             "llama-3.3-70b-instruct", "claude-3.5-sonnet",
             "meta-llama/llama-3.3-70b-instruct", "mistralai/mistral-large-2512", "anthropic/claude-sonnet-4.6"
         ]
@@ -1130,14 +1130,23 @@ class Temuclaude:
             )
             return ui_result
 
-        # Pro is quality-first by default.  Savings is an explicit opt-in; the
-        # historical "balanced" value is retained as a compatibility alias for
-        # the quality route so callers cannot silently receive a cheap draft.
+        # Pro is quality-first for genuinely hard queries and fast-adaptive for
+        # trivial/medium ones.  `tier` was computed by determine_tier() above.
+        # For max_quality we honour it: trivial/medium Pro queries take the fast
+        # tier-dispatch path (single specialist / shepherding / tree-of-thoughts,
+        # ~3-15s) and only hard Pro queries run the full gauntlet (MCTS, 10-sample
+        # self-consistency, QA gate, Z3).  `balanced` stays the always-hard
+        # compatibility alias so callers cannot silently receive a cheap draft;
+        # `max_savings` is the explicit cheap opt-in.
         n_samples = None
         if budget_profile in ("max_quality", "balanced"):
-            tier = "hard"
-            token_budget = 8192
-            n_samples = 10
+            if budget_profile == "max_quality" and tier in ("trivial", "medium"):
+                token_budget = self.get_adaptive_token_budget(tier)
+                n_samples = self.get_adaptive_n_samples(tier)
+            else:
+                tier = "hard"
+                token_budget = 8192
+                n_samples = 10
         elif budget_profile == "max_savings":
             if tier == "hard":
                 tier = "medium"
@@ -1339,7 +1348,7 @@ class Temuclaude:
                 strategy += "+usva_qa_passed"
             elif qa_result["attempts"] > 1:
                 escalation_model, _, _ = get_model_for_step(task_type, tier, "premium_escalation")
-                if escalation_model == "gpt-5.6-sol":
+                if escalation_model == "kimi-k3":
                     escalation_messages = [
                         {"role": "system", "content": "You are a senior verifier. Correct the candidate answer using the original request. Return only a precise, final answer."},
                         {"role": "user", "content": f"Original request:\n{query}\n\nCandidate answer that failed QA:\n{answer}"},
@@ -1350,9 +1359,9 @@ class Temuclaude:
                     if not escalated.startswith("[ERROR"):
                         answer = escalated
                         models_used.append(escalation_model)
-                        strategy += "+sol_frontier_escalation"
+                        strategy += "+kimi_k3_frontier_escalation"
                     else:
-                        strategy += "+sol_escalation_failed"
+                        strategy += "+kimi_k3_escalation_failed"
                 else:
                     debate_result = await multi_agent_debate(
                         query, self.call_model_with_fallback,

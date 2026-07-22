@@ -157,7 +157,7 @@ def test_log_analysis():
         {"task_type": "math", "models_used": ["deepseek-v4-pro"], "strategy": "direct", "success": True},
         {"task_type": "math", "models_used": ["glm-5.2"], "strategy": "direct", "success": False},
         {"task_type": "coding", "models_used": ["deepseek-v4-pro"], "strategy": "fusion", "success": True},
-        {"task_type": "coding", "models_used": ["kimi-k2.6"], "strategy": "fusion", "success": False},
+        {"task_type": "coding", "models_used": ["kimi-k3"], "strategy": "fusion", "success": False},
     ]
     
     with open(log_file, "w") as f:

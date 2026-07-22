@@ -35,7 +35,7 @@ export const PLANS: Record<PlanId, Plan> = {
     features: [
       'Standard usage limits apply',
       'Standard Mixture-of-Agents access',
-      'Full 10-layer orchestration',
+      'Adaptive orchestration (up to 10 layers for hard Pro)',
       'All 8 models',
       'Visible orchestration panel',
       'Community support',

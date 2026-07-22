@@ -46,7 +46,7 @@ def test_openrouter_config():
     
     # Check models
     model_names = [m["model_name"] for m in config.get("model_list", [])]
-    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6", 
+    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k3",
                 "minimax-m3", "nemotron-3-ultra", "gpt-oss-120b"]
     
     for m in expected:
@@ -99,7 +99,7 @@ def test_auto_detect_config():
         config = yaml.safe_load(f)
     
     model_names = [m["model_name"] for m in config.get("model_list", [])]
-    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k2.6",
+    expected = ["temuclaude", "glm-5.2", "deepseek-v4-pro", "kimi-k3",
                 "minimax-m3", "nemotron-3-ultra", "gpt-oss-120b"]
     
     for m in expected:
@@ -129,7 +129,7 @@ def test_model_ids():
     expected_ids = {
         "glm-5.2": "z-ai/glm-5.2",
         "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
-        "kimi-k2.6": "moonshotai/kimi-k2.6",
+        "kimi-k3": "moonshotai/kimi-k3",
         "minimax-m3": "minimax/minimax-m3",
         "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
         "gpt-oss-120b": "openai/gpt-oss-120b",

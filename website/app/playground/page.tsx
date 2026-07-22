@@ -11,6 +11,7 @@ type Message = {
   orchestration?: OrchestrationData;
   activity?: ActivityEvent[];
   media?: MediaJob;
+  generationJob?: GenerationJob;
   startedAt?: number;
   completedAt?: number;
 };
@@ -24,6 +25,16 @@ type MediaJob = {
   output_url: string | null;
   output_mime_type: string | null;
   error_code: string | null;
+};
+
+type GenerationJob = {
+  id: string;
+  request_kind: 'chat' | 'artifact';
+  status: 'queued' | 'running' | 'waiting_retry' | 'validating' | 'needs_review' | 'completed' | 'failed' | 'cancel_requested' | 'cancelled';
+  stage: string;
+  final_content: string | null;
+  final_artifact: string | null;
+  last_error_code: string | null;
 };
 
 type OrchestrationData = {
@@ -290,6 +301,31 @@ export default function PlaygroundPage() {
     }
   }, [input, messages.length, pollMediaJob, session, status]);
 
+  const pollGenerationJob = useCallback(async (jobId: string, messageIndex: number, token: string) => {
+    while (true) {
+      await new Promise((resolve) => window.setTimeout(resolve, 5_000));
+      try {
+        const response = await fetch(`/api/generation-jobs/${encodeURIComponent(jobId)}`, { headers: { Authorization: `Bearer ${token}` } });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.job) throw new Error(data.error || 'Maximum-quality task status is unavailable.');
+        const job = data.job as GenerationJob;
+        setMessages((previous) => previous.map((message, index) => index === messageIndex ? {
+          ...message, generationJob: job,
+          content: job.status === 'completed' ? (job.final_artifact || job.final_content || 'Task completed.') : generationStatusMessage(job),
+          completedAt: ['completed', 'failed', 'cancelled'].includes(job.status) ? Date.now() : message.completedAt,
+        } : message));
+        if (job.status === 'completed') { setStatus('ready'); return; }
+        if (job.status === 'failed' || job.status === 'cancelled') { setStatus('error'); return; }
+      } catch {
+        setMessages((previous) => previous.map((message, index) => index === messageIndex ? {
+          ...message, content: 'The task is still running. Refresh later to resume checking its durable job status.',
+        } : message));
+        setStatus('ready');
+        return;
+      }
+    }
+  }, []);
+
   const handleSend = useCallback(async () => {
     if (!session) {
       window.location.href = '/login?returnTo=/playground';
@@ -329,11 +365,31 @@ export default function PlaygroundPage() {
     setProgressSteps([queuedProgress]);
     addActivity(streamingIdxRef.current, queuedProgress);
     abortControllerRef.current = new AbortController();
+    let assistantContent = '';
+    let orchestrationData: OrchestrationData | undefined;
 
     try {
       const token = await getAccessToken();
       if (!token) {
         window.location.href = '/login?returnTo=/playground';
+        return;
+      }
+
+      if (modelProfile === 'pro' && isMaximumQualityArtifact(userMessage.content)) {
+        const response = await fetch('/api/generation-jobs', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ messages: [...messages, userMessage] }),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.job) throw new Error(data.error || 'Unable to start maximum-quality generation.');
+        const job = data.job as GenerationJob;
+        const idx = streamingIdxRef.current;
+        setMessages((previous) => previous.map((message, index) => index === idx ? {
+          ...message, generationJob: job, content: generationStatusMessage(job),
+          activity: [...(message.activity || []), { heading: 'Durable maximum-quality job started', detail: 'This task will continue even if you close the Playground.', kind: 'result', status: 'done' }],
+        } : message));
+        setStatus('streaming');
+        void pollGenerationJob(job.id, idx, token);
         return;
       }
 
@@ -353,8 +409,6 @@ export default function PlaygroundPage() {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let assistantContent = '';
-      let orchestrationData: OrchestrationData | undefined;
       let streamBuffer = '';
 
       if (reader) {
@@ -433,7 +487,11 @@ export default function PlaygroundPage() {
           const updated = [...prev];
           updated[index] = {
             ...updated[index],
-            content: 'Something went wrong. Please try again.',
+            // A late transport close can happen after the server has already
+            // streamed a usable artifact. Preserve that result instead of
+            // replacing it with a generic error.
+            content: assistantContent.trim() || 'Something went wrong. Please try again.',
+            orchestration: orchestrationData || updated[index].orchestration,
             completedAt: Date.now(),
             activity: [...(updated[index].activity || []), {
               heading: 'The workflow could not complete',
@@ -447,10 +505,20 @@ export default function PlaygroundPage() {
         streamingIdxRef.current = -1;
       }
     }
-  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity, handleMediaSend]);
+  }, [input, status, messages, limitMessage, checkUsage, session, activeConversationId, modelProfile, addProgress, addActivity, handleMediaSend, pollGenerationJob]);
 
-  const handleStop = () => {
+  const handleStop = async () => {
     abortControllerRef.current?.abort();
+    const activeJob = [...messages].reverse().find((message) => message.generationJob
+      && ['queued', 'running', 'waiting_retry', 'validating', 'cancel_requested'].includes(message.generationJob.status));
+    if (activeJob?.generationJob) {
+      const token = await getAccessToken();
+      if (token) {
+        await fetch(`/api/generation-jobs/${encodeURIComponent(activeJob.generationJob.id)}`, {
+          method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => undefined);
+      }
+    }
     setStatus('ready');
   };
 
@@ -625,7 +693,9 @@ export default function PlaygroundPage() {
                       aria-live={message.role === 'assistant' ? 'polite' : undefined}
                       aria-atomic="false"
                     >
-                      {message.content || (message.role === 'assistant' && status === 'submitted' ? 'Working…' : '')}
+                      {message.role === 'assistant'
+                        ? visibleAssistantText(message.content) || (status === 'submitted' ? 'Working…' : '')
+                        : message.content}
                       {status === 'streaming' && i === messages.length - 1 && message.role === 'assistant' && (
                         <span className="inline-block w-2 h-4 bg-accent-primary ml-0.5 animate-blink" />
                       )}
@@ -645,7 +715,13 @@ export default function PlaygroundPage() {
                             <circle cx="12" cy="12" r="10" />
                             <path d="M12 6v6l4 2" />
                           </svg>
-                          {message.orchestration.models.length} models · {message.orchestration.totalLatency}s · {message.orchestration.cost}
+                          {message.orchestration.techniques?.includes('modal-pro-orchestration')
+                            ? message.orchestration.models.length > 0
+                              ? `${message.orchestration.models.length} roles completed`
+                              : 'Modal synthesis · execution details unavailable'
+                            : message.orchestration.techniques?.includes('quality-first-code-panel')
+                              ? `${message.orchestration.models.filter((model) => model.correct).length}/${message.orchestration.models.length} panel roles completed`
+                              : `${message.orchestration.models.length} models`} · {message.orchestration.totalLatency}s · {message.orchestration.cost}
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: showOrchestration === String(i) ? 'rotate(180deg)' : 'none', transition: 'transform 150ms' }}>
                             <polyline points="6 9 12 15 18 9" />
                           </svg>
@@ -748,6 +824,20 @@ export default function PlaygroundPage() {
       </div>
     </>
   );
+}
+
+function isMaximumQualityArtifact(prompt: string): boolean {
+  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|webpage|web page|site|web app|landing page|html|css|javascript|app|component|file)\b/i.test(prompt);
+}
+
+function generationStatusMessage(job: GenerationJob): string {
+  if (job.status === 'queued') return 'Maximum-quality task queued. It will keep running even if you leave the Playground.';
+  if (job.status === 'completed') return job.final_artifact || job.final_content || 'Maximum-quality task completed.';
+  if (job.status === 'failed') return `The maximum-quality task stopped at ${job.stage}${job.last_error_code ? ` (${job.last_error_code})` : ''}.`;
+  if (job.status === 'needs_review') return 'The task reached its configured quality/retry budget and needs an operator review.';
+  if (job.status === 'cancelled') return 'The maximum-quality task was cancelled.';
+  if (job.status === 'cancel_requested') return 'Cancellation requested. The worker will stop at its next safe checkpoint.';
+  return `Maximum-quality task is running: ${job.stage.replace(/_/g, ' ')}.`;
 }
 
 function mediaStatusMessage(job: MediaJob): string {
@@ -887,7 +977,8 @@ function AgentActivity({
 }
 
 function CodeArtifact({ content }: { content: string }) {
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
+  const [showCode, setShowCode] = useState(false);
   const [isolatedPreview, setIsolatedPreview] = useState<{ previewUrl: string; downloadUrl: string; expiresAt: string } | null>(null);
   const [isolatedPreviewState, setIsolatedPreviewState] = useState<'idle' | 'starting' | 'error'>('idle');
   const html = extractHtmlArtifact(content);
@@ -932,10 +1023,14 @@ function CodeArtifact({ content }: { content: string }) {
   };
   return (
     <div className="mt-3 border-t border-border-subtle pt-3 text-xs">
+      <p className="mb-2 text-text-secondary">Your playable preview is ready below. Use <span className="font-medium text-text-primary">View code</span> only when you want the implementation.</p>
       <div className="flex items-center gap-2">
         <span className="font-mono text-text-muted">HTML deliverable</span>
         <button onClick={() => setPreviewOpen((open) => !open)} className="text-accent-primary hover:underline" aria-expanded={previewOpen}>
           {previewOpen ? 'Close preview' : 'Preview'}
+        </button>
+        <button onClick={() => setShowCode((open) => !open)} className="text-text-secondary hover:text-text-primary" aria-expanded={showCode}>
+          {showCode ? 'Hide code' : 'View code'}
         </button>
         <button onClick={runIsolatedPreview} disabled={isolatedPreviewState === 'starting'} className="text-text-secondary hover:text-text-primary disabled:opacity-50">
           {isolatedPreviewState === 'starting' ? 'Starting isolated preview…' : 'Run isolated preview'}
@@ -971,8 +1066,24 @@ function CodeArtifact({ content }: { content: string }) {
           )}
         </div>
       )}
+      {showCode && (
+        <pre className="mt-3 max-h-80 overflow-auto rounded-sm border border-border-subtle bg-bg-dark p-3 text-[11px] leading-relaxed text-text-inverse">
+          <code>{html}</code>
+        </pre>
+      )}
     </div>
   );
+}
+
+function visibleAssistantText(content: string): string {
+  const fenced = content.match(/```(?:html|htm)\s*\n[\s\S]*?```/i);
+  const prose = fenced
+    ? content.replace(fenced[0], '').replace(/\n{3,}/g, '\n\n').trim()
+    : (() => {
+      const start = content.search(/<!doctype\s+html\b|<html\b/i);
+      return start < 0 ? content : content.slice(0, start).trim();
+    })();
+  return prose.length > 520 ? `${prose.slice(0, 517).trim()}…` : prose;
 }
 
 function extractHtmlArtifact(content: string): string | null {
@@ -997,6 +1108,8 @@ function sandboxPreviewDocument(html: string): string {
 }
 
 function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClose: () => void }) {
+  const isModalPanel = (data.techniques?.includes('modal-pro-orchestration') ?? false)
+    && data.models.length > 0;
   return (
     <div className="border-t border-border-subtle bg-bg-secondary max-h-[40vh] overflow-y-auto">
       <div className="max-w-3xl mx-auto p-6">
@@ -1027,14 +1140,16 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E25822" strokeWidth="2"><circle cx="12" cy="12" r="3" /></svg>
               </div>
               <div className="flex-1">
-                <div className="text-sm font-medium text-text-primary mb-2">Combining multiple answers ({data.models.length} models)</div>
+                <div className="text-sm font-medium text-text-primary mb-2">
+                  {isModalPanel ? `Modal quality panel (${data.models.length} roles completed)` : `Combining multiple answers (${data.models.length} models)`}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   {data.models.map((model, i) => (
                     <div key={i} className="bg-white border border-border-subtle rounded-sm p-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-medium text-text-primary">{model.name}</span>
                         <span className={`text-xs ${model.correct ? 'text-accent-olive' : 'text-accent-fig'}`}>
-                          {model.correct ? '✓' : '✗'}
+                          {isModalPanel ? 'completed' : model.correct ? '✓' : '✗'}
                         </span>
                       </div>
                       <p className="text-xs text-text-muted line-clamp-2">{model.response}</p>
@@ -1043,7 +1158,9 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
                   ))}
                 </div>
                 <div className="text-xs text-text-muted mt-2">
-                  Aggregated by: {data.aggregator} · Consensus: {data.consensus}/3 agree
+                  {isModalPanel
+                    ? 'Only roles that returned usable work are shown. Timed-out or unavailable providers are not counted as completed.'
+                    : `Aggregated by: ${data.aggregator} · Consensus: ${data.consensus}/3 agree`}
                 </div>
               </div>
             </div>
@@ -1076,7 +1193,11 @@ function OrchestrationPanel({ data, onClose }: { data: OrchestrationData; onClos
           <div className="flex items-center gap-4 pt-2 border-t border-border-subtle text-xs text-text-muted">
             <span>Total: {data.totalLatency}s</span>
             <span>·</span>
-            <span>{data.models.length} models</span>
+            <span>{isModalPanel
+              ? `${data.models.length} roles completed`
+              : data.techniques?.includes('quality-first-code-panel')
+                ? `${data.models.filter((model) => model.correct).length}/${data.models.length} panel roles completed`
+                : `${data.models.length} models`}</span>
           </div>
         </div>
       </div>

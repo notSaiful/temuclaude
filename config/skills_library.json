@@ -1,0 +1,11 @@
+{
+  "skills": [
+    {
+      "query": "2+2",
+      "skill_code": "The answer is 4.\n\nWait",
+      "task_type": "math",
+      "metadata": {},
+      "embedding": null
+    }
+  ]
+}

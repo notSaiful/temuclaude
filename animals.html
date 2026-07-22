@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Animals</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+  }
+  h1 { font-size: 2.5rem; background: linear-gradient(135deg, #22d3ee, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: #94a3b8; margin-top: 0.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #1e293b;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border-color: #22d3ee;
+  }
+  .card:active { transform: scale(0.97); }
+  .emoji { font-size: 4rem; text-align: center; margin-bottom: 0.5rem; }
+  .name { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+  .fact { color: #94a3b8; font-size: 0.95rem; line-height: 1.5; text-align: center; }
+  .sound-btn {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1.5rem;
+    background: #334155;
+    color: #e2e8f0;
+    border: none;
+    border-radius: 2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+  .sound-btn:hover { background: #475569; }
+  .quiz-section {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #1e293b;
+    border-radius: 1rem;
+    text-align: center;
+  }
+  .quiz-section h2 { margin-bottom: 1rem; color: #22d3ee; }
+  .quiz-question { font-size: 1.2rem; margin-bottom: 1rem; }
+  .quiz-options { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+  .quiz-options button {
+    padding: 0.75rem 1.5rem;
+    background: #334155;
+    color: #e2e8f0;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .quiz-options button:hover { border-color: #22d3ee; }
+  .quiz-options button.correct { background: #166534; border-color: #22c55e; }
+  .quiz-options button.wrong { background: #7f1d1d; border-color: #ef4444; }
+  .quiz-result { margin-top: 1rem; font-size: 1.1rem; font-weight: 600; }
+  .search-box {
+    display: block;
+    margin: 0 auto 2rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    border: 2px solid #334155;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 1rem;
+    width: 300px;
+    max-width: 90%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: #22d3ee; }
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: #475569;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🐾 Amazing Animals</h1>
+  <p class="subtitle">Click a card to learn a fun fact • Take the quiz below!</p>
+  <input type="text" class="search-box" placeholder="🔍 Search animals..." id="search">
+</header>
+
+<div class="grid" id="grid"></div>
+
+<section class="quiz-section">
+  <h2>🧠 Animal Quiz</h2>
+  <p class="quiz-question" id="quiz-question"></p>
+  <div class="quiz-options" id="quiz-options"></div>
+  <p class="quiz-result" id="quiz-result"></p>
+</section>
+
+<footer>Made with ❤️ for nature</footer>
+
+<script>
+const animals = [
+  { emoji:"🦁", name:"Lion", fact:"A lion's roar can be heard up to 8 kilometers away!", sound:"Roar!" },
+  { emoji:"🐘", name:"Elephant", fact:"Elephants are the only animals that can't jump.", sound:"Trumpet!" },
+  { emoji:"🐬", name:"Dolphin", fact:"Dolphins sleep with one eye open to watch for predators.", sound:"Click-click!" },
+  { emoji:"🦅", name:"Eagle", fact:"Eagles can spot prey from over 3 kilometers away.", sound:"Screech!" },
+  { emoji:"🐙", name:"Octopus", fact:"Octopuses have three hearts and blue blood.", sound:"Blub-blub!" },
+  { emoji:"🦒", name:"Giraffe", fact:"A giraffe's tongue can be up to 45 cm long!", sound:"Munch-munch!" },
+  { emoji:"🐧", name:"Penguin", fact:"Penguins propose to their mates with a pebble.", sound:"Honk!" },
+  { emoji:"🦊", name:"Fox", fact:"Foxes use Earth's magnetic field to hunt prey under snow.", sound:"Yip-yip!" },
+  { emoji:"🐢", name:"Turtle", fact:"Some turtles can breathe through their butts underwater!", sound:"Hiss!" },
+  { emoji:"🦜", name:"Parrot", fact:"Some parrots can live over 80 years.", sound:"Hello!" },
+  { emoji:"🐸", name:"Frog", fact:"Some frogs can freeze solid in winter and thaw out alive in spring.", sound:"Ribbit!" },
+  { emoji:"🦈", name:"Shark", fact:"Sharks have been around longer than trees — over 400 million years!", sound:"Chomp!" }
+];
+
+let currentQuiz = null;
+
+function renderCards(filter = "") {
+  const grid = document.getElementById("grid");
+  const term = filter.toLowerCase();
+  const filtered = animals.filter(a => a.name.toLowerCase().includes(term));
+  grid.innerHTML = filtered.map(a => `
+    <div class="card" onclick="speak('${a.name} says: ${a.sound}')">
+      <div class="emoji">${a.emoji}</div>
+      <div class="name">${a.name}</div>
+      <div class="fact">${a.fact}</div>
+      <button class="sound-btn" onclick="event.stopPropagation(); speak('${a.sound}')">🔊 Hear Sound</button>
+    </div>
+  `).join("");
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.9;
+  u.pitch = 1.1;
+  speechSynthesis.speak(u);
+}
+
+function newQuiz() {
+  const pool = [...animals].sort(() => Math.random() - 0.5);
+  const correct = pool[0];
+  const options = [correct, pool[1], pool[2], pool[3]].sort(() => Math.random() - 0.5);
+  currentQuiz = correct;
+  document.getElementById("quiz-question").textContent = `Which animal makes this sound? "${correct.sound}"`;
+  const optsDiv = document.getElementById("quiz-options");
+  optsDiv.innerHTML = options.map(a =>
+    `<button onclick="checkAnswer('${a.name}')">${a.emoji} ${a.name}</button>`
+  ).join("");
+  document.getElementById("quiz-result").textContent = "";
+}
+
+function checkAnswer(name) {
+  const result = document.getElementById("quiz-result");
+  const buttons = document.querySelectorAll("#quiz-options button");
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (b.textContent.includes(currentQuiz.name)) b.classList.add("correct");
+    else if (b.textContent.includes(name) && name !== currentQuiz.name) b.classList.add("wrong");
+  });
+  result.textContent = name === currentQuiz.name ? "✅ Correct! Well done!" : "❌ Oops! Try the next one.";
+  result.style.color = name === currentQuiz.name ? "#22c55e" : "#ef4444";
+  setTimeout(newQuiz, 2000);
+}
+
+document.getElementById("search").addEventListener("input", e => renderCards(e.target.value));
+
+renderCards();
+newQuiz();
+</script>
+</body>
+</html>

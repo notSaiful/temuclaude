@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic';
 function getPlanByRazorpayPlanIdLocal(razorpayPlanId: string): { id: string } | null {
   if ((process.env.RAZORPAY_PLAN_DEV_ID || process.env.RAZORPAY_PLAN_DEVELOPER_ID) === razorpayPlanId) return { id: 'developer' };
   if (process.env.RAZORPAY_PLAN_PRO_ID === razorpayPlanId) return { id: 'pro' };
+  if (process.env.RAZORPAY_PLAN_MAX_ID === razorpayPlanId) return { id: 'max' };
   if (process.env.RAZORPAY_PLAN_ENTERPRISE_ID === razorpayPlanId) return { id: 'enterprise' };
   return null;
 }

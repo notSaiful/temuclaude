@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Neon Rift</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#050510;font-family:system-ui,sans-serif;color:#e0e0ff;touch-action:none;user-select:none}
+#c{display:block;width:100%;height:100%;cursor:crosshair;background:radial-gradient(ellipse at center,#0a0a30 0%,#050510 70%)}
+#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:10px 16px;pointer-events:none;z-index:10;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.h{background:rgba(10,10,30,.85);border:1px solid rgba(0,240,255,.25);border-radius:6px;padding:6px 12px;backdrop-filter:blur(4px)}
+.hb{font-size:10px;color:#8899aa}
+.hv{font-size:16px;font-weight:700}
+#sc{color:#ffe600}
+#wv{color:#a855f7}
+#hpw{width:120px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-top:3px;border:1px solid rgba(255,255,255,.08)}
+#hpf{height:100%;width:100%;background:linear-gradient(90deg,#ff2e88,#ffe600);border-radius:4px;transition:width .2s}
+#ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,15,.92);z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
+#ov.a{opacity:1;pointer-events:auto}
+#ov h1{font-size:clamp(26px,5vw,48px);font-weight:800;letter-spacing:3px;text-transform:uppercase;background:linear-gradient(90deg,#00f0ff,#ff2e88);-webkit-background-fill-color:transparent;-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 10px rgba(0,240,255,.3));margin-bottom:6px}
+#ov p{color:#aab;font-size:14px;margin-bottom:18px;text-align:center;max-width:420px;padding:0 16px}
+.b{background:transparent;color:#00f0ff;border:2px solid #00f0ff;border-radius:6px;padding:10px 28px;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin:5px;box-shadow:0 0 10px rgba(0,240,255,.1)}
+.b:hover{background:rgba(0,240,255,.1);color:#fff;box-shadow:0 0 20px rgba(0,240,255,.3)}
+.br{border-color:#ff2e88;color:#ff2e88;box-shadow:0 0 10px rgba(255,46,136,.1)}
+.br:hover{background:rgba(255,46,136,.1);color:#fff;box-shadow:0 0 20px rgba(255,46,136,.3)}
+#hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(10,10,30,.85);border:1px solid rgba(0,240,255,.15);border-radius:6px;padding:6px 14px;font-size:11px;color:#778899;z-index:10;pointer-events:none}
+#flash{position:absolute;inset:0;pointer-events:none;z-index:8;background:radial-gradient(circle at center,rgba(255,46,136,.2) 0%,transparent 70%);opacity:0;transition:opacity .12s}
+#tc{position:absolute;inset:0;z-index:5;pointer-events:none;display:none}
+.t{position:absolute;pointer-events:auto;border-radius:50%;border:2px solid rgba(0,240,255,.2);background:rgba(0,240,255,.03);display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(0,240,255,.4);text-transform:uppercase}
+#tm{width:120px;height:120px;left:16px;bottom:16px}
+#ta{width:120px;height:120px;right:16px;bottom:16px}
+#tf{width:70px;height:70px;right:40px;bottom:150px;border-color:rgba(255,46,136,.3);background:rgba(255,46,136,.06);color:rgba(255,46,136,.5)}
+@media(max-width:768px){#tc{display:block}#hint{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"><div class="h"><div class="hb">Score</div><div class="hv" id="sc">0</div></div><div class="h"><div class="hb">Wave</div><div class="hv" id="wv">1</div></div><div class="h"><div class="hb">Health</div><div id="hpw"><div id="hpf"></div></div></div></div>
+<div id="flash"></div>
+<div id="hint">WASD move · Mouse aim · Click/Space shoot · P pause · R restart</div>
+<div id="tc"><div id="tm" class="t">Move</div><div id="ta" class="t">Aim</div><div id="tf" class="t">Fire</div></div>
+<div id="ov" class="a"><h1 id="ot">Neon Rift</h1><p id="om">Survive the neon onslaught.</p><button class="b" id="bs">Start</button><button class="b br" id="br" style="display:none">Restart</button></div>
+<script>
+(function(){
+'use strict';
+const C=window.AudioContext||window.webkitAudioContext;let A=null;
+function E(){if(!A)A=new C();if(A.state==='suspended')A.resume()}
+function S(t){
+if(!A)return;const n=A.currentTime,o=A.createOscillator(),g=A.createGain();o.connect(g);g.connect(A.destination);
+if(t==='s'){o.type='square';o.frequency.setValueAtTime(880,n);o.frequency.exponentialRampToValueAtTime(220,n+.08);g.gain.setValueAtTime(.08,n);g.gain.exponentialRampToValueAtTime(.001,n+.08);o.start(n);o.stop(n+.08)}
+else if(t==='h'){o.type='sawtooth';o.frequency.setValueAtTime(200,n);o.frequency.exponentialRampToValueAtTime(50,n+.12);g.gain.setValueAtTime(.1,n);g.gain.exponentialRampToValueAtTime(.001,n+.12);o.start(n);o.stop(n+.12)}
+else if(t==='e'){o.type='sawtooth';o.frequency.setValueAtTime(100,n);o.frequency.exponentialRampToValueAtTime(20,n+.25);g.gain.setValueAtTime(.12,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);o.start(n);o.stop(n+.25)}
+else if(t==='d'){o.type='square';o.frequency.setValueAtTime(150,n);o.frequency.linearRampToValueAtTime(80,n+.12);g.gain.setValueAtTime(.1,n);g.gain.exponentialRampToValueAtTime(.001,n+.12);o.start(n);o.stop(n+.12)}
+else if(t==='w'){o.type='sine';o.frequency.setValueAtTime(440,n);o.frequency.exponentialRampToValueAtTime(880,n+.18);g.gain.setValueAtTime(.05,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);o.start(n);o.stop(n+.25)}
+}
+const c=document.getElementById('c'),x=c.getContext('2d');
+let W,H,CX,CY;
+function R(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;CX=W/2;CY=H/2}
+R();window.addEventListener('resize',R);
+const ST={M:0,P:1,U:2,G:3};let st=ST.M;
+let score=0,wave=1,hp=100,maxHp=100;
+let px,py,pv=4,pr=10;
+let bullets=[],enemies=[],particles=[],stars=[];
+let mx=CX,my=CY,fire=false,lastFire=0,fireRate=180;
+let keys={},waveTimer=0,spawnTimer=0,enemiesToSpawn=0;
+let touchMove=null,touchAim=null,touchFire=false;
+
+function reset(){
+px=CX;py=CY;score=0;wave=1;hp=maxHp;bullets=[];enemies=[];particles=[];waveTimer=0;spawnTimer=0;enemiesToSpawn=5;fire=false;lastFire=0;mx=CX;my=CY;
+for(let i=0;i<80;i++)stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*.8+.2,a:Math.random()*.5+.2});
+}
+reset();
+
+function spawnEnemy(){
+const side=Math.floor(Math.random()*4);let ex,ey;
+if(side===0){ex=Math.random()*W;ey=-20}
+else if(side===1){ex=W+20;ey=Math.random()*H}
+else if(side===2){ex=Math.random()*W;ey=H+20}
+else{ex=-20;ey=Math.random()*H}
+const angle=Math.atan2(py-ey,px-ex);
+const speed=1.2+wave*.25+Math.random()*.8;
+enemies.push({x:ex,y:ey,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,r:10+Math.random()*6,hp:1+Math.floor(wave/3),maxHp:1+Math.floor(wave/3),c:wave%3===0?'#ff2e88':wave%3===1?'#a855f7':'#00f0ff'});
+}
+
+function addParticles(xx,yy,color,count=8){
+for(let i=0;i<count;i++){
+const a=Math.random()*Math.PI*2,s=1+Math.random()*3;
+particles.push({x:xx,y:yy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:color||'#fff'});
+}
+}
+
+function update(dt){
+if(st!==ST.P)return;
+let dx=0,dy=0;
+if(keys['KeyW']||keys['ArrowUp'])dy=-1;
+if(keys['KeyS']||keys['ArrowDown'])dy=1;
+if(keys['KeyA']||keys['ArrowLeft'])dx=-1;
+if(keys['KeyD']||keys['ArrowRight'])dx=1;
+if(touchMove){dx=touchMove.dx;dy=touchMove.dy}
+if(dx!==0||dy!==0){const len=Math.hypot(dx,dy)||1;px+=dx/len*pv;py+=dy/len*pv}
+px=Math.max(pr,Math.min(W-pr,px));py=Math.max(pr,Math.min(H-pr,py));
+
+let ax,ay;
+if(touchAim){ax=touchAim.dx;ay=touchAim.dy}
+else{ax=mx-px;ay=my-py}
+const alen=Math.hypot(ax,ay)||1;
+const aimX=ax/alen,aimY=ay/alen;
+
+const now=performance.now();
+if((fire||touchFire||keys['Space'])&&now-lastFire>fireRate){
+lastFire=now;bullets.push({x:px,y:py,vx:aimX*10,vy:aimY*10,r:3,life:2});S('s');
+}
+
+for(let i=bullets.length-1;i>=0;i--){
+const b=bullets[i];b.x+=b.vx;b.y+=b.vy;b.life-=dt;
+if(b.x<-50||b.x>W+50||b.y<-50||b.y>H+50||b.life<=0)bullets.splice(i,1);
+}
+
+for(let i=enemies.length-1;i>=0;i--){
+const e=enemies[i];e.x+=e.vx;e.y+=e.vy;
+const dist=Math.hypot(px-e.x,py-e.y);
+if(dist<e.r+pr){
+hp-=10;S('d');document.getElementById('flash').style.opacity=.6;setTimeout(()=>document.getElementById('flash').style.opacity=0,120);
+addParticles(e.x,e.y,e.c,12);enemies.splice(i,1);if(hp<=0){hp=0;st=ST.G;showOver();}
+continue;
+}
+for(let j=bullets.length-1;j>=0;j--){
+const b=bullets[j];if(Math.hypot(b.x-e.x,b.y-e.y)<e.r+b.r){
+e.hp--;addParticles(b.x,b.y,'#ffe600',4);bullets.splice(j,1);S('h');
+if(e.hp<=0){score+=10*wave;addParticles(e.x,e.y,e.c,16);enemies.splice(i,1);S('e');}
+break;
+}
+}
+}
+
+for(let i=particles.length-1;i>=0;i--){
+const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.life-=dt*2;
+if(p.life<=0)particles.splice(i,1);
+}
+
+waveTimer+=dt;
+if(enemiesToSpawn>0){spawnTimer+=dt;if(spawnTimer>.6){spawnTimer=0;spawnEnemy();enemiesToSpawn--;}}
+else if(enemies.length===0){wave++;enemiesToSpawn=4+wave*2;S('w');}
+
+for(let s of stars){s.y+=s.s*.3;if(s.y>H)s.y=0;}
+}
+
+function draw(){
+x.clearRect(0,0,W,H);
+for(let s of stars){x.globalAlpha=s.a;x.fillStyle='#fff';x.fillRect(s.x,s.y,s.s*2,s.s*2)}
+x.globalAlpha=1;
+
+for(let p of particles){x.globalAlpha=Math.max(0,p.life);x.fillStyle=p.color;x.beginPath();x.arc(p.x,p.y,2,0,Math.PI*2);x.fill()}
+x.globalAlpha=1;
+
+for(let b of bullets){x.shadowBlur=10;x.shadowColor='#ffe600';x.fillStyle='#ffe600';x.beginPath();x.arc(b.x,b.y,b.r,0,Math.PI*2);x.fill();x.shadowBlur=0}
+
+for(let e of enemies){
+x.shadowBlur=14;x.shadowColor=e.c;
+x.fillStyle=e.c;x.beginPath();x.arc(e.x,e.y,e.r,0,Math.PI*2);x.fill();
+x.fillStyle='#fff';x.beginPath();x.arc(e.x,e.y,e.r*.35,0,Math.PI*2);x.fill();
+x.shadowBlur=0;
+}
+
+const a=Math.atan2(my-py,mx-px);
+x.save();x.translate(px,py);x.rotate(a);
+x.shadowBlur=18;x.shadowColor='#00f0ff';
+x.fillStyle='#00f0ff';x.beginPath();x.moveTo(12,0);x.lineTo(-8,8);x.lineTo(-5,0);x.lineTo(-8,-8);x.closePath();x.fill();
+x.shadowBlur=0;x.restore();
+
+x.fillStyle='#fff';x.font='12px monospace';x.fillText('Wave '+wave+' | '+enemies.length+' enemies',10,H-10);
+}
+
+function hud(){
+document.getElementById('sc').textContent=score;
+document.getElementById('wv').textContent=wave;
+document.getElementById('hpf').style.width=Math.max(0,hp)+'%';
+}
+
+function loop(){
+const now=performance.now();const dt=Math.min((now-(loop.last||now))/1000,.05);loop.last=now;
+update(dt);draw();hud();requestAnimationFrame(loop);
+}
+
+function showOver(){
+document.getElementById('ot').textContent='Game Over';
+document.getElementById('om').innerHTML='Score <span style="color:#ffe600">'+score+'</span> &nbsp;Wave <span style="color:#a855f7">'+wave+'</span>';
+document.getElementById('bs').style.display='none';document.getElementById('br').style.display='inline-block';
+document.getElementById('ov').classList.add('a');
+}
+function showStart(){
+document.getElementById('ot').textContent='Neon Rift';
+document.getElementById('om').textContent='Survive the neon onslaught.';
+document.getElementById('bs').style.display='inline-block';document.getElementById('br').style.display='none';
+document.getElementById('ov').classList.add('a');
+}
+function startGame(){st=ST.P;document.getElementById('ov').classList.remove('a');E();}
+function pauseGame(){if(st===ST.P){st=ST.U;document.getElementById('ot').textContent='Paused';document.getElementById('om').textContent='Press P to resume';document.getElementById('bs').textContent='Resume';document.getElementById('bs').style.display='inline-block';document.getElementById('br').style.display='inline-block';document.getElementById('ov').classList.add('a');}}
+function resumeGame(){if(st===ST.U){st=ST.P;document.getElementById('ov').classList.remove('a');}}
+function restartGame(){reset();st=ST.P;document.getElementById('ov').classList.remove('a');E();}
+
+document.getElementById('bs').addEventListener('click',()=>{if(st===ST.U)resumeGame();else startGame()});
+document.getElementById('br').addEventListener('click',restartGame);
+
+window.addEventListener('keydown',e=>{
+keys[e.code]=true;
+if(e.code==='KeyP'){if(st===ST.P)pauseGame();else if(st===ST.U)resumeGame();}
+if(e.code==='KeyR')restartGame();
+});
+window.addEventListener('keyup',e=>keys[e.code]=false);
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+window.addEventListener('mousedown',e=>{if(e.button===0)fire=true});
+window.addEventListener('mouseup',e=>{if(e.button===0)fire=false});
+
+function handleTouch(id,el,cb){
+el.addEventListener('touchstart',e=>{e.preventDefault();for(let t of e.changedTouches)if(!touchMove||t.identifier===touchMove.id){touchMove={id:t.identifier,dx:0,dy:0,sx:t.clientX,sy:t.clientY,el:id};break}},{passive:false});
+el.addEventListener('touchmove',e=>{e.preventDefault();for(let t of e.changedTouches){if(touchMove&&touchMove.id===t.identifier&&touchMove.el===id){const dx=t.clientX-touchMove.sx,dy=t.clientY-touchMove.sy;const d=Math.hypot(dx,dy);const max=50;const s=d>max?max/d:1;touchMove.dx=dx*s/max;touchMove.dy=dy*s/max;if(cb)cb(touchMove.dx,touchMove.dy);break}}},{passive:false});
+el.addEventListener('touchend',e=>{for(let t of e.changedTouches){if(touchMove&&touchMove.id===t.identifier&&touchMove.el===id){touchMove=null;break}}},{passive:false});
+}
+
+handleTouch('move',document.getElementById('tm'));
+handleTouch('aim',document.getElementById('ta'),(dx,dy)=>{touchAim={dx,dy};});
+const tf=document.getElementById('tf');
+tf.addEventListener('touchstart',e=>{e.preventDefault();touchFire=true;},{passive:false});
+tf.addEventListener('touchend',e=>{e.preventDefault();touchFire=false;},{passive:false});
+
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

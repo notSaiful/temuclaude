@@ -486,9 +486,11 @@ def route_with_trained_model(query: str, task_type: str, tier: str) -> tuple:
     Returns:
         (model: str, confidence: float, used_trained_router: bool)
     """
-    # For trivial tier, always use cheap model (no need for router)
+    # For trivial tier use the current low-cost worker.  Free models remain
+    # useful as availability fallbacks, but are too rate-limited to define the
+    # quality floor for a production route.
     if tier == "trivial":
-        return ("gpt-oss-120b", 1.0, False)
+        return ("deepseek-v4-flash", 1.0, False)
     
     # Get trained router
     trained_model = get_trained_router()
@@ -502,11 +504,11 @@ def route_with_trained_model(query: str, task_type: str, tier: str) -> tuple:
     
     if needs_strong:
         # Strong model needed - use task-specific specialist
-        from .models import TASK_MODEL_MAP
-        model = TASK_MODEL_MAP.get(task_type, "glm-5.2")
+        from .models import TASK_MODEL_MAP, get_runtime_model
+        model = get_runtime_model(TASK_MODEL_MAP.get(task_type, "glm-5.2"))
     else:
         # Weak model suffices - use cheap model
-        model = "gpt-oss-120b"
+        model = "deepseek-v4-flash"
     
     return (model, confidence, True)
 

@@ -26,14 +26,14 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://temuclaude.com'),
-  title: 'TemuClaude — Multi-Model AI Orchestration | 8 Models, 6-Layer Pipeline',
+  title: 'TemuClaude — Multi-Model AI Orchestration | 8 Models, Adaptive Multi-Layer Pipeline',
   description: 'TemuClaude assigns ten AI model roles by capability, synthesizes parallel specialist work, and independently verifies nontrivial responses. Try it free.',
   keywords: ['LLM orchestration', 'multi-model AI', 'Mixture of Agents', 'AI playground', 'model fusion', 'open source AI', 'frontier AI', 'cheap AI API'],
   authors: [{ name: 'Mohammad Saiful Haque' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 6-layer quality pipeline. A fraction of comparable frontier direct token cost. Open source. 25% to charity.',
+    description: '8 models. Adaptive multi-layer pipeline — up to 10 layers for hard queries. A fraction of comparable frontier direct token cost. Open source. 25% to charity.',
     type: 'website',
     url: 'https://temuclaude.com',
     siteName: 'TemuClaude',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'TemuClaude — One Question. Eight Minds. One Superior Answer.',
-    description: '8 models. 6-layer pipeline. Fraction of the cost. Open source. 25% to charity.',
+    description: '8 models. Adaptive multi-layer pipeline. Fraction of the cost. Open source. 25% to charity.',
     images: ['/og-image.png'],
     site: '@temuclaude',
   },
@@ -55,7 +55,7 @@ const structuredData = {
   name: 'TemuClaude',
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
-  description: 'Multi-model AI orchestration platform. 8 models, 6-layer quality pipeline, and a cost-aware frontier escalation policy. Open source.',
+  description: 'Multi-model AI orchestration platform. 8 models, an adaptive multi-layer pipeline (up to 10 layers for hard queries), and a cost-aware frontier escalation policy. Open source.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   url: 'https://temuclaude.com',
 };

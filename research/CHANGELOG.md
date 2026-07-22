@@ -2,6 +2,15 @@
 
 All automatic integrations logged here.
 
+## 2026-07-22
+IMPLEMENTED + DEPLOYED: Durable maximum-quality generation pipeline
+- Replaced the request-bound generation path for substantial web, game, and artifact work with durable Supabase-backed generation jobs.
+- Added a 24-hour Modal worker with renewable leases, checkpointed stages, exponential retry/recovery, cancellation, and a high-attempt review safety boundary; a browser/API request now creates a job and returns immediately instead of being limited by the request lifetime.
+- Maximum-quality contract: eight-model specialist panel, synthesis, artifact generation, deterministic HTML validation, isolated preview validation, Nemotron QA, and up to eight repair revisions before completion.
+- Added Playground job submission/progress/cancellation and API background execution (`POST /v1/chat/completions` with `background: true`, `GET /v1/jobs/:id`).
+- Applied production Supabase migrations `202607220001_durable_generation_jobs.sql` and `202607220002_maximum_quality_pipeline.sql`; deployed Modal (`temuclaude-prod`) and Vercel (`temuclaude.com`).
+- Verification: focused durability/orchestration/playground suite passed (32 tests); Python compile, TypeScript type-check, and production build passed; authenticated Playground and API background jobs reached `completed` with a runnable HTML artifact.
+
 ## 2026-07-08
 RESEARCH COMPLETED: deep_research_frontier_orchestration_20260708.md
 - Topic: frontier orchestration, adaptive test-time compute, verifier-guided reasoning, GEPA, cost-aware coding-agent evaluation, KV-cache economics

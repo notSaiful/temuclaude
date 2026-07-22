@@ -15,10 +15,11 @@ from src.fusion import get_panel
 from src.ui_ux.screenshot_feedback import ScreenshotFeedback, ScreenshotResult
 
 
-def test_updated_stack_has_ten_active_roles_and_frontier_sol():
-    assert len(UPDATED_MODEL_STACK) == 10
+def test_updated_stack_has_nine_active_roles_and_kimi_k3():
+    assert len(UPDATED_MODEL_STACK) == 9
     assert "gpt-5.6-luna" in UPDATED_MODEL_STACK
-    assert "gpt-5.6-sol" in UPDATED_MODEL_STACK
+    assert "kimi-k3" in UPDATED_MODEL_STACK
+    assert "gpt-5.6-sol" not in UPDATED_MODEL_STACK
     assert "gpt-5.6-terra" not in UPDATED_MODEL_STACK
 
 
@@ -27,32 +28,29 @@ def test_task_defaults_keep_open_cost_effective_core():
     assert TASK_MODEL_MAP["math"] == "deepseek-v4-pro"
     assert TASK_MODEL_MAP["agentic"] == "glm-5.2"
     assert TASK_MODEL_MAP["vision"] == "gemini-3.5-flash"
-    assert TASK_MODEL_MAP["ui_ux"] == "kimi-k2.6"
+    assert TASK_MODEL_MAP["ui_ux"] == "kimi-k3"
     assert TASK_MODEL_MAP["long_context"] == "minimax-m3"
 
 
 def test_premium_routes_are_unavailable_without_their_own_credentials():
     assert get_direct_model_provider("gemini-3.5-flash", {}) is None
     assert get_direct_model_provider("gpt-5.6-luna", {}) is None
-    assert get_direct_model_provider("gpt-5.6-sol", {}) is None
     assert get_direct_model_provider("grok-4.5", {}) is None
     assert get_direct_model_provider("gpt-5.6-terra", {}) is None
 
     assert get_runtime_model("gemini-3.5-flash", {}) == "minimax-m3"
     assert get_runtime_model("gpt-5.6-luna", {}) == "glm-5.2"
-    assert get_runtime_model("gpt-5.6-sol", {}) == "glm-5.2"
-    assert get_runtime_model("grok-4.5", {}) == "glm-5.2"
-    assert get_runtime_model("gpt-5.6-terra", {}) == "glm-5.2"
+    assert get_runtime_model("grok-4.5", {}) == "kimi-k3"
+    assert get_runtime_model("gpt-5.6-terra", {}) == "kimi-k3"
 
 
 def test_premium_routes_require_explicit_provider_access():
     assert get_runtime_model("gemini-3.5-flash", {"GOOGLE_API_KEY": "test"}) == "gemini-3.5-flash"
     assert get_runtime_model("gpt-5.6-luna", {"OPENAI_API_KEY": "test"}) == "gpt-5.6-luna"
-    assert get_runtime_model("gpt-5.6-sol", {"OPENAI_API_KEY": "test"}) == "gpt-5.6-sol"
     assert get_runtime_model("grok-4.5", {"XAI_API_KEY": "test"}) == "grok-4.5"
 
     # Terra remains unavailable with an OpenAI key alone.
-    assert get_runtime_model("gpt-5.6-terra", {"OPENAI_API_KEY": "test"}) == "gpt-5.6-sol"
+    assert get_runtime_model("gpt-5.6-terra", {"OPENAI_API_KEY": "test"}) == "kimi-k3"
     assert get_runtime_model(
         "gpt-5.6-terra",
         {"OPENAI_API_KEY": "test", "TEMUCLAUDE_ENABLE_TERRA_FALLBACK": "true"},
@@ -62,7 +60,6 @@ def test_premium_routes_require_explicit_provider_access():
 def test_openrouter_makes_frontier_aliases_routable_without_native_keys():
     env = {"OPENROUTER_API_KEY": "configured"}
     assert get_runtime_model("gpt-5.6-luna", env) == "gpt-5.6-luna"
-    assert get_runtime_model("gpt-5.6-sol", env) == "gpt-5.6-sol"
     assert get_runtime_model("grok-4.5", env) == "grok-4.5"
     assert get_runtime_model("gemini-3.5-flash", env) == "gemini-3.5-flash"
 
@@ -113,7 +110,7 @@ def test_screenshot_feedback_uses_a_vision_payload_when_available(monkeypatch):
 
 
 def test_all_direct_routes_have_a_provider_contract():
-    for model in ("gemini-3.5-flash", "gpt-5.6-luna", "gpt-5.6-sol", "grok-4.5", "gpt-5.6-terra"):
+    for model in ("gemini-3.5-flash", "gpt-5.6-luna", "grok-4.5", "gpt-5.6-terra"):
         provider = DIRECT_MODEL_PROVIDERS[model]
         assert provider["env"]
         assert provider["base_url"].startswith("https://")

@@ -77,3 +77,4 @@ website/.env.*
 # Personal Obsidian vault + Supabase CLI temp — never commit (added 2026-07-14)
 TemuClaude/
 supabase/.temp/
+creds/.env

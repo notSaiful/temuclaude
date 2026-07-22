@@ -46,7 +46,7 @@ cost-bounded routes.
 | DeepSeek V4 Flash | Lite worker | Explicit Lite and savings routes only |
 | DeepSeek V4 Pro | Reasoning specialist | Math, technical analysis, and difficult code reasoning |
 | GLM-5.2 | Planner + aggregator | Long-horizon planning, orchestration, and synthesis |
-| Kimi K2.6 | UI/UX implementation specialist | Coding-driven interfaces, interaction state, and multi-agent implementation |
+| Kimi K3 | UI/UX implementation specialist | Coding-driven interfaces, interaction state, and multi-agent implementation |
 | MiniMax M3 | Multimodal + long-context specialist | Image/video understanding, creative/product review, and long-context work |
 | Gemini 3.5 Flash | Visual UI specialist | Screen interaction, accessibility, multimodal, and tool-aware review |
 | GPT-5.6 Luna | Fast GPT-family worker | Independent proposal, tool opportunities, and consensus-diversity review |

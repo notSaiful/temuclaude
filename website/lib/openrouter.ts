@@ -29,12 +29,11 @@ const OPENROUTER_ROLE_FALLBACKS: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-flash'],
   'z-ai/glm-5.2': ['deepseek/deepseek-v4-pro', 'deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['z-ai/glm-5.2', 'deepseek/deepseek-v4-pro'],
-  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'moonshotai/kimi-k3': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
   'google/gemini-3.5-flash': ['minimax/minimax-m3', 'z-ai/glm-5.2'],
   'openai/gpt-5.6-luna': ['deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'openai/gpt-5.6-sol': ['x-ai/grok-4.5', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'x-ai/grok-4.5': ['openai/gpt-5.6-sol', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
-  'openai/gpt-5.6-terra': ['openai/gpt-5.6-sol', 'x-ai/grok-4.5', 'deepseek/deepseek-v4-pro'],
+  'x-ai/grok-4.5': ['moonshotai/kimi-k3', 'deepseek/deepseek-v4-pro', 'z-ai/glm-5.2'],
+  'openai/gpt-5.6-terra': ['moonshotai/kimi-k3', 'x-ai/grok-4.5', 'deepseek/deepseek-v4-pro'],
   'google/gemini-2.0-flash': ['google/gemini-2.5-flash', 'google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'google/gemini-2.5-flash': ['google/gemini-3-flash-preview', 'z-ai/glm-5.2'],
   'mistralai/mistral-large-2': ['mistralai/mistral-large-2512', 'minimax/minimax-m3', 'deepseek/deepseek-v4-pro'],
@@ -58,7 +57,7 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'deepseek/deepseek-v4-pro': ['deepseek/deepseek-v4-pro'],
   'deepseek/deepseek-v4-flash': ['deepseek/deepseek-v4-flash'],
   'minimax/minimax-m3': ['minimax/minimax-m3'],
-  'moonshotai/kimi-k2.6': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
+  'moonshotai/kimi-k3': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'openai/gpt-oss-120b': ['openai/gpt-oss-120b'],
   'openai/gpt-oss-120b:free': ['openai/gpt-oss-120b'],
   'nvidia/nemotron-3-ultra-550b-a55b:free': [
@@ -73,7 +72,6 @@ const AIML_MODEL_MAP: Record<string, string[]> = {
   'anthropic/claude-sonnet-4.6': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3.5-flash': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-luna': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
-  'openai/gpt-5.6-sol': ['deepseek/deepseek-v4-pro', 'zhipu/glm-5.2'],
   'x-ai/grok-4.5': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'openai/gpt-5.6-terra': ['zhipu/glm-5.2', 'deepseek/deepseek-v4-pro'],
   'google/gemini-3-flash-preview': ['zhipu/glm-5.2'],
@@ -464,10 +462,14 @@ function uniqueModels(models: string[]): string[] {
 }
 
 function getOpenRouterFallbacks(model: string, explicitFallbacks?: string[]): string[] {
-  // Model fallbacks are a product policy, not a transport concern. The old
-  // implicit list silently let a failed call become an unrelated free model,
-  // which made the OpenRouter logs and customer cost contract untrustworthy.
-  return uniqueModels(explicitFallbacks || []).filter((fallback) => fallback !== model);
+  // Model fallbacks are a product policy, not an OpenRouter price decision.
+  // Every role has an allowlisted, capability-compatible recovery chain so an
+  // empty completion or transient provider outage cannot turn into a raw user
+  // error. Explicit call-site fallbacks take precedence for artifact delivery.
+  const configured = explicitFallbacks && explicitFallbacks.length > 0
+    ? explicitFallbacks
+    : OPENROUTER_ROLE_FALLBACKS[model] || [];
+  return uniqueModels(configured).filter((fallback) => fallback !== model);
 }
 
 function getAimlFallbacks(openRouterModels: string[]): string[] {

@@ -126,7 +126,7 @@ def test_tier_determination():
 def test_model_pool():
     """Verify all models in the pool have correct configuration."""
     required_fields = ["ollama_tag", "role", "strengths", "cost_tier", "routing_weight"]
-    required_models = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6", "minimax-m3", "nemotron-3-ultra"]
+    required_models = ["glm-5.2", "deepseek-v4-pro", "kimi-k3", "minimax-m3", "nemotron-3-ultra"]
 
     passed = 0
     failed = 0

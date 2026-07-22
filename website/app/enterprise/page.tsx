@@ -35,8 +35,8 @@ export default function EnterprisePage() {
 
           <div className="text-center">
             <div className="card max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-text-primary mb-2">$499/month</h3>
-              <p className="text-sm text-text-secondary mb-4">Unlimited queries, 10 seats included, dedicated support. Contact us for custom enterprise pricing.</p>
+              <h3 className="text-lg font-semibold text-text-primary mb-2">Custom Enterprise Pricing</h3>
+              <p className="text-sm text-text-secondary mb-4">Dedicated hosting options, custom seats, SSO integration, and metered billing. Contact us for custom enterprise pricing.</p>
               <a href="mailto:hello@temuclaude.com" className="btn-accent w-full">Contact Sales</a>
             </div>
           </div>

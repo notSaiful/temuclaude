@@ -111,7 +111,7 @@ def test_preference_router() -> bool:
         record_routing_decision(
             query="Analyze the trade-offs between microservices and monoliths with detailed reasoning about deployment complexity and team autonomy",
             task_type="reasoning", tier="hard",
-            model="deepseek-v4-pro", models_used=["deepseek-v4-pro", "glm-5.2", "kimi-k2.6"],
+            model="deepseek-v4-pro", models_used=["deepseek-v4-pro", "glm-5.2", "kimi-k3"],
             strategy="fusion+step_verify+prm_consistency", latency_ms=15000, success=True
         )
         print(f"  OK: record_routing_decision works without errors")

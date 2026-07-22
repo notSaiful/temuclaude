@@ -12,13 +12,24 @@
       "value": {
         "alive": 22,
         "total": 23,
-        "timestamp": "2026-07-08T09:47:03.763613"
+        "timestamp": "2026-07-08T11:52:13.125890"
       },
       "daemon": "watchdog",
       "category": "system",
-      "timestamp": "2026-07-08T09:47:03.763698"
+      "timestamp": "2026-07-08T11:52:13.125941"
+    },
+    "durable_maximum_quality_generation": {
+      "value": {
+        "status": "deployed_and_verified",
+        "architecture": "Supabase durable jobs with 24-hour Modal workers and renewable leases",
+        "pipeline": "eight specialist panel, synthesis, artifact generation, deterministic validation, isolated preview, Nemotron QA, and repair loop",
+        "surfaces": ["Playground", "background API jobs"],
+        "verification": "32 focused tests plus Python compile, TypeScript type-check, production build, Playground and API end-to-end completion"
+      },
+      "category": "production_delivery",
+      "timestamp": "2026-07-22T00:00:00+00:00"
     }
   },
   "last_updated": "2026-07-06T18:02:36.132533+00:00",
-  "last_update": "2026-07-08T09:47:03.763704"
+  "last_update": "2026-07-22T00:00:00+00:00"
 }

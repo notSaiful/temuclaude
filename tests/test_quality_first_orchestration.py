@@ -17,13 +17,13 @@ def test_pro_fusion_uses_task_specialist_first_with_complementary_roles(monkeypa
     assert panel == [
         "deepseek-v4-pro",
         "grok-4.5",
-        "gpt-5.6-sol",
-        "kimi-k2.6",
+        "kimi-k3",
         "glm-5.2",
         "gpt-5.6-luna",
         "gemini-3.5-flash",
         "minimax-m3",
         "nemotron-3-ultra",
+        "deepseek-v4-flash",
     ]
 
 
@@ -36,12 +36,12 @@ def test_openrouter_quality_panel_activates_all_nine_roles(monkeypatch):
         "deepseek-v4-pro",
         "grok-4.5",
         "gpt-5.6-luna",
-        "gpt-5.6-sol",
         "glm-5.2",
         "gemini-3.5-flash",
-        "kimi-k2.6",
+        "kimi-k3",
         "minimax-m3",
         "nemotron-3-ultra",
+        "deepseek-v4-flash",
     }
 
 
@@ -51,6 +51,12 @@ def test_python_pro_default_is_quality_first_and_savings_is_explicit():
     source = (ROOT / "src/orchestrator.py").read_text()
     assert 'if budget_profile in ("max_quality", "balanced"):' in source
     assert "panel_size=9, max_tokens=token_budget" in source
+    # Layer 2 (2026-07-17): max_quality is difficulty-adaptive — trivial/medium
+    # Pro queries honour determine_tier() and take the fast tier-dispatch path;
+    # only hard Pro queries (and every `balanced` query) run the full gauntlet.
+    assert 'if budget_profile == "max_quality" and tier in ("trivial", "medium"):' in source
+    assert "self.get_adaptive_token_budget(tier)" in source
+    assert "self.get_adaptive_n_samples(tier)" in source
 
 
 def test_panel_members_receive_role_specific_instructions():
@@ -62,7 +68,6 @@ def test_panel_members_receive_role_specific_instructions():
         "multimodal, long-context",
         "visual UI, accessibility",
         "fast independent GPT-family proposer",
-        "frontier adjudicator",
         "coding-agent and repair specialist",
         "independent verifier",
     ):
@@ -80,7 +85,8 @@ def test_pro_playground_does_not_route_code_generation_to_a_single_draft():
     assert "runQualityCodeGeneration" in source
     assert "quality-first-code-panel" in source
     assert "independent-code-review" in source
-    assert "pro-quality-floor" in source
+    assert "Every Pro request receives the full specialist panel" in source
+    assert "pro-quality-floor" not in source
     assert "POOL.frontier" in source
     assert "POOL.codeRepair" in source
     assert "POOL.multimodal" in source

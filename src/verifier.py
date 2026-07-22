@@ -48,9 +48,56 @@ STEP_CODE_GENERATION_PROMPT = (
 )
 
 
+import ast
+
+def local_ast_check(code_text: str, language: str = "python") -> dict:
+    """
+    Perform local AST/syntax verification.
+    Returns a dict with 'ok': bool, and 'error': str (if any).
+    """
+    if not code_text.strip():
+        return {"ok": False, "error": "Empty code block"}
+
+    if language.lower() in ("python", "py"):
+        try:
+            ast.parse(code_text)
+            return {"ok": True, "error": None}
+        except SyntaxError as e:
+            return {
+                "ok": False,
+                "error": f"Python Syntax Error: {e.msg} on line {e.lineno} (col {e.offset})"
+            }
+        except Exception as e:
+            return {"ok": False, "error": f"Parsing Error: {str(e)}"}
+
+    # For JS/TS/HTML/CSS, do a basic brackets balance check
+    elif language.lower() in ("javascript", "typescript", "js", "ts", "html", "css"):
+        brackets = {')': '(', ']': '[', '}': '{'}
+        stack = []
+        for i, char in enumerate(code_text):
+            if char in brackets.values():
+                stack.append((char, i))
+            elif char in brackets.keys():
+                if not stack or stack[-1][0] != brackets[char]:
+                    line_no = code_text[:i].count('\n') + 1
+                    return {
+                        "ok": False,
+                        "error": f"Mismatched bracket '{char}' detected on line {line_no}."
+                    }
+                stack.pop()
+        if stack:
+            line_no = code_text[:stack[-1][1]].count('\n') + 1
+            return {
+                "ok": False,
+                "error": f"Unclosed bracket '{stack[-1][0]}' detected on line {line_no}."
+            }
+
+    return {"ok": True, "error": None}
+
+
 def extract_code(response: str) -> str:
     """Extract Python code from a model response.
-    
+
     Handles:
     - Raw code (no markdown)
     - ```python ... ``` blocks
@@ -60,12 +107,12 @@ def extract_code(response: str) -> str:
     match = re.search(r'```python\s*\n(.*?)```', response, re.DOTALL)
     if match:
         return match.group(1).strip()
-    
+
     # Try to find ``` ... ``` block
     match = re.search(r'```\s*\n(.*?)```', response, re.DOTALL)
     if match:
         return match.group(1).strip()
-    
+
     # No markdown — assume the response IS the code
     # But strip any leading/trailing explanation
     lines = response.strip().split('\n')
@@ -78,7 +125,7 @@ def extract_code(response: str) -> str:
         if line.strip().startswith('The code') or line.strip().startswith('Note:'):
             continue
         code_lines.append(line)
-    
+
     return '\n'.join(code_lines).strip()
 
 
@@ -91,14 +138,14 @@ async def verify_with_code(
 ) -> dict:
     """
     Generate code to solve the question, execute it, return verified answer.
-    
+
     Args:
         question: The user's question
         model: Which model generates the code
         call_model_func: Async function to call a model
         max_tokens: Max tokens for code generation
         execution_timeout: Seconds before code execution is killed
-    
+
     Returns:
         Dict with:
         - 'verified': bool — whether code execution succeeded
@@ -113,10 +160,10 @@ async def verify_with_code(
         {"role": "system", "content": "You are a Python code generator. Output only Python code that prints the answer."},
         {"role": "user", "content": code_prompt},
     ]
-    
+
     code_response = await call_model_func(model, messages, max_tokens=max_tokens)
     code = extract_code(code_response)
-    
+
     if not code.strip():
         return {
             "verified": False,
@@ -125,7 +172,18 @@ async def verify_with_code(
             "stdout": "",
             "stderr": "No code generated",
         }
-    
+
+    # AST/Syntax check
+    ast_check = local_ast_check(code, "python")
+    if not ast_check["ok"]:
+        return {
+            "verified": False,
+            "answer": None,
+            "code": code,
+            "stdout": "",
+            "stderr": f"AST Check Failed: {ast_check['error']}",
+        }
+
     # Execute in sandbox
     # Create a temp directory for execution
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -136,7 +194,7 @@ async def verify_with_code(
             "TMPDIR": tmpdir,
             "PYTHONPATH": "",
         }
-        
+
         try:
             # Run in a thread to avoid blocking the event loop
             result = await asyncio.get_event_loop().run_in_executor(
@@ -151,10 +209,10 @@ async def verify_with_code(
                     stdin=subprocess.DEVNULL,
                 )
             )
-            
+
             stdout = result.stdout.strip() if result.stdout else ""
             stderr = result.stderr.strip() if result.stderr else ""
-            
+
             if result.returncode == 0 and stdout:
                 return {
                     "verified": True,
@@ -171,7 +229,7 @@ async def verify_with_code(
                     "stdout": stdout,
                     "stderr": stderr,
                 }
-                
+
         except subprocess.TimeoutExpired:
             return {
                 "verified": False,
@@ -192,29 +250,29 @@ async def verify_with_code(
 
 def extract_reasoning_steps(response: str) -> List[str]:
     """Extract individual reasoning steps from a model response.
-    
+
     Splits the response into steps based on common patterns:
     - "Step 1:", "Step 2:", etc.
     - Numbered lists "1.", "2.", etc.
     - Paragraph breaks for unstructured responses
-    
+
     Returns a list of step texts.
     """
     # Try "Step N:" pattern
     steps = re.findall(r'Step\s+\d+[:.]\s*(.+?)(?=Step\s+\d+[:.]|$)', response, re.DOTALL | re.IGNORECASE)
     if len(steps) >= 2:
         return [s.strip() for s in steps if s.strip()]
-    
+
     # Try numbered list "1.", "2.", etc.
     steps = re.findall(r'(?:^|\n)\d+\.\s*(.+?)(?=\n\d+\.|\Z)', response, re.DOTALL)
     if len(steps) >= 2:
         return [s.strip() for s in steps if s.strip()]
-    
+
     # Try paragraph breaks
     paragraphs = [p.strip() for p in response.split("\n\n") if p.strip()]
     if len(paragraphs) >= 2:
         return paragraphs
-    
+
     # Single step
     return [response.strip()] if response.strip() else []
 
@@ -254,15 +312,15 @@ async def verify_steps_with_code(
 ) -> dict:
     """
     Step-Level Code Verification (rStar-Math pattern).
-    
+
     Instead of verifying only the final answer, this function:
     1. Extracts reasoning steps from the response
     2. Generates Python code to verify EACH step
     3. Executes each verification code block
     4. If any step fails, the response is marked as unverified
-    
+
     This catches intermediate errors before they cascade into wrong final answers.
-    
+
     Args:
         question: The original question
         response: The model's full response (with reasoning steps)
@@ -270,7 +328,7 @@ async def verify_steps_with_code(
         call_model_func: Async function to call a model
         max_tokens: Max tokens per verification code generation
         execution_timeout: Seconds before code execution is killed
-    
+
     Returns:
         Dict with:
         - 'verified': bool — all steps passed verification
@@ -281,18 +339,18 @@ async def verify_steps_with_code(
         - 'answer': The final answer (from last verified step) or None
     """
     steps = extract_reasoning_steps(response)
-    
+
     if not steps:
         # No steps found — fall back to whole-response verification
         return await verify_with_code(question, model, call_model_func, max_tokens, execution_timeout)
-    
+
     step_results = []
     steps_verified = 0
     steps_failed = 0
-    
+
     for i, step_text in enumerate(steps):
         step_num = i + 1
-        
+
         # Generate verification code for this step
         step_prompt = STEP_CODE_GENERATION_PROMPT.format(
             question=question, step_num=step_num, step_text=step_text[:500]
@@ -301,10 +359,10 @@ async def verify_steps_with_code(
             {"role": "system", "content": "You are a Python code verifier. Output only Python code."},
             {"role": "user", "content": step_prompt},
         ]
-        
+
         code_response = await call_model_func(model, messages, max_tokens=max_tokens)
         code = extract_code(code_response)
-        
+
         if not code.strip():
             step_results.append({
                 "step_num": step_num,
@@ -313,12 +371,12 @@ async def verify_steps_with_code(
             })
             steps_failed += 1
             continue
-        
+
         # Execute verification code in a thread
         success, stdout, stderr = await asyncio.get_event_loop().run_in_executor(
             None, lambda c=code, t=execution_timeout: _execute_code_safely(c, t)
         )
-        
+
         if success and "STEP_OK" in stdout:
             step_results.append({
                 "step_num": step_num,
@@ -333,10 +391,10 @@ async def verify_steps_with_code(
                 "reason": stderr if not success else stdout,
             })
             steps_failed += 1
-    
+
     # All steps must pass for the response to be verified
     all_verified = steps_failed == 0 and steps_verified > 0
-    
+
     return {
         "verified": all_verified,
         "steps_total": len(steps),
@@ -356,26 +414,26 @@ def apply_budget_forcing(
     min_reasoning_tokens: int = 200,
 ) -> str:
     """s1 Budget Forcing — append 'Wait' to force the model to continue reasoning.
-    
+
     The s1 paper showed that appending 'Wait' to a model's response forces it
     to continue reasoning, producing longer and more accurate chains of thought.
     This is extremely simple but effective for math/reasoning tasks.
-    
+
     Args:
         response: The model's initial response
         min_reasoning_tokens: Minimum reasoning length (approx tokens = words * 1.3)
-    
+
     Returns:
         The response, possibly with 'Wait' appended if it was too short
     """
     # Estimate tokens (rough: words * 1.3)
     word_count = len(response.split())
     estimated_tokens = int(word_count * 1.3)
-    
+
     if estimated_tokens < min_reasoning_tokens:
         # Response too short — append "Wait" to force more reasoning
         return response + "\n\nWait"
-    
+
     return response
 
 
@@ -387,31 +445,31 @@ async def generate_with_budget_forcing(
     max_wait_appends: int = 2,
 ) -> str:
     """Generate a response with s1 budget forcing.
-    
+
     1. Generate initial response
     2. If response is too short, append "Wait" and continue
     3. Repeat up to max_wait_appends times
-    
+
     This forces the model to reason longer, improving accuracy on hard problems.
     """
     messages = [
         {"role": "system", "content": "You are Temuclaude. Think step by step. Show your reasoning. At the end, write 'Answer: X'."},
         {"role": "user", "content": question},
     ]
-    
+
     response = await call_model_func(model, messages, max_tokens=max_tokens)
-    
+
     for _ in range(max_wait_appends):
         if "Answer:" in response:
             break  # Model reached a final answer — stop forcing
-        
+
         # Append "Wait" and ask for more
         messages.append({"role": "assistant", "content": response})
         messages.append({"role": "user", "content": "Wait"})
-        
+
         continuation = await call_model_func(model, messages, max_tokens=max_tokens)
         response += "\n" + continuation
-    
+
     return response
 
 
@@ -424,18 +482,18 @@ def verify_logical_with_z3(
     response: str,
 ) -> dict:
     """Verify logical reasoning using Z3 SMT solver.
-    
+
     The ConsistPRM research showed that Z3 can verify logical reasoning
     with mathematical certainty. LLMs may claim correct logic but actually
     have inconsistencies. Z3 checks if the logical claims are actually
     satisfiable.
-    
+
     This function:
     1. Extracts logical claims from the response
     2. Encodes them as Z3 constraints
     3. Checks satisfiability
     4. Returns whether the logic is consistent
-    
+
     Note: This requires z3-solver to be installed (pip install z3-solver).
     Falls back gracefully if Z3 is not available.
     """
@@ -447,10 +505,10 @@ def verify_logical_with_z3(
             "reason": "Z3 not installed (pip install z3-solver)",
             "answer": None,
         }
-    
+
     solver = Solver()
     bool_vars = {}
-    
+
     def parse_expr(name: str):
         """Parse expression, handling optional negation."""
         clean = name.strip().lower()
@@ -461,44 +519,44 @@ def verify_logical_with_z3(
         elif clean.startswith("no "):
             negated = True
             clean = clean[3:].strip()
-            
+
         clean_var = clean.replace(" ", "_")[:20]
         if not clean_var:
             clean_var = "var_empty"
         if clean_var not in bool_vars:
             bool_vars[clean_var] = Bool(clean_var)
-            
+
         return bool_vars[clean_var], clean_var, negated
 
     # Find "if X then Y" patterns
     if_patterns = re.findall(r'if\s+(.+?)\s+then\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
     premises_vars = set()
     conclusions_vars = set()
-    
+
     for premise, conclusion in if_patterns:
         p_var, p_name, p_neg = parse_expr(premise)
         c_var, c_name, c_neg = parse_expr(conclusion)
-        
+
         p_expr = Not(p_var) if p_neg else p_var
         c_expr = Not(c_var) if c_neg else c_var
-        
+
         solver.add(Implies(p_expr, c_expr))
         premises_vars.add(p_name)
         conclusions_vars.add(c_name)
-    
+
     # Find "X implies Y" patterns
     impl_patterns = re.findall(r'(.+?)\s+implies\s+(.+?)(?:[,.]|$)', response, re.IGNORECASE)
     for premise, conclusion in impl_patterns:
         p_var, p_name, p_neg = parse_expr(premise)
         c_var, c_name, c_neg = parse_expr(conclusion)
-        
+
         p_expr = Not(p_var) if p_neg else p_var
         c_expr = Not(c_var) if c_neg else c_var
-        
+
         solver.add(Implies(p_expr, c_expr))
         premises_vars.add(p_name)
         conclusions_vars.add(c_name)
-    
+
     # If no logical patterns found, Z3 can't verify
     if not bool_vars:
         return {
@@ -506,16 +564,16 @@ def verify_logical_with_z3(
             "reason": "No logical patterns found to verify",
             "answer": None,
         }
-    
+
     # To check if rules are contradictory under active premises,
     # we assert that pure premises (never conclusions) are True.
     pure_premises = premises_vars - conclusions_vars
     for p_name in pure_premises:
         solver.add(bool_vars[p_name] == True)
-        
+
     # Check if the constraints are satisfiable (not contradictory)
     result = solver.check()
-    
+
     if result == sat:
         # The logic is consistent — no contradictions
         return {
@@ -551,7 +609,7 @@ async def verify_logical_with_z3_enhanced(
     max_tokens: int = 4096,
 ) -> dict:
     """Enhanced logical verification using LLM-to-Z3 translation.
-    
+
     Translates logic constraints in the reasoning response to a Python script
     using the z3-solver library, runs it in a subprocess, and reports consistency.
     """
@@ -567,19 +625,19 @@ async def verify_logical_with_z3_enhanced(
         f"Reasoning/Response: {response}\n\n"
         "Generate the Z3 solver Python code:"
     )
-    
+
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-    
+
     code_response = await call_model_func(model, messages, max_tokens=max_tokens)
     z3_code = extract_code(code_response)
-    
+
     if not z3_code.strip():
         # Fall back to the basic regex-based solver
         return verify_logical_with_z3(question, response)
-        
+
     # Run the Z3 script in temp sandbox
     with tempfile.TemporaryDirectory() as tmpdir:
         safe_env = {
@@ -603,7 +661,7 @@ async def verify_logical_with_z3_enhanced(
             )
             stdout = result.stdout.strip()
             stderr = result.stderr.strip()
-            
+
             if "UNSATISFIABLE" in stdout:
                 return {
                     "verified": False,

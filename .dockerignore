@@ -5,6 +5,8 @@ __pycache__
 *.pyo
 *.pyd
 .env
+.env.*
+website/.env*
 *.db
 logs/
 *.jsonl
@@ -25,3 +27,11 @@ build/
 venv/
 .venv/
 node_modules/
+website/
+staging/
+research/
+docs/
+data/
+hasan-deploy/
+*.md
+.github/

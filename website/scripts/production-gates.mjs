@@ -64,7 +64,6 @@ assertIncludes('website/app/v1/chat/completions/route.ts', [
   "classifiedDifficulty === 'medium' ? 'hard'",
   'all nine Pro roles propose in parallel',
   'call(M_LUNA, messages, temp, maxTok)',
-  'call(M_SOL, messages, temp, maxTok)',
   'call(M_KIMI, messages, temp, maxTok)',
   'call(M_GEMINI, messages, temp, maxTok)',
   'call(M_GROK, messages, temp, maxTok)',

@@ -29,7 +29,7 @@ TIER_MODELS = {
     "trivial": "gpt-oss-120b",        # Cheapest — free or $0.03/M
     "medium": "glm-5.2",               # Mid-tier — $0.06/M on Ollama
     "hard": "deepseek-v4-pro",         # Premium — strong reasoning
-    "extreme": "kimi-k2.6",            # Most capable — agentic
+    "extreme": "kimi-k3",               # Most capable — agentic
 }
 
 # Cascade chain: if trivial fails → medium → hard → extreme

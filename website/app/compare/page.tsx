@@ -918,7 +918,7 @@ export default function ComparePage() {
                       <div className="w-8 h-8 rounded-full bg-[#738E54] text-white flex items-center justify-center font-mono text-xs font-bold">2</div>
                       <div className="flex-1 bg-[#738E54]/10 border border-[#738E54]/30 rounded-lg p-4">
                         <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#738E54] block">Parallel Dispatching</span>
-                        <span className="text-[11px] text-text-secondary">Dispatches concurrent draft queries to specialized panels (Gemini, Llama, DeepSeek).</span>
+                        <span className="text-[11px] text-text-secondary">Dispatches concurrent draft queries to specialized panels (GLM-5.2, DeepSeek, Gemini 3.5 Flash).</span>
                       </div>
                     </div>
 
@@ -926,7 +926,7 @@ export default function ComparePage() {
                       <div className="w-8 h-8 rounded-full bg-[#738E54] text-white flex items-center justify-center font-mono text-xs font-bold">3</div>
                       <div className="flex-1 bg-[#738E54]/10 border border-[#738E54]/30 rounded-lg p-4">
                         <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#738E54] block">D-MCTS Tree Search</span>
-                        <span className="text-[11px] text-text-secondary">Deep Monte Carlo reasoning trees verify syntax logic and execution branches.</span>
+                        <span className="text-[11px] text-text-secondary">Deep Monte Carlo reasoning trees verify syntax logic and execution branches (hard Pro path).</span>
                       </div>
                     </div>
 
@@ -934,7 +934,7 @@ export default function ComparePage() {
                       <div className="w-8 h-8 rounded-full bg-[#738E54] text-white flex items-center justify-center font-mono text-xs font-bold">4</div>
                       <div className="flex-1 bg-[#738E54] text-white rounded-lg p-4 shadow-md">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider block">Token Fusion Consensus</span>
-                        <span className="text-[11px] opacity-90">Mixture-of-Agents consensus blends candidate tokens, outputting clean zero-fluff code.</span>
+                        <span className="text-[11px] opacity-90">Mixture-of-Agents consensus blends candidate tokens, outputting clean zero-fluff code (nontrivial queries).</span>
                       </div>
                     </div>
                   </div>

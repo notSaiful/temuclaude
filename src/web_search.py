@@ -206,3 +206,42 @@ async def search_first_policy(
         return None
 
     return await search_and_summarize(query, model_fn)
+
+
+async def search_recursive(query: str, depth: int = 2, num_results: int = 3) -> List[Dict]:
+    """
+    Recursive Academic Search Loop.
+    Performs multi-step search queries to retrieve deep knowledge contexts for HLE academic questions.
+    """
+    all_results = []
+    seen_urls = set()
+
+    current_queries = [query]
+
+    for d in range(depth):
+        tasks = []
+        for q in current_queries:
+            tasks.append(search(q, num_results))
+
+        results_list = await asyncio.gather(*tasks, return_exceptions=True)
+
+        next_queries = []
+        for res in results_list:
+            if isinstance(res, list):
+                for item in res:
+                    url = item["url"]
+                    if url not in seen_urls:
+                        seen_urls.add(url)
+                        all_results.append(item)
+                        # Extract potential keywords/entities from snippets/titles
+                        words = re.findall(r'"([^"]+)"|\b([A-Z][a-zA-Z0-9-]{4,})\b', item["title"] + " " + item["snippet"])
+                        for w_tuple in words[:2]:
+                            w = w_tuple[0] or w_tuple[1]
+                            if w and len(w) > 4 and w not in query:
+                                next_queries.append(f"{query} {w}")
+
+        if not next_queries:
+            break
+        current_queries = list(set(next_queries))[:2]  # Limit fanout
+
+    return all_results

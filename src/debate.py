@@ -21,7 +21,7 @@ from collections import defaultdict
 
 
 DEFAULT_DEBATE_ROUNDS = 2
-DEFAULT_PANEL = ["glm-5.2", "deepseek-v4-pro", "kimi-k2.6"]
+DEFAULT_PANEL = ["glm-5.2", "deepseek-v4-pro", "kimi-k3"]
 
 
 def build_debate_prompt(question: str, model_name: str, other_responses: dict, round_num: int) -> list:
@@ -33,7 +33,7 @@ def build_debate_prompt(question: str, model_name: str, other_responses: dict, r
     model_labels = {
         "glm-5.2": "GLM-5.2",
         "deepseek-v4-pro": "DeepSeek V4 Pro",
-        "kimi-k2.6": "Kimi K2.6",
+        "kimi-k3": "Kimi K3",
         "minimax-m3": "MiniMax M3",
         "nemotron-3-ultra": "Nemotron 3 Ultra",
     }
@@ -78,7 +78,7 @@ def build_consensus_prompt(question: str, final_responses: dict) -> list:
     model_labels = {
         "glm-5.2": "GLM-5.2",
         "deepseek-v4-pro": "DeepSeek V4 Pro",
-        "kimi-k2.6": "Kimi K2.6",
+        "kimi-k3": "Kimi K3",
         "minimax-m3": "MiniMax M3",
         "nemotron-3-ultra": "Nemotron 3 Ultra",
     }

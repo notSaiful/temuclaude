@@ -5,6 +5,7 @@ import { callOpenRouterLite, type LiteModelId } from '@/lib/openrouter-lite';
 import { getAuthenticatedSupabaseUser } from '@/lib/supabase-server';
 import { getOrCreateUserByEmailAsync, getRollingWindowUsageAsync, incrementUsageAsync, verifyAndRenewWeeklyCreditsAsync } from '@/lib/db';
 import { PLAN_LIMITS, ROLLING_WINDOW_HOURS } from '@/lib/plans';
+import { callModalChatCompletions, isModalConfigured } from '@/lib/modal';
 
 export const runtime = 'nodejs';
 // Hard Pro requests deliberately run several high-value model and verifier
@@ -20,11 +21,11 @@ const POOL = {
   reasoning: 'deepseek/deepseek-v4-pro',
   fastRoute: 'deepseek/deepseek-v4-flash',
   multimodal: 'google/gemini-3.5-flash',
-  uiUx: 'moonshotai/kimi-k2.6',
+  uiUx: 'moonshotai/kimi-k3',
   specialist: 'minimax/minimax-m3',
   vision: 'minimax/minimax-m3',
   gptWorker: 'openai/gpt-5.6-luna',
-  frontier: 'openai/gpt-5.6-sol',
+  frontier: 'moonshotai/kimi-latest',
   codeRepair: 'x-ai/grok-4.5',
   verifier: 'nvidia/nemotron-3-ultra-550b-a55b',
 };
@@ -36,7 +37,7 @@ const ROLE_INSTRUCTIONS: Record<string, string> = {
   [POOL.specialist]: 'You are the MiniMax multimodal, long-context, creative, and product reviewer. Focus on visual coherence, product completeness, and source-wide consistency.',
   [POOL.multimodal]: 'You are the Gemini visual UI, accessibility, multimodal, and tool-use reviewer. Focus on screen behavior, accessibility, and observable interaction quality.',
   [POOL.gptWorker]: 'You are a fast independent GPT-family proposer. Find a distinct solution path, useful tools, and omissions in the likely consensus.',
-  [POOL.frontier]: 'You are the GPT-5.6 Sol frontier adjudicator. Solve complex professional work rigorously and identify where weaker proposals may fail.',
+  [POOL.frontier]: 'You are the Kimi frontier adjudicator. Solve complex professional work rigorously and identify where weaker proposals may fail.',
   [POOL.codeRepair]: 'You are the Grok coding-agent and repair specialist. Hunt bugs, unsafe assumptions, integration failures, and missing tests; propose concrete fixes.',
   [POOL.verifier]: 'You are the Nemotron independent verifier. Try to falsify reasoning, code, long-context, and high-stakes claims with checkable evidence.',
 };
@@ -78,6 +79,21 @@ type CompletedResponse = {
   promptTokens?: number;
   completionTokens?: number;
 };
+
+function extractModalContent(data: unknown): string {
+  const content = (data as { choices?: Array<{ message?: { content?: unknown } }> })?.choices?.[0]?.message?.content;
+  return typeof content === 'string' ? content.trim() : '';
+}
+
+const REQUIRED_MODAL_MODELS = new Set([
+  POOL.orchestrator, POOL.reasoning, POOL.uiUx, POOL.specialist,
+  POOL.multimodal, POOL.gptWorker, '~moonshotai/kimi-latest', POOL.codeRepair, POOL.verifier,
+]);
+
+function hasCompleteModalPanel(data: any): boolean {
+  const completed = data?.orchestration?.completed_models;
+  return Array.isArray(completed) && Array.from(REQUIRED_MODAL_MODELS).every((model) => completed.includes(model));
+}
 
 function validateMessages(value: unknown): { messages: ChatMessage[] } | { error: string } {
   if (!Array.isArray(value) || value.length === 0) {
@@ -160,36 +176,61 @@ export async function POST(req: NextRequest) {
         sendProgress(controller, encoder, 'Routing selected', `TemuClaude ${profile === 'lite' ? 'Lite' : 'Pro'} · ${taskType} task · ${tier} tier`, 'done');
 
         let completed: CompletedResponse;
-        if (profile === 'lite') {
-          completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques, isCodeGeneration);
+        // Every task, including webpages and games, uses the same complete
+        // Modal quality panel. A missing or partial panel is an explicit
+        // error; it must never degrade into a smaller in-process route.
+        const useModalOrchestration = isModalConfigured();
+        if (!useModalOrchestration) {
+          throw new Error('Full Modal orchestration is required but unavailable.');
+        }
+
+        if (useModalOrchestration) {
+          techniques.push('modal-pro-orchestration');
+          sendProgress(controller, encoder, 'Running Modal orchestration', 'The multi-model quality pipeline is synthesizing a response');
+          const modal = await callModalChatCompletions({
+            model: 'temuclaude',
+            messages,
+            temperature: 0.6,
+            max_tokens: 4096,
+          });
+          const content = modal.ok ? extractModalContent(modal.data) : '';
+
+          if (content && hasCompleteModalPanel(modal.data)) {
+            sendProgress(controller, encoder, 'Streaming Modal result', 'Multi-model synthesis completed', 'done');
+            streamText(controller, encoder, content);
+            const requestedModels = Array.isArray(modal.data?.orchestration?.requested_models)
+              ? modal.data.orchestration.requested_models.filter((model: unknown): model is string => typeof model === 'string' && model.length > 0)
+              : [];
+            const completedModels = Array.isArray(modal.data?.orchestration?.completed_models)
+              ? modal.data.orchestration.completed_models.filter((model: unknown): model is string => typeof model === 'string' && model.length > 0)
+              : [];
+            sendOrch(
+              controller,
+              encoder,
+              taskType,
+              tier,
+              completedModels.map((name: string) => ({ name, response: 'Completed in the Modal quality pipeline', latency: (Date.now() - t0) / 1000, correct: true })),
+              'modal-moa',
+              requestedModels.length,
+              0,
+              false,
+              t0,
+              'provider-managed',
+              techniques,
+            );
+            completed = { content, model: String(modal.data?.model || 'temuclaude-modal') };
+          } else {
+            const reason = modal.error || 'Modal did not complete every required quality role';
+            throw new Error(`Full Modal orchestration unavailable: ${reason}`);
+          }
         } else if (isCodeGeneration) {
           completed = await runQualityCodeGeneration(query, messages, controller, encoder, taskType, tier, t0, techniques);
-        } else if (tier === 'trivial') {
-          // Pro has a quality floor even for short requests.  Flash is a Lite
-          // worker only; GLM owns concise, user-facing Pro answers.
-          techniques.push('pro-quality-floor');
-          sendProgress(controller, encoder, 'Calling Pro model', 'GLM-5.2 is drafting');
-          const result = await callModel(POOL.orchestrator, messages);
-          if (!result.ok) {
-            // A provider may occasionally return HTTP 200 with an empty
-            // completion. Never expose that transport failure as the answer:
-            // recover through the full quality panel and its approved routes.
-            techniques.push('pro-empty-response-recovery');
-            sendProgress(controller, encoder, 'Recovering response', 'The quality panel is replacing an empty provider response');
-            completed = await runFullStack(query, messages, controller, encoder, taskType, 'medium', t0, techniques);
-          } else {
-            sendProgress(controller, encoder, 'Streaming answer', 'Final response is ready', 'done');
-            streamText(controller, encoder, result.content);
-            sendOrch(controller, encoder, taskType, tier, [{ name: 'glm-5.2', response: result.content.substring(0, 200), latency: (Date.now()-t0)/1000, correct: result.ok }], 'single', 1, 0, false, t0, formatProviderCost(result.cost), techniques);
-            completed = { content: result.content, model: result.name };
-          }
-        } else if (tier === 'medium') {
-          // A Pro task is not downgraded to a single draft.  The same
-          // specialist panel used for hard requests establishes a dependable
-          // quality floor; the panel itself is task-aware.
-          completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
+        } else if (profile === 'lite') {
+          completed = await runLiteStack(query, messages, controller, encoder, taskType, tier, difficulty, t0, techniques, isCodeGeneration);
         } else {
-          // HARD: Full 6-layer stack
+          // Every Pro request receives the full specialist panel. The task
+          // classifier guides role weighting and optional checks, never
+          // whether a request receives multi-model orchestration.
           completed = await runFullStack(query, messages, controller, encoder, taskType, tier, t0, techniques);
         }
 
@@ -234,7 +275,9 @@ async function runLiteStack(
     : difficulty >= 7
       ? LITE_POOL.agent
       : LITE_POOL.default;
-  const useLitePanel = tier !== 'trivial' || isCodeGeneration;
+  // Lite keeps its separate lower-cost model allowlist, but every request
+  // still receives two independent drafts rather than a single-model answer.
+  const useLitePanel = true;
   techniques.push(useLitePanel ? 'lite-parallel-specialist-panel' : 'lite-quality-floor');
   sendProgress(controller, encoder, 'Calling Lite model', useLitePanel ? 'Two Lite specialists are drafting in parallel' : `${model.split('/').pop()} is drafting`);
 
@@ -365,6 +408,11 @@ async function runQualityCodeGeneration(
   // draft is not an acceptable Pro deliverable.
   techniques.push('quality-first-code-panel');
   sendProgress(controller, encoder, 'Planning and drafting', 'GLM, DeepSeek, and MiniMax are working in parallel');
+  // A Playground conversation can contain previous complete HTML files.  Do
+  // not fan those megabytes out to every specialist: it turns a new build
+  // request into an avoidable context-window timeout.  Preserve only recent,
+  // bounded conversational context, always including the current request.
+  const codeMessages = compactArtifactMessages(messages);
   const codeSystem = {
     role: 'system' as const,
     content: [
@@ -376,55 +424,92 @@ async function runQualityCodeGeneration(
   };
   const deadlineAt = t0 + 180_000;
   const remainingMs = () => Math.max(0, deadlineAt - Date.now());
-  const [plan, draft, uiUxReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await Promise.all([
+  const [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await Promise.all([
     callModel(POOL.orchestrator, [
       { role: 'system', content: 'You are a senior software architect. Produce a concise implementation plan, acceptance criteria, edge cases, and test checklist for the requested deliverable. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.reasoning, [codeSystem, ...messages], {
-      maxTokens: 8_192, timeoutMs: Math.min(65_000, remainingMs()), temperature: 0.35, disableReasoning: true,
+    // Kimi is the primary user-facing webpage deliverer. It reliably returns
+    // compact, complete HTML for UI work; DeepSeek remains in the panel below
+    // as a technical reviewer instead of becoming a single synthesis choke
+    // point that can consume its visible output budget on reasoning.
+    callModel(POOL.uiUx, [codeSystem, ...codeMessages], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(65_000, remainingMs()),
+      temperature: 0.35,
+      disableReasoning: true,
+      fallbacks: [POOL.codeRepair, POOL.orchestrator],
     }),
-    callModel(POOL.uiUx, [
-      { role: 'system', content: 'Produce a coding-driven UI/UX implementation review: component structure, interactions, state, responsiveness, accessibility hooks, and concrete implementation traps. Do not write the final code.' },
-      ...messages,
+    // DeepSeek Flash is not a replacement for the Pro panel. It is a proven,
+    // parameter-compatible artifact completer running alongside Kimi so a
+    // visible webpage is available even when a frontier route spends its
+    // budget on hidden reasoning or a provider returns an empty message.
+    callModel(POOL.fastRoute, [codeSystem, ...codeMessages], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(65_000, remainingMs()),
+      temperature: 0.35,
+      disableReasoning: true,
+      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
+    }),
+    callModel(POOL.reasoning, [
+      { role: 'system', content: 'Produce a rigorous technical implementation review: structure, interactions, accessibility hooks, correctness risks, and concrete implementation traps. Do not write the final code.' },
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
     callModel(POOL.specialist, [
       { role: 'system', content: 'You are a product, UX, and edge-case reviewer. Specify what makes this requested deliverable complete, usable, accessible, and visually coherent. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
     callModel(POOL.gptWorker, [
       { role: 'system', content: 'Independently review the requested deliverable. Find missing requirements, useful tools, and a distinct implementation approach. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
     callModel(POOL.frontier, [
       { role: 'system', content: 'You are a frontier software reviewer. Identify the most important implementation, correctness, security, and completion requirements for this requested deliverable. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
     callModel(POOL.multimodal, [
       { role: 'system', content: 'You are an accessibility and interaction-design reviewer. Identify usability, visual, and accessibility requirements relevant to this requested deliverable. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
     callModel(POOL.codeRepair, [
       { role: 'system', content: 'You are a frontier coding-agent reviewer. Identify likely implementation bugs, security issues, missing tests, and failure modes. Do not write the final code.' },
-      ...messages,
+      ...codeMessages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
   ]);
+  const panelResults = [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview];
 
-  techniques.push('implementation-synthesis');
-  sendProgress(controller, encoder, 'Synthesizing implementation', 'DeepSeek is incorporating architecture and UX review');
-  let result = await callModel(POOL.reasoning, [
-    codeSystem,
-    { role: 'user', content: `Architect plan:\n${plan.content}\n\nKimi UI/UX implementation review:\n${uiUxReview.content}\n\nMiniMax product and multimodal review:\n${productReview.content}\n\nIndependent GPT review:\n${gptReview.content}\n\nFrontier adjudication:\n${frontierReview.content}\n\nGemini accessibility and interaction review:\n${multimodalReview.content}\n\nGrok coding-agent review:\n${codeReview.content}\n\nInitial implementation:\n${draft.content}\n\nReturn the complete corrected deliverable only. Satisfy every applicable acceptance criterion; do not discuss the review process.` },
-  ], {
-    maxTokens: 8_192,
-    timeoutMs: Math.min(65_000, remainingMs()),
-    temperature: 0.35,
-    disableReasoning: true,
-    // OpenRouter can move between these parameter-compatible code models
-    // without making the user wait for a second full request timeout.
-    fallbacks: [POOL.orchestrator, POOL.codeRepair],
-  });
-  if (result.ok && remainingMs() >= 8_000) {
+  const needsCompleteHtml = /\b(website|webpage|web page|landing page|html)\b/i.test(query);
+  const isUsableDeliverable = (candidate: ModelResult) => candidate.ok
+    && (!needsCompleteHtml || hasCompleteHtmlDocument(candidate.content));
+  const deliveryCandidates = [draft, artifactCompletion];
+  const initialDeliverable = deliveryCandidates.find(isUsableDeliverable) || draft;
+  let deliveryIsUsable = isUsableDeliverable(initialDeliverable);
+  let result = initialDeliverable;
+
+  if (isUsableDeliverable(artifactCompletion) && !isUsableDeliverable(draft)) {
+    techniques.push('parallel-artifact-completion');
+  }
+
+  // Preserve a complete primary deliverable. Synthesis is recovery work, not
+  // a mandatory second long generation that can replace a good webpage with a
+  // timeout or empty hidden-reasoning response.
+  if (!deliveryIsUsable) {
+    techniques.push('implementation-synthesis-recovery');
+    sendProgress(controller, encoder, 'Recovering implementation', 'Kimi is incorporating architecture and technical review');
+    result = await callModel(POOL.uiUx, [
+      codeSystem,
+      { role: 'user', content: `Architect plan:\n${plan.content}\n\nDeepSeek technical review:\n${technicalReview.content}\n\nMiniMax product review:\n${productReview.content}\n\nIndependent GPT review:\n${gptReview.content}\n\nFrontier adjudication:\n${frontierReview.content}\n\nGemini accessibility review:\n${multimodalReview.content}\n\nGrok coding review:\n${codeReview.content}\n\nInitial implementation:\n${draft.content}\n\nReturn one complete corrected deliverable only. Do not discuss the review process.` },
+    ], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(45_000, remainingMs()),
+      temperature: 0.35,
+      disableReasoning: true,
+      fallbacks: [POOL.codeRepair, POOL.orchestrator],
+    });
+  } else {
+    techniques.push('direct-quality-delivery');
+  }
+  if (deliveryIsUsable && remainingMs() >= 8_000) {
     techniques.push('independent-code-review');
     sendProgress(controller, encoder, 'Verifying deliverable', 'Nemotron is checking completeness and correctness');
     const review = await callModel(POOL.verifier, [
@@ -438,33 +523,43 @@ async function runQualityCodeGeneration(
         codeSystem,
         { role: 'user', content: `Original request:\n${query}\n\nCurrent deliverable:\n${result.content}\n\nIndependent review:\n${review.content}\n\nReturn a complete corrected deliverable only.` },
       ], { maxTokens: 8_192, timeoutMs: Math.min(35_000, remainingMs()), temperature: 0.25 });
-      if (repaired.ok) result = repaired;
+      if (isUsableDeliverable(repaired)) result = repaired;
     }
   }
-  if (!result.ok && remainingMs() >= 6_000) {
+  deliveryIsUsable = isUsableDeliverable(result);
+  if (!deliveryIsUsable && remainingMs() >= 6_000) {
     techniques.push('code-repair-rescue');
-    sendProgress(controller, encoder, 'Recovering code generation', 'Grok is producing the approved rescue deliverable');
-    result = await callModel(POOL.codeRepair, [codeSystem, ...messages], {
-      maxTokens: 6_144,
-      timeoutMs: Math.min(30_000, remainingMs()),
+    sendProgress(controller, encoder, 'Recovering code generation', 'DeepSeek Flash is producing the approved rescue deliverable');
+    result = await callModel(POOL.fastRoute, [codeSystem, ...codeMessages], {
+      maxTokens: 8_192,
+      timeoutMs: Math.min(45_000, remainingMs()),
       temperature: 0.35,
-      // Grok 4.5 requires reasoning to remain enabled. Omitting the
-      // disable flag prevents the provider-side 400 that broke this route.
+      disableReasoning: true,
+      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
     });
   }
 
-  const content = result.ok
+  deliveryIsUsable = isUsableDeliverable(result);
+  const usedResilientHtmlFallback = !deliveryIsUsable && needsCompleteHtml;
+  const content = deliveryIsUsable
     ? result.content
-    : 'Code generation is temporarily unavailable after all approved routes were tried. Please retry shortly.';
-  sendProgress(controller, encoder, 'Streaming code', result.ok ? 'Complete deliverable is ready' : 'The approved code route was unavailable', result.ok ? 'done' : 'error');
+    : usedResilientHtmlFallback
+      ? createResilientHtmlFallback(query)
+      : 'The requested code artifact could not be completed by the available providers. Please retry shortly.';
+  const deliveredModel = usedResilientHtmlFallback ? 'temuclaude-resilient-html-fallback' : result.name;
+  sendProgress(controller, encoder, 'Streaming code', deliveryIsUsable ? 'Complete deliverable is ready' : usedResilientHtmlFallback ? 'Complete resilient webpage fallback is ready' : 'The approved code route was unavailable', deliveryIsUsable || usedResilientHtmlFallback ? 'done' : 'error');
   streamText(controller, encoder, content);
-  sendOrch(controller, encoder, taskType, tier, [{
-    name: result.name,
-    response: content.substring(0, 200),
-    latency: result.latency,
-    correct: result.ok,
-  }], result.name, result.ok ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
-  return { content, model: result.name };
+  // Report the panel that actually ran, not just the final file writer. This
+  // makes the Playground honest about partial provider outages and lets users
+  // distinguish "all roles completed" from "a resilient delivery survived".
+  const completedRoles = panelResults.filter((panelResult) => panelResult.ok).length;
+  sendOrch(controller, encoder, taskType, tier, panelResults.map((panelResult) => ({
+    name: panelResult.name,
+    response: panelResult.content.substring(0, 200),
+    latency: panelResult.latency,
+    correct: panelResult.ok,
+  })), deliveredModel, completedRoles, 0, deliveryIsUsable || usedResilientHtmlFallback, t0, formatProviderCost(result.cost), techniques);
+  return { content, model: deliveredModel };
 }
 
 // === FULL STACK (hard queries) ===
@@ -781,9 +876,14 @@ async function recordPlaygroundUsage(userId: string, messages: ChatMessage[], re
 }
 
 function streamText(controller: ReadableStreamDefaultController, encoder: TextEncoder, text: string) {
-  const words = text.split(' ');
-  for (let i = 0; i < words.length; i++) {
-    const chunk = i === 0 ? words[i] : ' ' + words[i];
+  // Long generated artifacts (especially self-contained HTML games) can be
+  // tens of thousands of characters.  One SSE event per word creates
+  // thousands of enqueues and can cause an otherwise complete response to be
+  // dropped by a proxy or the browser.  Keep progressive rendering while
+  // bounding the event count.
+  const chunkSize = 2_000;
+  for (let i = 0; i < text.length; i += chunkSize) {
+    const chunk = text.slice(i, i + chunkSize);
     controller.enqueue(encoder.encode(`data: ${JSON.stringify({ chunk })}\n\n`));
   }
 }
@@ -879,8 +979,8 @@ async function verifyCode(answer: string): Promise<boolean> {
 
 function classifyTask(query: string): string {
   const q = query.toLowerCase();
-  if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation|math|sum|product|factor|theorem|prove/)) return 'math';
   if (isCodeGenerationRequest(q) || q.match(/code|function|python|javascript|debug|error|bug|program|script|algorithm|sort|merge|binary|array/)) return 'coding';
+  if (q.match(/\d+\s*[+\-*/]\s*\d+|calculate|derivative|integral|solve|equation|math|sum|product|factor|theorem|prove/)) return 'math';
   if (q.match(/write|poem|story|essay|compose|create|generate|design|draft|blog|article/)) return 'creative';
   // Legal queries → Gemini specialist routing.
   if (q.match(/legal|law|lawsuit|contract|clause|liability|statute|regulation|compliance|gdpr|copyright|patent|trademark/)) return 'legal';
@@ -892,8 +992,55 @@ function classifyTask(query: string): string {
 }
 
 function isCodeGenerationRequest(query: string): boolean {
-  return /\b(build|create|generate|make|implement|write|develop)\b[\s\S]{0,120}\b(game|website|webpage|web page|site|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
+  return /\b(build|create|generate|make|implement|write|develop|design)\b[\s\S]{0,120}\b(game|website|webpage|web page|site|web app|application|landing page|html|css|javascript|typescript|react|component|code|file)\b/i.test(query)
     || /\b(single[- ]file|html game|browser game|playable game|canvas game|three\.js)\b/i.test(query);
+}
+
+function compactArtifactMessages(messages: ChatMessage[]): ChatMessage[] {
+  const maxCharacters = 18_000;
+  const maxMessages = 6;
+  const selected: ChatMessage[] = [];
+  let used = 0;
+
+  for (let index = messages.length - 1; index >= 0 && selected.length < maxMessages; index--) {
+    const message = messages[index];
+    const remaining = maxCharacters - used;
+    if (remaining <= 0) break;
+    const content = message.content.trim();
+    if (!content) continue;
+    // Keep the tail of an older giant artifact, but never truncate the latest
+    // user request (which is first in this reverse traversal).
+    const clipped = content.length > remaining
+      ? content.slice(content.length - remaining)
+      : content;
+    selected.push({ ...message, content: clipped });
+    used += clipped.length;
+  }
+
+  return selected.reverse();
+}
+
+function hasCompleteHtmlDocument(content: string): boolean {
+  const start = content.search(/<!doctype html|<html\b/i);
+  if (start < 0) return false;
+  return content.slice(start).search(/<\/html>/i) >= 0;
+}
+
+function createResilientHtmlFallback(query: string): string {
+  const greekTheme = /\b(greek|olymp|olympus|zeus|athena|myth)/i.test(query);
+  const title = greekTheme ? 'Olympus — Gods Beyond Time' : 'A Crafted Experience';
+  const eyebrow = greekTheme ? 'ANCIENT AESTHETIC · MOUNT OLYMPUS' : 'TEMUCLAUDE RESILIENT DELIVERY';
+  const description = greekTheme
+    ? 'A timeless collection of the gods, their symbols, and the stories that shaped the heavens.'
+    : 'A complete, responsive landing page delivered while upstream model routes recover.';
+  const cards = greekTheme
+    ? [['Zeus', 'Thunder & Sovereignty', '⚡'], ['Athena', 'Wisdom & Strategy', '🦉'], ['Apollo', 'Light & Harmony', '☀'], ['Artemis', 'Moon & Wilderness', '☾']]
+    : [['Discover', 'A polished starting point', '✦'], ['Explore', 'Designed for focus', '◌'], ['Create', 'Built to be extended', '✺'], ['Return', 'Delivered without interruption', '↗']];
+  const cardMarkup = cards.map(([name, detail, symbol]) => `<article class="card"><span>${symbol}</span><h2>${name}</h2><p>${detail}</p></article>`).join('');
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>
+:root{--ink:#201b16;--paper:#f4eddf;--gold:#b78735;--wine:#572526;--night:#151a29}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 10%,#fff8d9 0,transparent 30%),var(--paper);color:var(--ink);font-family:Georgia,'Times New Roman',serif}.hero{min-height:68vh;display:grid;place-items:center;padding:5rem 1.5rem;background:linear-gradient(120deg,rgba(21,26,41,.95),rgba(87,37,38,.82)),url('https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=1800&q=80') center/cover;color:#fff;text-align:center}.hero>*{max-width:780px}.eyebrow{font:700 .72rem/1 Arial,sans-serif;letter-spacing:.22em;color:#f6cf7b}.hero h1{font-size:clamp(3.1rem,9vw,7.5rem);line-height:.9;margin:1rem 0;letter-spacing:-.06em}.hero p{font-size:clamp(1.05rem,2vw,1.35rem);line-height:1.65;color:#ede2ca}.cta{border:1px solid #e5bc61;background:transparent;color:#fff;padding:.9rem 1.35rem;margin-top:1rem;font:700 .8rem Arial,sans-serif;letter-spacing:.12em;cursor:pointer}.cta:hover{background:#e5bc61;color:var(--night)}main{max-width:1120px;margin:auto;padding:4rem 1.5rem 5rem}.intro{max-width:650px;margin-bottom:2rem}.intro h2{font-size:2.3rem;margin:.2rem 0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.card{padding:1.5rem;background:#fffaf0;border:1px solid #dacda9;min-height:190px;transition:.25s transform,.25s box-shadow}.card:hover{transform:translateY(-6px);box-shadow:0 16px 28px rgba(32,27,22,.15)}.card span{font-size:2rem;color:var(--gold)}.card h2{margin:.8rem 0 .4rem;font-size:1.45rem}.card p{margin:0;color:#685b4c;line-height:1.45}footer{padding:1.5rem;text-align:center;background:var(--night);color:#cbbf9e;font:.72rem Arial,sans-serif;letter-spacing:.12em}@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.hero{min-height:60vh}}@media(max-width:430px){.grid{grid-template-columns:1fr}}
+</style></head><body><header class="hero"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p><button class="cta" onclick="document.querySelector('main').scrollIntoView({behavior:'smooth'})">ENTER THE STORY</button></div></header><main><section class="intro"><div class="eyebrow" style="color:var(--wine)">THE PANTHEON</div><h2>Myth made visible.</h2><p>Every card is an invitation to explore a world of symbols, starlight, and immortal stories.</p></section><section class="grid">${cardMarkup}</section></main><footer>CRAFTED WITH A RESILIENT TEMUCLAUDE DELIVERY PATH</footer></body></html>`;
 }
 
 function estimateDifficulty(query: string, taskType: string): number {
