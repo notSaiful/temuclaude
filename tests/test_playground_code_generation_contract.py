@@ -56,6 +56,22 @@ def test_playground_pro_pipeline_is_quality_first_and_has_runtime_headroom():
     assert "Promise.all(steps.slice(0, 5).map" in route
 
 
+def test_hermes_and_playground_use_bounded_agent_and_visible_work_log_contracts():
+    api = (ROOT / "website/app/v1/chat/completions/route.ts").read_text()
+    playground = (ROOT / "website/app/playground/page.tsx").read_text()
+    chat = (ROOT / "website/app/api/chat/route.ts").read_text()
+    readme = (ROOT / "README.md").read_text()
+
+    assert "const TEMUCLAUDE_AGENT_MODEL = 'temuclaude/temuclaude-agent';" in api
+    assert "async function completeAgentTurn" in api
+    assert "tier: 'agent-bounded-degraded'" in api
+    assert "if (isAgentModel(model))" in api
+    assert "bounded agent route" in readme
+    assert "Creating an execution plan" in chat
+    assert "turn this into a complete deliverable" in playground
+    assert "rounded-sm border border-border-subtle bg-bg-secondary/40" in playground
+
+
 def test_webpage_requests_are_code_artifacts_and_empty_trivial_responses_recover():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
 

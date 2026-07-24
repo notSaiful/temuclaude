@@ -64,6 +64,7 @@ const LITE_REASONING: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_AGENT: LiteModelId = 'qwen/qwen3.7-plus';
 const LITE_VERIFIER: LiteModelId = 'nvidia/nemotron-3-ultra-550b-a55b';
 const TEMUCLAUDE_PRO_MODEL = 'temuclaude/temuclaude-pro';
+const TEMUCLAUDE_AGENT_MODEL = 'temuclaude/temuclaude-agent';
 
 const MODEL_ROLE_PROMPTS: Record<string, string> = {
   [M_GLM]: 'You are the GLM long-horizon planner and synthesis lead. Track dependencies, architecture, edge cases, and integration.',
@@ -207,6 +208,38 @@ async function finalRescue(messages: Msg[], temp: number, maxTok: number): Promi
   };
 }
 
+/** Bounded, availability-first route for the documented Hermes model. */
+async function completeAgentTurn(messages: Msg[], temp: number, maxTok: number): Promise<OrchestrationResult> {
+  const startedAt = Date.now();
+  const query = [...messages].reverse().find((message) => message.role === 'user')?.content || '';
+  const codeTask = isCodeGen(query);
+  const mathTask = isMath(query);
+  const tokenBudget = Math.min(Math.max(Number(maxTok) || 2048, 1024), 4096);
+  const primary = codeTask ? M_KIMI : mathTask ? M_DEEPSEEK : M_GLM;
+  const reviewer = codeTask ? M_GROK : mathTask ? M_GLM : M_DEEPSEEK;
+  const [first, second] = await Promise.all([
+    call(primary, messages, temp, tokenBudget, { fallbacks: [M_DEEPSEEK, M_GLM], timeoutMs: 30_000 }),
+    call(reviewer, [{ role: 'system', content: 'Independently solve the task. Focus on correctness, constraints, edge cases, and a concrete next action.' }, ...messages], temp, tokenBudget, { fallbacks: [M_GLM, M_DEEPSEEK], timeoutMs: 30_000 }),
+  ]);
+  const successful = [
+    { name: primary, content: first.content, result: first },
+    { name: reviewer, content: second.content, result: second },
+  ].filter((draft) => draft.result.success && hasUsableContent(draft.content));
+  let tokens = first.tokens + second.tokens;
+  if (successful.length === 2) {
+    const synthesis = await aggregate(query, successful.map(({ name, content }) => ({ name, content })), tokenBudget);
+    tokens += synthesis.tokens;
+    if (synthesis.success && hasUsableContent(synthesis.content)) {
+      return { content: synthesis.content, tokens, tier: 'agent-bounded-synthesis', time: Date.now() - startedAt };
+    }
+  }
+  if (successful.length > 0) {
+    return { content: successful[0].content, tokens, tier: 'agent-bounded-degraded', time: Date.now() - startedAt };
+  }
+  const rescue = await call(M_GLM, messages, temp, tokenBudget, { fallbacks: [M_DEEPSEEK, M_KIMI, M_GROK], timeoutMs: 30_000 });
+  return { content: rescue.success ? rescue.content : '', tokens: tokens + rescue.tokens, tier: rescue.success ? 'agent-rescue' : 'agent-unavailable', time: Date.now() - startedAt };
+}
+
 /**
  * Difficulty Classifier — heuristic, no API call.  Pro code generation is a
  * hard artifact task: it receives the full panel, aggregation, QA, and repair
@@ -271,6 +304,12 @@ function isProModel(model: unknown): boolean {
     'temuclaude/temuclaude',
     TEMUCLAUDE_PRO_MODEL,
     'temuclaude/pro',
+  ].includes(model.toLowerCase()));
+}
+
+function isAgentModel(model: unknown): boolean {
+  return model === undefined || model === null || (typeof model === 'string' && [
+    'temuclaude', 'temuclaude/temuclaude', 'temuclaude-agent', TEMUCLAUDE_AGENT_MODEL,
   ].includes(model.toLowerCase()));
 }
 
@@ -683,6 +722,31 @@ export async function POST(request: NextRequest) {
         { error: { message: 'Unsupported model. Use temuclaude/temuclaude-pro or temuclaude/temuclaude-lite.', type: 'invalid_request_error' } },
         { status: 400 },
       );
+    }
+
+    // `temuclaude` is the documented Hermes model. A hard agent task must
+    // receive a bounded useful turn instead of failing because a full panel
+    // cannot finish within one HTTP request. Full maximum-quality work stays
+    // available through the explicit asynchronous job contract.
+    if (isAgentModel(model)) {
+      const agent = await completeAgentTurn(messages, temperature ?? 0.6, max_tokens ?? 4096);
+      if (!hasUsableContent(agent.content)) {
+        return upstreamFailure('TemuClaude agent route could not produce a completion. Please retry shortly.', 503);
+      }
+      const content = agent.content.trim();
+      const promptTokens = promptTokenEstimate(messages);
+      const completionTokens = completionTokenEstimate(content);
+      if (!isEvalMode && userId) {
+        try { await incrementUsageAsync(userId, promptTokens, completionTokens, modelActivityStore.getStore()?.join(',')); } catch {}
+      }
+      return completionResponse({
+        id: `chatcmpl-${Date.now()}`,
+        object: 'chat.completion',
+        created: Math.floor(Date.now() / 1000),
+        model: TEMUCLAUDE_AGENT_MODEL,
+        choices: [{ index: 0, message: { role: 'assistant', content }, finish_reason: 'stop' }],
+        usage: { prompt_tokens: promptTokens, completion_tokens: completionTokens, total_tokens: promptTokens + completionTokens },
+      }, wantsStream);
     }
 
     // ── Layer 1: Pro orchestration proxy to the Fly Python engine ──────────

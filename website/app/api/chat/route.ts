@@ -158,6 +158,14 @@ export async function POST(req: NextRequest) {
         const cls = await classifyWithDeliberation(query, profile, controller, encoder, techniques);
         const { taskType, tier, isCodeGeneration, difficulty } = cls;
         sendProgress(controller, encoder, 'Routing selected', `TemuClaude ${profile === 'lite' ? 'Lite' : 'Pro'} · ${taskType} task · ${tier} tier · ${cls.confidence} confidence — ${cls.reason.slice(0, 80)}`, 'done');
+        sendProgress(
+          controller,
+          encoder,
+          'Creating an execution plan',
+          isCodeGeneration
+            ? 'Breaking the deliverable into implementation, interaction, and validation work.'
+            : 'Breaking the request into the right research, reasoning, and verification steps.',
+        );
 
         let completed: CompletedResponse;
         if (profile === 'lite') {

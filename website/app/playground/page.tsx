@@ -850,6 +850,9 @@ function sortConversations(conversations: Conversation[]) {
 
 function describeIntent(prompt: string) {
   const normalized = prompt.toLowerCase();
+  if (/build|create|generate|implement|website|web app|game|component|dashboard|html|css|javascript|python/.test(normalized)) {
+    return 'I’ll turn this into a complete deliverable, review the interactions and edge cases, then verify it before I send it.';
+  }
   if (/compare|cost|price|cheaper|pricing/.test(normalized)) {
     return 'I’ll compare the options against the relevant trade-offs and calculate the difference.';
   }
@@ -865,6 +868,7 @@ function describeIntent(prompt: string) {
 function toActivityEvent(step: ProgressStep): ActivityEvent {
   const label = step.label.toLowerCase();
   if (label.includes('queued')) return { heading: 'Prepared a work plan', detail: step.detail, kind: 'routing', status: step.status };
+  if (label.includes('execution plan') || label.includes('planning')) return { heading: 'Created an execution plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('classifying')) return { heading: 'Understood the request', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('routing')) return { heading: 'Selected a response plan', detail: step.detail, kind: 'routing', status: step.status };
   if (label.includes('search')) return { heading: label.includes('complete') ? 'Finished web research' : 'Searched the web', detail: step.detail, kind: 'research', status: step.status };
@@ -901,7 +905,7 @@ function AgentActivity({
   }
 
   return (
-    <div className="space-y-1.5 text-[13px] leading-5" aria-label="TemuClaude work log">
+    <div className="space-y-1.5 rounded-sm border border-border-subtle bg-bg-secondary/40 px-3 py-2.5 text-[13px] leading-5" aria-label="TemuClaude work log">
       {durationMs !== null && (
         <button onClick={onToggle} className="mb-1 flex items-center gap-2 text-xs text-text-muted hover:text-text-primary transition-colors" aria-expanded="true">
           <span className="h-1.5 w-1.5 rounded-full bg-accent-olive" aria-hidden="true" />
