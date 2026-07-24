@@ -160,7 +160,7 @@ class ZaiVisionClient:
             async with session.post(
                 url, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=120)
             ) as r:
-                data = await r.json()
                 if r.status != 200:
-                    raise RuntimeError(f"z.ai OCR error {r.status}: {data}")
-                return data
+                    text = await r.text()
+                    raise RuntimeError(f"z.ai OCR error {r.status}: {text}")
+                return await r.json()
