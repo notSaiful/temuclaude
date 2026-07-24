@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field, field_validator
 
 from src.orchestrator import Temuclaude
 from src.security_pipeline import secure_complete
+from src.vision_gateway import ZaiVisionClient, vision_enabled
 
 MAX_MESSAGES = 50
 MAX_MESSAGE_CHARS = 20_000
@@ -118,3 +119,29 @@ async def chat_completions(payload: ChatRequest, request: Request, authorization
         "choices": [{"index": 0, "message": {"role": "assistant", "content": result.response}, "finish_reason": "stop"}],
         "usage": {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens, "total_tokens": prompt_tokens + completion_tokens},
     }
+
+
+class VisionRequest(BaseModel):
+    task: Literal["understand", "extract_text"]
+    image_url: str = Field(min_length=8, max_length=2048)
+    prompt: str = Field(default="", max_length=8000)
+
+    @field_validator("image_url")
+    @classmethod
+    def must_be_https_url(cls, value: str) -> str:
+        if not value.startswith("https://"):
+            raise ValueError("image_url must be an https URL")
+        return value
+
+
+@app.post("/v1/vision/understand")
+async def vision_understand(payload: VisionRequest, authorization: str | None = Header(default=None)) -> dict:
+    _require_api_key(authorization)
+    if not vision_enabled():
+        raise HTTPException(status_code=501, detail="Vision gateway is not enabled")
+    client = ZaiVisionClient.from_env()
+    if payload.task == "understand":
+        return await client.understand(payload.image_url, payload.prompt)
+    if payload.task == "extract_text":
+        return await client.extract_text(payload.image_url)
+    raise HTTPException(status_code=400, detail="task must be 'understand' or 'extract_text'")
