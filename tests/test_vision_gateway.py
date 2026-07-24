@@ -220,3 +220,11 @@ def test_route_happy_path_extract_text(monkeypatch):
     out = asyncio.run(vision_understand(payload, authorization="Bearer test-key"))
     assert out["task"] == "extract_text"
     assert out["markdown"] == "# t"
+
+
+def test_env_example_documents_vision_gateway():
+    from pathlib import Path
+    text = (Path(__file__).resolve().parents[1] / ".env.example").read_text()
+    assert "TEMUCLAUDE_VISION_ENABLED" in text
+    assert "ZAI_API_KEY" in text
+    assert "TEMUCLAUDE_VISION_MODEL" in text
