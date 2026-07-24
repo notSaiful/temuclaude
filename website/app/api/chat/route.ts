@@ -444,6 +444,15 @@ async function runQualityCodeGeneration(
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
   ]);
+  const specialistPanel = [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview];
+  const usableSpecialists = specialistPanel.filter((candidate) => candidate.ok && candidate.content.trim()).length;
+  sendProgress(
+    controller,
+    encoder,
+    'Specialist panel complete',
+    `${usableSpecialists}/${specialistPanel.length} specialist roles returned usable work`,
+    usableSpecialists > 0 ? 'done' : 'error',
+  );
 
   const needsCompleteHtml = /\b(website|webpage|web page|landing page|html)\b/i.test(query);
   const isUsableDeliverable = (candidate: ModelResult) => candidate.ok
@@ -522,12 +531,21 @@ async function runQualityCodeGeneration(
   const deliveredModel = usedResilientHtmlFallback ? 'temuclaude-resilient-html-fallback' : result.name;
   sendProgress(controller, encoder, 'Streaming code', deliveryIsUsable ? 'Complete deliverable is ready' : usedResilientHtmlFallback ? 'Complete resilient webpage fallback is ready' : 'The approved code route was unavailable', deliveryIsUsable || usedResilientHtmlFallback ? 'done' : 'error');
   streamText(controller, encoder, content);
-  sendOrch(controller, encoder, taskType, tier, [{
-    name: deliveredModel,
-    response: content.substring(0, 200),
-    latency: result.latency,
-    correct: deliveryIsUsable || usedResilientHtmlFallback,
-  }], deliveredModel, deliveryIsUsable || usedResilientHtmlFallback ? 1 : 0, 0, false, t0, formatProviderCost(result.cost), techniques);
+  sendOrch(controller, encoder, taskType, tier,
+    specialistPanel.map((candidate) => ({
+      name: candidate.name,
+      response: candidate.content.substring(0, 200),
+      latency: candidate.latency,
+      correct: candidate.ok,
+    })),
+    deliveredModel,
+    usableSpecialists,
+    0,
+    false,
+    t0,
+    formatProviderCost(result.cost),
+    techniques,
+  );
   return { content, model: deliveredModel };
 }
 

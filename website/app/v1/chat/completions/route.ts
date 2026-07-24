@@ -724,11 +724,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // `temuclaude` is the documented Hermes model. A hard agent task must
-    // receive a bounded useful turn instead of failing because a full panel
-    // cannot finish within one HTTP request. Full maximum-quality work stays
-    // available through the explicit asynchronous job contract.
-    if (isAgentModel(model)) {
+    const latestUserText = [...messages].reverse().find((message: Msg) => message.role === 'user')?.content || '';
+    const agentArtifactRequest = isAgentModel(model) && isCodeGen(latestUserText);
+
+    // `temuclaude` is the documented Hermes model. Routine agent turns use a
+    // bounded route so an unavailable specialist cannot terminate the entire
+    // request. Code and artifact builds are deliberately different: they must
+    // reach the full specialist panel, rather than being silently downgraded
+    // to the two-model availability route.
+    if (isAgentModel(model) && !agentArtifactRequest) {
       const agent = await completeAgentTurn(messages, temperature ?? 0.6, max_tokens ?? 4096);
       if (!hasUsableContent(agent.content)) {
         return upstreamFailure('TemuClaude agent route could not produce a completion. Please retry shortly.', 503);
@@ -759,7 +763,7 @@ export async function POST(request: NextRequest) {
     // Fly hiccup degrades gracefully instead of 504'ing.
     const engineUrl = process.env.TEMUCLAUDE_ENGINE_URL;
     const engineKey = process.env.TEMUCLAUDE_ENGINE_API_KEY;
-    if (engineUrl && engineKey && isProModel(model) && !isLiteModel(model)) {
+    if (engineUrl && engineKey && isProModel(model) && !isLiteModel(model) && !agentArtifactRequest) {
       const engineBody = {
         model: 'temuclaude',
         messages,

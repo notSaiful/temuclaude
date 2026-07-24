@@ -20,11 +20,11 @@ Frontier-quality AI at a fraction of the cost. TemuClaude orchestrates a role-sp
 ## Use with Hermes Agent
 
 Configure Hermes with the OpenAI-compatible endpoint `https://temuclaude.com/v1`
-and model `temuclaude`. This is the bounded agent route: it uses two
+and model `temuclaude`. Routine agent turns use a bounded route: two
 complementary specialists, synthesis when both finish, and a rescue response
-when an upstream role is unavailable. For work that needs the full
-maximum-quality pipeline, submit an asynchronous job with
-`execution: "maximum_quality"` instead of holding one agent turn open.
+when an upstream role is unavailable. Code and artifact builds (for example,
+websites, web apps, and games) instead use the full specialist panel and
+report every participating role in the orchestration trace.
 
 ## Updated Model Stack + Step Router
 

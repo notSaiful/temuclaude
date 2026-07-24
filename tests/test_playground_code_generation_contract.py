@@ -65,11 +65,25 @@ def test_hermes_and_playground_use_bounded_agent_and_visible_work_log_contracts(
     assert "const TEMUCLAUDE_AGENT_MODEL = 'temuclaude/temuclaude-agent';" in api
     assert "async function completeAgentTurn" in api
     assert "tier: 'agent-bounded-degraded'" in api
-    assert "if (isAgentModel(model))" in api
-    assert "bounded agent route" in readme
+    assert "if (isAgentModel(model) && !agentArtifactRequest)" in api
+    assert "const agentArtifactRequest = isAgentModel(model) && isCodeGen(latestUserText);" in api
+    assert "isProModel(model) && !isLiteModel(model) && !agentArtifactRequest" in api
+    assert "Routine agent turns use a bounded route" in readme
     assert "Creating an execution plan" in chat
     assert "turn this into a complete deliverable" in playground
     assert "rounded-sm border border-border-subtle bg-bg-secondary/40" in playground
+
+
+def test_full_specialist_panel_is_used_and_reported_for_code_artifacts():
+    api = (ROOT / "website/app/v1/chat/completions/route.ts").read_text()
+    route = (ROOT / "website/app/api/chat/route.ts").read_text()
+    generation = route[route.index("async function runQualityCodeGeneration"):route.index("// === FULL STACK")]
+
+    assert "agentArtifactRequest" in api
+    assert "isCodeGen(latestUserText)" in api
+    assert "specialistPanel = [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview]" in generation
+    assert "Specialist panel complete" in generation
+    assert "specialistPanel.map((candidate)" in generation
 
 
 def test_webpage_requests_are_code_artifacts_and_empty_trivial_responses_recover():
