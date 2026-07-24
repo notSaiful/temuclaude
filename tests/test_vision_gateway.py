@@ -162,3 +162,61 @@ async def run_extract_text_contract():
 
 def test_extract_text_contract():
     asyncio.run(run_extract_text_contract())
+
+
+# ---- route handler (direct call, no TestClient) ----
+
+def _set_env(monkeypatch, *, enabled, key="test-key", zai="zai-key"):
+    monkeypatch.setenv("TEMUCLAUDE_API_KEY", key)
+    monkeypatch.setenv("TEMUCLAUDE_VISION_ENABLED", "true" if enabled else "false")
+    monkeypatch.setenv("ZAI_API_KEY", zai)
+
+
+def test_vision_request_rejects_non_https():
+    from api_server import VisionRequest
+    with pytest.raises(Exception):
+        VisionRequest(task="understand", image_url="http://insecure/x.png", prompt="q")
+
+
+def test_route_returns_501_when_disabled(monkeypatch):
+    from api_server import vision_understand, VisionRequest
+    _set_env(monkeypatch, enabled=False)
+    payload = VisionRequest(task="understand", image_url="https://x/y.png", prompt="q")
+    with pytest.raises(Exception) as ei:
+        asyncio.run(vision_understand(payload, authorization="Bearer test-key"))
+    assert ei.value.status_code == 501
+
+
+def test_route_returns_401_without_key(monkeypatch):
+    from api_server import vision_understand, VisionRequest
+    _set_env(monkeypatch, enabled=True, key="")
+    payload = VisionRequest(task="understand", image_url="https://x/y.png", prompt="q")
+    with pytest.raises(Exception) as ei:
+        asyncio.run(vision_understand(payload, authorization=None))
+    assert ei.value.status_code == 401
+
+
+def test_route_happy_path_understand(monkeypatch):
+    from api_server import vision_understand, VisionRequest, ZaiVisionClient
+    _set_env(monkeypatch, enabled=True)
+    fake_client = ZaiVisionClient(api_key="zai-key", chat_client=_fake_chat('{"panels": [9]}'))
+    monkeypatch.setattr("api_server.ZaiVisionClient.from_env", staticmethod(lambda: fake_client))
+    payload = VisionRequest(task="understand", image_url="https://x/y.png", prompt="list panels")
+    out = asyncio.run(vision_understand(payload, authorization="Bearer test-key"))
+    assert out["task"] == "understand"
+    assert out["parsed"] == {"panels": [9]}
+
+
+def test_route_happy_path_extract_text(monkeypatch):
+    from api_server import vision_understand, VisionRequest, ZaiVisionClient
+
+    async def fake_ocr(url, payload):
+        return {"md_results": "# t", "layout_details": [], "layout_visualization": []}
+
+    _set_env(monkeypatch, enabled=True)
+    fake_client = ZaiVisionClient(api_key="zai-key", ocr_post=fake_ocr)
+    monkeypatch.setattr("api_server.ZaiVisionClient.from_env", staticmethod(lambda: fake_client))
+    payload = VisionRequest(task="extract_text", image_url="https://x/y.png")
+    out = asyncio.run(vision_understand(payload, authorization="Bearer test-key"))
+    assert out["task"] == "extract_text"
+    assert out["markdown"] == "# t"
