@@ -6,25 +6,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_code_generation_has_parameter_compatible_fallbacks():
+def test_code_generation_uses_the_bounded_eight_specialist_topology():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
     generation = route[route.index("async function runQualityCodeGeneration"):route.index("// === FULL STACK")]
 
-    assert "Promise.all([" in generation
+    assert "MAX_SPECIALIST_CONCURRENCY = 4" in route
+    assert "runWithConcurrency([" in generation
     assert "POOL.orchestrator" in generation
     assert "POOL.specialist" in generation
     assert "POOL.uiUx" in generation
     assert "POOL.gptWorker" in generation
     assert "POOL.frontier" in generation
     assert "POOL.verifier" in generation
-    assert "fallbacks: [POOL.codeRepair, POOL.orchestrator]" in generation
+    assert "panel-informed-artifact-synthesis" in generation
+    assert "Seven independent roles are starting with a concurrency limit of four" in generation
     assert "deadlineAt = t0 + 180_000" in generation
     assert "remainingMs() >= 6_000" in generation
 
 
 def test_grok_repair_does_not_disable_mandatory_reasoning():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
-    repair = route[route.index("const repaired = await callModel(POOL.codeRepair"):route.index("if (!deliveryIsUsable && remainingMs()")]
+    repair = route[route.index("const repaired = await callModel(POOL.codeRepair"):route.index("if (isUsableDeliverable(repaired))")]
 
     assert "disableReasoning: true" not in repair
     assert "timeoutMs: Math.min(35_000, remainingMs())" in repair
@@ -34,13 +36,13 @@ def test_webpage_delivery_preserves_kimi_output_before_optional_recovery():
     route = (ROOT / "website/app/api/chat/route.ts").read_text()
     generation = route[route.index("async function runQualityCodeGeneration"):route.index("// === FULL STACK")]
 
-    assert "Kimi is the primary user-facing webpage deliverer" in generation
-    assert "deliveryCandidates.find(isUsableDeliverable)" in generation
-    assert "let deliveryIsUsable = isUsableDeliverable(initialDeliverable)" in generation
-    assert "let result = initialDeliverable;" in generation
-    assert "if (!deliveryIsUsable)" in generation
-    assert "direct-quality-delivery" in generation
-    assert "fallbacks: [POOL.codeRepair, POOL.orchestrator]" in generation
+    assert "Kimi is turning the full specialist panel into a complete artifact" in generation
+    assert "const artifactDelivery = await callModel(POOL.uiUx" in generation
+    assert "let deliveryIsUsable = isUsableDeliverable(result);" in generation
+    assert "let result = artifactDelivery;" in generation
+    assert "if (!deliveryIsUsable && remainingMs() >= 12_000)" in generation
+    assert "Specialist evidence:" in generation
+    assert "fallbacks: [POOL.codeRepair]" in generation
     assert "function hasCompleteHtmlDocument" in route
 
 
@@ -81,9 +83,9 @@ def test_full_specialist_panel_is_used_and_reported_for_code_artifacts():
 
     assert "agentArtifactRequest" in api
     assert "isCodeGen(latestUserText)" in api
-    assert "specialistPanel = [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview]" in generation
+    assert "specialistPanel = [plan, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview]" in generation
     assert "Specialist panel complete" in generation
-    assert "specialistPanel.map((candidate)" in generation
+    assert "const completedPanel = [...specialistPanel, artifactDelivery" in generation
 
 
 def test_webpage_requests_are_code_artifacts_and_empty_trivial_responses_recover():
@@ -95,13 +97,24 @@ def test_webpage_requests_are_code_artifacts_and_empty_trivial_responses_recover
     assert "completed = await runFullStack(query, messages, controller, encoder, taskType, 'medium', t0, techniques);" in route
 
 
-def test_openrouter_timeout_is_shared_by_all_fallback_attempts():
+def test_openrouter_uses_one_gateway_managed_fallback_per_role():
     transport = (ROOT / "website/lib/openrouter.ts").read_text()
 
     assert "const deadlineAt = Date.now() + Math.max(1, timeoutMs)" in transport
     assert "const remainingTimeoutMs = () => Math.max(0, deadlineAt - Date.now())" in transport
-    assert transport.count("if (attemptTimeoutMs < 250) break") >= 4
-    assert "postAiml(candidate, messages, temperature, maxTokens, attemptTimeoutMs)" in transport
+    assert "]).slice(0, 2);" in transport
+    assert "const attemptedModels = [`openrouter:role:${openRouterModels.join(' -> ')}`];" in transport
+    assert "...(responseFormat ? { require_parameters: true } : {})" in transport
+    assert "quantizations:" not in transport
+    assert "openrouter:resilience:" not in transport
+
+
+def test_public_api_bounds_openrouter_concurrency_for_full_panels():
+    api = (ROOT / "website/app/v1/chat/completions/route.ts").read_text()
+
+    assert "const MAX_OPENROUTER_CONCURRENCY = 4;" in api
+    assert "async function withOpenRouterSlot" in api
+    assert "withOpenRouterSlot(() => callOpenRouter" in api
 
 
 def test_lite_rejects_truncated_artifacts_and_allows_quality_time():

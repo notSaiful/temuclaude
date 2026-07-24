@@ -22,7 +22,7 @@ export default function ModelsPage() {
         <div className="container-max">
           <h1 className="text-3xl md:text-4xl font-light text-text-primary mb-3" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Model Pool</h1>
           <p className="text-text-secondary mb-8 max-w-2xl">
-            Ten active routing roles. Nontrivial Pro work runs every available specialist in parallel with role-specific instructions, then synthesizes and verifies the result.
+            Nine maximum-quality roles: eight complementary specialists and an independent verifier. Artifact work runs the advisory specialists in bounded batches, then synthesizes and verifies the result.
           </p>
 
           <div className="mb-8 border border-border-subtle rounded-sm bg-bg-secondary/60 p-5 max-w-3xl">

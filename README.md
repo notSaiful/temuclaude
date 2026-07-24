@@ -28,25 +28,29 @@ report every participating role in the orchestration trace.
 
 ## Updated Model Stack + Step Router
 
-TemuClaude uses eight active *roles*, not an always-on eight-model ensemble.
-The router begins on the least-expensive model expected to succeed and only
-adds specialists after uncertainty, verifier failure, or a clear modality need.
+TemuClaude keeps nine active quality roles, rather than treating every request
+as a nine-way fan-out. Maximum-quality artifacts use seven independent
+advisory specialists, Kimi as the panel-informed artifact author, and Nemotron
+as an independent verifier. Those roles run in bounded batches of four, with
+one OpenRouter-managed fallback per role. The router otherwise begins on the
+least-expensive model expected to succeed and adds specialists after
+uncertainty, verifier failure, or a clear modality need.
 
-| Model | Role | Route policy |
-|-------|------|--------------|
-| DeepSeek V4 Flash | High-volume worker | Default for simple drafting, extraction, and low-risk steps |
-| DeepSeek V4 Pro | Reasoning specialist | Math, technical analysis, and difficult code reasoning |
-| GLM-5.2 | Planner + aggregator | Long-horizon planning, orchestration, and synthesis |
-| MiniMax M3 | Budget multimodal | Image/video, UI, and long-context work |
-| Gemini 3.5 Flash | Premium multimodal | Only when its tools/UI-control capability has expected value |
-| GPT-5.6 Luna | Closed-model escalation | Only after a hard response fails the QA gate |
-| Grok 4.5 | Coding-agent escalation | Targeted repair for difficult coding-agent work |
-| Nemotron 3 Ultra | Independent verifier | Conditional QA and verification, never an always-on panel member |
+| Model | Role | Maximum-quality policy |
+|-------|------|------------------------|
+| DeepSeek V4 Pro | Reasoning specialist | Technical review and bounded recovery |
+| GLM-5.2 | Planner + aggregator | Architecture and synthesis evidence |
+| Kimi K2.6 | UI/UX implementation | Panel-informed artifact author |
+| MiniMax M3 | Product and long-context specialist | Product, UX, and completeness review |
+| Gemini 3.5 Flash | Multimodal specialist | Accessibility and interaction review |
+| GPT-5.6 Luna | Independent proposer | Diverse implementation review |
+| GPT-5.6 Sol | Frontier adjudicator | High-rigor requirements review |
+| Grok 4.5 | Coding-agent specialist | Failure-mode review and targeted repair |
+| Nemotron 3 Ultra | Independent verifier | Final QA gate after artifact generation |
 
-GPT-5.6 Terra is a disabled emergency fallback. It needs both approved API
-access and `TEMUCLAUDE_ENABLE_TERRA_FALLBACK=true`; GPT-5.6 Sol is excluded.
-Kimi K2.6 and legacy models remain compatibility fallbacks while they are
-evaluated against this stack.
+DeepSeek V4 Flash remains a Lite/availability worker, not part of the
+maximum-quality panel. GPT-5.6 Terra is a disabled emergency fallback and
+requires both approved API access and `TEMUCLAUDE_ENABLE_TERRA_FALLBACK=true`.
 
 Runtime selection is no longer only whole-query routing. TemuClaude records per-step telemetry for search, verification, consistency, QA gates, debate, post-processing, and formal verification, then uses observed success/cost/progress signals to recommend better step-level model choices when enough evidence exists.
 

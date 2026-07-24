@@ -187,7 +187,7 @@ async function postOpenRouter(
   sessionId?: string,
   modelFallbacks: string[] = [],
   disableReasoning = false,
-  strictQuality = true,
+  _strictQuality = true,
   responseFormat?: 'json_object',
 ): Promise<OpenRouterResult> {
   const key = process.env.OPENROUTER_API_KEY || '';
@@ -233,14 +233,16 @@ async function postOpenRouter(
         // endpoint. Requiring it made valid approved models look unavailable.
         max_tokens: Math.max(16, maxTokens),
         provider: {
+          // A role gets one OpenRouter-managed provider/model recovery path.
+          // Layering local candidate loops on top of this turned one panel role
+          // into several simultaneous provider calls and caused avoidable 429s.
           allow_fallbacks: true,
-          require_parameters: true,
-          // Pro fixes the model explicitly and prefers full/high precision,
-          // high-throughput endpoints. OpenRouter otherwise price-weights
-          // provider selection, which conflicts with TemuClaude's quality-first
-          // product contract.
+          // Structured requests need strict parameter support; ordinary text
+          // roles should retain the widest healthy provider pool.
+          ...(responseFormat ? { require_parameters: true } : {}),
+          // Prefer responsive quality endpoints without excluding a model just
+          // because the provider does not advertise a particular quantization.
           sort: 'throughput',
-          ...(strictQuality ? { quantizations: ['bf16', 'fp16', 'fp8'] } : {}),
         },
         ...(disableReasoning ? { reasoning: { enabled: false, exclude: true } } : {}),
         ...(responseFormat ? { response_format: { type: responseFormat } } : {}),
@@ -521,59 +523,26 @@ export async function callOpenRouter(
   const openRouterModels = uniqueModels([
     resolveOpenRouterModel(model),
     ...getOpenRouterFallbacks(resolveOpenRouterModel(model), options.fallbacks).map(resolveOpenRouterModel),
-  ]);
-  const attemptedModels: string[] = [];
-
-  let last: OpenRouterResult | null = null;
-  for (let i = 0; i < openRouterModels.length; i++) {
-    const attemptTimeoutMs = remainingTimeoutMs();
-    if (attemptTimeoutMs < 250) break;
-    const candidate = openRouterModels[i];
-    attemptedModels.push(`openrouter:quality:${candidate}`);
-    const result = await postOpenRouter(
-      candidate,
+  ]).slice(0, 2);
+  const attemptedModels = [`openrouter:role:${openRouterModels.join(' -> ')}`];
+  const attemptTimeoutMs = remainingTimeoutMs();
+  const primary = openRouterModels[0];
+  const result = attemptTimeoutMs < 250
+    ? null
+    : await postOpenRouter(
+      primary,
       messages,
       temperature,
       maxTokens,
-      Math.max(250, Math.floor(attemptTimeoutMs * 0.6)),
+      attemptTimeoutMs,
       options.sessionId,
-      openRouterModels.slice(i + 1),
+      openRouterModels.slice(1),
       options.disableReasoning,
       true,
       options.responseFormat,
     );
-    if (result.success) {
-      return { ...result, attemptedModels };
-    }
-    last = result;
-
-    // A precision filter can temporarily leave an otherwise approved model
-    // without a routable endpoint. Retry the exact same approved model with
-    // throughput-first provider routing before moving to a different model.
-    // Authentication/permission errors are not retried because they require
-    // configuration changes, not transport recovery.
-    const relaxedTimeoutMs = remainingTimeoutMs();
-    const retryable = result.status !== 401 && result.status !== 403;
-    if (retryable && relaxedTimeoutMs >= 250) {
-      attemptedModels.push(`openrouter:resilience:${candidate}`);
-      const relaxed = await postOpenRouter(
-        candidate,
-        messages,
-        temperature,
-        maxTokens,
-        relaxedTimeoutMs,
-        options.sessionId,
-        openRouterModels.slice(i + 1),
-        options.disableReasoning,
-        false,
-        options.responseFormat,
-      );
-      if (relaxed.success) {
-        return { ...relaxed, attemptedModels };
-      }
-      last = relaxed;
-    }
-  }
+  if (result?.success) return { ...result, attemptedModels };
+  let last: OpenRouterResult | null = result;
 
   if (options.allowExternalFallbacks && deepinfraFallbackEnabled()) {
     for (const candidate of getMappedFallbacks(openRouterModels, DEEPINFRA_MODEL_MAP)) {

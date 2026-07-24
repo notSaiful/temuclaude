@@ -43,6 +43,22 @@ let circuitTrippedUntil = 0;
 // One request can invoke several models in parallel. AsyncLocalStorage keeps
 // that invocation list isolated per request, including across Promise.all.
 const modelActivityStore = new AsyncLocalStorage<string[]>();
+const MAX_OPENROUTER_CONCURRENCY = 4;
+let activeOpenRouterCalls = 0;
+const openRouterWaiters: Array<() => void> = [];
+
+async function withOpenRouterSlot<T>(operation: () => Promise<T>): Promise<T> {
+  if (activeOpenRouterCalls >= MAX_OPENROUTER_CONCURRENCY) {
+    await new Promise<void>((resolve) => openRouterWaiters.push(resolve));
+  }
+  activeOpenRouterCalls += 1;
+  try {
+    return await operation();
+  } finally {
+    activeOpenRouterCalls -= 1;
+    openRouterWaiters.shift()?.();
+  }
+}
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -182,14 +198,14 @@ async function call(model: string, messages: Msg[], temp = 0.6, maxTok = 4096, o
   const rolePrompt = MODEL_ROLE_PROMPTS[model];
   if (rolePrompt) msgs = [{ role: 'system', content: rolePrompt }, ...msgs];
 
-  const result = await callOpenRouter(model, msgs, {
+  const result = await withOpenRouterSlot(() => callOpenRouter(model, msgs, {
     temperature: temp,
     maxTokens: effectiveMaxTokens,
     timeoutMs: options.timeoutMs ?? 60_000,
     fallbacks: options.fallbacks,
     disableReasoning: options.disableReasoning,
     sessionId: `v1-${Buffer.from(messages[messages.length - 1]?.content || '').toString('base64url').slice(0, 64)}`,
-  });
+  }));
   recordModelActivity(result.model);
   return { success: result.success, content: result.content, tokens: result.tokens };
 }

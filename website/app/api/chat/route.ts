@@ -81,6 +81,25 @@ type CompletedResponse = {
   completionTokens?: number;
 };
 
+// A full-quality job uses eight complementary specialist roles plus an
+// independent verifier. Bound concurrent provider requests so the panel gains
+// diverse evidence without stampeding one OpenRouter account or provider.
+const MAX_SPECIALIST_CONCURRENCY = 4;
+
+async function runWithConcurrency<T>(tasks: Array<() => Promise<T>>, limit = MAX_SPECIALIST_CONCURRENCY): Promise<T[]> {
+  const results = new Array<T>(tasks.length);
+  let next = 0;
+  const worker = async () => {
+    while (true) {
+      const index = next++;
+      if (index >= tasks.length) return;
+      results[index] = await tasks[index]();
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));
+  return results;
+}
+
 function validateMessages(value: unknown): { messages: ChatMessage[] } | { error: string } {
   if (!Array.isArray(value) || value.length === 0) {
     return { error: 'messages must be a non-empty array' };
@@ -374,11 +393,11 @@ async function runQualityCodeGeneration(
   t0: number,
   techniques: string[],
 ): Promise<CompletedResponse> {
-  // Treat generated code as an artifact: parallel planning, implementation,
-  // product/UX review, independent verification, and repair.  A single cheap
-  // draft is not an acceptable Pro deliverable.
+  // Maximum-quality artifacts use eight specialist roles across two stages:
+  // seven independent reviewers, then Kimi turns their evidence into the
+  // deliverable. Nemotron is a ninth, independent verification role.
   techniques.push('quality-first-code-panel');
-  sendProgress(controller, encoder, 'Planning and drafting', 'GLM, DeepSeek, and MiniMax are working in parallel');
+  sendProgress(controller, encoder, 'Specialist panel', 'Seven independent roles are starting with a concurrency limit of four');
   const codeSystem = {
     role: 'system' as const,
     content: [
@@ -392,135 +411,100 @@ async function runQualityCodeGeneration(
   };
   const deadlineAt = t0 + 180_000;
   const remainingMs = () => Math.max(0, deadlineAt - Date.now());
-  const [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await Promise.all([
-    callModel(POOL.orchestrator, [
+  const [plan, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview] = await runWithConcurrency([
+    () => callModel(POOL.orchestrator, [
       { role: 'system', content: 'You are a senior software architect. Produce a concise implementation plan, acceptance criteria, edge cases, and test checklist for the requested deliverable. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    // Kimi is the primary user-facing webpage deliverer. It reliably returns
-    // compact, complete HTML for UI work; DeepSeek remains in the panel below
-    // as a technical reviewer instead of becoming a single synthesis choke
-    // point that can consume its visible output budget on reasoning.
-    callModel(POOL.uiUx, [codeSystem, ...messages], {
-      maxTokens: 8_192,
-      timeoutMs: Math.min(65_000, remainingMs()),
-      temperature: 0.35,
-      disableReasoning: true,
-      fallbacks: [POOL.codeRepair, POOL.orchestrator],
-    }),
-    // DeepSeek Flash is not a replacement for the Pro panel. It is a proven,
-    // parameter-compatible artifact completer running alongside Kimi so a
-    // visible webpage is available even when a frontier route spends its
-    // budget on hidden reasoning or a provider returns an empty message.
-    callModel(POOL.fastRoute, [codeSystem, ...messages], {
-      maxTokens: 8_192,
-      timeoutMs: Math.min(65_000, remainingMs()),
-      temperature: 0.35,
-      disableReasoning: true,
-      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
-    }),
-    callModel(POOL.reasoning, [
+    () => callModel(POOL.reasoning, [
       { role: 'system', content: 'Produce a rigorous technical implementation review: structure, interactions, accessibility hooks, correctness risks, and concrete implementation traps. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.specialist, [
+    () => callModel(POOL.specialist, [
       { role: 'system', content: 'You are a product, UX, and edge-case reviewer. Specify what makes this requested deliverable complete, usable, accessible, and visually coherent. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.gptWorker, [
+    () => callModel(POOL.gptWorker, [
       { role: 'system', content: 'Independently review the requested deliverable. Find missing requirements, useful tools, and a distinct implementation approach. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.frontier, [
+    () => callModel(POOL.frontier, [
       { role: 'system', content: 'You are a frontier software reviewer. Identify the most important implementation, correctness, security, and completion requirements for this requested deliverable. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.multimodal, [
+    () => callModel(POOL.multimodal, [
       { role: 'system', content: 'You are an accessibility and interaction-design reviewer. Identify usability, visual, and accessibility requirements relevant to this requested deliverable. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
-    callModel(POOL.codeRepair, [
+    () => callModel(POOL.codeRepair, [
       { role: 'system', content: 'You are a frontier coding-agent reviewer. Identify likely implementation bugs, security issues, missing tests, and failure modes. Do not write the final code.' },
       ...messages,
     ], { maxTokens: 2_000, timeoutMs: Math.min(35_000, remainingMs()) }),
   ]);
-  const specialistPanel = [plan, draft, artifactCompletion, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview];
+  const specialistPanel = [plan, technicalReview, productReview, gptReview, frontierReview, multimodalReview, codeReview];
   const usableSpecialists = specialistPanel.filter((candidate) => candidate.ok && candidate.content.trim()).length;
   sendProgress(
     controller,
     encoder,
     'Specialist panel complete',
-    `${usableSpecialists}/${specialistPanel.length} specialist roles returned usable work`,
+    `${usableSpecialists}/${specialistPanel.length} advisory specialist roles returned usable work`,
     usableSpecialists > 0 ? 'done' : 'error',
   );
 
   const needsCompleteHtml = /\b(website|webpage|web page|landing page|html)\b/i.test(query);
   const isUsableDeliverable = (candidate: ModelResult) => candidate.ok
     && (!needsCompleteHtml || hasCompleteHtmlDocument(candidate.content));
-  const deliveryCandidates = [draft, artifactCompletion];
-  const initialDeliverable = deliveryCandidates.find(isUsableDeliverable) || draft;
-  let deliveryIsUsable = isUsableDeliverable(initialDeliverable);
-  let result = initialDeliverable;
+  techniques.push('panel-informed-artifact-synthesis');
+  sendProgress(controller, encoder, 'Synthesizing deliverable', 'Kimi is turning the full specialist panel into a complete artifact');
+  const advisoryEvidence = specialistPanel
+    .filter((candidate) => candidate.ok)
+    .map((candidate) => `${candidate.name}:\n${candidate.content}`)
+    .join('\n\n');
+  const artifactDelivery = await callModel(POOL.uiUx, [
+    codeSystem,
+    { role: 'user', content: `Original request:\n${query}\n\nSpecialist evidence:\n${advisoryEvidence}\n\nReturn one complete corrected deliverable only. Do not discuss the review process.` },
+  ], {
+    maxTokens: 8_192,
+    timeoutMs: Math.min(65_000, remainingMs()),
+    temperature: 0.35,
+    disableReasoning: true,
+    fallbacks: [POOL.codeRepair],
+  });
+  let result = artifactDelivery;
+  let deliveryIsUsable = isUsableDeliverable(result);
 
-  if (isUsableDeliverable(artifactCompletion) && !isUsableDeliverable(draft)) {
-    techniques.push('parallel-artifact-completion');
-  }
-
-  // Preserve a complete primary deliverable. Synthesis is recovery work, not
-  // a mandatory second long generation that can replace a good webpage with a
-  // timeout or empty hidden-reasoning response.
-  if (!deliveryIsUsable) {
+  if (!deliveryIsUsable && remainingMs() >= 12_000) {
     techniques.push('implementation-synthesis-recovery');
-    sendProgress(controller, encoder, 'Recovering implementation', 'Kimi is incorporating architecture and technical review');
-    result = await callModel(POOL.uiUx, [
+    sendProgress(controller, encoder, 'Recovering implementation', 'DeepSeek is creating a bounded rescue deliverable from the panel evidence');
+    result = await callModel(POOL.reasoning, [
       codeSystem,
-      { role: 'user', content: `Architect plan:\n${plan.content}\n\nDeepSeek technical review:\n${technicalReview.content}\n\nMiniMax product review:\n${productReview.content}\n\nIndependent GPT review:\n${gptReview.content}\n\nFrontier adjudication:\n${frontierReview.content}\n\nGemini accessibility review:\n${multimodalReview.content}\n\nGrok coding review:\n${codeReview.content}\n\nInitial implementation:\n${draft.content}\n\nReturn one complete corrected deliverable only. Do not discuss the review process.` },
+      { role: 'user', content: `Original request:\n${query}\n\nSpecialist evidence:\n${advisoryEvidence}\n\nReturn one complete corrected deliverable only.` },
     ], {
       maxTokens: 8_192,
       timeoutMs: Math.min(45_000, remainingMs()),
       temperature: 0.35,
-      disableReasoning: true,
-      fallbacks: [POOL.codeRepair, POOL.orchestrator],
+      fallbacks: [POOL.codeRepair],
     });
-  } else {
-    techniques.push('direct-quality-delivery');
   }
+  deliveryIsUsable = isUsableDeliverable(result);
+  let verification: ModelResult | null = null;
   if (deliveryIsUsable && remainingMs() >= 8_000) {
     techniques.push('independent-code-review');
     sendProgress(controller, encoder, 'Verifying deliverable', 'Nemotron is checking completeness and correctness');
-    const review = await callModel(POOL.verifier, [
+    verification = await callModel(POOL.verifier, [
       { role: 'system', content: 'Audit this generated deliverable against the request. Reply PASS if it is complete and correct. Otherwise reply FAIL followed by concrete, prioritized fixes.' },
       { role: 'user', content: `Request:\n${query}\n\nDeliverable:\n${result.content}` },
     ], { maxTokens: 1_200, timeoutMs: Math.min(25_000, remainingMs()) });
-    if (review.ok && review.content.toUpperCase().startsWith('FAIL') && remainingMs() >= 6_000) {
+    if (verification.ok && verification.content.toUpperCase().startsWith('FAIL') && remainingMs() >= 6_000) {
       techniques.push('code-repair');
       sendProgress(controller, encoder, 'Repairing deliverable', 'Grok is applying independent review feedback');
       const repaired = await callModel(POOL.codeRepair, [
         codeSystem,
-        { role: 'user', content: `Original request:\n${query}\n\nCurrent deliverable:\n${result.content}\n\nIndependent review:\n${review.content}\n\nReturn a complete corrected deliverable only.` },
+        { role: 'user', content: `Original request:\n${query}\n\nCurrent deliverable:\n${result.content}\n\nIndependent review:\n${verification.content}\n\nReturn a complete corrected deliverable only.` },
       ], { maxTokens: 8_192, timeoutMs: Math.min(35_000, remainingMs()), temperature: 0.25 });
       if (isUsableDeliverable(repaired)) result = repaired;
     }
   }
-  deliveryIsUsable = isUsableDeliverable(result);
-  if (!deliveryIsUsable && remainingMs() >= 6_000) {
-    techniques.push('code-repair-rescue');
-    sendProgress(controller, encoder, 'Recovering code generation', 'DeepSeek V4 Pro is producing the approved rescue deliverable');
-    // Pro-tier rescue: DeepSeek V4 Pro reasons over the full request. Reasoning
-    // is intentionally NOT disabled here — a reasoning model under
-    // disableReasoning can return an empty completion (the original "approved
-    // route unavailable" outage), so we let it reason and give it token room
-    // for both the hidden chain-of-thought and the visible deliverable. The
-    // resilient HTML fallback below catches the rare timeout/empty case so the
-    // user always gets a runnable webpage. Quality over cost: rescue is Pro.
-    result = await callModel(POOL.reasoning, [codeSystem, ...messages], {
-      maxTokens: 12_000,
-      timeoutMs: Math.min(45_000, remainingMs()),
-      temperature: 0.35,
-      fallbacks: [POOL.uiUx, POOL.codeRepair, POOL.orchestrator],
-    });
-  }
-
   deliveryIsUsable = isUsableDeliverable(result);
   const usedResilientHtmlFallback = !deliveryIsUsable && needsCompleteHtml;
   const content = deliveryIsUsable
@@ -531,15 +515,16 @@ async function runQualityCodeGeneration(
   const deliveredModel = usedResilientHtmlFallback ? 'temuclaude-resilient-html-fallback' : result.name;
   sendProgress(controller, encoder, 'Streaming code', deliveryIsUsable ? 'Complete deliverable is ready' : usedResilientHtmlFallback ? 'Complete resilient webpage fallback is ready' : 'The approved code route was unavailable', deliveryIsUsable || usedResilientHtmlFallback ? 'done' : 'error');
   streamText(controller, encoder, content);
+  const completedPanel = [...specialistPanel, artifactDelivery, ...(verification ? [verification] : [])];
   sendOrch(controller, encoder, taskType, tier,
-    specialistPanel.map((candidate) => ({
+    completedPanel.map((candidate) => ({
       name: candidate.name,
-      response: candidate.content.substring(0, 200),
+      response: candidate.ok ? candidate.content.substring(0, 200) : 'Role unavailable; the panel continued with the remaining specialists.',
       latency: candidate.latency,
       correct: candidate.ok,
     })),
     deliveredModel,
-    usableSpecialists,
+    completedPanel.filter((candidate) => candidate.ok).length,
     0,
     false,
     t0,
@@ -594,19 +579,17 @@ async function runFullStack(query: string, messages: any[], controller: Readable
 
   // LAYER 3: MoA 3-LAYER — Propose → Cross-Review → Aggregate
   techniques.push('moa-3-layer');
-  sendProgress(controller, encoder, 'Drafting proposals', 'Frontier and specialist models are working in parallel');
+  sendProgress(controller, encoder, 'Drafting proposals', 'Specialists are working in bounded batches of four');
 
-  // Layer 1: all available frontier and specialist roles propose independently.
-  const proposeResults = await Promise.allSettled(
-    fusionModels.map(id => callModel(id, augmentedMessages, {
+  // Layer 1: every configured role contributes, but bounded concurrency avoids
+  // provider-rate-limit amplification from an all-at-once panel launch.
+  const proposals = await runWithConcurrency(fusionModels.map((id) => () =>
+    callModel(id, augmentedMessages, {
       maxTokens: 6_144,
       timeoutMs: 45_000,
       temperature: 0.6,
-    }))
-  );
-  const proposals: ModelResult[] = proposeResults.map((r, i) =>
-    r.status === 'fulfilled' ? r.value : { name: fusionModels[i].split('/').pop()||'', content: '[failed]', latency: 0, ok: false }
-  );
+    }),
+  ));
   const workingProposals = proposals.filter(p => p.ok);
   sendProgress(controller, encoder, 'Proposal pass complete', `${workingProposals.length}/${proposals.length} models returned usable drafts`, workingProposals.length > 0 ? 'done' : 'error');
 
@@ -929,9 +912,18 @@ async function callModel(
     fallbacks: options.fallbacks,
     sessionId: asciiSessionId('playground', messages[messages.length - 1]?.content || String(Date.now())),
   });
+  if (!result.success) {
+    console.warn('OpenRouter role unavailable', {
+      role: model,
+      status: result.status,
+      provider: result.provider,
+      attemptedModels: result.attemptedModels,
+      error: result.error,
+    });
+  }
   return {
     name: result.model.split('/').pop() || result.model,
-    content: result.success ? result.content : `[OpenRouter error: ${result.error || result.status || 'failed'}]`,
+    content: result.success ? result.content : '',
     latency: (Date.now() - start) / 1000,
     ok: result.success,
     cost: result.cost,
