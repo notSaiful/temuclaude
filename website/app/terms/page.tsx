@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — TemuClaude',
-  description: 'Terms of Service for TemuClaude AI orchestration platform.',
+  description: 'Terms of Service for the TemuClaude API.',
 };
 
 export default function TermsPage() {
@@ -13,7 +13,7 @@ export default function TermsPage() {
       <main id="main-content" className="pt-24 pb-20 px-6" aria-label="Terms of Service">
         <div className="container-max max-w-2xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-serif text-text-primary mb-2" style={{ fontWeight: 300, letterSpacing: '-0.03em' }}>Terms of Service</h1>
-          <p className="text-sm text-text-muted mb-12">Last updated: July 4, 2026</p>
+          <p className="text-sm text-text-muted mb-12">Last updated: August 7, 2026</p>
 
           <div className="space-y-8 text-sm text-text-secondary leading-relaxed">
             <section>
@@ -23,13 +23,11 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">2. Description of Service</h2>
-              <p>TemuClaude is an AI orchestration platform that routes queries to multiple AI models, fuses their responses, and returns a single answer. The Service includes:</p>
+              <p>TemuClaude is an OpenAI-compatible API that selects one appropriate model from its approved three-model pool for each request and returns a single response. The Service includes:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Playground (free, 20 queries/day and 50K monthly credits)</li>
-                <li>Developer Plan ($19/month, 5M monthly credits)</li>
-                <li>Pro Plan ($49/month, 25M monthly credits)</li>
-                <li>Max Plan ($149/month, 100M monthly credits)</li>
-                <li>Enterprise Plan (from $499/month, custom agreements, metered billing, SLA contracts)</li>
+                <li>OpenAI-compatible API access and associated usage limits</li>
+                <li>Automatic classification for general reasoning, coding and agentic work, and repair or review</li>
+                <li>Account, API-key, and usage-management features where enabled</li>
               </ul>
             </section>
 
@@ -49,25 +47,25 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">4. Subscription Terms</h2>
-              <p>Paid plans are currently activated by request while hosted checkout is finalized. When paid access is activated, you agree to:</p>
+              <p>When paid access is offered and activated, you agree to:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Pay the monthly fee in advance when billing is enabled</li>
                 <li>Allow automatic renewal only after you have agreed to recurring billing terms</li>
                 <li>Cancel with written notice before the next billing period</li>
-                <li>Not exceed the credit or request limits of your plan</li>
+                <li>Not exceed the usage limits applicable to your account</li>
               </ul>
-              <p className="mt-2">If you exceed your plan's monthly credits, additional usage may be billed at the overage rate shown on the pricing page or paused until your limit resets.</p>
+              <p className="mt-2">If you exceed an applicable usage limit, service may be paused or additional usage may be billed only where those terms have been presented to you.</p>
             </section>
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">5. API Usage</h2>
-              <p>API access is available on Developer, Pro, Max, and Enterprise plans. You are responsible for:</p>
+              <p>API access is available to authorized accounts. You are responsible for:</p>
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>Keeping your API key secure</li>
                 <li>All usage under your API key</li>
                 <li>Notifying us within 24 hours of key compromise</li>
               </ul>
-              <p className="mt-2">API rate limits: 60 requests/minute (Developer), 300 requests/minute (Pro), 1,000 requests/minute (Max), and custom limits for Enterprise.</p>
+              <p className="mt-2">Rate limits and quotas may vary by account and are communicated through the Service or your applicable agreement.</p>
             </section>
 
             <section>
@@ -99,7 +97,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-text-primary mb-3">10. Refunds</h2>
-              <p>See our <a href="/cancellation-refunds" className="text-accent-primary hover:underline">Cancellation and Refunds Policy</a> for details on refunds and cancellations.</p>
+              <p>See our <a href="/refunds" className="text-accent-primary hover:underline">Cancellation and Refunds Policy</a> for details on refunds and cancellations.</p>
             </section>
 
             <section>

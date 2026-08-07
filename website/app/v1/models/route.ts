@@ -5,8 +5,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MODELS = [
-  { id: 'temuclaude/temuclaude-pro', object: 'model', owned_by: 'temuclaude' },
-  { id: 'temuclaude/temuclaude-lite', object: 'model', owned_by: 'temuclaude' },
+  { id: 'temuclaude/temuclaude', object: 'model', owned_by: 'temuclaude' },
 ];
 
 export async function GET(request: NextRequest) {

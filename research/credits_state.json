@@ -1,9 +1,0 @@
-{
-  "total_credits": 0,
-  "total_usage": 0,
-  "timestamp": "2026-07-08T02:42:11.684408+00:00",
-  "should_throttle": true,
-  "reason": "CRITICAL: Only $0.00 credits remaining",
-  "remaining_credits": 0,
-  "burn_rate_per_day": 0
-}

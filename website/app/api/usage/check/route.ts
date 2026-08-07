@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         plan: user.plan,
         creditBalance: 0,
         message: `You've run out of credits. Please purchase a credit top-up or wait for your weekly allocation to renew.`,
-        upgradeUrl: '/pricing',
+        upgradeUrl: 'mailto:hello@temuclaude.com?subject=API%20access',
       });
     }
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         plan: user.plan,
         creditBalance: user.credit_balance,
         message: `You've reached your rolling limit of ${limits.rollingQueries} queries per 5 hours. Capacity recovers gradually as older queries age out.`,
-        upgradeUrl: '/pricing',
+        upgradeUrl: 'mailto:hello@temuclaude.com?subject=API%20access',
       });
     }
 
