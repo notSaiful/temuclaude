@@ -1,29 +1,91 @@
-[codex/simplify-core-api f4d08a8] enforce API scope in CI
- Committer: Mohammad Saiful haque <mohammadsaiful@MacBook-Air-M5.local>
-Your name and email address were configured automatically based
-on your username and hostname. Please check that they are accurate.
-You can suppress this message by setting them explicitly. Run the
-following command and follow the instructions in your editor to edit
-your configuration file:
+name: Build and Deploy
 
-    git config --global --edit
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-After doing this, you may fix the identity used for this commit with:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+      
+      - name: Install dependencies
+        run: cd website && npm ci
 
-    git commit --amend --reset-author
+      - name: Verify Supabase migration packet
+        run: node website/scripts/verify-supabase-migrations.mjs
+      
+      - name: TypeScript check
+        run: cd website && npx tsc --noEmit
 
- 1 file changed, 3 insertions(+)
-diff --git a/.github/workflows/build-deploy.yml b/.github/workflows/build-deploy.yml
-index bbdd58b..2f933c7 100644
---- a/.github/workflows/build-deploy.yml
-+++ b/.github/workflows/build-deploy.yml
-@@ -28,6 +28,9 @@ jobs:
-       
-       - name: TypeScript check
-         run: cd website && npx tsc --noEmit
-+
-+      - name: Enforce three-model API scope
-+        run: cd website && npm run production:gates
-       
-       - name: Build
-         run: cd website && npm run build
+      - name: Enforce three-model API scope
+        run: cd website && npm run production:gates
+      
+      - name: Build
+        run: cd website && npm run build
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      
+      - name: Check for banned words
+        run: |
+          cd website
+          # Check for old branding
+          if grep -r "Temuclaude" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v "temuclaude.com" | grep -v "node_modules"; then
+            echo "Found 'Temuclaude' (should be 'TemuClaude')"
+            exit 1
+          fi
+          # Check for Fable references
+          if grep -ri "Fable" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found 'Fable' reference"
+            exit 1
+          fi
+          # Check for Islam references in public copy
+          if grep -riE "ummah|islam|muslim|palestine|prophet|muhammad|quran" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules | grep -v "email.ts"; then
+            echo "Found religion reference in public copy"
+            exit 1
+          fi
+          # Check for false claims
+          if grep -r "100 queries" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found '100 queries' (should be 20)"
+            exit 1
+          fi
+          if grep -r "SOC2" app/ lib/ --include="*.tsx" --include="*.ts" | grep -v node_modules; then
+            echo "Found 'SOC2' false claim"
+            exit 1
+          fi
+          echo "All checks passed"
+
+  deploy:
+    name: Deploy to Vercel
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+      
+      - name: Deploy
+        run: |
+          vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
