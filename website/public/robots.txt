@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /playground
 Disallow: /api/
 
 Sitemap: https://temuclaude.com/sitemap.xml

@@ -13,7 +13,7 @@ import nodemailer from 'nodemailer';
  * - Billing / receipts
  * - Security alerts
  * 
- * Managed by Hasan autonomous system.
+ * Used by the TemuClaude API application.
  */
 
 function getEmailProvider() {
@@ -219,7 +219,7 @@ export async function sendEmail({
       html,
       tags: [
         { name: 'type', value: type },
-        { name: 'source', value: 'hasan' },
+        { name: 'source', value: 'temuclaude-api' },
         ...uniqueTags.map((t, idx) => ({ name: `tag_${idx + 1}`, value: t })),
       ],
     };
@@ -279,7 +279,7 @@ export async function sendSupportEmail(
         </div>
       </div>
       <div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 12px;">
-        TemuClaude · Multi-Model AI Orchestration · temuclaude.com
+        TemuClaude · Three-Model API Routing · temuclaude.com
       </div>
     </div>
   `;
@@ -463,7 +463,7 @@ export async function sendWelcomeEmail(
           automatically. You never pick models. TemuClaude does it for you.
         </p>
         <div style="margin: 25px 0;">
-          <a href="https://temuclaude.com/playground" style="background: #3b82f6; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Try the Playground</a>
+          <a href="https://temuclaude.com/docs" style="background: #3b82f6; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">Read the API docs</a>
         </div>
         <p style="color: #475569; line-height: 1.6; font-size: 14px;">
           <strong>What you get (free):</strong><br>
@@ -569,7 +569,7 @@ export async function sendBillingEmail(
         <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
           <p style="color: #64748b; font-size: 13px; margin: 0;">
             Billing questions? Contact billing@temuclaude.com<br>
-            Manage your subscription: <a href="https://temuclaude.com/pricing" style="color: #3b82f6;">temuclaude.com/pricing</a>
+            Manage your subscription: contact <a href="mailto:billing@temuclaude.com" style="color: #3b82f6;">billing@temuclaude.com</a>
           </p>
         </div>
       </div>

@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="text-text-secondary mb-8 max-w-md">The page you're looking for doesn't exist or has been moved.</p>
         <div className="flex gap-3 justify-center">
           <Link href="/" className="btn-primary">Back to Home</Link>
-          <Link href="/playground" className="btn-secondary">Try the Playground</Link>
+          <Link href="/docs" className="btn-secondary">Read the API docs</Link>
         </div>
       </div>
     </div>

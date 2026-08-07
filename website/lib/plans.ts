@@ -31,7 +31,7 @@ export const PLANS: Record<PlanId, Plan> = {
     priceINR: 0,
     priceLabel: '$0',
     period: 'forever',
-    description: 'Sign in and try TemuClaude in the playground.',
+    description: 'For API evaluation and small experiments.',
     features: [
       'Standard usage limits apply',
       'Standard Mixture-of-Agents access',

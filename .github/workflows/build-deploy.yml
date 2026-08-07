@@ -28,6 +28,9 @@ jobs:
       
       - name: TypeScript check
         run: cd website && npx tsc --noEmit
+
+      - name: Enforce three-model API scope
+        run: cd website && npm run production:gates
       
       - name: Build
         run: cd website && npm run build
